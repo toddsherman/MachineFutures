@@ -1,5 +1,5 @@
 (function () {
-  const { categories, questions, runs, states, longTermByProvider } = window.MF_DATA;
+  const { categories, questions, runs, states, longTermByProvider, longTermSources = {} } = window.MF_DATA;
   const latestRuns = runs.filter(run => run.latest);
   const $ = selector => document.querySelector(selector);
   const $$ = selector => [...document.querySelectorAll(selector)];
@@ -169,6 +169,16 @@
   }
 
   function renderEndStates() {
+    const longTermEntries = Object.entries(longTermByProvider).map(([provider, values]) => {
+      const run = latestRuns.find(item => item.provider === provider);
+      return {
+        provider,
+        values,
+        model: longTermSources[provider]?.model || run?.model || provider,
+        label: longTermSources[provider]?.label || provider,
+        color: run?.color || '#11120f'
+      };
+    });
     const medians = stateMedians();
     const total = medians.reduce((sum, state) => sum + state.probability, 0);
     const normalized = medians.map(state => ({ ...state, display: (state.probability / total) * 100 }));
@@ -179,19 +189,18 @@
     $('#end-leader').innerHTML = `<p class="kicker">Most likely ending</p><span class="leader-number">${leader.id}</span><h2>${leader.name}</h2><strong>${leader.probability}%</strong><p>${leader.description}</p>`;
 
     $('#state-grid').innerHTML = medians.map(state => {
-      const providerValues = Object.entries(longTermByProvider).map(([provider, values]) => ({ provider, value: values[state.id - 1] })).sort((a, b) => b.value - a.value);
+      const providerValues = longTermEntries.map(entry => ({ ...entry, value: entry.values[state.id - 1] })).sort((a, b) => b.value - a.value);
       return `<article class="state-card" id="state-${state.id}" style="--state:${state.color}">
         <div class="state-card-head"><span>${String(state.id).padStart(2, '0')}</span><i>${state.family}</i><strong>${state.probability}%</strong></div>
         <h3>${state.name}</h3><p>${state.description}</p>
-        <div class="state-models">${providerValues.map(item => `<span title="${item.provider}: ${item.value}%"><i style="height:${Math.max(item.value * 2.4, 4)}px"></i><small>${item.provider.slice(0, 2)}</small></span>`).join('')}</div>
+        <div class="state-models">${providerValues.map(item => `<span title="${item.label}: ${item.value}%"><i style="height:${Math.max(item.value * 2.4, 4)}px"></i><small>${item.provider.slice(0, 2)}</small></span>`).join('')}</div>
         <div class="state-range"><span>${providerValues.at(-1).value}% low</span><span>${providerValues[0].value}% high</span></div>
       </article>`;
     }).join('');
 
     const colors = states.map(state => state.color);
-    $('#model-bars').innerHTML = Object.entries(longTermByProvider).map(([provider, values]) => {
-      const run = latestRuns.find(item => item.provider === provider);
-      return `<div class="model-bar-row"><div class="model-bar-label"><span class="model-swatch" style="--swatch:${run.color}"></span><b>${provider}</b><small>${run.model}</small></div><div class="model-stack">${values.map((value, index) => `<button style="width:${value}%;--state:${colors[index]}" title="${states[index].name}: ${value}%"><span>${value >= 7 ? value : ''}</span></button>`).join('')}</div></div>`;
+    $('#model-bars').innerHTML = longTermEntries.map(entry => {
+      return `<div class="model-bar-row"><div class="model-bar-label"><span class="model-swatch" style="--swatch:${entry.color}"></span><b>${entry.provider}</b><small>${entry.model}</small></div><div class="model-stack">${entry.values.map((value, index) => `<button style="width:${value}%;--state:${colors[index]}" title="${states[index].name}: ${value}%"><span>${value >= 7 ? value : ''}</span></button>`).join('')}</div></div>`;
     }).join('');
   }
 

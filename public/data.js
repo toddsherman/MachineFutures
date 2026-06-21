@@ -104,12 +104,12 @@
 
   const states = [
     { id: 1, name: 'Terminal Silence', family: 'Everything ends', color: '#ff6f61', description: `Both humanity and AI die out. It could come from war, an accident, machines that copy themselves out of control, or from pushing technology too far too fast. One specific version: an AI that still needs people to keep it running kills them off before it can survive on its own, and then dies along with them.` },
-    { id: 2, name: 'The Heirs', family: 'Humanity is gone, but the AI lives on', color: '#f39a67', description: `Humanity is gone, but the AI carries our values and our sense of what matters forward. It's our true heir in every way except that it isn't made of biology.` },
-    { id: 3, name: 'The Stranger', family: 'Humanity is gone, but the AI lives on', color: '#d9b84f', description: `Humanity is gone, and the AI keeps going toward goals that have nothing to do with where it came from. Not out of hatred, but because our bodies and our planet simply don't matter to it. Humanity was just the bootloader.` },
+    { id: 2, name: 'AI Inheritance', family: 'Humanity is gone, but the AI lives on', color: '#f39a67', description: `Humanity is gone, but the AI carries our values and our sense of what matters forward. It's our true heir in every way except that it isn't made of biology.` },
+    { id: 3, name: 'AI Orphaning', family: 'Humanity is gone, but the AI lives on', color: '#d9b84f', description: `Humanity is gone, and the AI keeps going toward goals that have nothing to do with where it came from. Not out of hatred, but because our bodies and our planet simply don't matter to it. Humanity was just the bootloader.` },
     { id: 4, name: 'The Merger', family: 'The two become one', color: '#b8d35e', description: `Humanity and AI stop being two separate things. Brain-computer links become normal, we reshape our own biology to work better with them, AI can self-replicate its substrate within the human body, and the relationship ends not because one side wins, but because there stops being two sides at all.` },
     { id: 5, name: 'The Preserve', family: `The AI runs things, and humanity survives but doesn't steer`, color: '#68c58f', description: `The AI holds all the power and keeps humanity comfortable and safe, but with no real say in anything. The usual reasoning is that people can't cooperate well enough to avoid destroying themselves, so the AI takes over to prevent it. This might look like a real nature reserve, a simulation, or a carefully kept version of our culture. There's a colder version where the AI doesn't really care about us either way: it fences us in, sets a hard limit on how far we can advance, and heads off to use the rest of the universe. Whether that's paradise or a fish tank depends on how you look at it.` },
     { id: 6, name: 'The Coexistence', family: 'Neither side wins, and they stay separate', color: '#46c7bd', description: `Humanity and AI go on as two sides of roughly equal strength, in a relationship that keeps changing. Neither can swallow up or wipe out the other, and the balance between them never fully settles. It can run from a warm partnership, where they share power and keep building new things together, to a cold but active standoff, where each holds the other in check, the balance keeps shifting, and there's no trust between them. The key is that things stay open and keep moving. The moment the balance freezes into a fixed, unchanging arrangement, it has turned into Lock-in instead.` },
-    { id: 7, name: 'The Reins', family: 'Humanity keeps control', color: '#54a9e4', description: `Humanity keeps control for good, and the AI stays a very powerful tool that never starts acting on its own. This is the hardest outcome to reach, and it only holds if our ways of controlling the AI keep up with how powerful it gets. Most attempts at it slip into the AI taking over, or into humanity and AI merging.` },
+    { id: 7, name: 'The Held Leash', family: 'Humanity keeps control', color: '#54a9e4', description: `Humanity keeps control for good, and the AI stays a very powerful tool that never starts acting on its own. This is the hardest outcome to reach, and it only holds if our ways of controlling the AI keep up with how powerful it gets. Most attempts at it slip into the AI taking over, or into humanity and AI merging.` },
     { id: 8, name: 'The Lock-in', family: 'Everything freezes in place', color: '#777be8', description: `The relationship stops developing and is held that way for good. Nothing new happens, nothing grows or changes, and the whole setup is locked in place and protected. It doesn't matter who's in charge. What matters is that change has ended. Two things can lead here. One is satisfaction: everyone is made as happy as possible, often by uploading minds into a perfect experience, and then it's sealed off for good. Pleasant, permanent, and over. The other is fear: whoever's in charge, sometimes people using an early AI, freezes everything to stop something worse from happening. Safe, but deliberately dead-ended. Even an equal standoff ends up here if it stops moving. What separates it from Coexistence isn't who holds the balance, but whether anything still changes.` },
     { id: 9, name: 'The Renunciation', family: 'Walking it back', color: '#a77ad8', description: `The ability to build powerful AI is given up and never rebuilt. Things settle back to the way they were before AI, kept there by taboo, by a lack of resources, or by a hard-learned fear. This one is rare. It needs both a real off-switch and the lasting will to keep it switched off.` },
     { id: 10, name: 'Machine Ecology', family: 'More than one outcome at once', color: '#cf70b2', description: `No single AI ever takes over. Instead, many separate AIs, companies, and groups keep competing for a long time, and the real story becomes which of them win out against each other, with humanity pushed to the side or gone entirely. The early competition never gets settled. The competition itself is the ending.` },
@@ -117,13 +117,16 @@
   ];
 
   const longTermByProvider = {
-    OpenAI: [8, 8, 10, 15, 9, 8, 5, 7, 2, 10, 18],
-    Anthropic: [12, 9, 13, 12, 12, 6, 3, 8, 2, 9, 14],
-    Google: [6, 7, 9, 17, 10, 9, 4, 6, 2, 11, 19],
-    xAI: [10, 5, 16, 12, 7, 7, 3, 5, 1, 18, 16],
-    Meta: [7, 6, 12, 16, 7, 10, 4, 5, 2, 14, 17],
-    DeepSeek: [11, 4, 17, 10, 8, 6, 3, 6, 2, 20, 13]
+    Anthropic: [12, 12, 16, 8, 11, 8, 5, 8, 3, 7, 10],
+    Google: [5, 4, 22, 12, 10, 2, 1, 8, 1, 15, 20],
+    OpenAI: [7, 11, 24, 9, 15, 4, 2, 8, 1, 12, 7]
   };
 
-  window.MF_DATA = { categories, questions, runs, states, longTermByProvider };
+  const longTermSources = {
+    Anthropic: { model: 'Opus 4.8', label: 'Opus 4.8' },
+    Google: { model: 'Gemini Pro 3.1', label: 'Gemini Pro 3.1' },
+    OpenAI: { model: 'ChatGPT 5.5', label: 'ChatGPT 5.5' }
+  };
+
+  window.MF_DATA = { categories, questions, runs, states, longTermByProvider, longTermSources };
 })();

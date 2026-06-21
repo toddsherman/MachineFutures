@@ -123,9 +123,9 @@
   };
 
   const longTermSources = {
-    Anthropic: { model: 'Opus 4.8', label: 'Opus 4.8' },
-    Google: { model: 'Gemini Pro 3.1', label: 'Gemini Pro 3.1' },
-    OpenAI: { model: 'ChatGPT 5.5', label: 'ChatGPT 5.5' }
+    Anthropic: { model: 'Opus 4.8', label: 'Opus 4.8', shortLabel: 'ANT' },
+    Google: { model: 'Gemini Pro 3.1', label: 'Gemini Pro 3.1', shortLabel: 'GDM' },
+    OpenAI: { model: 'ChatGPT 5.5', label: 'ChatGPT 5.5', shortLabel: 'OAI' }
   };
 
   window.MF_DATA = { categories, questions, runs, states, longTermByProvider, longTermSources };

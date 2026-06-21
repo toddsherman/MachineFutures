@@ -176,6 +176,7 @@
         values,
         model: longTermSources[provider]?.model || run?.model || provider,
         label: longTermSources[provider]?.label || provider,
+        shortLabel: longTermSources[provider]?.shortLabel || provider.slice(0, 2),
         color: run?.color || '#11120f'
       };
     });
@@ -193,7 +194,7 @@
       return `<article class="state-card" id="state-${state.id}" style="--state:${state.color}">
         <div class="state-card-head"><span>${String(state.id).padStart(2, '0')}</span><i>${state.family}</i><strong>${state.probability}%</strong></div>
         <h3>${state.name}</h3><p>${state.description}</p>
-        <div class="state-models">${providerValues.map(item => `<span title="${item.label}: ${item.value}%"><i style="height:${Math.max(item.value * 2.4, 4)}px"></i><small>${item.provider.slice(0, 2)}</small></span>`).join('')}</div>
+        <div class="state-models">${providerValues.map(item => `<span title="${item.label}: ${item.value}%"><i style="height:${Math.max(item.value * 2.4, 4)}px"></i><small>${item.shortLabel}</small></span>`).join('')}</div>
         <div class="state-range"><span>${providerValues.at(-1).value}% low</span><span>${providerValues[0].value}% high</span></div>
       </article>`;
     }).join('');

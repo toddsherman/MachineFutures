@@ -86,7 +86,7 @@
   <div class="sub">Paste one model run, validate it against the 50-question spec, stack repeated samples, export one JSON per model. Nothing leaves your browser.</div>
 
   <div class="topnote">
-    Paste the valid JSON object returned by the current benchmark prompt. The earlier <code>Q1: 23% | rationale</code> line format is also accepted. Q47&ndash;Q50 are numeric (percent, percent, USD&nbsp;trillions, USD&nbsp;billions). Each paste is <strong>one sample</strong>; add several from the same model to capture its spread.
+    Paste the JSON object returned by the current benchmark prompt. The ingester checks all 50 answers, numeric types, units, ordering, and metadata; it can safely restore missing closing <code>]}</code> characters when a response is cut off immediately after Q50. The earlier <code>Q1: 23% | rationale</code> format remains supported.
   </div>
 
   <div class="grid">
@@ -109,7 +109,7 @@
       <div class="row">
         <button class="primary" id="btn-parse">Parse &amp; validate</button>
       </div>
-      <div class="hint">Model name and cutoff auto-fill from <code>model</code> / <code>knowledge_cutoff</code> in JSON, or from the legacy text headers.</div>
+      <div class="hint">Model, provider, cutoff, and date asked auto-fill from the JSON metadata when available.</div>
     </div>
 
     <div class="panel">
@@ -153,27 +153,88 @@ const QUESTIONS=(()=>{const q=[];for(let i=1;i<=46;i++)q.push({id:'Q'+i,type:'pr
   {id:'Q49',type:'numeric',unit:'usd_trillions'},{id:'Q50',type:'numeric',unit:'usd_billions'});return q;})();
 const META=Object.fromEntries(QUESTIONS.map(q=>[q.id,q]));
 
+function repairTruncatedJson(text){
+  const stack=[];let inString=false,escaped=false;
+  for(const char of text){
+    if(inString){
+      if(escaped){escaped=false;continue;}
+      if(char==='\\'){escaped=true;continue;}
+      if(char==='"')inString=false;
+      continue;
+    }
+    if(char==='"'){inString=true;continue;}
+    if(char==='{'||char==='['){stack.push(char);continue;}
+    if(char==='}'||char===']'){
+      const expected=char==='}'?'{':'[';
+      if(stack.pop()!==expected)return null;
+    }
+  }
+  if(inString||!stack.length)return null;
+  const base=text.replace(/,\s*$/,'');
+  return base+stack.reverse().map(char=>char==='{'?'}':']').join('');
+}
+
+function isoDateFromModel(value){
+  const text=String(value||'').trim();let match;
+  if((match=text.match(/^(\d{2})\/(\d{2})\/(\d{4})/)))return match[3]+'-'+match[1]+'-'+match[2];
+  if((match=text.match(/^(\d{4})-(\d{2})-(\d{2})/)))return match[1]+'-'+match[2]+'-'+match[3];
+  return null;
+}
+
+function inferProvider(model){
+  const name=String(model||'').toLowerCase();
+  if(name.includes('meta')||name.includes('llama')||name.includes('muse'))return 'Meta';
+  if(name.includes('grok')||name.includes('xai'))return 'xAI';
+  if(name.includes('deepseek'))return 'DeepSeek';
+  if(name.includes('claude'))return 'Anthropic';
+  if(name.includes('gemini'))return 'Google';
+  if(name.includes('gpt')||name.includes('openai'))return 'OpenAI';
+  return null;
+}
+
+function expectedUnit(q){
+  if(q.id==='Q49')return ['trillion usd','usd trillion','usd_trillions'];
+  if(q.id==='Q50')return ['billion usd','usd billion','usd_billions'];
+  return ['percent'];
+}
+
+function normalizedUnit(value){return String(value||'').trim().toLowerCase().replace(/\s+/g,' ');}
+
+function sentenceCount(value){
+  const matches=String(value||'').trim().match(/[.!?]["']?(?=\s|$)/g);
+  return matches?matches.length:0;
+}
+
 /* ---------- core parser (liftable to Node / GitHub Action unchanged) ---------- */
 function parseRaw(text){
   const clean=(text||'').trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');
   if(clean.startsWith('{')){
-    try{
-      const obj=JSON.parse(clean);const answers={},seen={};
+    let obj,repaired=false,firstError=null;
+    try{obj=JSON.parse(clean);}
+    catch(error){
+      firstError=error;
+      const repairedText=repairTruncatedJson(clean);
+      if(repairedText){try{obj=JSON.parse(repairedText);repaired=true;}catch(repairError){/* report original */}}
+    }
+    if(obj){
+      const answers={},seen={},answerOrder=[],unknownIds=[];
       if(Array.isArray(obj.answers)){
         for(const item of obj.answers){
           const id=String(item&&item.id||'').toUpperCase();
-          if(!META[id])continue;
+          if(!META[id]){unknownIds.push(id||'(blank)');continue;}
           seen[id]=(seen[id]||0)+1;
+          answerOrder.push(id);
           const meta=META[id];
           const rawValue=meta.type==='probability'?item.probability:item.value;
           const value=typeof rawValue==='number'?rawValue:Number(rawValue);
-          answers[id]={value:Number.isFinite(value)?value:null,unit:item.unit||meta.unit,rationale:String(item.rationale||''),raw:JSON.stringify(item)};
+          answers[id]={value:Number.isFinite(value)?value:null,unit:item.unit||null,rationale:String(item.rationale||''),raw:JSON.stringify(item),source:item};
         }
       }
-      return {model:obj.model||null,cutoff:obj.knowledge_cutoff||null,answers,seen,format:'json'};
-    }catch(error){
-      return {model:null,cutoff:null,answers:{},seen:{},format:'invalid_json',parseError:error.message};
+      return {model:obj.model||null,provider:inferProvider(obj.model),cutoff:obj.knowledge_cutoff||null,
+        currentDatetime:obj.current_datetime||null,askedOn:isoDateFromModel(obj.current_datetime),answers,seen,
+        answerOrder,unknownIds,format:'json',repairNote:repaired?'JSON ended before its final closing characters; the ingester safely restored them.':null};
     }
+    return {model:null,provider:null,cutoff:null,currentDatetime:null,askedOn:null,answers:{},seen:{},answerOrder:[],unknownIds:[],format:'invalid_json',parseError:firstError?firstError.message:'Could not parse JSON.'};
   }
   const lines=(text||'').split(/\r?\n/);
   let model=null,cutoff=null;const answers={},seen={};
@@ -192,28 +253,38 @@ function parseRaw(text){
     const vm=valuePart.match(/(-?\d+(?:\.\d+)?)/);if(vm)value=parseFloat(vm[1]);
     answers[id]={value,unit:meta?meta.unit:null,rationale,raw:rest};
   }
-  return {model,cutoff,answers,seen,format:'lines'};
+  return {model,provider:inferProvider(model),cutoff,currentDatetime:null,askedOn:null,answers,seen,answerOrder:Object.keys(answers),unknownIds:[],format:'lines'};
 }
 
 /* ---------- validator ---------- */
 function validate(parsed){
   const errors=[],warnings=[];
   if(parsed.parseError)errors.push('Invalid JSON: '+parsed.parseError);
-  if(!parsed.model)warnings.push('No MODEL: header found — fill the model field manually.');
+  if(parsed.repairNote)warnings.push(parsed.repairNote);
+  if(!parsed.model)warnings.push('No model metadata found — fill the model field manually.');
+  if(parsed.format==='json'&&!parsed.currentDatetime)warnings.push('No current_datetime metadata found — confirm the date asked manually.');
+  if(parsed.unknownIds&&parsed.unknownIds.length)errors.push('Unknown answer IDs: '+parsed.unknownIds.join(', '));
   const dupes=Object.keys(parsed.seen).filter(k=>parsed.seen[k]>1);
   if(dupes.length)errors.push('Duplicate questions: '+dupes.join(', '));
+  if(parsed.format==='json'&&parsed.answerOrder.length===50){
+    const misplaced=parsed.answerOrder.filter((id,index)=>id!==QUESTIONS[index].id);
+    if(misplaced.length)errors.push('Answers are not ordered Q1 through Q50.');
+  }
   const missing=[];
   for(const q of QUESTIONS){
     const a=parsed.answers[q.id];
     if(!a||a.value===null||Number.isNaN(a.value)){missing.push(q.id);continue;}
     if(q.type==='probability'){
       if(a.value<0||a.value>100)errors.push(q.id+': probability '+a.value+' is outside 0–100.');
+      if(!Number.isInteger(a.value))errors.push(q.id+': probability must be a whole-number percentage.');
     }else{
       if(q.unit==='percent'&&(a.value<0||a.value>100))warnings.push(q.id+': '+a.value+'% looks out of range.');
       if(q.unit==='usd_trillions'&&(a.value<=0||a.value>100))warnings.push(q.id+': '+a.value+' trillion looks off.');
       if(q.unit==='usd_billions'&&(a.value<=0||a.value>100000))warnings.push(q.id+': '+a.value+' billion looks off.');
+      if(parsed.format==='json'&&!expectedUnit(q).includes(normalizedUnit(a.unit)))errors.push(q.id+': expected unit "'+(q.id==='Q49'?'trillion USD':q.id==='Q50'?'billion USD':'percent')+'", received "'+(a.unit||'missing')+'".');
     }
     if(!a.rationale)warnings.push(q.id+': empty rationale.');
+    else if(sentenceCount(a.rationale)>2)warnings.push(q.id+': rationale appears to exceed two sentences.');
   }
   if(missing.length)errors.push('Missing or unparsable: '+missing.join(', '));
   return {ok:errors.length===0,errors,warnings};
@@ -333,11 +404,17 @@ function renderAggregate(){
 $('btn-parse').onclick=()=>{
   const parsed=parseRaw($('f-raw').value);const report=validate(parsed);current={parsed,report};
   if($('f-model').value.trim()===''&&parsed.model)$('f-model').value=parsed.model;
+  if($('f-provider').value.trim()===''&&parsed.provider)$('f-provider').value=parsed.provider;
   if($('f-cutoff').value.trim()===''&&parsed.cutoff)$('f-cutoff').value=parsed.cutoff;
-  if($('f-date').value.trim()==='')$('f-date').value=todayISO();
+  if(parsed.askedOn&&($('f-date').dataset.autofilled==='true'||$('f-date').value.trim()==='')){
+    $('f-date').value=parsed.askedOn;$('f-date').dataset.autofilled='true';
+  }else if($('f-date').value.trim()===''){
+    $('f-date').value=todayISO();$('f-date').dataset.autofilled='true';
+  }
   const st=$('status'),txt=$('status-text');const nAns=Object.keys(parsed.answers).length;
-  if(report.ok&&report.warnings.length===0){st.className='status ok';txt.textContent='Valid · 50/50 parsed, no issues.';}
-  else if(report.ok){st.className='status warn';txt.textContent='Valid with '+report.warnings.length+' warning(s) · '+nAns+'/50 parsed.';}
+  const formatLabel=parsed.format==='json'?'JSON':'legacy text';
+  if(report.ok&&report.warnings.length===0){st.className='status ok';txt.textContent='Valid '+formatLabel+' · 50/50 parsed, no issues.';}
+  else if(report.ok){st.className='status warn';txt.textContent='Valid '+formatLabel+' with '+report.warnings.length+' warning(s) · '+nAns+'/50 parsed.';}
   else{st.className='status err';txt.textContent='Not valid · '+report.errors.length+' error(s), '+nAns+'/50 parsed.';}
   const ul=$('msgs');ul.innerHTML='';
   report.errors.forEach(m=>{const li=document.createElement('li');li.className='e';li.textContent='● '+m;ul.appendChild(li);});
@@ -365,7 +442,8 @@ $('btn-add').onclick=()=>{
 $('btn-dl').onclick=()=>{const f=buildSessionFile();if(f)download(f.run_id+'.json',f);};
 $('lnk-clear').onclick=()=>{if(!batch.length)return;batch.length=0;renderAggregate();};
 
-$('f-date').value=todayISO();
+$('f-date').value=todayISO();$('f-date').dataset.autofilled='true';
+$('f-date').addEventListener('input',()=>{$('f-date').dataset.autofilled='false';});
 </script>
 </body>
 </html>

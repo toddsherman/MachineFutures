@@ -19,7 +19,8 @@
   };
 
   let activeCategory = 'All';
-  let searchTerm = '';
+  let activeProvider = 'All';
+  const providerLabels = { OpenAI: 'OpenAI', Anthropic: 'Anthropic', Google: 'Gemini', xAI: 'xAI', Meta: 'Meta', DeepSeek: 'DeepSeek' };
 
   function renderOrbit() {
     const target = $('#orbit-models');
@@ -41,12 +42,12 @@
     $('#stat-runs').textContent = runs.length;
   }
 
-  function miniRange(question, stats) {
+  function miniRange(question, stats, marker = stats.median) {
     if (question.type !== 'probability') {
       const max = Math.max(...stats.values) * 1.12;
-      return `<div class="mini-range numeric"><span style="left:${(stats.min / max) * 100}%"></span><b style="left:${(stats.median / max) * 100}%"></b><i style="width:${(stats.max / max) * 100}%"></i></div>`;
+      return `<div class="mini-range numeric"><span style="left:${(stats.min / max) * 100}%"></span><b style="left:${(marker / max) * 100}%"></b><i style="width:${(stats.max / max) * 100}%"></i></div>`;
     }
-    return `<div class="mini-range"><span style="left:${stats.min}%"></span><b style="left:${stats.median}%"></b><i style="left:${stats.min}%;width:${Math.max(stats.spread, 1)}%"></i></div>`;
+    return `<div class="mini-range"><span style="left:${stats.min}%"></span><b style="left:${marker}%"></b><i style="left:${stats.min}%;width:${Math.max(stats.spread, 1)}%"></i></div>`;
   }
 
   function renderSignals() {
@@ -88,24 +89,33 @@
     ).join('');
   }
 
+  function renderProviderFilters() {
+    const options = [{ key: 'All', label: 'All models', color: '#d9ff57' }, ...latestRuns.map(run => ({ key: run.provider, label: providerLabels[run.provider] || run.provider, color: run.color }))];
+    $('#provider-list').innerHTML = options.map(option =>
+      `<button type="button" class="category-button provider-button${option.key === activeProvider ? ' active' : ''}" style="--provider-color:${option.color}" data-provider="${option.key}"><i></i>${option.label}</button>`
+    ).join('');
+  }
+
   function renderQuestions() {
-    const filtered = questions.filter(question => {
-      const matchesCategory = activeCategory === 'All' || question.category === activeCategory;
-      const haystack = `${question.id} ${question.title} ${question.category}`.toLowerCase();
-      return matchesCategory && haystack.includes(searchTerm.toLowerCase());
-    });
+    const filtered = questions.filter(question => activeCategory === 'All' || question.category === activeCategory);
+    const providerRun = activeProvider === 'All' ? null : latestRuns.find(run => run.provider === activeProvider);
+    const viewLabel = providerRun ? `${providerLabels[providerRun.provider] || providerRun.provider} forecast` : 'median';
+    const markerColor = providerRun ? providerRun.color : '#d9ff57';
     $('#result-count').textContent = `${filtered.length} question${filtered.length === 1 ? '' : 's'}`;
+    $('#forecast-label').textContent = viewLabel;
+    $('.legend').style.setProperty('--legend-color', markerColor);
     $('#empty-state').hidden = filtered.length !== 0;
     $('#question-grid').innerHTML = filtered.map(question => {
       const stats = questionStats(question);
-      return `<button class="question-card" data-question="${question.id}">
+      const displayValue = providerRun ? providerRun.answers[question.id].value : stats.median;
+      return `<button class="question-card" style="--marker-color:${markerColor}" data-question="${question.id}">
         <span class="question-top"><b>${question.id}</b><i>${question.category}</i><em>↗</em></span>
         <span class="question-title">${question.title}</span>
         <span class="question-result">
-          <strong>${formatValue(stats.median, question)}</strong>
-          <span>median forecast</span>
+          <strong>${formatValue(displayValue, question)}</strong>
+          <span>${viewLabel}</span>
         </span>
-        ${miniRange(question, stats)}
+        ${miniRange(question, stats, displayValue)}
         <span class="question-range">${formatValue(stats.min, question)} low <i>·</i> ${formatValue(stats.max, question)} high</span>
       </button>`;
     }).join('');
@@ -115,11 +125,19 @@
     const question = questions.find(q => q.id === id);
     if (!question) return;
     const stats = questionStats(question);
-    const modelRows = [...latestRuns].sort((a, b) => b.answers[id].value - a.answers[id].value).map(run => {
+    const providerRun = activeProvider === 'All' ? null : latestRuns.find(run => run.provider === activeProvider);
+    const primaryValue = providerRun ? providerRun.answers[id].value : stats.median;
+    const primaryLabel = providerRun ? `${providerLabels[providerRun.provider] || providerRun.provider} forecast` : 'median forecast';
+    const orderedRuns = [...latestRuns].sort((a, b) => {
+      if (providerRun && a.provider === providerRun.provider) return -1;
+      if (providerRun && b.provider === providerRun.provider) return 1;
+      return b.answers[id].value - a.answers[id].value;
+    });
+    const modelRows = orderedRuns.map(run => {
       const answer = run.answers[id];
       const previous = runs.filter(r => r.provider === run.provider && !r.latest).sort((a, b) => b.date.localeCompare(a.date))[0];
       const delta = previous ? answer.value - previous.answers[id].value : 0;
-      return `<article class="model-answer">
+      return `<article class="model-answer${providerRun && run.provider === providerRun.provider ? ' selected' : ''}">
         <div class="model-answer-head">
           <span class="model-swatch" style="--swatch:${run.color}"></span>
           <div><b>${run.model}</b><small>${run.provider} · ${run.date}</small></div>
@@ -134,7 +152,7 @@
       <div class="dialog-kicker"><span>${question.id}</span>${question.category}</div>
       <h2>${question.title}</h2>
       <div class="dialog-summary">
-        <div><strong>${formatValue(stats.median, question)}</strong><span>median forecast</span></div>
+        <div><strong>${formatValue(primaryValue, question)}</strong><span>${primaryLabel}</span></div>
         <div><strong>${formatValue(stats.min, question)}–${formatValue(stats.max, question)}</strong><span>model range</span></div>
         <div><strong>${latestRuns.length}</strong><span>current models</span></div>
       </div>
@@ -197,11 +215,17 @@
       renderQuestions();
     }
 
+    const providerTarget = event.target.closest('[data-provider]');
+    if (providerTarget) {
+      activeProvider = providerTarget.dataset.provider;
+      renderProviderFilters();
+      renderQuestions();
+    }
+
     const stateTarget = event.target.closest('[data-state]');
     if (stateTarget) document.querySelector(`#state-${stateTarget.dataset.state}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 
-  $('#search-input').addEventListener('input', event => { searchTerm = event.target.value.trim(); renderQuestions(); });
   $('#dialog-close').addEventListener('click', () => $('#detail-dialog').close());
   $('#detail-dialog').addEventListener('click', event => {
     if (event.target !== $('#detail-dialog')) return;
@@ -215,6 +239,7 @@
   renderOrbit();
   renderSignals();
   renderCategoryFilters();
+  renderProviderFilters();
   renderQuestions();
   renderEndStates();
   switchView(location.hash.slice(1));

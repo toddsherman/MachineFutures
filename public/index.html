@@ -86,20 +86,22 @@
           </div>
 
           <div class="index-controls">
-            <div class="category-list" id="category-list" aria-label="Filter by category"></div>
-            <label class="search-box">
-              <span class="sr-only">Search questions</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.2 4.2"/></svg>
-              <input id="search-input" type="search" placeholder="Search the index">
-            </label>
+            <div class="filter-row">
+              <span class="filter-title">Topic</span>
+              <div class="category-list" id="category-list" aria-label="Filter by category"></div>
+            </div>
+            <div class="filter-row">
+              <span class="filter-title">Model view</span>
+              <div class="category-list" id="provider-list" aria-label="View forecasts by model provider"></div>
+            </div>
           </div>
 
           <div class="index-summary">
             <span id="result-count">50 questions</span>
-            <span class="legend"><i></i> median <b></b> model range</span>
+            <span class="legend"><i></i><span id="forecast-label">median</span><b></b> model range</span>
           </div>
           <div class="question-grid" id="question-grid"></div>
-          <div class="empty-state" id="empty-state" hidden>No questions match that search.</div>
+          <div class="empty-state" id="empty-state" hidden>No questions in this view.</div>
         </div>
       </section>
     </section>

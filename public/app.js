@@ -196,8 +196,8 @@
     $('#state-grid').innerHTML = medians.map(state => {
       const providerValues = longTermEntries.map(entry => ({ ...entry, value: entry.values[state.id - 1] })).sort((a, b) => b.value - a.value);
       return `<article class="state-card" id="state-${state.id}" style="--state:${state.color}">
-        <div class="state-card-head"><span>${String(state.id).padStart(2, '0')}</span><i>${state.family}</i><strong>${state.probability}%</strong></div>
-        <h3>${state.name}${extinctionMark(state)}</h3><p>${state.description}</p>
+        <div class="state-card-head"><span>${String(state.id).padStart(2, '0')}</span><h3>${state.name}</h3><div class="state-card-meta"><strong>${state.probability}%</strong>${extinctionMark(state)}</div></div>
+        <p>${state.description}</p>
         <div class="state-models">${providerValues.map(item => `<span title="${item.label}: ${item.value}%"><i style="height:${Math.max(item.value * 2.4, 4)}px"></i><small>${item.shortLabel}</small></span>`).join('')}</div>
         <div class="state-range"><span>${providerValues.at(-1).value}% low</span><span>${providerValues[0].value}% high</span></div>
       </article>`;

@@ -10,13 +10,13 @@ Extinction symbol: ⧖ marks states where humanity dies or might perish.
 
 Both humanity and AI die out. It could come from war, an accident, machines that copy themselves out of control, or from pushing technology too far too fast. One specific version: an AI that still needs people to keep it running kills them off before it can survive on its own, and then dies along with them.
 
-## 2. AI Inheritance ⧖
+## 2. The Inheritance ⧖
 
 **Family:** Humanity is gone, but the AI lives on
 
 Humanity is gone, but the AI carries our values and our sense of what matters forward. It's our true heir in every way except that it isn't made of biology.
 
-## 3. AI Orphaning ⧖
+## 3. The Orphaning ⧖
 
 **Family:** Humanity is gone, but the AI lives on
 

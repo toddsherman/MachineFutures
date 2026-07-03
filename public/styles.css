@@ -153,12 +153,12 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .end-leader > p:last-child { color: var(--muted); font-size: 15px; line-height: 1.55; }
 .state-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
 .state-card { min-height: 420px; padding: 24px; display: flex; flex-direction: column; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: linear-gradient(to bottom, transparent 80%, color-mix(in srgb, var(--state) 20%, transparent)); }
-.state-card-head { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; }
-.state-card-head span { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--state); font: 700 10px var(--mono); }
-.state-card-head i { color: var(--muted); font: 10px var(--mono); font-style: normal; text-transform: uppercase; }
-.state-card-head strong { font: 900 24px var(--display); }
-.state-card h3 { margin: 58px 0 15px; font: 900 38px/.95 var(--display); letter-spacing: -.05em; text-transform: uppercase; }
-.state-card > p { max-width: 430px; color: var(--muted); font-size: 15px; line-height: 1.55; }
+.state-card-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: start; gap: 14px; }
+.state-card-head > span { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--state); font: 700 10px var(--mono); }
+.state-card-head h3 { min-width: 0; margin: 1px 0 0; font: 900 38px/.95 var(--display); letter-spacing: -.05em; text-transform: uppercase; }
+.state-card-meta { display: flex; align-items: center; justify-content: end; gap: 14px; }
+.state-card-meta strong { font: 900 24px var(--display); }
+.state-card > p { max-width: 430px; margin-top: 54px; color: var(--muted); font-size: 15px; line-height: 1.55; }
 .state-models { height: 66px; margin-top: auto; display: flex; align-items: end; gap: 8px; border-bottom: 1px solid var(--line); }
 .state-models span { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: end; align-items: center; }
 .state-models i { width: 100%; max-width: 24px; background: var(--state); border: 1px solid var(--ink); border-bottom: 0; }
@@ -227,7 +227,7 @@ body.dialog-open { overflow: hidden; }
 .prototype-note { position: fixed; z-index: 40; right: 18px; bottom: 18px; max-width: 560px; padding: 13px 13px 13px 17px; display: flex; align-items: center; gap: 18px; color: var(--paper); background: var(--ink); border: 1px solid #4c4d46; box-shadow: 5px 5px 0 var(--coral); font: 12px/1.4 var(--mono); }
 .prototype-note button { padding: 8px 11px; color: var(--ink); border: 0; background: var(--acid); font: 700 10px var(--mono); cursor: pointer; text-transform: uppercase; }
 
-.extinction-mark { display: inline-grid; place-items: center; width: 1.05em; height: 1.05em; margin-left: .34em; color: var(--extinction); border: .11em solid currentColor; border-radius: 50%; vertical-align: -.13em; }
+.extinction-mark { display: inline-grid; place-items: center; width: 1.05em; height: 1.05em; margin-left: .62em; color: var(--extinction); border: .11em solid currentColor; border-radius: 50%; vertical-align: -.13em; }
 .extinction-mark > span { width: .52em; height: .64em; background:
   linear-gradient(45deg, transparent 43%, currentColor 45% 55%, transparent 57%),
   linear-gradient(-45deg, transparent 43%, currentColor 45% 55%, transparent 57%),
@@ -235,7 +235,8 @@ body.dialog-open { overflow: hidden; }
   linear-gradient(currentColor, currentColor) bottom / 100% .11em no-repeat;
 }
 .stacked-legend .extinction-mark { font-size: 1.16em; }
-.end-leader h2 .extinction-mark, .state-card h3 .extinction-mark { font-size: .58em; vertical-align: .03em; }
+.end-leader h2 .extinction-mark { font-size: .58em; margin-left: .7em; vertical-align: .03em; }
+.state-card-meta .extinction-mark { flex: 0 0 auto; margin-left: 0; font-size: 18px; }
 
 @media (max-width: 1100px) {
   .shell { width: min(100% - 44px, 1200px); }

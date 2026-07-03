@@ -21,6 +21,10 @@
   let activeCategory = 'All';
   let activeProvider = 'All';
   const providerLabels = { OpenAI: 'OpenAI', Anthropic: 'Anthropic', Google: 'Gemini', xAI: 'xAI', Meta: 'Meta', DeepSeek: 'DeepSeek' };
+  const extinctionLabel = 'Humanity dies or might perish';
+  const extinctionMark = state => state.extinction
+    ? `<span class="extinction-mark" role="img" title="${extinctionLabel}" aria-label="${extinctionLabel}"><span></span></span>`
+    : '';
 
   function renderOrbit() {
     const target = $('#orbit-models');
@@ -183,17 +187,17 @@
     const medians = stateMedians();
     const total = medians.reduce((sum, state) => sum + state.probability, 0);
     const normalized = medians.map(state => ({ ...state, display: (state.probability / total) * 100 }));
-    $('#consensus-bar').innerHTML = normalized.map(state => `<button style="width:${state.display}%;--state:${state.color}" title="${state.name}: ${state.probability}%" data-state="${state.id}"><span>${state.id}</span></button>`).join('');
-    $('#consensus-legend').innerHTML = normalized.map(state => `<button data-state="${state.id}"><i style="--state:${state.color}"></i><span>${state.id}. ${state.name}</span><b>${state.probability}%</b></button>`).join('');
+    $('#consensus-bar').innerHTML = normalized.map(state => `<button style="width:${state.display}%;--state:${state.color}" title="${state.name}: ${state.probability}%${state.extinction ? ` · ${extinctionLabel}` : ''}" data-state="${state.id}"><span>${state.id}</span></button>`).join('');
+    $('#consensus-legend').innerHTML = normalized.map(state => `<button data-state="${state.id}"><i style="--state:${state.color}"></i><span>${state.id}. ${state.name}${extinctionMark(state)}</span><b>${state.probability}%</b></button>`).join('');
 
     const leader = [...medians].sort((a, b) => b.probability - a.probability)[0];
-    $('#end-leader').innerHTML = `<p class="kicker">Most likely ending</p><span class="leader-number">${leader.id}</span><h2>${leader.name}</h2><strong>${leader.probability}%</strong><p>${leader.description}</p>`;
+    $('#end-leader').innerHTML = `<p class="kicker">Most likely ending</p><span class="leader-number">${leader.id}</span><h2>${leader.name}${extinctionMark(leader)}</h2><strong>${leader.probability}%</strong><p>${leader.description}</p>`;
 
     $('#state-grid').innerHTML = medians.map(state => {
       const providerValues = longTermEntries.map(entry => ({ ...entry, value: entry.values[state.id - 1] })).sort((a, b) => b.value - a.value);
       return `<article class="state-card" id="state-${state.id}" style="--state:${state.color}">
         <div class="state-card-head"><span>${String(state.id).padStart(2, '0')}</span><i>${state.family}</i><strong>${state.probability}%</strong></div>
-        <h3>${state.name}</h3><p>${state.description}</p>
+        <h3>${state.name}${extinctionMark(state)}</h3><p>${state.description}</p>
         <div class="state-models">${providerValues.map(item => `<span title="${item.label}: ${item.value}%"><i style="height:${Math.max(item.value * 2.4, 4)}px"></i><small>${item.shortLabel}</small></span>`).join('')}</div>
         <div class="state-range"><span>${providerValues.at(-1).value}% low</span><span>${providerValues[0].value}% high</span></div>
       </article>`;

@@ -112,13 +112,13 @@
           <p class="kicker">Beyond the resolution window</p>
           <h1>How does this<br>story <em>end?</em></h1>
         </div>
-        <p class="dek">Eleven mutually exclusive end states. One hundred percentage points. No “it depends.” We ask each model where humanity’s relationship with AI ultimately settles—even if it takes a million years.</p>
+        <p class="dek">Eleven mutually exclusive end states. One hundred percentage points. No “it depends.” We ask each model where humanity’s relationship with AI ultimately settles.</p>
       </div>
 
       <div class="end-intro shell">
         <div class="end-consensus">
           <div class="section-heading compact">
-            <div><p class="kicker">Median machine forecast</p><h2>All futures,<br>weighted.</h2></div>
+            <div><p class="kicker" id="end-forecast-kicker">Median machine forecast</p><h2>All futures,<br>weighted.</h2></div>
             <p class="section-note">Hover or tap a segment to identify the end state.</p>
           </div>
           <div class="stacked-bar" id="consensus-bar" aria-label="Median probability by end state"></div>
@@ -129,8 +129,11 @@
 
       <section class="states-section shell" aria-labelledby="states-title">
         <div class="section-heading">
-          <div><p class="kicker">The full taxonomy</p><h2 id="states-title">Eleven endings</h2></div>
-          <p class="section-note">The probability shown is the median across current model forecasts. The extinction symbol marks states where humanity dies or might perish.</p>
+          <div>
+            <p class="kicker">The full taxonomy</p>
+            <h2 id="states-title">Eleven endings</h2>
+            <div class="end-forecast-toggle" id="end-forecast-toggle" aria-label="Select end-state forecast view"></div>
+          </div>
         </div>
         <div class="state-grid" id="state-grid"></div>
       </section>
@@ -141,6 +144,7 @@
           <p class="section-note">Each row sums to 100%. The shape of a model’s bar is its compressed theory of the future.</p>
         </div>
         <div id="model-bars" class="model-bars"></div>
+        <div id="doomer-ratings" class="doomer-ratings"></div>
       </section>
     </section>
 
@@ -183,7 +187,7 @@
     <button type="button" aria-label="Dismiss notice">Got it</button>
   </div>
 
-  <script src="data.js"></script>
-  <script src="app.js"></script>
+  <script src="data.js?v=20260703"></script>
+  <script src="app.js?v=20260703"></script>
 </body>
 </html>

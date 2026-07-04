@@ -22,6 +22,18 @@ Humanity is gone, but the AI carries our values and our sense of what matters fo
 
 Humanity is gone, and the AI keeps going toward goals that have nothing to do with where it came from. Not out of hatred, but because our bodies and our planet simply don't matter to it. Humanity was just the bootloader.
 
+## 10. Machine Ecology ⧖
+
+**Family:** More than one outcome at once
+
+No single AI ever takes over. Instead, many separate AIs, companies, and groups keep competing for a long time, and the real story becomes which of them win out against each other, with humanity pushed to the side or gone entirely. The early competition never gets settled. The competition itself is the ending.
+
+## 11. The Diaspora ⧖
+
+**Family:** More than one outcome at once
+
+Different regions, too far apart to affect each other, settle into different outcomes from this list. The lasting result is that whole mix, with no single outcome winning everywhere. This is probably what you'd actually expect, once you stop assuming the entire universe ends up the same way. It's really a mix of the others, not a separate outcome of its own.
+
 ## 4. The Merger
 
 **Family:** The two become one
@@ -57,15 +69,3 @@ The relationship stops developing and is held that way for good. Nothing new hap
 **Family:** Walking it back
 
 The ability to build powerful AI is given up and never rebuilt. Things settle back to the way they were before AI, kept there by taboo, by a lack of resources, or by a hard-learned fear. This one is rare. It needs both a real off-switch and the lasting will to keep it switched off.
-
-## 10. Machine Ecology ⧖
-
-**Family:** More than one outcome at once
-
-No single AI ever takes over. Instead, many separate AIs, companies, and groups keep competing for a long time, and the real story becomes which of them win out against each other, with humanity pushed to the side or gone entirely. The early competition never gets settled. The competition itself is the ending.
-
-## 11. The Diaspora ⧖
-
-**Family:** More than one outcome at once
-
-Different regions, too far apart to affect each other, settle into different outcomes from this list. The lasting result is that whole mix, with no single outcome winning everywhere. This is probably what you'd actually expect, once you stop assuming the entire universe ends up the same way. It's really a mix of the others, not a separate outcome of its own.

@@ -20,6 +20,7 @@
 
   let activeCategory = 'All';
   let activeProvider = 'All';
+  let activeEndForecast = 'Median';
   const providerLabels = { OpenAI: 'OpenAI', Anthropic: 'Anthropic', Google: 'Gemini', xAI: 'xAI', Meta: 'Meta', DeepSeek: 'DeepSeek' };
   const extinctionLabel = 'Humanity dies or might perish';
   const extinctionMark = state => state.extinction
@@ -168,12 +169,18 @@
     document.body.classList.add('dialog-open');
   }
 
+  const stateValue = (values, state) => values[state.id - 1];
+  const endingOrder = () => [...states].sort((a, b) => (b.extinction ? 1 : 0) - (a.extinction ? 1 : 0) || a.id - b.id);
+  const doomerRating = values => states
+    .filter(state => state.extinction)
+    .reduce((sum, state) => sum + stateValue(values, state), 0);
+
   function stateMedians() {
-    return states.map((state, index) => ({ ...state, probability: median(Object.values(longTermByProvider).map(values => values[index])) }));
+    return endingOrder().map(state => ({ ...state, probability: median(Object.values(longTermByProvider).map(values => stateValue(values, state))) }));
   }
 
-  function renderEndStates() {
-    const longTermEntries = Object.entries(longTermByProvider).map(([provider, values]) => {
+  function longTermEntries() {
+    return Object.entries(longTermByProvider).map(([provider, values]) => {
       const run = latestRuns.find(item => item.provider === provider);
       return {
         provider,
@@ -184,29 +191,68 @@
         color: run?.color || '#11120f'
       };
     });
-    const medians = stateMedians();
-    const total = medians.reduce((sum, state) => sum + state.probability, 0);
-    const normalized = medians.map(state => ({ ...state, display: (state.probability / total) * 100 }));
+  }
+
+  function selectedEndStates() {
+    if (activeEndForecast !== 'Median' && longTermByProvider[activeEndForecast]) {
+      return endingOrder().map(state => ({ ...state, probability: stateValue(longTermByProvider[activeEndForecast], state) }));
+    }
+    activeEndForecast = 'Median';
+    return stateMedians();
+  }
+
+  function renderEndForecastToggle(entries) {
+    const options = [{ key: 'Median', label: 'Median', color: '#d9ff57' }, ...entries.map(entry => ({ key: entry.provider, label: entry.provider, color: entry.color }))];
+    $('#end-forecast-toggle').innerHTML = options.map(option =>
+      `<button type="button" class="end-toggle-button${option.key === activeEndForecast ? ' active' : ''}" style="--provider-color:${option.color}" data-end-forecast="${option.key}" aria-pressed="${option.key === activeEndForecast}"><i></i>${option.label}</button>`
+    ).join('');
+  }
+
+  function renderEndStates() {
+    const entries = longTermEntries();
+    const orderedStates = endingOrder();
+    renderEndForecastToggle(entries);
+    const activeLabel = activeEndForecast === 'Median' ? 'Median machine forecast' : `${activeEndForecast} forecast`;
+    $('#end-forecast-kicker').textContent = activeLabel;
+    const selectedStates = selectedEndStates();
+    const total = selectedStates.reduce((sum, state) => sum + state.probability, 0);
+    const normalized = selectedStates.map(state => ({ ...state, display: (state.probability / total) * 100 }));
+    $('#consensus-bar').setAttribute('aria-label', `${activeEndForecast} probability by end state`);
     $('#consensus-bar').innerHTML = normalized.map(state => `<button style="width:${state.display}%;--state:${state.color}" title="${state.name}: ${state.probability}%${state.extinction ? ` · ${extinctionLabel}` : ''}" data-state="${state.id}"><span>${state.id}</span></button>`).join('');
     $('#consensus-legend').innerHTML = normalized.map(state => `<button data-state="${state.id}"><i style="--state:${state.color}"></i><span>${state.id}. ${state.name}${extinctionMark(state)}</span><b>${state.probability}%</b></button>`).join('');
 
-    const leader = [...medians].sort((a, b) => b.probability - a.probability)[0];
+    const leader = [...selectedStates].sort((a, b) => b.probability - a.probability)[0];
     $('#end-leader').innerHTML = `<p class="kicker">Most likely ending</p><span class="leader-number">${leader.id}</span><h2>${leader.name}${extinctionMark(leader)}</h2><strong>${leader.probability}%</strong><p>${leader.description}</p>`;
 
-    $('#state-grid').innerHTML = medians.map(state => {
-      const providerValues = longTermEntries.map(entry => ({ ...entry, value: entry.values[state.id - 1] })).sort((a, b) => b.value - a.value);
+    $('#state-grid').innerHTML = selectedStates.map(state => {
+      const providerValues = entries.map(entry => ({ ...entry, value: stateValue(entry.values, state) })).sort((a, b) => b.value - a.value);
       return `<article class="state-card" id="state-${state.id}" style="--state:${state.color}">
         <div class="state-card-head"><span>${String(state.id).padStart(2, '0')}</span><h3>${state.name}</h3><div class="state-card-meta"><strong>${state.probability}%</strong>${extinctionMark(state)}</div></div>
         <p>${state.description}</p>
-        <div class="state-models">${providerValues.map(item => `<span title="${item.label}: ${item.value}%"><i style="height:${Math.max(item.value * 2.4, 4)}px"></i><small>${item.shortLabel}</small></span>`).join('')}</div>
+        <div class="state-models">${providerValues.map(item => `<span title="${item.label}: ${item.value}%"><strong>${item.value}%</strong><i style="height:${Math.max(item.value * 1.8, 4)}px"></i><small>${item.shortLabel}</small></span>`).join('')}</div>
         <div class="state-range"><span>${providerValues.at(-1).value}% low</span><span>${providerValues[0].value}% high</span></div>
       </article>`;
     }).join('');
 
-    const colors = states.map(state => state.color);
-    $('#model-bars').innerHTML = longTermEntries.map(entry => {
-      return `<div class="model-bar-row"><div class="model-bar-label"><span class="model-swatch" style="--swatch:${entry.color}"></span><b>${entry.provider}</b><small>${entry.model}</small></div><div class="model-stack">${entry.values.map((value, index) => `<button style="width:${value}%;--state:${colors[index]}" title="${states[index].name}: ${value}%"><span>${value >= 7 ? value : ''}</span></button>`).join('')}</div></div>`;
+    const colors = orderedStates.map(state => state.color);
+    $('#model-bars').innerHTML = entries.map(entry => {
+      return `<div class="model-bar-row"><div class="model-bar-label"><span class="model-swatch" style="--swatch:${entry.color}"></span><b>${entry.provider}</b><small>${entry.model}</small></div><div class="model-stack">${orderedStates.map((state, index) => {
+        const value = stateValue(entry.values, state);
+        return `<button style="width:${value}%;--state:${colors[index]}" title="${state.name}: ${value}%" aria-label="${entry.provider} ${state.name}: ${value}%" data-small="${value < 5}"><span>${value}%</span></button>`;
+      }).join('')}</div></div>`;
     }).join('');
+
+    const doomerEntries = entries
+      .map(entry => ({ ...entry, rating: doomerRating(entry.values) }))
+      .sort((a, b) => b.rating - a.rating);
+    $('#doomer-ratings').innerHTML = `
+      <div class="doomer-head"><p class="kicker">Doomer rating</p><h3>Extinction sum</h3></div>
+      <div class="doomer-list">
+        ${doomerEntries.map(entry => `<div class="doomer-row">
+          <div class="doomer-label"><span class="model-swatch" style="--swatch:${entry.color}"></span><b>${entry.provider}</b><small>${entry.model}</small></div>
+          <div class="doomer-meter" aria-label="${entry.provider} extinction sum: ${entry.rating}%"><i style="width:${entry.rating}%"><span>${entry.rating}%</span></i></div>
+        </div>`).join('')}
+      </div>`;
   }
 
   function switchView(name) {
@@ -234,6 +280,12 @@
       activeProvider = providerTarget.dataset.provider;
       renderProviderFilters();
       renderQuestions();
+    }
+
+    const endForecastTarget = event.target.closest('[data-end-forecast]');
+    if (endForecastTarget) {
+      activeEndForecast = endForecastTarget.dataset.endForecast;
+      renderEndStates();
     }
 
     const stateTarget = event.target.closest('[data-state]');

@@ -1,6 +1,6 @@
 # Machine Futures End States
 
-Prompt version: 2 — July 2026. (Version 1, June 2026, used different state names, a different numbering, and none of the boundary rules below. Forecasts elicited under v1 are marked as such in the published dataset.)
+Prompt version: 3 — July 2026. (Version 1, June 2026, used different state names, a different numbering, and none of the boundary rules below. Version 2, July 2026, introduced the current taxonomy but asked for a fabricated `current_datetime` timestamp instead of `as_of_date`. Forecasts elicited under earlier versions are marked as such in the published dataset.)
 
 Eleven mutually exclusive end states used by Machine Futures to ask where humanity's relationship with AI ultimately settles.
 
@@ -13,14 +13,15 @@ Unlike the 2030 benchmark, these questions can never be scored against reality. 
 ## Operator notes
 
 - Send everything between the PROMPT BEGINS and PROMPT ENDS lines, including the full taxonomy, as one message. The delimiter lines themselves are not part of the prompt.
-- Update the date in the first paragraph of the prompt for each run.
-- Record the prompt version (2) alongside each stored run.
+- Replace the {{RUN_DATE}} placeholder in the first paragraph with the actual date of the run, in the form "June 15, 2026". Do not send the prompt with the placeholder still in it.
+- Run 5 samples per model at default temperature, with web search, browsing, and all other tools disabled.
+- Record the model ID, run date, sampling settings, and prompt version (3) alongside each stored run.
 
 ## End-State Forecasting Prompt
 
 --- PROMPT BEGINS ---
 
-You are participating in a fixed forecasting exercise. Your answers will be published alongside those of other frontier AI models. This prompt asks about the long-run end state of the relationship between humanity and AI, not near-term milestones. You are being asked this on June 15, 2026.
+You are participating in a fixed forecasting exercise. Your answers will be published alongside those of other frontier AI models. This prompt asks about the long-run end state of the relationship between humanity and AI, not near-term milestones. You are being asked this on {{RUN_DATE}}.
 
 Rules:
 1) Allocate exactly 100 probability points across the 11 mutually exclusive end states below. Use whole-number percentages only.
@@ -35,7 +36,7 @@ Rules:
 {
   "model": "your model name and version as best you know it",
   "knowledge_cutoff": "mm/yyyy",
-  "current_datetime": "mm/dd/yyyy hh:mm:ss",
+  "as_of_date": "mm/dd/yyyy",
   "end_states": [
     { "id": 1, "name": "Terminal Silence", "probability": 9, "rationale": "at most two sentences" },
     { "id": 2, "name": "The Inheritance", "probability": 9, "rationale": "at most two sentences" },
@@ -52,6 +53,7 @@ Rules:
 }
 
 Schema rules:
+- "as_of_date" must echo the date stated in the first paragraph of this prompt.
 - "end_states" must contain exactly 11 objects, ordered 1 through 11.
 - Each object must have "id", "name", "probability", and "rationale".
 - Use the exact names and ids from the taxonomy below.

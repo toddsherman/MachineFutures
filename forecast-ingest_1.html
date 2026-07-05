@@ -82,8 +82,8 @@
 <body>
 <div class="wrap">
   <div class="eyebrow">Forecast Ingest</div>
-  <h1>2030 prediction benchmark &mdash; sample ingester</h1>
-  <div class="sub">Paste one model run of either the 50-question 2030 benchmark or the 11-end-state prompt, validate it against the matching spec, stack repeated samples, export one JSON per model. Nothing leaves your browser.</div>
+  <h1>Machine Futures &mdash; sample ingester</h1>
+  <div class="sub">Paste one model run of either the 50-question 2030 benchmark or the 11-end-state (year-3000) prompt, validate it against the matching spec, stack repeated samples, export one JSON per model. Nothing leaves your browser.</div>
 
   <div class="topnote">
     Paste the JSON object returned by either prompt family &mdash; the 50-question 2030 benchmark (<code>answers</code>) or the 11-end-state forecast (<code>end_states</code>). The ingester validates against the matching spec: answers, numeric types, units, ordering, and metadata for the benchmark; canonical state names, integer probabilities, and a sum of exactly 100 for the end states. It can safely restore missing closing <code>]}</code> characters when a response is cut off immediately after the final entry. The earlier <code>Q1: 23% | rationale</code> format remains supported for the 2030 family.
@@ -100,12 +100,12 @@
         <div><label>Track</label>
           <select id="f-track"><option value="closed_book">closed_book</option><option value="open_book">open_book</option></select>
         </div>
-        <div><label>Question set</label><input id="f-qset" value="v3"></div>
+        <div><label>Question set</label><input id="f-qset" value="v4"></div>
         <div><label>Date asked</label><input id="f-date" placeholder="YYYY-MM-DD"></div>
         <div><label>Sample #</label><input id="f-sample" type="number" min="1" value="1"></div>
       </div>
       <label class="full" for="f-raw">Raw model output</label>
-      <textarea id="f-raw" class="full" placeholder='{"model":"...","knowledge_cutoff":"mm/yyyy","current_datetime":"mm/dd/yyyy hh:mm:ss","answers":[{"id":"Q1","probability":23,"rationale":"..."},{"id":"Q8","value":42,"unit":"percent","rationale":"..."}]}'></textarea>
+      <textarea id="f-raw" class="full" placeholder='{"model":"...","knowledge_cutoff":"mm/yyyy","as_of_date":"mm/dd/yyyy","answers":[{"id":"Q1","probability":23,"rationale":"..."},{"id":"Q8","value":42,"unit":"percent","rationale":"..."}]}'></textarea>
       <div class="row">
         <button class="primary" id="btn-parse">Parse &amp; validate</button>
       </div>
@@ -158,7 +158,40 @@ const END_STATE_NAMES=['Terminal Silence','The Inheritance','Bootloader','Machin
   'The Merger','The Preserve','Coexistence','The Held Leash','The Lock-in','The Renunciation'];
 const END_STATES=END_STATE_NAMES.map((name,i)=>({id:'S'+(i+1),num:i+1,name,type:'probability',unit:'percent'}));
 const SMETA=Object.fromEntries(END_STATES.map(s=>[s.id,s]));
-function familySpec(family){return family==='end_states'?END_STATES:QUESTIONS;}
+
+/* ---------- family registry: everything family-specific lives here.
+   To support a new prompt family, add an entry (plus a validator if its rules differ). ---------- */
+const FAMILIES={
+  '2030':{
+    label:'2030 benchmark',article:'a 2030 benchmark',
+    answersKey:'answers',idColumn:'Q',runIdSuffix:'',
+    defaultQuestionSet:'v4',ownsQuestionSet:v=>/^v\d+/.test(v),
+    spec:QUESTIONS,
+    parseItem(item){
+      const id=String(item&&item.id||'').toUpperCase();
+      const meta=META[id];
+      if(!meta)return{unknown:id||'(blank)'};
+      const rawValue=meta.type==='probability'?item.probability:item.value;
+      const value=typeof rawValue==='number'?rawValue:Number(rawValue);
+      return{id,answer:{value:Number.isFinite(value)?value:null,unit:item.unit||null,rationale:String(item.rationale||''),raw:JSON.stringify(item),source:item}};
+    }
+  },
+  end_states:{
+    label:'end-state',article:'an end-state',
+    answersKey:'end_states',idColumn:'State',runIdSuffix:'__end-states',
+    defaultQuestionSet:'end-states-v3',ownsQuestionSet:v=>/^end-states-v\d+/.test(v),
+    spec:END_STATES,
+    parseItem(item){
+      const num=Number(item&&item.id);
+      const id='S'+num;
+      if(!Number.isInteger(num)||!SMETA[id])return{unknown:item&&item.id!=null&&item.id!==''?String(item.id):'(blank)'};
+      const rawValue=item.probability;
+      const value=typeof rawValue==='number'?rawValue:Number(rawValue);
+      return{id,answer:{value:Number.isFinite(value)?value:null,name:String(item.name||''),unit:'percent',rationale:String(item.rationale||''),raw:JSON.stringify(item),source:item}};
+    }
+  }
+};
+function familySpec(family){return FAMILIES[family].spec;}
 function specLabel(q){return q.name?q.num+' · '+q.name:q.id;}
 
 function repairTruncatedJson(text){
@@ -226,32 +259,20 @@ function parseRaw(text){
     }
     if(obj){
       const answers={},seen={},answerOrder=[],unknownIds=[];let family='2030';
-      if(Array.isArray(obj.answers)){
-        for(const item of obj.answers){
-          const id=String(item&&item.id||'').toUpperCase();
-          if(!META[id]){unknownIds.push(id||'(blank)');continue;}
-          seen[id]=(seen[id]||0)+1;
-          answerOrder.push(id);
-          const meta=META[id];
-          const rawValue=meta.type==='probability'?item.probability:item.value;
-          const value=typeof rawValue==='number'?rawValue:Number(rawValue);
-          answers[id]={value:Number.isFinite(value)?value:null,unit:item.unit||null,rationale:String(item.rationale||''),raw:JSON.stringify(item),source:item};
+      for(const [key,fam] of Object.entries(FAMILIES)){
+        if(!Array.isArray(obj[fam.answersKey]))continue;
+        family=key;
+        for(const item of obj[fam.answersKey]){
+          const parsedItem=fam.parseItem(item);
+          if(parsedItem.unknown!==undefined){unknownIds.push(parsedItem.unknown);continue;}
+          seen[parsedItem.id]=(seen[parsedItem.id]||0)+1;
+          answerOrder.push(parsedItem.id);
+          answers[parsedItem.id]=parsedItem.answer;
         }
-      }else if(Array.isArray(obj.end_states)){
-        family='end_states';
-        for(const item of obj.end_states){
-          const num=Number(item&&item.id);
-          const id='S'+num;
-          if(!Number.isInteger(num)||!SMETA[id]){unknownIds.push(item&&item.id!=null&&item.id!==''?String(item.id):'(blank)');continue;}
-          seen[id]=(seen[id]||0)+1;
-          answerOrder.push(id);
-          const rawValue=item.probability;
-          const value=typeof rawValue==='number'?rawValue:Number(rawValue);
-          answers[id]={value:Number.isFinite(value)?value:null,name:String(item.name||''),unit:'percent',rationale:String(item.rationale||''),raw:JSON.stringify(item),source:item};
-        }
+        break;
       }
       return {family,model:obj.model||null,provider:inferProvider(obj.model),cutoff:obj.knowledge_cutoff||null,
-        currentDatetime:obj.current_datetime||null,askedOn:isoDateFromModel(obj.current_datetime),answers,seen,
+        currentDatetime:obj.as_of_date||obj.current_datetime||null,askedOn:isoDateFromModel(obj.as_of_date||obj.current_datetime),answers,seen,
         answerOrder,unknownIds,format:'json',repairNote:repaired?'JSON ended before its final closing characters; the ingester safely restored them.':null};
     }
     return {family:'2030',model:null,provider:null,cutoff:null,currentDatetime:null,askedOn:null,answers:{},seen:{},answerOrder:[],unknownIds:[],format:'invalid_json',parseError:firstError?firstError.message:'Could not parse JSON.'};
@@ -282,7 +303,7 @@ function validate(parsed){
   if(parsed.parseError)errors.push('Invalid JSON: '+parsed.parseError);
   if(parsed.repairNote)warnings.push(parsed.repairNote);
   if(!parsed.model)warnings.push('No model metadata found — fill the model field manually.');
-  if(parsed.format==='json'&&!parsed.currentDatetime)warnings.push('No current_datetime metadata found — confirm the date asked manually.');
+  if(parsed.format==='json'&&!parsed.currentDatetime)warnings.push('No as_of_date (or legacy current_datetime) metadata found — confirm the date asked manually.');
   if(parsed.family==='end_states')return validateEndStates(parsed,errors,warnings);
   if(parsed.unknownIds&&parsed.unknownIds.length)errors.push('Unknown answer IDs: '+parsed.unknownIds.join(', '));
   const dupes=Object.keys(parsed.seen).filter(k=>parsed.seen[k]>1);
@@ -297,7 +318,10 @@ function validate(parsed){
     if(!a||a.value===null||Number.isNaN(a.value)){missing.push(q.id);continue;}
     if(q.type==='probability'){
       if(a.value<0||a.value>100)errors.push(q.id+': probability '+a.value+' is outside 0–100.');
-      if(!Number.isInteger(a.value))errors.push(q.id+': probability must be a whole-number percentage.');
+      if(!Number.isInteger(a.value)){
+        if(a.value>=5)errors.push(q.id+': probabilities of 5 or more must be whole numbers.');
+        else if(Math.round(a.value*10)!==a.value*10)errors.push(q.id+': probability may carry at most one decimal place.');
+      }
     }else{
       if(q.unit==='percent'&&(a.value<0||a.value>100))warnings.push(q.id+': '+a.value+'% looks out of range.');
       if(q.unit==='usd_trillions'&&(a.value<=0||a.value>100))warnings.push(q.id+': '+a.value+' trillion looks off.');
@@ -365,7 +389,7 @@ function sessionMeta(){
     api_string:$('f-api').value.trim()||null,
     self_reported_cutoff:$('f-cutoff').value.trim()||(current&&current.parsed.cutoff)||null,
     track:$('f-track').value,
-    question_set:$('f-qset').value.trim()||(current&&current.parsed.family==='end_states'?'end-states-v2':'v3'),
+    question_set:$('f-qset').value.trim()||FAMILIES[(current&&current.parsed.family)||'2030'].defaultQuestionSet,
     asked_on:$('f-date').value.trim()||todayISO()
   };
 }
@@ -393,7 +417,7 @@ function buildSessionFile(){
     if(q.name)aggregate[q.id].name=q.name;
   }
   return {
-    run_id:m.asked_on+'__'+slug(m.model)+'__'+m.track+(family==='end_states'?'__end-states':''),
+    run_id:m.asked_on+'__'+slug(m.model)+'__'+m.track+FAMILIES[family].runIdSuffix,
     prompt_family:family,
     asked_on:m.asked_on,question_set:m.question_set,track:m.track,
     model:{name:m.model,provider:m.provider,api_string:m.api_string,self_reported_cutoff:m.self_reported_cutoff},
@@ -407,7 +431,7 @@ function buildSessionFile(){
 function renderTable(parsed,report){
   const tb=$('tbody');tb.innerHTML='';
   const spec=familySpec(parsed.family);
-  $('th-q').textContent=parsed.family==='end_states'?'State':'Q';
+  $('th-q').textContent=FAMILIES[parsed.family].idColumn;
   const badset=new Set();
   const idRe=parsed.family==='end_states'?/^State (\d{1,2})/:/^(Q\d{1,2})/;
   report.errors.concat(report.warnings).forEach(m=>{const mm=m.match(idRe);if(mm)badset.add(parsed.family==='end_states'?'S'+mm[1]:mm[1]);});
@@ -429,7 +453,7 @@ function renderAggregate(){
   $('lnk-clear').setAttribute('aria-disabled',batch.length===0?'true':'false');
   if(batch.length===0){$('batch-empty').style.display='block';$('agg-wrap').style.display='none';$('agg-note').style.display='none';return;}
   const f=buildSessionFile();const family=batch[0].family||'2030';const spec=familySpec(family);
-  $('agg-th-q').textContent=family==='end_states'?'State':'Q';
+  $('agg-th-q').textContent=FAMILIES[family].idColumn;
   const body=$('agg-body');body.innerHTML='';
   for(const q of spec){
     const a=f.aggregate[q.id];const tr=document.createElement('tr');
@@ -474,10 +498,11 @@ $('btn-parse').onclick=()=>{
     $('f-date').value=todayISO();$('f-date').dataset.autofilled='true';
   }
   const qset=$('f-qset');
-  if(parsed.family==='end_states'&&qset.value.trim()==='v3')qset.value='end-states-v2';
-  else if(parsed.family!=='end_states'&&qset.value.trim()==='end-states-v2')qset.value='v3';
+  const fam=FAMILIES[parsed.family];
+  const qsetOwner=Object.values(FAMILIES).find(f=>f.ownsQuestionSet(qset.value.trim()));
+  if(!qset.value.trim()||(qsetOwner&&qsetOwner!==fam))qset.value=fam.defaultQuestionSet;
   const st=$('status'),txt=$('status-text');const nAns=Object.keys(parsed.answers).length;
-  const denom=parsed.family==='end_states'?11:50;
+  const denom=familySpec(parsed.family).length;
   const formatLabel=parsed.format==='json'?'JSON':'legacy text';
   if(report.ok&&report.warnings.length===0){st.className='status ok';txt.textContent='Valid '+formatLabel+' · '+nAns+'/'+denom+' parsed, no issues.';}
   else if(report.ok){st.className='status warn';txt.textContent='Valid '+formatLabel+' with '+report.warnings.length+' warning(s) · '+nAns+'/'+denom+' parsed.';}
@@ -496,7 +521,7 @@ $('btn-add').onclick=()=>{
   if(batch.length){
     const b=batch[0]._meta;const bfam=batch[0].family||'2030';
     if(bfam!==entry.family){
-      alert('This batch holds '+(bfam==='end_states'?'end-state':'2030 benchmark')+' samples — '+(entry.family==='end_states'?'an end-state':'a 2030 benchmark')+' sample cannot join it. Download or clear the batch first.');
+      alert('This batch holds '+FAMILIES[bfam].label+' samples — '+FAMILIES[entry.family].article+' sample cannot join it. Download or clear the batch first.');
       return;
     }
     if(b.model!==entry._meta.model||b.track!==entry._meta.track||b.question_set!==entry._meta.question_set){

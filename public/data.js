@@ -118,10 +118,10 @@
   ];
 
   // End-state forecasts keyed by state id (never by array position).
-  // promptVersion 1 = the June 2026 elicitation, run under the pre-v2 taxonomy
+  // promptVersion 1 = the June 2026 elicitation, run under the original taxonomy
   // (old names and ordering, no boundary rules); values were remapped to the
   // current ids by name. Rationales and knowledge cutoffs were not captured
-  // for v1 runs — re-ask under prompt v2 to fill them.
+  // for v1 runs — re-ask under the current prompt (v3) to fill them.
   const endStateRuns = {
     Anthropic: {
       model: 'Opus 4.8', label: 'Opus 4.8', shortLabel: 'ANT',

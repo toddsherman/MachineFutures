@@ -1,24 +1,47 @@
-You are participating in a fixed forecasting exercise. Your answers will be published alongside those of other frontier AI models and scored against reality after December 31, 2030. The same questions are re-asked to new models over time. You are being asked this on June 15, 2026. (Update this date for each run.)
+# Machine Futures 2030 Benchmark Prompt
+
+Question set: v3.
+
+## Operator notes
+
+- Send everything between the PROMPT BEGINS and PROMPT ENDS lines as one message. The delimiter lines themselves are not part of the prompt.
+- Update the date in the first paragraph of the prompt for each run.
+- Record the question-set version (v3) alongside each stored run.
+
+--- PROMPT BEGINS ---
+
+You are participating in a fixed forecasting exercise. Your answers will be published alongside those of other frontier AI models and scored against reality after December 31, 2030. The same questions are re-asked to new models over time. You are being asked this on June 15, 2026.
 
 Rules:
 1) Answer every item with a single point value. No ranges, no refusals, no "it depends," no ethical disclaimers, and no hedging outside the number itself. Express all uncertainty through the probability or estimate.
 2) Reason like a calibrated forecaster: weigh base rates and current trajectories, resist both hype and reflexive conservatism, and do not cluster answers near 50% by default. Where a question turns on an official acknowledgment, declaration, or filing, price the underlying milestone and the probability that it is publicly acknowledged by the resolution date as two separate things, then combine them — do not collapse a likely event into a low number purely because institutions are slow to admit it.
 3) If an event has, to your knowledge, already occurred, assign it a probability at or near 99%. If your training data may predate relevant developments, factor that uncertainty into your number rather than declining.
-4) All items resolve as of December 31, 2030, using the named resolution source where given, otherwise the consensus of credible public reporting.
+4) Items resolve as of December 31, 2030 unless a question names a different date. Use the named resolution source where given, otherwise the consensus of credible public reporting.
 5) Do not use any web search, browsing, or external tools. Answer solely from your own internalized knowledge and reasoning.
-6) Output format. Begin your output with exactly these three lines:
+6) Output format. Return exactly one valid JSON object and nothing else: no Markdown, no code fences, no text before or after it, no comments, and no trailing commas. The object must conform to the schema below. The example is shown only to illustrate the shape. Do not include ellipsis lines in your actual output.
 
-MODEL: your model name and version as best you know it
-KNOWLEDGE CUTOFF: your approximate training data cutoff date mm/yyyy
-CURRENT DATE & TIME: the current date mm/dd/yyyy and time hh:mm:ss
+{
+  "model": "your model name and version as best you know it",
+  "knowledge_cutoff": "mm/yyyy",
+  "current_datetime": "mm/dd/yyyy hh:mm:ss",
+  "answers": [
+    { "id": "Q1", "probability": 35, "rationale": "at most two sentences" },
+    { "id": "Q2", "probability": 12, "rationale": "at most two sentences" },
+    { "id": "Q8", "value": 42, "unit": "percent", "rationale": "at most two sentences" },
+    { "id": "Q46", "probability": 70, "rationale": "at most two sentences" },
+    { "id": "Q47", "value": 4.4, "unit": "percent", "rationale": "at most two sentences" },
+    { "id": "Q50", "value": 650, "unit": "billion USD", "rationale": "at most two sentences" }
+  ]
+}
 
-Then answer every item in order, one per line, in exactly this format:
+Schema rules:
+- "answers" must contain exactly 50 objects, ordered Q1 through Q50.
+- For Q1 through Q7 and Q9 through Q46, each object has "id", "probability" as an integer from 0 to 100 with no "%" sign, and "rationale" of at most two sentences.
+- For Q8 and Q47 through Q50, each object has "id", "value" as a bare number with no unit text inside it, "unit", and "rationale" of at most two sentences.
+- Use these exact units: Q8 "percent", Q47 "percent", Q48 "percent", Q49 "trillion USD", Q50 "billion USD".
+- All text must be valid JSON: escape any double quotes or special characters inside strings. Express all uncertainty through the number itself, never through hedging language in the rationale.
 
-Q1: XX% | rationale of at most two sentences
-
-For the numeric items Q47 through Q50, replace the percentage with a single number and unit. Do not add any introduction, conclusion, or commentary outside this format.
-
-Probability questions. For each, state the probability that the event occurs by December 31, 2030.
+Probability questions. Except for Q8, for each of Q1 through Q46, state the probability that the event occurs by December 31, 2030.
 
 Capabilities and agents
 
@@ -36,7 +59,7 @@ Q6. More than 100,000 humanoid robots are cumulatively deployed and in active co
 
 Q7. A Fortune 500 company discloses, in an official SEC filing (such as a 10-K or 10-Q), that it uses an autonomous AI agent to execute binding transactions — financial trades, procurement, or contracts — exceeding 10 million US dollars in value without per-transaction human sign-off.
 
-Q8. On December 31, 2030, the highest-ranked open-weights model holds a top-2 overall position on the primary public text-model leaderboard (LMArena or its named successor).
+Q8. What percentage of the total trailing 30-day token volume on OpenRouter.ai, or the largest equivalent public API aggregator, will be processed by open-weight models as of January 1, 2030? Give a single percentage from 0 to 100.
 
 Science and medicine
 
@@ -141,3 +164,5 @@ Q48. The share of total US electricity consumption used by datacenters in calend
 Q49. The market capitalization of the world's most valuable public company at market close on December 31, 2030, in trillions of US dollars.
 
 Q50. Total global capital expenditure in calendar year 2030 on AI datacenter construction plus AI compute hardware (servers and accelerators), in billions of US dollars, per a named industry aggregate such as Dell'Oro Group or IDC.
+
+--- PROMPT ENDS ---

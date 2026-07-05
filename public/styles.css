@@ -7,6 +7,7 @@
   --coral: #ff765f;
   --blue: #6f9dff;
   --extinction: #d83b2d;
+  --risk: #dd8f1f;
   --muted: #78786e;
   --line: rgba(17, 18, 15, .17);
   --display: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
@@ -189,9 +190,17 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .doomer-label { display: grid; grid-template-columns: 10px 1fr; gap: 2px 10px; align-items: center; }
 .doomer-label b { font: 800 13px var(--display); text-transform: uppercase; }
 .doomer-label small { color: var(--muted); font: 10px var(--mono); }
-.doomer-meter { height: 24px; border: 1px solid var(--ink); background: rgba(17,18,15,.04); }
+.doomer-meter { height: 24px; display: flex; border: 1px solid var(--ink); background: rgba(17,18,15,.04); }
 .doomer-meter i { min-width: max-content; display: flex; height: 100%; align-items: center; justify-content: flex-end; padding-right: 8px; background: var(--coral); }
+.doomer-meter i.gone { background: var(--extinction); }
+.doomer-meter i.gone span { color: var(--paper); }
+.doomer-meter i.risk { background: var(--risk); }
 .doomer-meter span { font: 800 10px var(--mono); color: var(--ink); }
+.doomer-key { margin: 0; display: flex; gap: 18px; color: var(--muted); font: 10px var(--mono); text-transform: uppercase; }
+.doomer-key span { display: inline-flex; align-items: center; gap: 6px; }
+.doomer-key i { width: 10px; height: 10px; }
+.doomer-key .key-gone i { background: var(--extinction); }
+.doomer-key .key-risk i { background: var(--risk); }
 
 .method-view { padding-bottom: 110px; }
 .method-hero { min-height: 600px; padding-block: 100px; display: flex; flex-direction: column; justify-content: center; }
@@ -205,6 +214,8 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .prompt-block h2 { margin: 0 0 10px; font: 900 44px var(--display); text-transform: uppercase; letter-spacing: -.05em; }
 .prompt-block p:last-child { margin: 0; }
 .button { padding: 17px 21px; display: inline-flex; gap: 28px; flex: 0 0 auto; color: var(--paper); background: var(--ink); text-decoration: none; font: 700 12px var(--mono); text-transform: uppercase; }
+.prompt-buttons { display: flex; flex-direction: column; gap: 12px; flex: 0 0 auto; }
+.prompt-buttons .button { justify-content: space-between; }
 
 .site-footer { min-height: 250px; padding: 55px 36px; display: grid; grid-template-columns: 1fr 1fr auto; align-items: end; gap: 30px; color: var(--paper); background: var(--ink); }
 .footer-mark { font: 900 clamp(42px, 5vw, 78px)/.8 var(--display); letter-spacing: -.07em; text-transform: uppercase; }
@@ -256,6 +267,11 @@ body.dialog-open { overflow: hidden; }
 .stacked-legend .extinction-mark { font-size: 1.16em; }
 .end-leader h2 .extinction-mark { font-size: .58em; margin-left: .7em; vertical-align: .03em; }
 .state-card-meta .extinction-mark { flex: 0 0 auto; margin-left: 0; font-size: 18px; }
+
+.risk-mark { margin-left: .62em; color: var(--risk); font-size: 1.1em; line-height: 1; vertical-align: -.02em; font-style: normal; }
+.stacked-legend .risk-mark { font-size: 1.22em; }
+.end-leader h2 .risk-mark { font-size: .62em; margin-left: .7em; vertical-align: .06em; }
+.state-card-meta .risk-mark { flex: 0 0 auto; margin-left: 0; font-size: 19px; }
 
 @media (max-width: 1100px) {
   .shell { width: min(100% - 44px, 1200px); }

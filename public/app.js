@@ -1,5 +1,14 @@
 (function () {
-  const { categories, questions, runs, states, longTermByProvider, longTermSources = {} } = window.MF_DATA;
+  const { categories, questions, runs, states, endStateRuns = {}, datasetDate } = window.MF_DATA;
+
+  // Guard against taxonomy/data drift: every end-state run must cover exactly
+  // the published state ids and allocate exactly 100 points.
+  Object.entries(endStateRuns).forEach(([provider, run]) => {
+    const ids = Object.keys(run.probabilities).map(Number).sort((a, b) => a - b);
+    const sum = ids.reduce((total, id) => total + run.probabilities[id], 0);
+    const coversAllStates = ids.length === states.length && states.every(state => ids.includes(state.id));
+    if (!coversAllStates || sum !== 100) console.error(`MF_DATA.endStateRuns.${provider}: probabilities must cover state ids 1–${states.length} and sum to 100 (got ${ids.length} states, sum ${sum}).`);
+  });
   const latestRuns = runs.filter(run => run.latest);
   const $ = selector => document.querySelector(selector);
   const $$ = selector => [...document.querySelectorAll(selector)];
@@ -22,10 +31,12 @@
   let activeProvider = 'All';
   let activeEndForecast = 'Median';
   const providerLabels = { OpenAI: 'OpenAI', Anthropic: 'Anthropic', Google: 'Gemini', xAI: 'xAI', Meta: 'Meta', DeepSeek: 'DeepSeek' };
-  const extinctionLabel = 'Humanity dies or might perish';
-  const extinctionMark = state => state.extinction
-    ? `<span class="extinction-mark" role="img" title="${extinctionLabel}" aria-label="${extinctionLabel}"><span></span></span>`
-    : '';
+  const extinctionLabels = { gone: 'Humanity is gone', risk: 'Humanity might perish' };
+  const extinctionMark = state => {
+    if (state.extinction === 'gone') return `<span class="extinction-mark" role="img" title="${extinctionLabels.gone}" aria-label="${extinctionLabels.gone}"><span></span></span>`;
+    if (state.extinction === 'risk') return `<span class="risk-mark" role="img" title="${extinctionLabels.risk}" aria-label="${extinctionLabels.risk}">⚠︎</span>`;
+    return '';
+  };
 
   function renderOrbit() {
     const target = $('#orbit-models');
@@ -169,33 +180,38 @@
     document.body.classList.add('dialog-open');
   }
 
-  const stateValue = (values, state) => values[state.id - 1];
-  const endingOrder = () => [...states].sort((a, b) => (b.extinction ? 1 : 0) - (a.extinction ? 1 : 0) || a.id - b.id);
-  const doomerRating = values => states
-    .filter(state => state.extinction)
-    .reduce((sum, state) => sum + stateValue(values, state), 0);
+  // Forecasts are keyed by state id, never by array position, so a taxonomy
+  // reorder cannot silently misattribute stored probabilities.
+  const stateValue = (run, state) => run.probabilities[state.id];
+  const endingOrder = () => [...states].sort((a, b) => a.id - b.id);
+  const extinctionSums = run => {
+    const sums = { gone: 0, risk: 0 };
+    states.forEach(state => { if (state.extinction) sums[state.extinction] += stateValue(run, state); });
+    return { ...sums, total: sums.gone + sums.risk };
+  };
 
   function stateMedians() {
-    return endingOrder().map(state => ({ ...state, probability: median(Object.values(longTermByProvider).map(values => stateValue(values, state))) }));
+    return endingOrder().map(state => ({ ...state, probability: median(Object.values(endStateRuns).map(run => stateValue(run, state))) }));
   }
 
   function longTermEntries() {
-    return Object.entries(longTermByProvider).map(([provider, values]) => {
+    return Object.entries(endStateRuns).map(([provider, source]) => {
       const run = latestRuns.find(item => item.provider === provider);
       return {
         provider,
-        values,
-        model: longTermSources[provider]?.model || run?.model || provider,
-        label: longTermSources[provider]?.label || provider,
-        shortLabel: longTermSources[provider]?.shortLabel || provider.slice(0, 2),
+        probabilities: source.probabilities,
+        promptVersion: source.promptVersion,
+        model: source.model || run?.model || provider,
+        label: source.label || provider,
+        shortLabel: source.shortLabel || provider.slice(0, 2),
         color: run?.color || '#11120f'
       };
     });
   }
 
   function selectedEndStates() {
-    if (activeEndForecast !== 'Median' && longTermByProvider[activeEndForecast]) {
-      return endingOrder().map(state => ({ ...state, probability: stateValue(longTermByProvider[activeEndForecast], state) }));
+    if (activeEndForecast !== 'Median' && endStateRuns[activeEndForecast]) {
+      return endingOrder().map(state => ({ ...state, probability: stateValue(endStateRuns[activeEndForecast], state) }));
     }
     activeEndForecast = 'Median';
     return stateMedians();
@@ -218,14 +234,14 @@
     const total = selectedStates.reduce((sum, state) => sum + state.probability, 0);
     const normalized = selectedStates.map(state => ({ ...state, display: (state.probability / total) * 100 }));
     $('#consensus-bar').setAttribute('aria-label', `${activeEndForecast} probability by end state`);
-    $('#consensus-bar').innerHTML = normalized.map(state => `<button style="width:${state.display}%;--state:${state.color}" title="${state.name}: ${state.probability}%${state.extinction ? ` · ${extinctionLabel}` : ''}" data-state="${state.id}"><span>${state.id}</span></button>`).join('');
+    $('#consensus-bar').innerHTML = normalized.map(state => `<button style="width:${state.display}%;--state:${state.color}" title="${state.name}: ${state.probability}%${state.extinction ? ` · ${extinctionLabels[state.extinction]}` : ''}" data-state="${state.id}"><span>${state.id}</span></button>`).join('');
     $('#consensus-legend').innerHTML = normalized.map(state => `<button data-state="${state.id}"><i style="--state:${state.color}"></i><span>${state.id}. ${state.name}${extinctionMark(state)}</span><b>${state.probability}%</b></button>`).join('');
 
     const leader = [...selectedStates].sort((a, b) => b.probability - a.probability)[0];
     $('#end-leader').innerHTML = `<p class="kicker">Most likely ending</p><span class="leader-number">${leader.id}</span><h2>${leader.name}${extinctionMark(leader)}</h2><strong>${leader.probability}%</strong><p>${leader.description}</p>`;
 
     $('#state-grid').innerHTML = selectedStates.map(state => {
-      const providerValues = entries.map(entry => ({ ...entry, value: stateValue(entry.values, state) })).sort((a, b) => b.value - a.value);
+      const providerValues = entries.map(entry => ({ ...entry, value: stateValue(entry, state) })).sort((a, b) => b.value - a.value);
       return `<article class="state-card" id="state-${state.id}" style="--state:${state.color}">
         <div class="state-card-head"><span>${String(state.id).padStart(2, '0')}</span><h3>${state.name}</h3><div class="state-card-meta"><strong>${state.probability}%</strong>${extinctionMark(state)}</div></div>
         <p>${state.description}</p>
@@ -237,20 +253,27 @@
     const colors = orderedStates.map(state => state.color);
     $('#model-bars').innerHTML = entries.map(entry => {
       return `<div class="model-bar-row"><div class="model-bar-label"><span class="model-swatch" style="--swatch:${entry.color}"></span><b>${entry.provider}</b><small>${entry.model}</small></div><div class="model-stack">${orderedStates.map((state, index) => {
-        const value = stateValue(entry.values, state);
+        const value = stateValue(entry, state);
         return `<button style="width:${value}%;--state:${colors[index]}" title="${state.name}: ${value}%" aria-label="${entry.provider} ${state.name}: ${value}%" data-small="${value < 5}"><span>${value}%</span></button>`;
       }).join('')}</div></div>`;
     }).join('');
 
     const doomerEntries = entries
-      .map(entry => ({ ...entry, rating: doomerRating(entry.values) }))
-      .sort((a, b) => b.rating - a.rating);
+      .map(entry => ({ ...entry, sums: extinctionSums(entry) }))
+      .sort((a, b) => b.sums.total - a.sums.total);
     $('#doomer-ratings').innerHTML = `
-      <div class="doomer-head"><p class="kicker">Doomer rating</p><h3>Extinction sum</h3></div>
+      <div class="doomer-head">
+        <div><p class="kicker">Doomer rating</p><h3>Extinction-risk exposure</h3></div>
+        <p class="doomer-key"><span class="key-gone"><i></i>Humanity is gone (1–3)</span><span class="key-risk"><i></i>Might perish (4–5)</span></p>
+      </div>
       <div class="doomer-list">
         ${doomerEntries.map(entry => `<div class="doomer-row">
           <div class="doomer-label"><span class="model-swatch" style="--swatch:${entry.color}"></span><b>${entry.provider}</b><small>${entry.model}</small></div>
-          <div class="doomer-meter" aria-label="${entry.provider} extinction sum: ${entry.rating}%"><i style="width:${entry.rating}%"><span>${entry.rating}%</span></i></div>
+          <div class="doomer-meter" aria-label="${entry.provider}: ${entry.sums.gone}% humanity is gone, ${entry.sums.risk}% might perish">${
+            [['gone', entry.sums.gone], ['risk', entry.sums.risk]]
+              .filter(([, value]) => value > 0)
+              .map(([tier, value]) => `<i class="${tier}" style="width:${value}%"><span>${value}%</span></i>`).join('')
+          }</div>
         </div>`).join('')}
       </div>`;
   }
@@ -302,6 +325,7 @@
   $('#prototype-note button').addEventListener('click', () => $('#prototype-note').remove());
   window.addEventListener('hashchange', () => switchView(location.hash.slice(1)));
 
+  if (datasetDate) $('#dataset-date').textContent = datasetDate;
   renderOrbit();
   renderSignals();
   renderCategoryFilters();

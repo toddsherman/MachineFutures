@@ -30,6 +30,43 @@
   let activeCategory = 'All';
   let activeProvider = 'All';
   let activeEndForecast = 'Median';
+
+  // Filter state lives in the hash so any configuration is shareable:
+  //   #2030?model=Anthropic&topic=Labor   #end-states?model=Google
+  function parseHash() {
+    const raw = location.hash.slice(1);
+    const splitAt = raw.indexOf('?');
+    return {
+      view: splitAt === -1 ? raw : raw.slice(0, splitAt),
+      params: new URLSearchParams(splitAt === -1 ? '' : raw.slice(splitAt + 1))
+    };
+  }
+
+  function applyHashState() {
+    const { view, params } = parseHash();
+    const model = params.get('model');
+    const topic = params.get('topic');
+    if (view === 'end-states') {
+      activeEndForecast = model && endStateRuns[model] ? model : 'Median';
+    } else {
+      activeProvider = model && latestRuns.some(run => run.provider === model) ? model : 'All';
+      activeCategory = topic && categories.includes(topic) ? topic : 'All';
+    }
+    return view;
+  }
+
+  function updateHash() {
+    const view = document.documentElement.dataset.view || '2030';
+    const params = new URLSearchParams();
+    if (view === 'end-states') {
+      if (activeEndForecast !== 'Median') params.set('model', activeEndForecast);
+    } else if (view === '2030') {
+      if (activeProvider !== 'All') params.set('model', activeProvider);
+      if (activeCategory !== 'All') params.set('topic', activeCategory);
+    }
+    const query = params.toString();
+    history.replaceState(null, '', location.pathname + location.search + '#' + view + (query ? '?' + query : ''));
+  }
   const providerLabels = { OpenAI: 'OpenAI', Anthropic: 'Anthropic', Google: 'Gemini', xAI: 'xAI', Meta: 'Meta', DeepSeek: 'DeepSeek' };
   const extinctionLabels = { gone: 'Humanity is gone', risk: 'Humanity might perish' };
   const extinctionMark = state => {
@@ -296,6 +333,7 @@
       activeCategory = categoryTarget.dataset.category;
       renderCategoryFilters();
       renderQuestions();
+      updateHash();
     }
 
     const providerTarget = event.target.closest('[data-provider]');
@@ -303,12 +341,14 @@
       activeProvider = providerTarget.dataset.provider;
       renderProviderFilters();
       renderQuestions();
+      updateHash();
     }
 
     const endForecastTarget = event.target.closest('[data-end-forecast]');
     if (endForecastTarget) {
       activeEndForecast = endForecastTarget.dataset.endForecast;
       renderEndStates();
+      updateHash();
     }
 
     const stateTarget = event.target.closest('[data-state]');
@@ -323,14 +363,22 @@
   });
   $('#detail-dialog').addEventListener('close', () => document.body.classList.remove('dialog-open'));
   $('#prototype-note button').addEventListener('click', () => $('#prototype-note').remove());
-  window.addEventListener('hashchange', () => switchView(location.hash.slice(1)));
+  window.addEventListener('hashchange', () => {
+    const view = applyHashState();
+    renderCategoryFilters();
+    renderProviderFilters();
+    renderQuestions();
+    renderEndStates();
+    switchView(view);
+  });
 
   if (datasetDate) $('#dataset-date').textContent = datasetDate;
+  const initialView = applyHashState();
   renderOrbit();
   renderSignals();
   renderCategoryFilters();
   renderProviderFilters();
   renderQuestions();
   renderEndStates();
-  switchView(location.hash.slice(1));
+  switchView(initialView);
 })();

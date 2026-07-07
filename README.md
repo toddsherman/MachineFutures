@@ -28,7 +28,7 @@ For each model on each dataset date:
 - Use the median aggregate as the default value shown on the website.
 - Preserve min, max, sample count, and representative rationale text so the site can show model instability or spread over time.
 
-The current authoring path is model output -> local ingester/exported JSON -> `public/data.js` -> git push -> Vercel deploy. Until an automated importer exists, update `public/data.js` from the normalized aggregate files.
+The authoring path is model output -> local ingester -> batch JSON in `runs/` -> `node tools/import-runs.mjs` -> git push -> Vercel deploy. The importer rewrites the IMPORTED RUNS block in `public/data.js` from every batch in `runs/`; imported runs replace the synthetic placeholder runs for their provider. (End-state batches are not imported yet; `endStateRuns` in `public/data.js` is still maintained by hand.)
 
 ## Repository structure
 
@@ -38,6 +38,7 @@ The current authoring path is model output -> local ingester/exported JSON -> `p
 - `public/forecasting_prompt.md` — 50-question 2030 benchmark prompt
 - `forecast-ingest_1.html` — private local ingestion utility
 - `runs/` — raw sample batches + aggregates exported by the ingester (committed, never deployed)
+- `tools/import-runs.mjs` — imports `runs/*.json` into `public/data.js`
 - `vercel.json` — restricts Vercel output to `public/`
 
 The included forecasts are explicitly marked as illustrative. Replace the generated run data in `public/data.js` with parsed model outputs before publication.

@@ -393,16 +393,30 @@ function sessionMeta(){
     asked_on:$('f-date').value.trim()||todayISO()
   };
 }
-function buildSampleEntry(){
-  const sample=parseInt($('f-sample').value,10)||1;
-  const family=current.parsed.family||'2030';
+function normalizedAnswers(parsed){
   const answers={};
-  for(const q of familySpec(family)){
-    const a=current.parsed.answers[q.id];
+  for(const q of familySpec(parsed.family||'2030')){
+    const a=parsed.answers[q.id];
     answers[q.id]={value:a?a.value:null,rationale:a?a.rationale:''};
     if(q.type==='numeric')answers[q.id].unit=q.unit;
   }
-  return {sample,family,answers,_meta:sessionMeta()};
+  return answers;
+}
+/* ---------- duplicate detection: same content pasted twice, regardless of sample number ---------- */
+function answerSig(answers,withRationales){
+  return JSON.stringify(Object.keys(answers).sort().map(k=>withRationales
+    ?[k,answers[k].value,answers[k].rationale||'']
+    :[k,answers[k].value]));
+}
+function findDuplicate(answers){
+  for(const s of batch)if(answerSig(s.answers,true)===answerSig(answers,true))return{sample:s.sample,kind:'exact'};
+  for(const s of batch)if(answerSig(s.answers,false)===answerSig(answers,false))return{sample:s.sample,kind:'values'};
+  return null;
+}
+function buildSampleEntry(){
+  const sample=parseInt($('f-sample').value,10)||1;
+  const family=current.parsed.family||'2030';
+  return {sample,family,answers:normalizedAnswers(current.parsed),_meta:sessionMeta()};
 }
 function buildSessionFile(){
   if(!batch.length)return null;
@@ -489,6 +503,12 @@ function renderAggregate(){
 /* ---------- actions ---------- */
 $('btn-parse').onclick=()=>{
   const parsed=parseRaw($('f-raw').value);const report=validate(parsed);current={parsed,report};
+  if(batch.length&&(batch[0].family||'2030')===parsed.family){
+    const dupe=findDuplicate(normalizedAnswers(parsed));
+    if(dupe)report.warnings.unshift(dupe.kind==='exact'
+      ?'Duplicate run: values and rationales are identical to sample #'+dupe.sample+' already in the batch — adding it will be blocked.'
+      :'All values match sample #'+dupe.sample+' already in the batch (rationales differ) — confirm this is really a distinct run.');
+  }
   if($('f-model').value.trim()===''&&parsed.model)$('f-model').value=parsed.model;
   if($('f-provider').value.trim()===''&&parsed.provider)$('f-provider').value=parsed.provider;
   if($('f-cutoff').value.trim()===''&&parsed.cutoff)$('f-cutoff').value=parsed.cutoff;
@@ -529,6 +549,11 @@ $('btn-add').onclick=()=>{
     }
   }
   if(batch.some(x=>x.sample===entry.sample)){alert('Sample #'+entry.sample+' is already in the batch. Bump the sample number.');return;}
+  const dupe=findDuplicate(entry.answers);
+  if(dupe){
+    if(dupe.kind==='exact'){alert('Duplicate run: values and rationales are identical to sample #'+dupe.sample+'. This looks like the same output pasted twice — get a fresh run from the model instead.');return;}
+    if(!confirm('All values match sample #'+dupe.sample+' (rationales differ). Are you sure this is a distinct run? Add anyway?'))return;
+  }
   batch.push(entry);
   $('f-sample').value=entry.sample+1;
   renderAggregate();

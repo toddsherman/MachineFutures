@@ -14,7 +14,7 @@
 
 - [ ] Ensure the local HTML ingestion tool works well end to end.
 - [x] Extend ingestion to support the separate 11-end-state prompt.
-- [ ] Store 5 raw samples plus a normalized aggregate for each model/date/prompt family.
+- [ ] Store 5 raw samples plus a normalized aggregate for each model/date/prompt family. (Layout decided: one batch JSON per model/date/family in `runs/`.)
 - [ ] Add or document the transform from normalized aggregate JSON into `public/data.js`.
 
 ## Site Content

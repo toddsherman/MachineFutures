@@ -37,6 +37,7 @@ The current authoring path is model output -> local ingester/exported JSON -> `p
 - `public/end_states.md` — 11-end-state prompt and taxonomy
 - `public/forecasting_prompt.md` — 50-question 2030 benchmark prompt
 - `forecast-ingest_1.html` — private local ingestion utility
+- `runs/` — raw sample batches + aggregates exported by the ingester (committed, never deployed)
 - `vercel.json` — restricts Vercel output to `public/`
 
 The included forecasts are explicitly marked as illustrative. Replace the generated run data in `public/data.js` with parsed model outputs before publication.

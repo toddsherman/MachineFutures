@@ -1,0 +1,10 @@
+{
+  "_comment": "Roster for tools/run-elicitation.mjs. VERIFY each api model id against the provider's current docs before enabling its key — ids here are best-effort placeholders except Anthropic's, which is confirmed. keyEnv names the GitHub Actions secret / env var holding the API key; a model whose key is absent is skipped.",
+  "models": [
+    { "key": "anthropic", "provider": "Anthropic", "label": "Claude Fable 5", "api": "anthropic", "model": "claude-fable-5", "keyEnv": "ANTHROPIC_API_KEY" },
+    { "key": "openai", "provider": "OpenAI", "label": "GPT-5.5", "api": "openai-compatible", "baseUrl": "https://api.openai.com/v1", "model": "gpt-5.5", "keyEnv": "OPENAI_API_KEY" },
+    { "key": "google", "provider": "Google", "label": "Gemini 3.1 Pro", "api": "google", "model": "gemini-3.1-pro", "keyEnv": "GEMINI_API_KEY" },
+    { "key": "xai", "provider": "xAI", "label": "Grok 4", "api": "openai-compatible", "baseUrl": "https://api.x.ai/v1", "model": "grok-4", "keyEnv": "XAI_API_KEY" },
+    { "key": "deepseek", "provider": "DeepSeek", "label": "DeepSeek R2", "api": "openai-compatible", "baseUrl": "https://api.deepseek.com/v1", "model": "deepseek-reasoner", "keyEnv": "DEEPSEEK_API_KEY" }
+  ]
+}

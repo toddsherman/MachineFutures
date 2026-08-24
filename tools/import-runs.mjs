@@ -21,15 +21,47 @@ const PROVIDER_COLORS = {
   xAI: '#f0eddf', Meta: '#9c87ff', DeepSeek: '#49d3d3'
 };
 const QUESTION_IDS = Array.from({ length: 50 }, (_, i) => 'Q' + (i + 1));
+const STATE_IDS = Array.from({ length: 11 }, (_, i) => 'S' + (i + 1));
+const SHORT_LABELS = { Anthropic: 'ANT', OpenAI: 'OAI', Google: 'GDM', xAI: 'XAI', Meta: 'MET', DeepSeek: 'DSK' };
+const stripProvider = name => String(name || 'unknown').replace(/\s*\((?:OpenAI|Anthropic|Google|xAI|Meta|DeepSeek|mock)\)\s*$/, '');
+
+// Largest-remainder renormalization: integer probabilities summing to exactly 100.
+function renormalize(values) {
+  const total = values.reduce((a, c) => a + c, 0);
+  if (!total) return values.map(() => 0);
+  const scaled = values.map(v => (v / total) * 100);
+  const floored = scaled.map(Math.floor);
+  let shortfall = 100 - floored.reduce((a, c) => a + c, 0);
+  const order = scaled.map((v, i) => [v - floored[i], i]).sort((a, b) => b[0] - a[0]);
+  for (let k = 0; k < shortfall; k++) floored[order[k % order.length][1]] += 1;
+  return floored;
+}
 
 const files = readdirSync(runsDir).filter(f => f.endsWith('.json')).sort();
 const batches = [];
+const endStateBatches = [];
 const problems = [];
 
 for (const file of files) {
   const batch = JSON.parse(readFileSync(join(runsDir, file), 'utf8'));
   if (batch.prompt_family === 'end_states') {
-    console.log(`~ ${file}: end-state batches are not imported yet (endStateRuns in data.js is still maintained by hand) — skipped.`);
+    const provider = batch.model?.provider;
+    if (!PROVIDER_COLORS[provider]) { problems.push(`${file}: unknown provider "${provider}"`); continue; }
+    const missing = STATE_IDS.filter(id => { const a = batch.aggregate?.[id]; return !a || !a.n || typeof a.median !== 'number'; });
+    if (missing.length) { problems.push(`${file}: aggregate missing ${missing.join(', ')}`); continue; }
+    const medians = STATE_IDS.map(id => batch.aggregate[id].median);
+    const probs = renormalize(medians);
+    endStateBatches.push({
+      file,
+      provider,
+      model: stripProvider(batch.model?.name),
+      date: batch.asked_on,
+      promptVersion: Number((batch.question_set || '').match(/end-states-v(\d+)/)?.[1]) || null,
+      knowledgeCutoff: batch.model?.self_reported_cutoff || null,
+      sampleCount: batch.n_samples ?? (batch.samples || []).length,
+      probabilities: Object.fromEntries(probs.map((p, i) => [i + 1, p])),
+      rationales: Object.fromEntries(STATE_IDS.map((id, i) => [i + 1, String(batch.aggregate[id].rationale || '')]))
+    });
     continue;
   }
   if (batch.prompt_family !== '2030') { problems.push(`${file}: unknown prompt_family "${batch.prompt_family}"`); continue; }
@@ -97,10 +129,37 @@ const block = batches.length
   ? `const importedRuns = [\n${batches.map(emit).join(',\n')}\n  ];`
   : 'const importedRuns = [];';
 
-const data = readFileSync(dataPath, 'utf8');
+// End-state runs: one entry per provider, newest asked_on wins.
+const endStateByProvider = {};
+for (const b of endStateBatches) {
+  if (!endStateByProvider[b.provider] || b.date >= endStateByProvider[b.provider].date) endStateByProvider[b.provider] = b;
+}
+const emitEndState = b => `${indent}${b.provider}: {
+${indent}  model: ${JSON.stringify(b.model)}, label: ${JSON.stringify(b.model)}, shortLabel: ${JSON.stringify(SHORT_LABELS[b.provider] || b.provider.slice(0, 3).toUpperCase())},
+${indent}  promptVersion: ${JSON.stringify(b.promptVersion)}, date: ${JSON.stringify(b.date)}, knowledgeCutoff: ${JSON.stringify(b.knowledgeCutoff)},
+${indent}  sampleCount: ${b.sampleCount}, source: ${JSON.stringify('runs/' + b.file)},
+${indent}  probabilities: { ${Object.entries(b.probabilities).map(([id, p]) => `${id}: ${p}`).join(', ')} },
+${indent}  rationales: {
+${Object.entries(b.rationales).map(([id, r]) => `${indent}    ${id}: ${JSON.stringify(r)}`).join(',\n')}
+${indent}  }
+${indent}}`;
+const endStateEntries = Object.values(endStateByProvider);
+const endStateBlock = endStateEntries.length
+  ? `const importedEndStateRuns = {\n${endStateEntries.map(emitEndState).join(',\n')}\n  };`
+  : 'const importedEndStateRuns = {};';
+
+let data = readFileSync(dataPath, 'utf8');
 const marker = /(\/\* BEGIN IMPORTED RUNS[\s\S]*?\*\/\n)[\s\S]*?(\n\s*\/\* END IMPORTED RUNS \*\/)/;
 if (!marker.test(data)) { console.error('✗ IMPORTED RUNS markers not found in public/data.js'); process.exit(1); }
-writeFileSync(dataPath, data.replace(marker, `$1  ${block}$2`));
+data = data.replace(marker, `$1  ${block}$2`);
+const endStateMarker = /(\/\* BEGIN IMPORTED END-STATE RUNS[\s\S]*?\*\/\n)[\s\S]*?(\n\s*\/\* END IMPORTED END-STATE RUNS \*\/)/;
+if (!endStateMarker.test(data)) { console.error('✗ IMPORTED END-STATE RUNS markers not found in public/data.js'); process.exit(1); }
+data = data.replace(endStateMarker, `$1  ${endStateBlock}$2`);
+writeFileSync(dataPath, data);
 
-console.log(`✓ Imported ${batches.length} run(s) into public/data.js:`);
-batches.forEach(b => console.log(`  ${b.id} — ${b.provider} / ${b.model}, ${b.sampleCount} samples${b === latestByProvider[b.provider] ? ' (latest)' : ''}`));
+console.log(`✓ Imported ${batches.length} 2030 run(s) and ${endStateEntries.length} end-state run(s) into public/data.js:`);
+batches.forEach(b => console.log(`  [2030] ${b.id} — ${b.provider} / ${b.model}, ${b.sampleCount} samples${b === latestByProvider[b.provider] ? ' (latest)' : ''}`));
+endStateEntries.forEach(b => {
+  const sum = Object.values(b.probabilities).reduce((a, c) => a + c, 0);
+  console.log(`  [end-states] ${b.provider} / ${b.model} — ${b.date}, ${b.sampleCount} samples, prompt v${b.promptVersion}, sum ${sum}`);
+});

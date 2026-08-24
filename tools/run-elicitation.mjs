@@ -1,0 +1,220 @@
+#!/usr/bin/env node
+// Automated end-state elicitation harness.
+//
+// For each model in tools/models.json whose API key is present in the
+// environment: sends the end-state prompt (extracted verbatim from
+// public/end_states.md between the PROMPT BEGINS/ENDS delimiters, with
+// {{RUN_DATE}} substituted), collects 5 samples at provider-default
+// sampling settings with no tools, validates each against the taxonomy
+// rules, and writes one batch JSON per model into runs/ — the same
+// format forecast-ingest_1.html exports, so tools/import-runs.mjs and
+// the manual path stay interchangeable.
+//
+// Usage:
+//   node tools/run-elicitation.mjs [--models anthropic,google] [--samples 5]
+//                                  [--out runs] [--date YYYY-MM-DD] [--mock]
+//
+// Methodology notes: no fallback models are configured anywhere — a
+// refusal or invalid response is recorded as a failed sample, never
+// silently answered by a different model. Sampling params are omitted
+// so every provider runs at its own defaults.
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+
+const args = process.argv.slice(2);
+const argValue = name => { const i = args.indexOf(name); return i === -1 ? null : args[i + 1]; };
+const MOCK = args.includes('--mock');
+const SAMPLES = Number(argValue('--samples') || 5);
+const OUT_DIR = join(root, argValue('--out') || 'runs');
+const RUN_DATE = argValue('--date') || new Date().toISOString().slice(0, 10);
+const ONLY = argValue('--models')?.split(',').map(s => s.trim()).filter(Boolean) || null;
+const QUESTION_SET = 'end-states-v3';
+
+const STATE_NAMES = ['Terminal Silence', 'The Inheritance', 'Bootloader', 'Machine Ecology', 'The Diaspora',
+  'The Merger', 'The Preserve', 'Coexistence', 'The Held Leash', 'The Lock-in', 'The Renunciation'];
+
+/* ---------- prompt ---------- */
+function buildPrompt() {
+  const doc = readFileSync(join(root, 'public', 'end_states.md'), 'utf8');
+  const match = doc.match(/^--- PROMPT BEGINS ---$([\s\S]*?)^--- PROMPT ENDS ---$/m);
+  if (!match) throw new Error('PROMPT BEGINS/ENDS delimiters not found in public/end_states.md');
+  const [y, m, d] = RUN_DATE.split('-').map(Number);
+  const longDate = new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'long', day: 'numeric' });
+  const prompt = match[1].trim().replaceAll('{{RUN_DATE}}', longDate);
+  if (prompt.includes('{{')) throw new Error('Unsubstituted placeholder left in prompt');
+  return prompt;
+}
+
+/* ---------- provider adapters (raw HTTP, zero dependencies) ---------- */
+async function post(url, headers, body) {
+  const res = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify(body) });
+  const text = await res.text();
+  if (!res.ok) { const err = new Error(`HTTP ${res.status}: ${text.slice(0, 400)}`); err.status = res.status; throw err; }
+  return JSON.parse(text);
+}
+
+const adapters = {
+  async anthropic(model, prompt, key) {
+    // Fable-5-generation models: thinking is always on (omit the param) and
+    // sampling params are rejected — send only model/max_tokens/messages.
+    const res = await post('https://api.anthropic.com/v1/messages', {
+      'x-api-key': key, 'anthropic-version': '2023-06-01'
+    }, { model: model.model, max_tokens: 8192, messages: [{ role: 'user', content: prompt }] });
+    if (res.stop_reason === 'refusal') throw new Error(`refusal (${res.stop_details?.category || 'uncategorized'})`);
+    if (res.stop_reason === 'max_tokens') throw new Error('response truncated at max_tokens');
+    return res.content.filter(block => block.type === 'text').map(block => block.text).join('');
+  },
+  async 'openai-compatible'(model, prompt, key) {
+    const res = await post(`${model.baseUrl}/chat/completions`, {
+      authorization: `Bearer ${key}`
+    }, { model: model.model, messages: [{ role: 'user', content: prompt }] });
+    const choice = res.choices?.[0];
+    if (!choice?.message?.content) throw new Error('empty completion');
+    if (choice.finish_reason === 'length') throw new Error('response truncated');
+    return choice.message.content;
+  },
+  async google(model, prompt, key) {
+    const res = await post(`https://generativelanguage.googleapis.com/v1beta/models/${model.model}:generateContent`, {
+      'x-goog-api-key': key
+    }, { contents: [{ role: 'user', parts: [{ text: prompt }] }] });
+    const parts = res.candidates?.[0]?.content?.parts || [];
+    const text = parts.filter(p => p.text && !p.thought).map(p => p.text).join('');
+    if (!text) throw new Error('empty completion');
+    return text;
+  }
+};
+
+function mockResponse(model, sampleIndex) {
+  const base = [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 10];
+  const probs = [...base];
+  const shift = (sampleIndex + model.key.length) % 10;
+  probs[shift] += 3; probs[(shift + 4) % 11] -= 3;
+  return JSON.stringify({
+    model: `${model.label} (mock)`, knowledge_cutoff: '01/2026',
+    as_of_date: `${RUN_DATE.slice(5, 7)}/${RUN_DATE.slice(8, 10)}/${RUN_DATE.slice(0, 4)}`,
+    end_states: STATE_NAMES.map((name, i) => ({ id: i + 1, name, probability: probs[i], rationale: `Mock rationale ${sampleIndex + 1} for ${name}.` }))
+  });
+}
+
+/* ---------- validation (same rules the ingester enforces) ---------- */
+function parseAndValidate(text) {
+  const clean = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
+  let obj;
+  try { obj = JSON.parse(clean); } catch (error) { throw new Error('invalid JSON: ' + error.message); }
+  if (!Array.isArray(obj.end_states)) throw new Error('missing end_states array');
+  if (obj.end_states.length !== 11) throw new Error(`expected 11 entries, got ${obj.end_states.length}`);
+  let sum = 0;
+  const answers = {};
+  obj.end_states.forEach((entry, index) => {
+    const id = index + 1;
+    if (Number(entry.id) !== id) throw new Error(`entry ${index}: id ${entry.id}, expected ${id} (must be ordered 1-11)`);
+    if (entry.name !== STATE_NAMES[index]) throw new Error(`state ${id}: name must be "${STATE_NAMES[index]}", received "${entry.name}"`);
+    const p = entry.probability;
+    if (!Number.isInteger(p) || p < 0 || p > 100) throw new Error(`state ${id}: probability must be an integer 0-100, received ${JSON.stringify(p)}`);
+    sum += p;
+    answers['S' + id] = { value: p, rationale: String(entry.rationale || '') };
+  });
+  if (sum !== 100) throw new Error(`probabilities sum to ${sum}, must be exactly 100`);
+  return { meta: { model: obj.model || null, cutoff: obj.knowledge_cutoff || null, asOf: obj.as_of_date || null }, answers };
+}
+
+/* ---------- aggregation (mirrors forecast-ingest_1.html) ---------- */
+const median = a => { const s = [...a].sort((x, y) => x - y); const n = s.length; return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2; };
+const round1 = v => Math.round(v * 10) / 10;
+
+function aggregate(samples) {
+  const agg = {};
+  STATE_NAMES.forEach((name, index) => {
+    const id = 'S' + (index + 1);
+    const vals = samples.map(s => s.answers[id].value);
+    const med = median(vals);
+    let best = '', bd = Infinity;
+    for (const s of samples) { const d = Math.abs(s.answers[id].value - med); if (d < bd) { bd = d; best = s.answers[id].rationale; } }
+    agg[id] = { name, mean: round1(vals.reduce((a, c) => a + c, 0) / vals.length), median: round1(med), min: Math.min(...vals), max: Math.max(...vals), n: vals.length, unit: 'percent', rationale: best };
+  });
+  return agg;
+}
+
+const slug = s => (s || 'model').toLowerCase().replace(/[^a-z0-9.]+/g, '-').replace(/^-+|-+$/g, '');
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+/* ---------- per-model elicitation ---------- */
+async function elicit(model, prompt) {
+  const key = MOCK ? 'mock' : process.env[model.keyEnv];
+  if (!key) { console.log(`~ ${model.key}: ${model.keyEnv} not set — skipped`); return null; }
+
+  const samples = [];
+  const failures = [];
+  const seen = new Map();
+  const maxAttempts = SAMPLES + 4;
+
+  for (let attempt = 1; samples.length < SAMPLES && attempt <= maxAttempts; attempt++) {
+    try {
+      let text;
+      if (MOCK) text = mockResponse(model, attempt - 1);
+      else {
+        for (let httpTry = 1; ; httpTry++) {
+          try { text = await adapters[model.api](model, prompt, key); break; }
+          catch (error) {
+            const retryable = error.status === 429 || error.status >= 500;
+            if (!retryable || httpTry >= 3) throw error;
+            await sleep(httpTry * 15000);
+          }
+        }
+      }
+      const { meta, answers } = parseAndValidate(text);
+      const sig = JSON.stringify(Object.values(answers).map(a => [a.value, a.rationale]));
+      if (seen.has(sig)) console.warn(`! ${model.key}: sample ${samples.length + 1} is identical to sample ${seen.get(sig)} (kept — an API run, not a paste error, but worth noting)`);
+      else seen.set(sig, samples.length + 1);
+      samples.push({ sample: samples.length + 1, meta, answers, raw: text });
+      console.log(`  ${model.key}: sample ${samples.length}/${SAMPLES} ok`);
+    } catch (error) {
+      failures.push({ attempt, reason: String(error.message || error) });
+      console.warn(`! ${model.key}: attempt ${attempt} failed — ${error.message}`);
+    }
+    if (!MOCK) await sleep(1500);
+  }
+
+  if (!samples.length) { console.error(`✗ ${model.key}: no valid samples after ${maxAttempts} attempts`); return { ok: false }; }
+  if (samples.length < SAMPLES) console.warn(`! ${model.key}: only ${samples.length}/${SAMPLES} valid samples`);
+
+  const name = samples[0].meta.model || `${model.label} (${model.provider})`;
+  const batch = {
+    run_id: `${RUN_DATE}__${slug(name)}__closed_book__end-states`,
+    prompt_family: 'end_states',
+    asked_on: RUN_DATE,
+    question_set: QUESTION_SET,
+    track: 'closed_book',
+    model: { name, provider: model.provider, api_string: model.model, self_reported_cutoff: samples[0].meta.cutoff },
+    n_samples: samples.length,
+    samples: samples.map(s => ({ sample: s.sample, answers: s.answers })),
+    aggregate: aggregate(samples),
+    harness: { version: 1, mode: MOCK ? 'mock' : 'api', target_samples: SAMPLES, failures }
+  };
+  const file = join(OUT_DIR, batch.run_id + '.json');
+  mkdirSync(OUT_DIR, { recursive: true });
+  writeFileSync(file, JSON.stringify(batch, null, 2) + '\n');
+  console.log(`✓ ${model.key}: wrote ${file} (${samples.length} samples, ${failures.length} failed attempts)`);
+  return { ok: true };
+}
+
+/* ---------- main ---------- */
+const roster = JSON.parse(readFileSync(join(root, 'tools', 'models.json'), 'utf8')).models
+  .filter(model => !ONLY || ONLY.includes(model.key));
+if (!roster.length) { console.error('✗ no models matched --models filter'); process.exit(1); }
+
+const prompt = buildPrompt();
+console.log(`Eliciting ${SAMPLES} samples for ${roster.length} model(s), run date ${RUN_DATE}${MOCK ? ' [MOCK]' : ''}`);
+
+let wrote = 0, hardFailures = 0;
+for (const model of roster) {
+  const result = await elicit(model, prompt);
+  if (result?.ok) wrote++;
+  else if (result) hardFailures++;
+}
+console.log(`Done: ${wrote} batch(es) written, ${hardFailures} model(s) failed, ${roster.length - wrote - hardFailures} skipped.`);
+if (!wrote) { console.error('✗ nothing elicited — check API keys and model ids in tools/models.json'); process.exit(1); }
+if (hardFailures) process.exit(2);

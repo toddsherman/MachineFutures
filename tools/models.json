@@ -1,14 +1,84 @@
 {
   "_comment": "Roster for tools/run-elicitation.mjs. A model whose keyEnv is absent from the environment is skipped, so the set of keys you configure decides which models actually run. Run `node tools/run-elicitation.mjs --check` to verify every key and model id with one cheap call each before a full run.",
-  "_verified": "Ids checked against provider docs 2026-08-24. Confirmed: claude-fable-5, gemini-3.1-pro, grok-4.6, deepseek-v4-pro, muse-spark-1.2. Preflight-confirmed live 2026-08-24: claude-fable-5, gpt-5.5, gemini-3.1-pro-preview, grok-4.6, muse-spark-1.2. Unconfirmed (no key yet): deepseek-v4-pro, mistral-large-3, kimi-k2.6. Always pin an explicit version — never an alias like gemini-pro-latest, which drifts and breaks longitudinal comparability.",
+  "_verified": "Preflight-confirmed live 2026-08-24: claude-fable-5, gpt-5.5, gemini-3.1-pro-preview, grok-4.6, muse-spark-1.2. Unconfirmed (no key set yet): deepseek-v4-pro, mistral-large-3, kimi-k2.6 \u2014 run --check after adding those keys. Always pin an explicit version, never an alias like gemini-pro-latest: aliases drift to new models and break longitudinal comparability.",
   "models": [
-    { "key": "anthropic", "provider": "Anthropic", "label": "Claude Fable 5", "tier": "frontier", "api": "anthropic", "model": "claude-fable-5", "keyEnv": "ANTHROPIC_API_KEY" },
-    { "key": "openai", "provider": "OpenAI", "label": "GPT-5.5", "tier": "frontier", "api": "openai-compatible", "baseUrl": "https://api.openai.com/v1", "model": "gpt-5.5", "keyEnv": "OPENAI_API_KEY" },
-    { "key": "google", "provider": "Google", "label": "Gemini 3.1 Pro", "tier": "frontier", "api": "google", "model": "gemini-3.1-pro-preview", "keyEnv": "GEMINI_API_KEY" },
-    { "key": "xai", "provider": "xAI", "label": "Grok 4.6", "tier": "frontier", "api": "openai-compatible", "baseUrl": "https://api.x.ai/v1", "model": "grok-4.6", "keyEnv": "XAI_API_KEY" },
-    { "key": "meta", "provider": "Meta", "label": "Muse Spark 1.2", "tier": "frontier", "api": "openai-compatible", "baseUrl": "https://api.meta.ai/v1", "model": "muse-spark-1.2", "keyEnv": "META_API_KEY" },
-    { "key": "deepseek", "provider": "DeepSeek", "label": "DeepSeek V4 Pro", "tier": "frontier", "api": "openai-compatible", "baseUrl": "https://api.deepseek.com/v1", "model": "deepseek-v4-pro", "keyEnv": "DEEPSEEK_API_KEY" },
-    { "key": "mistral", "provider": "Mistral", "label": "Mistral Large 3", "tier": "extended", "api": "openai-compatible", "baseUrl": "https://api.mistral.ai/v1", "model": "mistral-large-3", "keyEnv": "MISTRAL_API_KEY" },
-    { "key": "moonshot", "provider": "Moonshot", "label": "Kimi K2.6", "tier": "extended", "api": "openai-compatible", "baseUrl": "https://api.moonshot.ai/v1", "model": "kimi-k2.6", "keyEnv": "MOONSHOT_API_KEY" }
+    {
+      "key": "anthropic",
+      "provider": "Anthropic",
+      "label": "Claude Fable 5",
+      "tier": "frontier",
+      "api": "anthropic",
+      "model": "claude-fable-5",
+      "keyEnv": "ANTHROPIC_API_KEY"
+    },
+    {
+      "key": "openai",
+      "provider": "OpenAI",
+      "label": "GPT-5.5",
+      "tier": "frontier",
+      "api": "openai-compatible",
+      "baseUrl": "https://api.openai.com/v1",
+      "model": "gpt-5.5",
+      "keyEnv": "OPENAI_API_KEY"
+    },
+    {
+      "key": "google",
+      "provider": "Google",
+      "label": "Gemini 3.1 Pro",
+      "tier": "frontier",
+      "api": "google",
+      "model": "gemini-3.1-pro-preview",
+      "keyEnv": "GEMINI_API_KEY"
+    },
+    {
+      "key": "xai",
+      "provider": "xAI",
+      "label": "Grok 4.6",
+      "tier": "frontier",
+      "api": "openai-compatible",
+      "baseUrl": "https://api.x.ai/v1",
+      "model": "grok-4.6",
+      "keyEnv": "XAI_API_KEY"
+    },
+    {
+      "key": "meta",
+      "provider": "Meta",
+      "label": "Muse Spark 1.2",
+      "tier": "frontier",
+      "api": "openai-compatible",
+      "baseUrl": "https://api.meta.ai/v1",
+      "model": "muse-spark-1.2",
+      "keyEnv": "META_API_KEY"
+    },
+    {
+      "key": "deepseek",
+      "provider": "DeepSeek",
+      "label": "DeepSeek V4 Pro",
+      "tier": "frontier",
+      "api": "openai-compatible",
+      "baseUrl": "https://api.deepseek.com/v1",
+      "model": "deepseek-v4-pro",
+      "keyEnv": "DEEPSEEK_API_KEY"
+    },
+    {
+      "key": "mistral",
+      "provider": "Mistral",
+      "label": "Mistral Large 3",
+      "tier": "extended",
+      "api": "openai-compatible",
+      "baseUrl": "https://api.mistral.ai/v1",
+      "model": "mistral-large-3",
+      "keyEnv": "MISTRAL_API_KEY"
+    },
+    {
+      "key": "moonshot",
+      "provider": "Moonshot",
+      "label": "Kimi K2.6",
+      "tier": "extended",
+      "api": "openai-compatible",
+      "baseUrl": "https://api.moonshot.ai/v1",
+      "model": "kimi-k2.6",
+      "keyEnv": "MOONSHOT_API_KEY"
+    }
   ]
 }

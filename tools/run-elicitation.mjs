@@ -11,8 +11,11 @@
 // the manual path stay interchangeable.
 //
 // Usage:
-//   node tools/run-elicitation.mjs [--models anthropic,google] [--samples 5]
-//                                  [--out runs] [--date YYYY-MM-DD] [--mock]
+//   node tools/run-elicitation.mjs [--models anthropic,google] [--tier frontier]
+//                                  [--samples 5] [--out runs] [--date YYYY-MM-DD]
+//                                  [--mock]
+//   node tools/run-elicitation.mjs --check    # verify keys + model ids, ~1 cheap
+//                                             # call per model, writes nothing
 //
 // Methodology notes: no fallback models are configured anywhere — a
 // refusal or invalid response is recorded as a failed sample, never
@@ -27,10 +30,12 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const argValue = name => { const i = args.indexOf(name); return i === -1 ? null : args[i + 1]; };
 const MOCK = args.includes('--mock');
+const CHECK = args.includes('--check');
 const SAMPLES = Number(argValue('--samples') || 5);
 const OUT_DIR = join(root, argValue('--out') || 'runs');
 const RUN_DATE = argValue('--date') || new Date().toISOString().slice(0, 10);
 const ONLY = argValue('--models')?.split(',').map(s => s.trim()).filter(Boolean) || null;
+const TIER = argValue('--tier');
 const QUESTION_SET = 'end-states-v3';
 
 const STATE_NAMES = ['Terminal Silence', 'The Inheritance', 'Bootloader', 'Machine Ecology', 'The Diaspora',
@@ -201,10 +206,53 @@ async function elicit(model, prompt) {
   return { ok: true };
 }
 
+/* ---------- preflight: does the key work and does the model id resolve? ---------- */
+// One minimal call per model. Any HTTP 200 is a pass — we only care that the
+// credential is accepted and the model id exists, not what the model says.
+async function check(model) {
+  const key = process.env[model.keyEnv];
+  if (!key) return { model, status: 'skip', detail: `${model.keyEnv} not set` };
+  try {
+    if (model.api === 'anthropic') {
+      await post('https://api.anthropic.com/v1/messages', { 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+        { model: model.model, max_tokens: 1024, messages: [{ role: 'user', content: 'Reply with OK.' }] });
+    } else if (model.api === 'google') {
+      await post(`https://generativelanguage.googleapis.com/v1beta/models/${model.model}:generateContent`,
+        { 'x-goog-api-key': key }, { contents: [{ role: 'user', parts: [{ text: 'Reply with OK.' }] }] });
+    } else {
+      await post(`${model.baseUrl}/chat/completions`, { authorization: `Bearer ${key}` },
+        { model: model.model, messages: [{ role: 'user', content: 'Reply with OK.' }] });
+    }
+    return { model, status: 'ok', detail: model.model };
+  } catch (error) {
+    const status = error.status;
+    const hint = status === 401 || status === 403 ? 'key rejected — check the secret'
+      : status === 404 || /model/i.test(error.message) && /not.*(found|exist)|invalid/i.test(error.message) ? 'model id not recognized — check tools/models.json'
+      : status === 429 ? 'rate limited or out of credit'
+      : `HTTP ${status ?? '?'}`;
+    return { model, status: 'fail', detail: `${hint}: ${String(error.message).slice(0, 160)}` };
+  }
+}
+
 /* ---------- main ---------- */
 const roster = JSON.parse(readFileSync(join(root, 'tools', 'models.json'), 'utf8')).models
-  .filter(model => !ONLY || ONLY.includes(model.key));
-if (!roster.length) { console.error('✗ no models matched --models filter'); process.exit(1); }
+  .filter(model => !ONLY || ONLY.includes(model.key))
+  .filter(model => !TIER || model.tier === TIER);
+if (!roster.length) { console.error('✗ no models matched the --models/--tier filter'); process.exit(1); }
+
+if (CHECK) {
+  console.log(`Preflight: ${roster.length} model(s)\n`);
+  const results = await Promise.all(roster.map(check));
+  const pad = Math.max(...results.map(r => r.model.key.length));
+  for (const r of results) {
+    const icon = r.status === 'ok' ? '✓' : r.status === 'skip' ? '~' : '✗';
+    console.log(`${icon} ${r.model.key.padEnd(pad)}  ${r.model.provider} / ${r.model.label} — ${r.detail}`);
+  }
+  const ok = results.filter(r => r.status === 'ok').length;
+  const failed = results.filter(r => r.status === 'fail').length;
+  console.log(`\n${ok} ready, ${failed} failing, ${results.length - ok - failed} skipped (no key).`);
+  process.exit(failed ? 1 : 0);
+}
 
 const prompt = buildPrompt();
 console.log(`Eliciting ${SAMPLES} samples for ${roster.length} model(s), run date ${RUN_DATE}${MOCK ? ' [MOCK]' : ''}`);

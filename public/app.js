@@ -241,7 +241,8 @@
         model: source.model || run?.model || provider,
         label: source.label || provider,
         shortLabel: source.shortLabel || provider.slice(0, 2),
-        color: run?.color || '#11120f'
+        // Imported runs carry their own color; providers with no 2030 run rely on it.
+        color: source.color || run?.color || '#11120f'
       };
     });
   }

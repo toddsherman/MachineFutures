@@ -36,10 +36,12 @@ The authoring path is model output -> local ingester -> batch JSON in `runs/` ->
 
 Setup, in the GitHub repo settings:
 
-1. Add API-key secrets (Settings → Secrets and variables → Actions → Secrets): `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, `XAI_API_KEY`, `DEEPSEEK_API_KEY`. Models whose key is missing are skipped, so partial rosters work.
-2. Verify the `model` ids in `tools/models.json` against each provider's current docs (only Anthropic's is confirmed).
-3. Enable "Allow GitHub Actions to create and approve pull requests" (Settings → Actions → General).
-4. To turn on the monthly schedule (1st of each month), add a repository variable `ELICITATION_ENABLED` = `true`. Until then, trigger runs manually from the Actions tab (workflow_dispatch, with optional model filter).
+1. Add API-key secrets (Settings → Secrets and variables → Actions → Secrets), one per provider you want on the board: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, `XAI_API_KEY`, `META_API_KEY`, `DEEPSEEK_API_KEY`, `MISTRAL_API_KEY`, `MOONSHOT_API_KEY`. **Models whose key is missing are skipped**, so the keys you configure decide the roster.
+2. Enable "Allow GitHub Actions to create and approve pull requests" (Settings → Actions → General).
+3. Run the preflight before the first real run: Actions → Elicit end-state forecasts → Run workflow with **check_only** ticked. It makes one cheap call per model and reports, per provider, whether the key works and the model id resolves. Fix anything it flags in `tools/models.json`, then run for real. Locally: `node tools/run-elicitation.mjs --check`.
+4. To turn on the monthly schedule (1st of each month), add a repository variable `ELICITATION_ENABLED` = `true`. Until then, trigger runs manually (optionally filtered with `models`, e.g. `anthropic,google`).
+
+Adding a model is one entry in `tools/models.json` plus its key. Anything with an OpenAI-compatible endpoint needs no new code — set `api: "openai-compatible"` and its `baseUrl`. New *providers* also want a color and short label in `tools/import-runs.mjs` (`PROVIDER_COLORS`, `SHORT_LABELS`), or they render in the fallback color.
 
 Methodology guarantees encoded in the harness: the prompt is read verbatim from `public/end_states.md` between the PROMPT BEGINS/ENDS delimiters; no fallback models are configured, so a refusal or invalid response is recorded as a failed sample rather than answered by a different model; sampling parameters are omitted so every provider runs at its own defaults; the exact `api_string` is recorded per run. Local dry run: `node tools/run-elicitation.mjs --mock`.
 

@@ -18,11 +18,12 @@ const dataPath = join(root, 'public', 'data.js');
 // Must stay in sync with runSpecs colors in public/data.js.
 const PROVIDER_COLORS = {
   OpenAI: '#63d8ad', Anthropic: '#e89866', Google: '#73a8ff',
-  xAI: '#f0eddf', Meta: '#9c87ff', DeepSeek: '#49d3d3'
+  xAI: '#f0eddf', Meta: '#9c87ff', DeepSeek: '#49d3d3',
+  Mistral: '#f2c14e', Moonshot: '#ff6fb5'
 };
 const QUESTION_IDS = Array.from({ length: 50 }, (_, i) => 'Q' + (i + 1));
 const STATE_IDS = Array.from({ length: 11 }, (_, i) => 'S' + (i + 1));
-const SHORT_LABELS = { Anthropic: 'ANT', OpenAI: 'OAI', Google: 'GDM', xAI: 'XAI', Meta: 'MET', DeepSeek: 'DSK' };
+const SHORT_LABELS = { Anthropic: 'ANT', OpenAI: 'OAI', Google: 'GDM', xAI: 'XAI', Meta: 'MET', DeepSeek: 'DSK', Mistral: 'MIS', Moonshot: 'KMI' };
 const stripProvider = name => String(name || 'unknown').replace(/\s*\((?:OpenAI|Anthropic|Google|xAI|Meta|DeepSeek|mock)\)\s*$/, '');
 
 // Largest-remainder renormalization: integer probabilities summing to exactly 100.
@@ -135,7 +136,7 @@ for (const b of endStateBatches) {
   if (!endStateByProvider[b.provider] || b.date >= endStateByProvider[b.provider].date) endStateByProvider[b.provider] = b;
 }
 const emitEndState = b => `${indent}${b.provider}: {
-${indent}  model: ${JSON.stringify(b.model)}, label: ${JSON.stringify(b.model)}, shortLabel: ${JSON.stringify(SHORT_LABELS[b.provider] || b.provider.slice(0, 3).toUpperCase())},
+${indent}  model: ${JSON.stringify(b.model)}, label: ${JSON.stringify(b.model)}, shortLabel: ${JSON.stringify(SHORT_LABELS[b.provider] || b.provider.slice(0, 3).toUpperCase())}, color: ${JSON.stringify(PROVIDER_COLORS[b.provider])},
 ${indent}  promptVersion: ${JSON.stringify(b.promptVersion)}, date: ${JSON.stringify(b.date)}, knowledgeCutoff: ${JSON.stringify(b.knowledgeCutoff)},
 ${indent}  sampleCount: ${b.sampleCount}, source: ${JSON.stringify('runs/' + b.file)},
 ${indent}  probabilities: { ${Object.entries(b.probabilities).map(([id, p]) => `${id}: ${p}`).join(', ')} },

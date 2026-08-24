@@ -14,6 +14,11 @@ on:
         description: 'Samples per model'
         required: false
         default: '5'
+      check_only:
+        description: 'Preflight only — verify keys and model ids, elicit nothing'
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -30,25 +35,45 @@ jobs:
         with:
           node-version: 22
 
-      - name: Elicit forecasts
+      - name: Preflight — verify keys and model ids
+        if: inputs.check_only
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          META_API_KEY: ${{ secrets.META_API_KEY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
+        run: node tools/run-elicitation.mjs --check
+
+      - name: Elicit forecasts
+        if: ${{ !inputs.check_only }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          META_API_KEY: ${{ secrets.META_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
         run: >
           node tools/run-elicitation.mjs
           --samples ${{ inputs.samples || '5' }}
           ${{ inputs.models && format('--models {0}', inputs.models) || '' }}
 
       - name: Import into site data
+        if: ${{ !inputs.check_only }}
         run: node tools/import-runs.mjs
 
       - name: Syntax-check generated data
+        if: ${{ !inputs.check_only }}
         run: node --check public/data.js
 
       - name: Open pull request
+        if: ${{ !inputs.check_only }}
         uses: peter-evans/create-pull-request@v7
         with:
           branch: elicitation/${{ github.run_id }}

@@ -226,12 +226,42 @@ async function check(model) {
     return { model, status: 'ok', detail: model.model };
   } catch (error) {
     const status = error.status;
+    const badModel = status === 404 || (/model/i.test(error.message) && /not.*(found|exist)|invalid/i.test(error.message));
     const hint = status === 401 || status === 403 ? 'key rejected — check the secret'
-      : status === 404 || /model/i.test(error.message) && /not.*(found|exist)|invalid/i.test(error.message) ? 'model id not recognized — check tools/models.json'
+      : badModel ? 'model id not recognized — check tools/models.json'
       : status === 429 ? 'rate limited or out of credit'
       : `HTTP ${status ?? '?'}`;
-    return { model, status: 'fail', detail: `${hint}: ${String(error.message).slice(0, 160)}` };
+    // A wrong model id is the most common failure, so ask the provider what it
+    // actually serves rather than making the operator guess.
+    const available = badModel ? await listModels(model, key) : null;
+    return {
+      model, status: 'fail',
+      detail: `${hint}: ${String(error.message).replace(/\s+/g, ' ').slice(0, 140)}`,
+      available
+    };
   }
+}
+
+// Best-effort model listing, for the failure hint only.
+async function listModels(model, key) {
+  try {
+    if (model.api === 'google') {
+      const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200', { headers: { 'x-goog-api-key': key } });
+      if (!res.ok) return null;
+      const json = await res.json();
+      return (json.models || [])
+        .filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
+        .map(m => String(m.name).replace(/^models\//, ''));
+    }
+    if (model.api === 'anthropic') {
+      const res = await fetch('https://api.anthropic.com/v1/models?limit=100', { headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01' } });
+      if (!res.ok) return null;
+      return ((await res.json()).data || []).map(m => m.id);
+    }
+    const res = await fetch(`${model.baseUrl}/models`, { headers: { authorization: `Bearer ${key}` } });
+    if (!res.ok) return null;
+    return ((await res.json()).data || []).map(m => m.id);
+  } catch { return null; }
 }
 
 /* ---------- main ---------- */
@@ -247,6 +277,10 @@ if (CHECK) {
   for (const r of results) {
     const icon = r.status === 'ok' ? '✓' : r.status === 'skip' ? '~' : '✗';
     console.log(`${icon} ${r.model.key.padEnd(pad)}  ${r.model.provider} / ${r.model.label} — ${r.detail}`);
+    if (r.available?.length) {
+      const relevant = r.available.filter(id => !/embed|image|video|tts|audio|vision-only/i.test(id));
+      console.log(`${' '.repeat(pad + 4)}available: ${(relevant.length ? relevant : r.available).join(', ')}`);
+    }
   }
   const ok = results.filter(r => r.status === 'ok').length;
   const failed = results.filter(r => r.status === 'fail').length;

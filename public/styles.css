@@ -122,21 +122,24 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .doomer-ratings { margin-top: 48px; padding-top: 36px; border-top: 1px solid var(--line); }
 .doomer-head { display: flex; align-items: center; justify-content: flex-start; gap: 24px; margin-bottom: 18px; }
 .doomer-list { display: grid; gap: 12px; }
-.doomer-row { display: grid; grid-template-columns: 230px minmax(0, 1fr); align-items: center; gap: 20px; }
+.doomer-row { display: grid; grid-template-columns: 210px minmax(0, 1fr) 78px; align-items: center; gap: 18px; }
 .doomer-label { display: grid; grid-template-columns: 10px 1fr; gap: 2px 10px; align-items: center; }
 .doomer-label b { font: 800 13px var(--display); text-transform: uppercase; }
 .doomer-label small { color: var(--muted); font: 10px var(--mono); }
-.doomer-meter { height: 24px; display: flex; border: 1px solid var(--ink); background: rgba(17,18,15,.04); }
-.doomer-meter i { min-width: max-content; display: flex; height: 100%; align-items: center; justify-content: flex-end; padding-right: 8px; background: var(--coral); }
-.doomer-meter i.gone { background: var(--extinction); }
-.doomer-meter i.gone span { color: var(--paper); }
-.doomer-meter i.risk { background: var(--risk); }
-.doomer-meter span { font: 800 10px var(--mono); color: var(--ink); }
-/* Sampling error, drawn over the bar it qualifies. */
-.doomer-meter i.err { position: absolute; top: 50%; height: 11px; transform: translateY(-50%); background: none;
-  border-left: 2px solid var(--ink); border-right: 2px solid var(--ink); }
-.doomer-meter i.err::after { content: ""; position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: var(--ink); }
-.doomer-meter { position: relative; }
+.doomer-bar { height: 24px; display: flex; border: 1px solid var(--ink); background: rgba(17,18,15,.04); }
+.doomer-bar i { min-width: max-content; display: flex; height: 100%; align-items: center; justify-content: flex-end; padding-right: 8px; background: var(--coral); }
+.doomer-bar i.gone { background: var(--extinction); }
+.doomer-bar i.gone span { color: var(--paper); }
+.doomer-bar i.risk { background: var(--risk); }
+.doomer-bar span { font: 800 10px var(--mono); color: var(--ink); }
+/* Sampling error gets its own track beneath the bar. */
+.doomer-err { position: relative; height: 9px; }
+.doomer-err i { position: absolute; top: 3px; height: 3px; border-left: 2px solid var(--ink); border-right: 2px solid var(--ink); }
+.doomer-err i::after { content: ""; position: absolute; top: 1px; left: 0; right: 0; height: 1px; background: var(--ink); }
+.doomer-meter { display: grid; gap: 4px; }
+.doomer-total { display: flex; align-items: baseline; gap: 5px; justify-content: flex-end; }
+.doomer-total b { font: 900 17px var(--display); letter-spacing: -.03em; }
+.doomer-total small { color: var(--muted); font: 10px var(--mono); }
 .doomer-note { max-width: 62ch; margin: 22px 0 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
 .doomer-key .key-error i { width: 11px; height: 9px; background: none; border-left: 2px solid var(--ink); border-right: 2px solid var(--ink); position: relative; }
 .doomer-key .key-error i::after { content: ""; position: absolute; top: 50%; left: 0; right: 0; height: 2px; margin-top: -1px; background: var(--ink); }
@@ -237,7 +240,7 @@ body.dialog-open { overflow: hidden; }
   .state-card-head { row-gap: 12px; }
   .state-card-head h3 { font-size: 32px; }
   .states-section, .model-mix, .matrix-section { padding-block: 52px; }
-  .doomer-row { grid-template-columns: 150px minmax(0, 1fr); }
+  .doomer-row { grid-template-columns: 150px minmax(0, 1fr) 70px; gap: 14px; }
   .method-grid { grid-template-columns: repeat(2, 1fr); }
   .prompt-block { padding: 35px; align-items: start; flex-direction: column; }
   .site-footer { grid-template-columns: 1fr 1fr; }
@@ -255,7 +258,13 @@ body.dialog-open { overflow: hidden; }
   .state-grid { grid-template-columns: 1fr; }
   .state-card { min-height: 390px; }
   .doomer-head { align-items: start; flex-direction: column; }
-  .doomer-row { grid-template-columns: 1fr; gap: 8px; }
+  /* Stacked: the label and its total share a line, the bar sits beneath. */
+  .doomer-row { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; }
+  /* Rows are explicit: the meter comes before the total in the DOM, so without
+     them its full-width span pushes the total onto a third line. */
+  .doomer-label { grid-column: 1; grid-row: 1; }
+  .doomer-total { grid-column: 2; grid-row: 1; }
+  .doomer-meter { grid-column: 1 / -1; grid-row: 2; }
   .method-hero { padding-block: 52px 34px; }
   .method-grid { grid-template-columns: 1fr; }
   .method-grid article { min-height: 200px; }

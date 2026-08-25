@@ -144,7 +144,8 @@
         </button>
         ${entries.map(entry => {
           const value = stateValue(entry, state);
-          return `<div class="matrix-cell" role="cell" title="${entry.label} · ${state.name}: ${value}%" style="--state:${state.color};--fill:${Math.max(value / peak, 0.04).toFixed(3)}"><span>${value}</span></div>`;
+          const spread = entry.range?.[state.id];
+          return `<div class="matrix-cell" role="cell" title="${entry.label} · ${state.name}: ${value}%${spread ? ` (${spread[0]}–${spread[1]}% across ${entry.sampleCount} samples)` : ''}" style="--state:${state.color};--fill:${Math.max(value / peak, 0.04).toFixed(3)}"><span>${value}</span></div>`;
         }).join('')}
       </div>`).join('');
 
@@ -213,7 +214,7 @@
         <div class="state-card-head"><span>${String(state.id).padStart(2, '0')}</span><h3>${state.name}</h3><div class="state-card-meta"><strong></strong>${extinctionMark(state)}</div></div>
         <p>${state.description}</p>
         <div class="state-models">${providerValues.map(item => `<span title="${item.label}: ${item.value}%"><strong>${item.value}%</strong><i style="height:${Math.max(item.value * 1.8, 4)}px"></i><small>${item.shortLabel}</small></span>`).join('')}</div>
-        <div class="state-range"><span>${providerValues.at(-1).value}% low</span><span>${providerValues[0].value}% high</span><em class="state-more">Why ↗</em></div>
+        <div class="state-range"><span class="range-text"></span><em class="state-more">Why ↗</em></div>
       </article>`;
     }).join('');
 
@@ -242,16 +243,20 @@
         ${doomerEntries.map(entry => {
           const se = entry.exposure?.se;
           const total = entry.sums.total;
-          const whisker = Number.isFinite(se)
-            ? `<i class="err" style="left:${Math.max(total - se, 0)}%;width:${Math.min(se * 2, 100 - Math.max(total - se, 0))}%" title="±${se.toFixed(1)} points across ${entry.exposure.n} samples"></i>`
-            : '';
+          // Bar and error live in separate tracks: the segment label sits at the
+          // bar's end and the error is centred on that same point, so overlaying
+          // them guarantees a collision.
           return `<div class="doomer-row">
           <div class="doomer-label">${labLogo(entry.provider, 'in-row')}<b>${entry.label}</b><small>${entry.provider}</small></div>
-          <div class="doomer-meter" aria-label="${entry.label}: ${total}% total exposure${Number.isFinite(se) ? `, plus or minus ${se.toFixed(1)} points` : ''}">${
-            [['gone', entry.sums.gone], ['risk', entry.sums.risk]]
-              .filter(([, value]) => value > 0)
-              .map(([tier, value]) => `<i class="${tier}" style="width:${value}%"><span>${value}%</span></i>`).join('')
-          }${whisker}</div>
+          <div class="doomer-meter">
+            <div class="doomer-bar" role="img" aria-label="${entry.label}: ${entry.sums.gone}% humanity is gone, ${entry.sums.risk}% might perish">${
+              [['gone', entry.sums.gone], ['risk', entry.sums.risk]]
+                .filter(([, value]) => value > 0)
+                .map(([tier, value]) => `<i class="${tier}" style="width:${value}%"><span>${value}%</span></i>`).join('')
+            }</div>
+            ${Number.isFinite(se) ? `<div class="doomer-err"><i style="left:${Math.max(total - se, 0)}%;width:${Math.min(se * 2, 100 - Math.max(total - se, 0))}%" title="±${se.toFixed(1)} points across ${entry.exposure.n} samples"></i></div>` : ''}
+          </div>
+          <div class="doomer-total"><b>${total}%</b>${Number.isFinite(se) ? `<small>±${se.toFixed(1)}</small>` : ''}</div>
         </div>`;
         }).join('')}
       </div>
@@ -264,6 +269,7 @@
     $('#end-forecast-title').textContent = activeLabel;
 
     const selectedStates = selectedEndStates();
+    const entriesForRange = longTermEntries();
     const total = selectedStates.reduce((sum, state) => sum + state.probability, 0);
     const bar = $('#consensus-bar');
     const legend = $('#consensus-legend');
@@ -273,12 +279,23 @@
     selectedStates.forEach((state, index) => {
       const segment = bar.children[index];
       segment.style.width = `${(state.probability / total) * 100}%`;
-      segment.title = `${state.name}: ${state.probability}%${state.extinction ? ` · ${extinctionLabels[state.extinction]}` : ''}`;
+      const spread = activeRun?.range?.[state.id];
+      segment.title = `${state.name}: ${state.probability}%${spread ? ` (${spread[0]}–${spread[1]}% across samples)` : ''}${state.extinction ? ` · ${extinctionLabels[state.extinction]}` : ''}`;
 
       const value = legend.children[index].querySelector('b');
       animate ? tweenNumber(value, state.probability) : (value.textContent = `${state.probability}%`);
 
       const card = $(`#state-${state.id}`);
+      const rangeText = card.querySelector('.range-text');
+      if (activeRun) {
+        const own = activeRun.range?.[state.id];
+        rangeText.textContent = own
+          ? `${own[0]}–${own[1]}% across ${activeRun.sampleCount} samples`
+          : `${state.probability}% · spread not recorded`;
+      } else {
+        const across = entriesForRange.map(entry => stateValue(entry, state));
+        rangeText.textContent = `${Math.min(...across)}–${Math.max(...across)}% across ${across.length} models`;
+      }
       const figure = card.querySelector('.state-card-meta strong');
       animate ? tweenNumber(figure, state.probability) : (figure.textContent = `${state.probability}%`);
       card.setAttribute('aria-label', `${state.name}: ${state.probability}% — see each model's reasoning`);

@@ -102,15 +102,21 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .state-card-meta { display: flex; align-items: center; justify-content: end; gap: 12px; }
 .state-card-meta strong { font: 900 24px var(--display); }
 .state-card > p { max-width: 430px; margin-top: 54px; color: var(--muted); font-size: 15px; line-height: 1.55; }
-.state-models { height: 82px; margin-top: auto; display: flex; align-items: end; gap: 8px; border-bottom: 1px solid var(--line); }
-.state-models > span { flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: end; align-items: center; }
-.state-models .chip-track { position: relative; width: 100%; display: flex; justify-content: center; align-items: flex-end; }
-.state-models strong { margin-bottom: 4px; font: 800 10px/1 var(--mono); }
-.state-models i { width: 100%; max-width: 24px; background: var(--state); border: 1px solid var(--ink); border-bottom: 0; }
-/* Sampling range for this model on this ending, over its bar. */
-.state-models em { position: absolute; left: 50%; width: 9px; margin-left: -4.5px; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); }
-.state-models em::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; margin-left: -.5px; background: var(--ink); }
-.state-models small { margin: 4px 0 3px; font: 10px var(--mono); text-transform: uppercase; }
+/* Interval strip: one axis per ending, a dot per model with its sampling
+   range. Dots are translucent so overlap reads as agreement. Three lanes keep
+   near-identical figures from hiding one another entirely. */
+.state-strip { margin-top: auto; padding-top: 20px; }
+.strip-axis { position: relative; height: 34px; border-bottom: 1px solid var(--ink); }
+.strip-model { position: absolute; bottom: 0; height: 100%; }
+.strip-model i { position: absolute; bottom: calc(7px + var(--lane) * 9px); height: 1px; background: color-mix(in srgb, var(--ink) 42%, transparent); }
+.strip-model b { position: absolute; left: -4px; bottom: calc(4px + var(--lane) * 9px); width: 8px; height: 8px; border-radius: 50%;
+  background: color-mix(in srgb, var(--state) 88%, var(--ink)); box-shadow: 0 0 0 1px var(--ink); }
+.strip-model:hover b, .strip-model.is-active b { background: var(--ink); transform: scale(1.35); }
+.strip-model.is-active i { background: var(--ink); height: 2px; }
+/* Shared ticks, so every card is read against the same ruler. */
+.strip-axis u { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); text-decoration: none; }
+.strip-axis u span { position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); color: var(--muted); font: 9px var(--mono); }
+.state-strip { padding-bottom: 16px; }
 .state-range { margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--muted); font: 10px var(--mono); text-transform: uppercase; }
 .state-more { margin-left: auto; color: var(--ink); font-style: normal; font-weight: 700; opacity: 0; transition: opacity .18s ease; }
 .state-card { cursor: pointer; transition: background .2s ease; }
@@ -356,8 +362,22 @@ body.dialog-open { overflow: hidden; }
      per-card chip row is redundant on a narrow screen — and it is what makes
      eleven cards unscrollably tall. */
   .state-card { min-height: 0; }
-  .state-card .state-models { display: none; }
   .state-card > p { margin-top: 22px; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
-  .state-range { margin-top: 20px; }
+  /* Interval strip: one axis per ending, a dot per model with its sampling
+   range. Dots are translucent so overlap reads as agreement. Three lanes keep
+   near-identical figures from hiding one another entirely. */
+.state-strip { margin-top: auto; padding-top: 20px; }
+.strip-axis { position: relative; height: 34px; border-bottom: 1px solid var(--ink); }
+.strip-model { position: absolute; bottom: 0; height: 100%; }
+.strip-model i { position: absolute; bottom: calc(7px + var(--lane) * 9px); height: 1px; background: color-mix(in srgb, var(--ink) 42%, transparent); }
+.strip-model b { position: absolute; left: -4px; bottom: calc(4px + var(--lane) * 9px); width: 8px; height: 8px; border-radius: 50%;
+  background: color-mix(in srgb, var(--state) 88%, var(--ink)); box-shadow: 0 0 0 1px var(--ink); }
+.strip-model:hover b, .strip-model.is-active b { background: var(--ink); transform: scale(1.35); }
+.strip-model.is-active i { background: var(--ink); height: 2px; }
+/* Shared ticks, so every card is read against the same ruler. */
+.strip-axis u { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); text-decoration: none; }
+.strip-axis u span { position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); color: var(--muted); font: 9px var(--mono); }
+.state-strip { padding-bottom: 16px; }
+.state-range { margin-top: 20px; }
   .state-more { opacity: 1; }
 }

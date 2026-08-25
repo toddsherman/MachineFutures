@@ -212,21 +212,35 @@
     $('#consensus-legend').innerHTML = orderedStates.map(state =>
       `<button data-state-jump="${state.id}"><i style="--state:${state.color}"></i><span>${state.id}. ${state.name}${extinctionMark(state)}</span><b></b></button>`).join('');
 
+    const axisMax = Math.ceil(Math.max(...orderedStates.flatMap(state =>
+      entries.map(entry => entry.range?.[state.id]?.[1] ?? stateValue(entry, state)))) / 5) * 5;
+
     $('#state-grid').innerHTML = orderedStates.map(state => {
       const providerValues = entries.map(entry => ({ ...entry, value: stateValue(entry, state) })).sort((a, b) => b.value - a.value);
       return `<article class="state-card" id="state-${state.id}" style="--state:${state.color}" data-state="${state.id}" tabindex="0" role="button">
         <div class="state-card-head"><span>${String(state.id).padStart(2, '0')}</span><h3>${state.name}</h3><div class="state-card-meta"><strong></strong>${extinctionMark(state)}</div></div>
         <p>${state.description}</p>
-        <div class="state-models">${providerValues.map(item => {
-          // Bar is the model's published figure; the whisker is the range its
-          // own samples covered, so a tall bar with a long whisker reads as
-          // "high, but the model was not consistent about it".
-          const span = item.range?.[state.id];
-          const px = v => Math.max(v * SCALE, 2);
-          const whisker = span && span[1] > span[0]
-            ? `<em style="bottom:${px(span[0]).toFixed(1)}px;height:${((span[1] - span[0]) * SCALE).toFixed(1)}px"></em>` : '';
-          return `<span title="${item.label}: ${item.value}%${span ? ` (${span[0]}–${span[1]}% across ${item.sampleCount} samples)` : ''}"><strong>${item.value}%</strong><span class="chip-track"><i style="height:${px(item.value).toFixed(1)}px"></i>${whisker}</span><small>${item.shortLabel}</small></span>`;
-        }).join('')}</div>
+        ${(() => {
+          // One axis per ending, scaled to what the models actually said rather
+          // than 0-100, so a tight cluster stays legible. Each model is a dot at
+          // its figure with a line for its sampling range; overlapping dots are
+          // agreement, a wide scatter is disagreement.
+          // One scale for every card, from zero, so position means the same
+          // thing everywhere: a clump at the left is an ending everyone
+          // dismisses, a wide scatter is one they argue about. Per-card scaling
+          // would make those two look alike.
+          const at = v => (v / axisMax) * 100;
+          return `<div class="state-strip">
+            <div class="strip-axis">
+              ${providerValues.map((m, i) => {
+                const r = m.range?.[state.id];
+                const line = r && r[1] > r[0] ? `<i style="left:${at(r[0]).toFixed(2)}%;width:${(at(r[1]) - at(r[0])).toFixed(2)}%"></i>` : '';
+                return `<span class="strip-model" data-model="${m.runKey}" style="left:${at(m.value).toFixed(2)}%;--lane:${i % 3}" title="${m.label}: ${m.value}%${r ? ` (${r[0]}–${r[1]}% across ${m.sampleCount} samples)` : ''}">${line}<b></b></span>`;
+              }).join('')}
+              ${[10, 20, 30].filter(t => t < axisMax).map(t => `<u style="left:${at(t)}%"><span>${t}</span></u>`).join('')}
+            </div>
+          </div>`;
+        })()}
         <div class="state-range"><span class="range-text"></span><em class="state-more">Why ↗</em></div>
       </article>`;
     }).join('');
@@ -309,6 +323,8 @@
         const across = entriesForRange.map(entry => stateValue(entry, state));
         rangeText.textContent = `${Math.min(...across)}–${Math.max(...across)}% across ${across.length} models`;
       }
+      card.querySelectorAll('.strip-model').forEach(dot =>
+        dot.classList.toggle('is-active', Boolean(activeRun) && dot.dataset.model === activeEndForecast));
       const figure = card.querySelector('.state-card-meta strong');
       animate ? tweenNumber(figure, state.probability) : (figure.textContent = `${state.probability}%`);
       card.setAttribute('aria-label', `${state.name}: ${state.probability}% — see each model's reasoning`);

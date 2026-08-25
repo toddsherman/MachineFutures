@@ -73,8 +73,7 @@
       date: source.date,
       model: source.model || provider,
       label: source.label || provider,
-      shortLabel: source.shortLabel || provider.slice(0, 2),
-      color: source.color || '#11120f'
+      shortLabel: source.shortLabel || provider.slice(0, 2)
     }));
   }
 
@@ -86,10 +85,28 @@
     return stateMedians();
   }
 
+  // Lab marks, drawn as simplified monochrome glyphs so model identity is
+  // carried by shape rather than colour — colour belongs to the endings.
+  // These are approximations: drop official SVG paths in here to replace them.
+  const LAB_LOGOS = {
+    Anthropic: '<path d="M8.4 3.5 3 20.5h3.5l1.1-3.6h5.3l1.1 3.6H17.5L12.1 3.5Zm.1 10.4 1.8-5.8 1.8 5.8Z"/>',
+    OpenAI: '<path d="M12 2.6 20.1 7v10L12 21.4 3.9 17V7Zm0 2.7L6.2 8.5v7L12 18.7l5.8-3.2v-7Zm0 3.1a3.6 3.6 0 1 1 0 7.2 3.6 3.6 0 0 1 0-7.2Z"/>',
+    Google: '<path d="M12 3a9 9 0 1 0 8.8 10.9h-8.4v-3.3h11.2q.2 1 .2 2A10.1 10.1 0 1 1 12 3Z"/>',
+    xAI: '<path d="M3.6 3.4h4.2l12.6 17.2h-4.2Zm16.3 0h-3.6l-4 5.4 1.9 2.6ZM3.9 20.6h3.6l4.2-5.7-1.8-2.6Z"/>',
+    Meta: '<path d="M4.6 7.3C6 5.3 8.4 5 10 6.3c1.1.9 1.9 2.3 2.9 4.2 1-1.9 1.8-3.3 2.9-4.2 1.6-1.3 4-1 5.4 1 1.6 2.3 1.6 6.1 0 8.4-1.4 2-3.8 2.3-5.4 1-1.1-.9-1.9-2.3-2.9-4.2-1 1.9-1.8 3.3-2.9 4.2-1.6 1.3-4 1-5.4-1-1.6-2.3-1.6-6.1 0-8.4Zm2.1 1.5c-.9 1.4-.9 4 0 5.4.6.9 1.6 1 2.4.4.7-.6 1.4-1.7 2.3-3.1-.9-1.4-1.6-2.5-2.3-3.1-.8-.6-1.8-.5-2.4.4Zm10.6 0c-.6-.9-1.6-1-2.4-.4-.7.6-1.4 1.7-2.3 3.1.9 1.4 1.6 2.5 2.3 3.1.8.6 1.8.5 2.4-.4.9-1.4.9-4 0-5.4Z"/>',
+    DeepSeek: '<path d="M2.6 12.6c2.6.4 4.4-.4 5.6-1.8-.6-1.7-.3-3.5.9-5 .3 1.7 1.2 2.9 2.5 3.6 1.8 1 3.4.7 5.1.2 1.5-.4 3-.9 4.7-.2-.5 1.3-1.5 2-2.6 2.4.6 3.5-1.6 6.6-5.3 7.6-4.2 1.1-8.6-1-10.9-6.8Zm11.9-.7a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z"/>',
+    Mistral: '<path d="M3 4h3.6v3.6H3Zm3.6 3.6h3.6v3.6H6.6Zm3.6 3.6h3.6v3.6h-3.6Zm3.6-3.6h3.6v3.6h-3.6ZM17.4 4H21v3.6h-3.6ZM3 11.2h3.6v3.6H3Zm14.4 0H21v3.6h-3.6ZM3 14.8h3.6V20H3Zm14.4 0H21V20h-3.6Z"/>',
+    Moonshot: '<path d="M13.6 2.6a9.4 9.4 0 1 0 7.8 14.6A9.4 9.4 0 0 1 13.6 2.6Z"/>'
+  };
+  const labLogo = (provider, cls = '') =>
+    `<span class="lab-logo ${cls}" role="img" aria-label="${provider}">${LAB_LOGOS[provider]
+      ? `<svg viewBox="0 0 24 24" aria-hidden="true">${LAB_LOGOS[provider]}</svg>`
+      : `<b>${provider.slice(0, 2)}</b>`}</span>`;
+
   function renderEndForecastToggle(entries) {
-    const options = [{ key: 'Median', label: 'Median' }, ...entries.map(entry => ({ key: entry.runKey, label: entry.label, color: entry.color }))];
+    const options = [{ key: 'Median', label: 'Median' }, ...entries.map(entry => ({ key: entry.runKey, label: entry.label, provider: entry.provider }))];
     $('#end-forecast-toggle').innerHTML = options.map(option =>
-      `<button type="button" class="end-toggle-button${option.color ? '' : ' is-median'}${option.key === activeEndForecast ? ' active' : ''}"${option.color ? ` style="--provider-color:${option.color}"` : ''} data-end-forecast="${option.key}" aria-pressed="${option.key === activeEndForecast}">${option.color ? '<i></i>' : ''}${option.label}</button>`
+      `<button type="button" class="end-toggle-button${option.provider ? '' : ' is-median'}${option.key === activeEndForecast ? ' active' : ''}" data-end-forecast="${option.key}" aria-pressed="${option.key === activeEndForecast}">${option.provider ? labLogo(option.provider) : ''}${option.label}</button>`
     ).join('');
   }
 
@@ -108,11 +125,11 @@
     const head = `
       <div class="matrix-row matrix-head" role="row">
         <div class="matrix-corner" role="columnheader"></div>
-        ${labs.map(lab => `<div class="matrix-lab" style="--span:${lab.models.length}" role="columnheader"><span>${lab.provider}</span></div>`).join('')}
+        ${labs.map(lab => `<div class="matrix-lab" style="--span:${lab.models.length}" role="columnheader" title="${lab.provider}">${labLogo(lab.provider)}</div>`).join('')}
       </div>
       <div class="matrix-row matrix-subhead" role="row">
         <div class="matrix-corner" role="columnheader"></div>
-        ${entries.map(entry => `<div class="matrix-model" role="columnheader" title="${entry.label}"><i style="--swatch:${entry.color}"></i><span>${entry.shortLabel}</span></div>`).join('')}
+        ${entries.map(entry => `<div class="matrix-model" role="columnheader" title="${entry.label}"><span>${entry.shortLabel}</span></div>`).join('')}
       </div>`;
 
     const rows = orderedStates.map(state => `
@@ -179,7 +196,7 @@
       </div>
       <div class="doomer-list">
         ${doomerEntries.map(entry => `<div class="doomer-row">
-          <div class="doomer-label"><span class="model-swatch" style="--swatch:${entry.color}"></span><b>${entry.label}</b><small>${entry.provider}</small></div>
+          <div class="doomer-label">${labLogo(entry.provider, 'in-row')}<b>${entry.label}</b><small>${entry.provider}</small></div>
           <div class="doomer-meter" aria-label="${entry.label}: ${entry.sums.gone}% humanity is gone, ${entry.sums.risk}% might perish">${
             [['gone', entry.sums.gone], ['risk', entry.sums.risk]]
               .filter(([, value]) => value > 0)
@@ -200,7 +217,7 @@
     const rows = entries.map(entry => `
       <article class="model-answer">
         <div class="model-answer-head">
-          <span class="model-swatch" style="--swatch:${entry.color}"></span>
+          ${labLogo(entry.provider, 'in-row')}
           <div><b>${entry.label}</b><small>${entry.provider} · ${entry.date || ''}</small></div>
           <strong>${entry.value}%</strong>
         </div>

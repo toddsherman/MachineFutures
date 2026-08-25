@@ -15,27 +15,6 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const runsDir = join(root, 'runs');
 const dataPath = join(root, 'public', 'data.js');
 
-// One hue per lab. When a lab has several models on the board, later roster
-// entries are darkened toward the ink so same-lab models stay related but
-// distinct. Darkening (not lightening) keeps contrast on the light paper —
-// xAI's cream would disappear if lightened.
-const PROVIDER_COLORS = {
-  OpenAI: '#63d8ad', Anthropic: '#e89866', Google: '#73a8ff',
-  xAI: '#f0eddf', Meta: '#9c87ff', DeepSeek: '#49d3d3',
-  Mistral: '#f2c14e', Moonshot: '#ff6fb5'
-};
-const INK = [17, 18, 15];
-const SHADE_STEPS = [0, 0.34, 0.56, 0.72];
-function shadeFor(hex, index) {
-  if (!index) return hex;
-  const amount = SHADE_STEPS[Math.min(index, SHADE_STEPS.length - 1)];
-  const n = parseInt(hex.slice(1), 16);
-  const channels = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-  return '#' + channels
-    .map((c, i) => Math.round(c + (INK[i] - c) * amount).toString(16).padStart(2, '0'))
-    .join('');
-}
-
 // The roster is the source of display identity and ordering. Batches whose
 // model id is not in it (hand-ingested, or a retired entry) still import.
 const roster = JSON.parse(readFileSync(join(root, 'tools', 'models.json'), 'utf8')).models;
@@ -65,7 +44,7 @@ for (const file of files) {
   const batch = JSON.parse(readFileSync(join(runsDir, file), 'utf8'));
   if (batch.prompt_family === 'end_states') {
     const provider = batch.model?.provider;
-    if (!PROVIDER_COLORS[provider]) { problems.push(`${file}: unknown provider "${provider}"`); continue; }
+    if (!provider) { problems.push(`${file}: batch has no model.provider`); continue; }
     const missing = STATE_IDS.filter(id => { const a = batch.aggregate?.[id]; return !a || !a.n || typeof a.median !== 'number'; });
     if (missing.length) { problems.push(`${file}: aggregate missing ${missing.join(', ')}`); continue; }
     const medians = STATE_IDS.map(id => batch.aggregate[id].median);
@@ -98,7 +77,7 @@ for (const b of endStateBatches) {
   if (!endStateByModel[b.runKey] || b.date >= endStateByModel[b.runKey].date) endStateByModel[b.runKey] = b;
 }
 const emitEndState = b => `${indent}${JSON.stringify(b.runKey)}: {
-${indent}  provider: ${JSON.stringify(b.provider)}, model: ${JSON.stringify(b.displayLabel)}, label: ${JSON.stringify(b.displayLabel)}, shortLabel: ${JSON.stringify(b.short)}, color: ${JSON.stringify(shadeFor(PROVIDER_COLORS[b.provider], b.shadeIndex))},
+${indent}  provider: ${JSON.stringify(b.provider)}, model: ${JSON.stringify(b.displayLabel)}, label: ${JSON.stringify(b.displayLabel)}, shortLabel: ${JSON.stringify(b.short)},
 ${indent}  promptVersion: ${JSON.stringify(b.promptVersion)}, date: ${JSON.stringify(b.date)}, knowledgeCutoff: ${JSON.stringify(b.knowledgeCutoff)},
 ${indent}  sampleCount: ${b.sampleCount}, source: ${JSON.stringify('runs/' + b.file)},
 ${indent}  probabilities: { ${Object.entries(b.probabilities).map(([id, p]) => `${id}: ${p}`).join(', ')} },
@@ -111,10 +90,7 @@ const endStateEntries = Object.values(endStateByModel).sort((a, b) => {
   const rb = rosterByModel.get(b.runKey)?.order ?? Infinity;
   return ra - rb || a.runKey.localeCompare(b.runKey);
 });
-// Shade index = position of this model within its lab's roster entries.
-const seenPerProvider = {};
 for (const b of endStateEntries) {
-  b.shadeIndex = seenPerProvider[b.provider] = (seenPerProvider[b.provider] ?? -1) + 1;
   const entry = rosterByModel.get(b.runKey);
   b.displayLabel = entry?.label || b.model;
   b.short = entry?.shortLabel || SHORT_LABELS[b.provider] || b.provider.slice(0, 3).toUpperCase();

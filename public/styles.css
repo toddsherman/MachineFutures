@@ -48,9 +48,8 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .section-note { max-width: 430px; margin: 0; color: var(--muted); font-size: 16px; line-height: 1.55; }
 .end-forecast-toggle { margin-bottom: 30px; display: flex; flex-wrap: wrap; gap: 8px; }
 .end-toggle-button { min-height: 38px; padding: 9px 13px; display: inline-flex; align-items: center; gap: 8px; color: var(--muted); border: 1px solid var(--line); border-radius: 99px; background: transparent; font: 700 11px var(--mono); text-transform: uppercase; cursor: pointer; transition: .2s ease; }
-.end-toggle-button i { width: 7px; height: 7px; border-radius: 50%; background: var(--provider-color); box-shadow: 0 0 0 1px rgba(17,18,15,.2); }
-.end-toggle-button:hover, .end-toggle-button.active { color: var(--ink); border-color: var(--provider-color); background: var(--provider-color); }
-.end-toggle-button:hover i, .end-toggle-button.active i { background: var(--ink); box-shadow: none; }
+.end-toggle-button:hover { color: var(--ink); border-color: var(--ink); background: rgba(17, 18, 15, .07); }
+.end-toggle-button.active { color: var(--paper); border-color: var(--ink); background: var(--ink); }
 /* Median is an aggregate, not a model, so it carries no swatch and no hue —
    any tint would read as a twelfth model and sit close to the real ones. */
 .end-toggle-button.is-median { color: var(--ink); border-color: var(--ink); background: transparent; }
@@ -106,7 +105,10 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .state-card:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
 .dialog-description { margin: 22px 0 0; color: #b6b5ac; font-size: 15px; line-height: 1.6; }
 .model-mix { border-top: 1px solid var(--line); }
-.model-swatch { grid-row: span 2; width: 9px; height: 9px; border-radius: 50%; background: var(--swatch); box-shadow: 0 0 0 1px var(--ink); }
+.lab-logo { display: inline-grid; place-items: center; width: 1.15em; height: 1.15em; flex: 0 0 auto; color: currentColor; }
+.lab-logo svg { width: 100%; height: 100%; fill: currentColor; }
+.lab-logo b { font: 800 .62em var(--mono); }
+.lab-logo.in-row { grid-row: span 2; width: 17px; height: 17px; }
 .doomer-ratings { margin-top: 48px; padding-top: 36px; border-top: 1px solid var(--line); }
 .doomer-head { display: flex; align-items: center; justify-content: flex-start; gap: 24px; margin-bottom: 18px; }
 .doomer-list { display: grid; gap: 12px; }
@@ -268,9 +270,8 @@ body.dialog-open { overflow: hidden; }
 .matrix-corner, .matrix-state { position: sticky; left: 0; z-index: 2; background: var(--paper); }
 .method-view { border-top: 1px solid var(--line); scroll-margin-top: 12px; }
 .matrix-lab { grid-column: span var(--span); display: grid; place-items: center; padding: 10px 6px 8px; border-left: 1px solid var(--line); }
-.matrix-lab span { color: var(--muted); font: 700 10px var(--mono); text-transform: uppercase; letter-spacing: .07em; }
-.matrix-model { display: grid; justify-items: center; gap: 5px; padding: 8px 4px 10px; }
-.matrix-model i { width: 100%; max-width: 26px; height: 4px; background: var(--swatch); }
+.matrix-lab .lab-logo { width: 17px; height: 17px; color: var(--ink); }
+.matrix-model { display: grid; justify-items: center; padding: 9px 4px 10px; }
 .matrix-model span { font: 700 10px var(--mono); }
 .matrix-subhead { border-bottom: 1px solid var(--ink); }
 
@@ -309,9 +310,8 @@ body.dialog-open { overflow: hidden; }
   }
   .matrix-state .state-mark { position: relative; background: var(--paper); box-shadow: 0 0 0 5px var(--paper); }
   .matrix-lab { padding: 4px 2px 3px; }
-  .matrix-lab span { font-size: 9px; letter-spacing: .04em; }
+  .matrix-lab .lab-logo { width: 14px; height: 14px; }
   .matrix-model { padding: 6px 2px 8px; gap: 4px; }
-  .matrix-model i { max-width: 18px; height: 3px; }
   .matrix-model span { font-size: 9px; }
   .matrix-cell { min-height: 34px; }
   .matrix-cell span { font-size: 11px; }

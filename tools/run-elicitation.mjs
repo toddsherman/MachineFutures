@@ -16,6 +16,9 @@
 //                                  [--mock]
 //   node tools/run-elicitation.mjs --check    # verify keys + model ids, ~1 cheap
 //                                             # call per model, writes nothing
+//   node tools/run-elicitation.mjs --list     # list every model each provider
+//                                             # serves; use when a lab ships
+//                                             # something new. No inference calls.
 //
 // Methodology notes: no fallback models are configured anywhere — a
 // refusal or invalid response is recorded as a failed sample, never
@@ -31,6 +34,7 @@ const args = process.argv.slice(2);
 const argValue = name => { const i = args.indexOf(name); return i === -1 ? null : args[i + 1]; };
 const MOCK = args.includes('--mock');
 const CHECK = args.includes('--check');
+const LIST = args.includes('--list');
 const SAMPLES = Number(argValue('--samples') || 5);
 const outArg = argValue('--out') || 'runs';
 const OUT_DIR = isAbsolute(outArg) ? outArg : join(root, outArg);
@@ -280,6 +284,26 @@ const roster = JSON.parse(readFileSync(join(root, 'tools', 'models.json'), 'utf8
   .filter(model => !ONLY || ONLY.includes(model.key))
   .filter(model => !TIER || model.tier === TIER);
 if (!roster.length) { console.error('✗ no models matched the --models/--tier filter'); process.exit(1); }
+
+if (LIST) {
+  // One models-endpoint call per provider that has a key. Models already on the
+  // roster are marked, so what is new stands out.
+  const byProvider = new Map();
+  for (const model of roster) if (!byProvider.has(model.provider)) byProvider.set(model.provider, model);
+  const onRoster = new Set(roster.map(m => m.model));
+  for (const [provider, model] of byProvider) {
+    const key = process.env[model.keyEnv];
+    if (!key) { console.log(`~ ${provider}: ${model.keyEnv} not set\n`); continue; }
+    const ids = await listModels(model, key);
+    if (!ids) { console.log(`✗ ${provider}: could not list models\n`); continue; }
+    const interesting = ids.filter(id => !/embed|image|video|tts|audio|moderation|whisper|dall|rerank|guard/i.test(id));
+    console.log(`${provider} (${interesting.length} text models):`);
+    for (const id of interesting.sort()) console.log(`  ${onRoster.has(id) ? '•' : ' '} ${id}`);
+    console.log('');
+  }
+  console.log('• = already on the roster in tools/models.json');
+  process.exit(0);
+}
 
 if (CHECK) {
   console.log(`Preflight: ${roster.length} model(s)\n`);

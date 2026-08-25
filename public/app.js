@@ -3,11 +3,11 @@
 
   // Guard against taxonomy/data drift: every end-state run must cover exactly
   // the published state ids and allocate exactly 100 points.
-  Object.entries(endStateRuns).forEach(([provider, run]) => {
+  Object.entries(endStateRuns).forEach(([runKey, run]) => {
     const ids = Object.keys(run.probabilities).map(Number).sort((a, b) => a - b);
     const sum = ids.reduce((total, id) => total + run.probabilities[id], 0);
     const coversAllStates = ids.length === states.length && states.every(state => ids.includes(state.id));
-    if (!coversAllStates || sum !== 100) console.error(`MF_DATA.endStateRuns.${provider}: probabilities must cover state ids 1–${states.length} and sum to 100 (got ${ids.length} states, sum ${sum}).`);
+    if (!coversAllStates || sum !== 100) console.error(`MF_DATA.endStateRuns['${runKey}']: probabilities must cover state ids 1–${states.length} and sum to 100 (got ${ids.length} states, sum ${sum}).`);
   });
   const $ = selector => document.querySelector(selector);
   const $$ = selector => [...document.querySelectorAll(selector)];
@@ -64,8 +64,9 @@
   }
 
   function longTermEntries() {
-    return Object.entries(endStateRuns).map(([provider, source]) => ({
-      provider,
+    return Object.entries(endStateRuns).map(([runKey, source]) => ({
+      runKey,
+      provider: source.provider || runKey,
       probabilities: source.probabilities,
       rationales: source.rationales,
       promptVersion: source.promptVersion,
@@ -87,7 +88,7 @@
   }
 
   function renderEndForecastToggle(entries) {
-    const options = [{ key: 'Median', label: 'Median', color: '#d9ff57' }, ...entries.map(entry => ({ key: entry.provider, label: entry.provider, color: entry.color }))];
+    const options = [{ key: 'Median', label: 'Median', color: '#d9ff57' }, ...entries.map(entry => ({ key: entry.runKey, label: entry.label, color: entry.color }))];
     $('#end-forecast-toggle').innerHTML = options.map(option =>
       `<button type="button" class="end-toggle-button${option.key === activeEndForecast ? ' active' : ''}" style="--provider-color:${option.color}" data-end-forecast="${option.key}" aria-pressed="${option.key === activeEndForecast}"><i></i>${option.label}</button>`
     ).join('');
@@ -97,12 +98,13 @@
     const entries = longTermEntries();
     const orderedStates = endingOrder();
     renderEndForecastToggle(entries);
-    const activeLabel = activeEndForecast === 'Median' ? 'Median machine forecast' : `${activeEndForecast} forecast`;
+    const activeRun = endStateRuns[activeEndForecast];
+    const activeLabel = activeRun ? `${activeRun.label || activeEndForecast} forecast` : 'Median machine forecast';
     $('#end-forecast-kicker').textContent = activeLabel;
     const selectedStates = selectedEndStates();
     const total = selectedStates.reduce((sum, state) => sum + state.probability, 0);
     const normalized = selectedStates.map(state => ({ ...state, display: (state.probability / total) * 100 }));
-    $('#consensus-bar').setAttribute('aria-label', `${activeEndForecast} probability by end state`);
+    $('#consensus-bar').setAttribute('aria-label', `${activeRun ? activeRun.label : 'Median'} probability by end state`);
     $('#consensus-bar').innerHTML = normalized.map(state => `<button style="width:${state.display}%;--state:${state.color}" title="${state.name}: ${state.probability}%${state.extinction ? ` · ${extinctionLabels[state.extinction]}` : ''}" data-state-jump="${state.id}"><span>${state.id}</span></button>`).join('');
     $('#consensus-legend').innerHTML = normalized.map(state => `<button data-state-jump="${state.id}"><i style="--state:${state.color}"></i><span>${state.id}. ${state.name}${extinctionMark(state)}</span><b>${state.probability}%</b></button>`).join('');
 
@@ -121,9 +123,9 @@
 
     const colors = orderedStates.map(state => state.color);
     $('#model-bars').innerHTML = entries.map(entry => {
-      return `<div class="model-bar-row"><div class="model-bar-label"><span class="model-swatch" style="--swatch:${entry.color}"></span><b>${entry.provider}</b><small>${entry.model}</small></div><div class="model-stack">${orderedStates.map((state, index) => {
+      return `<div class="model-bar-row"><div class="model-bar-label"><span class="model-swatch" style="--swatch:${entry.color}"></span><b>${entry.label}</b><small>${entry.provider}</small></div><div class="model-stack">${orderedStates.map((state, index) => {
         const value = stateValue(entry, state);
-        return `<button style="width:${value}%;--state:${colors[index]}" title="${state.name}: ${value}%" aria-label="${entry.provider} ${state.name}: ${value}%" data-small="${value < 5}"><span>${value}%</span></button>`;
+        return `<button style="width:${value}%;--state:${colors[index]}" title="${state.name}: ${value}%" aria-label="${entry.label} ${state.name}: ${value}%" data-small="${value < 5}"><span>${value}%</span></button>`;
       }).join('')}</div></div>`;
     }).join('');
 
@@ -137,8 +139,8 @@
       </div>
       <div class="doomer-list">
         ${doomerEntries.map(entry => `<div class="doomer-row">
-          <div class="doomer-label"><span class="model-swatch" style="--swatch:${entry.color}"></span><b>${entry.provider}</b><small>${entry.model}</small></div>
-          <div class="doomer-meter" aria-label="${entry.provider}: ${entry.sums.gone}% humanity is gone, ${entry.sums.risk}% might perish">${
+          <div class="doomer-label"><span class="model-swatch" style="--swatch:${entry.color}"></span><b>${entry.label}</b><small>${entry.provider}</small></div>
+          <div class="doomer-meter" aria-label="${entry.label}: ${entry.sums.gone}% humanity is gone, ${entry.sums.risk}% might perish">${
             [['gone', entry.sums.gone], ['risk', entry.sums.risk]]
               .filter(([, value]) => value > 0)
               .map(([tier, value]) => `<i class="${tier}" style="width:${value}%"><span>${value}%</span></i>`).join('')

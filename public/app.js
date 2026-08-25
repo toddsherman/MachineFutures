@@ -427,7 +427,12 @@
             ${entry.range?.[state.id] ? `<i class="strip-range" style="left:${pos(entry.range[state.id][0]).toFixed(2)}%;width:${(pos(entry.range[state.id][1]) - pos(entry.range[state.id][0])).toFixed(2)}%"></i>` : ''}
             <b class="strip-mid" style="left:${pos(entry.value).toFixed(2)}%"></b>
           </div>
-          <span>${entry.range?.[state.id] ? `${entry.range[state.id][0]}–${entry.range[state.id][1]}%` : '—'}</span>
+          <div class="answer-axis">
+            <span>0%</span>
+            ${ticks.map(t => `<span style="left:${pos(t)}%">${t}</span>`).join('')}
+            <span class="strip-end">${axisMax}%</span>
+          </div>
+          <span class="answer-range">${entry.range?.[state.id] ? `${entry.range[state.id][0]}–${entry.range[state.id][1]}%` : '—'}</span>
         </div>
         ${entry.rationales?.[state.id] ? `<p>${entry.rationales[state.id]}</p>` : ''}
       </article>`).join('');
@@ -443,14 +448,6 @@
       </div>
       <p class="dialog-description">${state.description}</p>
       <div class="dialog-subhead"><h3>How each model sees it</h3><span>Band is the range across ${entries[0]?.sampleCount ?? 5} samples; tick is the published figure</span></div>
-      <div class="answer-plot answer-scale">
-        <div class="strip-scale">
-          <span>0%</span>
-          ${ticks.map(t => `<span style="left:${pos(t)}%">${t}</span>`).join('')}
-          <span class="strip-end">${axisMax}%</span>
-        </div>
-        <span></span>
-      </div>
       <div class="model-answer-list">${rows}</div>`;
     $('#detail-dialog').showModal();
     document.body.classList.add('dialog-open');

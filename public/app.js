@@ -160,28 +160,53 @@
     if (roster) roster.textContent = `${entries.length} models across ${labs.size} labs`;
   }
 
+  const MOTION_MS = 500;
+  const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Count a figure from where it is to where it lands, matching the target's
+  // precision so a median of 13.5 does not render as 14 mid-flight. rAF is
+  // paused in a hidden tab, so a timer guarantees the value still lands, and a
+  // token drops stale tweens when a selection changes mid-flight.
+  const tweenTimers = new WeakMap();
+  const tweenTokens = new WeakMap();
+  function tweenNumber(el, to, suffix = '%') {
+    const from = parseFloat(el.textContent);
+    const dp = Number.isInteger(to) ? 0 : 1;
+    const land = () => { el.textContent = to + suffix; };
+    clearTimeout(tweenTimers.get(el));
+    const token = {};
+    tweenTokens.set(el, token);
+    if (reduceMotion() || !Number.isFinite(from) || from === to) return land();
+    const started = performance.now();
+    const step = now => {
+      if (tweenTokens.get(el) !== token) return;
+      const t = Math.min((now - started) / MOTION_MS, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = (from + (to - from) * eased).toFixed(dp) + suffix;
+      if (t < 1) requestAnimationFrame(step); else land();
+    };
+    requestAnimationFrame(step);
+    tweenTimers.set(el, setTimeout(() => { if (tweenTokens.get(el) === token) land(); }, MOTION_MS + 80));
+  }
+
+  // Structure is built once. Selecting a model then rewrites values in place —
+  // rebuilding the markup would restart every element at its final state and
+  // there would be nothing for a transition to animate between.
   function renderEndStates() {
     const entries = longTermEntries();
     const orderedStates = endingOrder();
     renderHeroStats(entries);
     renderEndForecastToggle(entries);
-    const activeRun = endStateRuns[activeEndForecast];
-    const activeLabel = activeRun ? `${activeRun.label || activeEndForecast} forecast` : 'Median machine forecast';
-    $('#end-forecast-title').textContent = activeLabel;
-    const selectedStates = selectedEndStates();
-    const total = selectedStates.reduce((sum, state) => sum + state.probability, 0);
-    const normalized = selectedStates.map(state => ({ ...state, display: (state.probability / total) * 100 }));
-    $('#consensus-bar').setAttribute('aria-label', `${activeRun ? activeRun.label : 'Median'} probability by end state`);
-    $('#consensus-bar').innerHTML = normalized.map(state => `<button style="width:${state.display}%;--state:${state.color}" title="${state.name}: ${state.probability}%${state.extinction ? ` · ${extinctionLabels[state.extinction]}` : ''}" data-state-jump="${state.id}"><span>${state.id}</span></button>`).join('');
-    $('#consensus-legend').innerHTML = normalized.map(state => `<button data-state-jump="${state.id}"><i style="--state:${state.color}"></i><span>${state.id}. ${state.name}${extinctionMark(state)}</span><b>${state.probability}%</b></button>`).join('');
 
-    const leader = [...selectedStates].sort((a, b) => b.probability - a.probability)[0];
-    $('#end-leader').innerHTML = `<p class="kicker">Most likely ending</p><span class="leader-number">${leader.id}</span><h2>${leader.name}${extinctionMark(leader)}</h2><strong>${leader.probability}%</strong><p>${leader.description}</p>`;
+    $('#consensus-bar').innerHTML = orderedStates.map(state =>
+      `<button style="--state:${state.color}" data-state-jump="${state.id}"><span>${state.id}</span></button>`).join('');
+    $('#consensus-legend').innerHTML = orderedStates.map(state =>
+      `<button data-state-jump="${state.id}"><i style="--state:${state.color}"></i><span>${state.id}. ${state.name}${extinctionMark(state)}</span><b></b></button>`).join('');
 
-    $('#state-grid').innerHTML = selectedStates.map(state => {
+    $('#state-grid').innerHTML = orderedStates.map(state => {
       const providerValues = entries.map(entry => ({ ...entry, value: stateValue(entry, state) })).sort((a, b) => b.value - a.value);
-      return `<article class="state-card" id="state-${state.id}" style="--state:${state.color}" data-state="${state.id}" tabindex="0" role="button" aria-label="${state.name}: ${state.probability}% — see each model's reasoning">
-        <div class="state-card-head"><span>${String(state.id).padStart(2, '0')}</span><h3>${state.name}</h3><div class="state-card-meta"><strong>${state.probability}%</strong>${extinctionMark(state)}</div></div>
+      return `<article class="state-card" id="state-${state.id}" style="--state:${state.color}" data-state="${state.id}" tabindex="0" role="button">
+        <div class="state-card-head"><span>${String(state.id).padStart(2, '0')}</span><h3>${state.name}</h3><div class="state-card-meta"><strong></strong>${extinctionMark(state)}</div></div>
         <p>${state.description}</p>
         <div class="state-models">${providerValues.map(item => `<span title="${item.label}: ${item.value}%"><strong>${item.value}%</strong><i style="height:${Math.max(item.value * 1.8, 4)}px"></i><small>${item.shortLabel}</small></span>`).join('')}</div>
         <div class="state-range"><span>${providerValues.at(-1).value}% low</span><span>${providerValues[0].value}% high</span><em class="state-more">Why ↗</em></div>
@@ -189,7 +214,11 @@
     }).join('');
 
     renderMatrix(entries, orderedStates);
+    renderDoomer(entries);
+    applyForecast({ animate: false });
+  }
 
+  function renderDoomer(entries) {
     const doomerEntries = entries
       .map(entry => ({ ...entry, sums: extinctionSums(entry) }))
       .sort((a, b) => b.sums.total - a.sums.total);
@@ -209,7 +238,52 @@
       </div>`;
   }
 
-  // Each run carries a rationale per state; the dialog is where they surface.
+  function applyForecast({ animate }) {
+    const activeRun = endStateRuns[activeEndForecast];
+    const activeLabel = activeRun ? `${activeRun.label || activeEndForecast} forecast` : 'Median machine forecast';
+    $('#end-forecast-title').textContent = activeLabel;
+
+    const selectedStates = selectedEndStates();
+    const total = selectedStates.reduce((sum, state) => sum + state.probability, 0);
+    const bar = $('#consensus-bar');
+    const legend = $('#consensus-legend');
+    bar.setAttribute('aria-label', `${activeRun ? activeRun.label : 'Median'} probability by end state`);
+    bar.classList.toggle('is-animating', Boolean(animate) && !reduceMotion());
+
+    selectedStates.forEach((state, index) => {
+      const segment = bar.children[index];
+      segment.style.width = `${(state.probability / total) * 100}%`;
+      segment.title = `${state.name}: ${state.probability}%${state.extinction ? ` · ${extinctionLabels[state.extinction]}` : ''}`;
+
+      const value = legend.children[index].querySelector('b');
+      animate ? tweenNumber(value, state.probability) : (value.textContent = `${state.probability}%`);
+
+      const card = $(`#state-${state.id}`);
+      const figure = card.querySelector('.state-card-meta strong');
+      animate ? tweenNumber(figure, state.probability) : (figure.textContent = `${state.probability}%`);
+      card.setAttribute('aria-label', `${state.name}: ${state.probability}% — see each model's reasoning`);
+    });
+
+    const leader = [...selectedStates].sort((a, b) => b.probability - a.probability)[0];
+    const leaderEl = $('#end-leader');
+    const paint = () => {
+      leaderEl.innerHTML = `<p class="kicker">Most likely ending</p><span class="leader-number">${leader.id}</span><h2>${leader.name}${extinctionMark(leader)}</h2><strong>${leader.probability}%</strong><p>${leader.description}</p>`;
+    };
+    // The leader can become a different ending entirely, so it crossfades
+    // rather than counting between two unrelated states.
+    if (!animate || reduceMotion() || Number(leaderEl.dataset.leader) === leader.id) {
+      const previous = leaderEl.querySelector('strong');
+      if (animate && !reduceMotion() && previous && Number(leaderEl.dataset.leader) === leader.id) {
+        tweenNumber(previous, leader.probability);
+      } else paint();
+    } else {
+      leaderEl.classList.add('is-swapping');
+      clearTimeout(leaderEl._swap);
+      leaderEl._swap = setTimeout(() => { paint(); leaderEl.classList.remove('is-swapping'); }, MOTION_MS * 0.4);
+    }
+    leaderEl.dataset.leader = leader.id;
+  }
+
   function openState(id) {
     const state = states.find(item => item.id === Number(id));
     if (!state) return;
@@ -246,7 +320,12 @@
     const endForecastTarget = event.target.closest('[data-end-forecast]');
     if (endForecastTarget) {
       activeEndForecast = endForecastTarget.dataset.endForecast;
-      renderEndStates();
+      $$('.end-toggle-button').forEach(button => {
+        const on = button.dataset.endForecast === activeEndForecast;
+        button.classList.toggle('active', on);
+        button.setAttribute('aria-pressed', on);
+      });
+      applyForecast({ animate: true });
       updateUrl();
       return;
     }

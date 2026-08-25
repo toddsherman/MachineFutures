@@ -47,7 +47,7 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .section-heading h2 { margin: 0; font: 900 clamp(46px, 5vw, 78px)/.88 var(--display); letter-spacing: -.065em; text-transform: uppercase; }
 .section-note { max-width: 430px; margin: 0; color: var(--muted); font-size: 16px; line-height: 1.55; }
 .end-forecast-toggle { margin-bottom: 30px; display: flex; flex-wrap: wrap; gap: 8px; }
-.end-toggle-button { min-height: 38px; padding: 9px 13px; display: inline-flex; align-items: center; gap: 8px; color: var(--muted); border: 1px solid var(--line); border-radius: 99px; background: transparent; font: 700 11px var(--mono); text-transform: uppercase; cursor: pointer; transition: .2s ease; }
+.end-toggle-button { min-height: 38px; padding: 9px 13px; display: inline-flex; align-items: center; gap: 8px; color: var(--muted); border: 1px solid var(--line); border-radius: 99px; background: transparent; font: 700 11px var(--mono); text-transform: uppercase; cursor: pointer; }
 .end-toggle-button:hover { color: var(--ink); border-color: var(--ink); background: rgba(17, 18, 15, .07); }
 .end-toggle-button.active { color: var(--paper); border-color: var(--ink); background: var(--ink); }
 /* Median is an aggregate, not a model, so it carries no swatch and no hue —
@@ -70,6 +70,16 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .stacked-bar { height: 100px; display: flex; overflow: hidden; border: 1px solid var(--ink); }
 .stacked-bar button, .model-stack button { min-width: 2px; padding: 0; display: grid; place-items: center; border: 0; border-right: 1px solid rgba(17,18,15,.4); background: var(--state); cursor: pointer; }
 .stacked-bar button:hover { filter: brightness(1.15); }
+/* Widths only animate while a selection is being applied, so the initial paint
+   and any resize stay instant. */
+.stacked-bar.is-animating button { transition: width 500ms cubic-bezier(.33, 0, .2, 1); }
+.end-leader { transition: opacity 200ms ease; }
+.end-leader.is-swapping { opacity: 0; }
+.end-toggle-button { transition: color .2s ease, background .2s ease, border-color .2s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .stacked-bar.is-animating button, .end-leader { transition: none; }
+}
 .stacked-bar span { font: 700 12px var(--mono); }
 .stacked-legend { display: grid; grid-template-columns: repeat(2, 1fr); margin-top: 24px; gap: 5px 30px; }
 .stacked-legend button { padding: 7px 0; display: grid; grid-template-columns: 10px 1fr auto; gap: 10px; align-items: center; text-align: left; border: 0; background: transparent; cursor: pointer; font: 11px var(--mono); }

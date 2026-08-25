@@ -46,10 +46,12 @@ jobs:
       - name: Update baseline
         run: |
           set -euo pipefail
-          if git diff --quiet tools/seen-models.json; then echo "Baseline unchanged."; exit 0; fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Stage first: a brand-new baseline file is untracked, and `git diff`
+          # alone reports no change for untracked paths.
           git add tools/seen-models.json
+          if git diff --cached --quiet; then echo "Baseline unchanged."; exit 0; fi
           git commit -m "Update model-catalogue baseline"
           git push
 

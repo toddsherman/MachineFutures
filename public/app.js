@@ -235,7 +235,11 @@
               ${providerValues.map((m, i) => {
                 const r = m.range?.[state.id];
                 const line = r && r[1] > r[0] ? `<i style="left:${at(r[0]).toFixed(2)}%;width:${(at(r[1]) - at(r[0])).toFixed(2)}%"></i>` : '';
-                return `<span class="strip-model" data-model="${m.runKey}" style="left:${at(m.value).toFixed(2)}%;--lane:${i % 3}" title="${m.label}: ${m.value}%${r ? ` (${r[0]}–${r[1]}% across ${m.sampleCount} samples)` : ''}">${line}<b></b></span>`;
+                // The wrapper spans the whole axis so the dot and its error bar
+                // can both be placed as a share of it; a shrink-to-fit wrapper
+                // has no width for those percentages to resolve against.
+                const tip = `${m.label}: ${m.value}%${r ? ` (${r[0]}–${r[1]}% across ${m.sampleCount} samples)` : ''}`;
+                return `<span class="strip-model" data-model="${m.runKey}" style="--lane:${i % 3}">${line}<b style="left:${at(m.value).toFixed(2)}%" title="${tip}"></b></span>`;
               }).join('')}
               ${[10, 20, 30].filter(t => t < axisMax).map(t => `<u style="left:${at(t)}%"><span>${t}</span></u>`).join('')}
             </div>

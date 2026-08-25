@@ -145,7 +145,7 @@
       provider: "Google", model: "Gemini 3.7 Flash", label: "Gemini 3.7 Flash", shortLabel: "G37",
       promptVersion: 3, date: "2026-08-25", knowledgeCutoff: "03/2026",
       sampleCount: 20, source: "runs/2026-08-25__gemini-3.7-flash__closed_book__end-states.json",
-      probabilities: { 1: 5, 2: 10, 3: 15, 4: 11, 5: 19, 6: 17, 7: 10, 8: 4, 9: 4, 10: 4, 11: 1 },
+      probabilities: { 1: 5, 2: 10, 3: 15, 4: 12, 5: 18, 6: 17, 7: 10, 8: 4, 9: 4, 10: 4, 11: 1 },
       range: { 1: [4, 7], 2: [8, 12], 3: [12, 16], 4: [8, 14], 5: [13, 18], 6: [15, 22], 7: [9, 13], 8: [3, 6], 9: [2, 5], 10: [3, 6], 11: [1, 2] },
       exposure: {"n":20,"mean":58.4,"se":0.57,"min":54,"max":65},
       rationales: {

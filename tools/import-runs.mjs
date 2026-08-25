@@ -45,16 +45,33 @@ function exposureStats(samples) {
 const runKeyOf = batch => batch.model?.api_string || batch.model?.name || batch.run_id;
 const stripProvider = name => String(name || 'unknown').replace(/\s*\((?:OpenAI|Anthropic|Google|xAI|Meta|DeepSeek|mock)\)\s*$/, '');
 
-// Largest-remainder renormalization: integer probabilities summing to exactly 100.
-function renormalize(values) {
+// Largest-remainder renormalization: integer probabilities summing to exactly
+// 100. Bounded, when the sample ranges are known: rounding a median up must not
+// carry it past the highest figure the model actually gave, or the site would
+// publish a number that appears in none of its samples. Remainders are still
+// taken in order; a state at its observed ceiling is skipped in favour of the
+// next, and the bound is only ignored if every state is capped.
+function renormalize(values, bounds) {
   const total = values.reduce((a, c) => a + c, 0);
   if (!total) return values.map(() => 0);
   const scaled = values.map(v => (v / total) * 100);
-  const floored = scaled.map(Math.floor);
-  let shortfall = 100 - floored.reduce((a, c) => a + c, 0);
-  const order = scaled.map((v, i) => [v - floored[i], i]).sort((a, b) => b[0] - a[0]);
-  for (let k = 0; k < shortfall; k++) floored[order[k % order.length][1]] += 1;
-  return floored;
+  const out = scaled.map(Math.floor);
+  const shortfall = 100 - out.reduce((a, c) => a + c, 0);
+  const order = scaled.map((v, i) => [v - out[i], i]).sort((a, b) => b[0] - a[0]).map(([, i]) => i);
+  const ceiling = i => (bounds && Number.isFinite(bounds[i]?.[1]) ? bounds[i][1] : Infinity);
+
+  let given = 0;
+  for (let pass = 0; pass < 2 && given < shortfall; pass++) {
+    for (const i of order) {
+      if (given >= shortfall) break;
+      // First pass respects the observed ceiling; a second pass ignores it only
+      // if the points could not be placed anywhere else.
+      if (pass === 0 && out[i] + 1 > ceiling(i)) continue;
+      out[i] += 1;
+      given += 1;
+    }
+  }
+  return out;
 }
 
 const files = readdirSync(runsDir).filter(f => f.endsWith('.json')).sort();
@@ -69,7 +86,7 @@ for (const file of files) {
     const missing = STATE_IDS.filter(id => { const a = batch.aggregate?.[id]; return !a || !a.n || typeof a.median !== 'number'; });
     if (missing.length) { problems.push(`${file}: aggregate missing ${missing.join(', ')}`); continue; }
     const medians = STATE_IDS.map(id => batch.aggregate[id].median);
-    const probs = renormalize(medians);
+    const probs = renormalize(medians, STATE_IDS.map(id => [batch.aggregate[id].min, batch.aggregate[id].max]));
     endStateBatches.push({
       file,
       runKey: runKeyOf(batch),

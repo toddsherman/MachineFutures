@@ -186,14 +186,24 @@ async function elicit(model, prompt) {
   if (!samples.length) { console.error(`✗ ${model.key}: no valid samples after ${maxAttempts} attempts`); return { ok: false }; }
   if (samples.length < SAMPLES) console.warn(`! ${model.key}: only ${samples.length}/${SAMPLES} valid samples`);
 
-  const name = samples[0].meta.model || `${model.label} (${model.provider})`;
+  // Identity comes from the roster — the model id we actually called — never
+  // from the model's self-report. Models are unreliable narrators about their
+  // own version (an observed run had Gemini 3.1 Pro answer "gpt-4o"). The
+  // self-report is kept alongside as data, clearly marked as a claim.
+  const selfReported = [...new Set(samples.map(s => s.meta.model).filter(Boolean))];
   const batch = {
-    run_id: `${RUN_DATE}__${slug(name)}__closed_book__end-states`,
+    run_id: `${RUN_DATE}__${slug(model.model)}__closed_book__end-states`,
     prompt_family: 'end_states',
     asked_on: RUN_DATE,
     question_set: QUESTION_SET,
     track: 'closed_book',
-    model: { name, provider: model.provider, api_string: model.model, self_reported_cutoff: samples[0].meta.cutoff },
+    model: {
+      name: model.label,
+      provider: model.provider,
+      api_string: model.model,
+      self_reported_name: selfReported.length === 1 ? selfReported[0] : selfReported,
+      self_reported_cutoff: samples[0].meta.cutoff
+    },
     n_samples: samples.length,
     samples: samples.map(s => ({ sample: s.sample, answers: s.answers })),
     aggregate: aggregate(samples),

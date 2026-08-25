@@ -39,15 +39,34 @@ The 50-question 2030 benchmark was retired in August 2026; its prompt and only r
 
 The raw batches are also uploaded as a workflow artifact immediately after elicitation, before any step that could fail — a paid run is never lost to a downstream error.
 
-Setup, in the GitHub repo settings:
+### Ongoing cadence
 
-1. Add API-key secrets (Settings → Secrets and variables → Actions → Secrets), one per provider you want on the board: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, `XAI_API_KEY`, `META_API_KEY`, `DEEPSEEK_API_KEY`, `MISTRAL_API_KEY`, `MOONSHOT_API_KEY`. **Models whose key is missing are skipped**, so the keys you configure decide the roster.
-2. Run the preflight before the first real run: Actions → Elicit end-state forecasts → Run workflow with **check_only** ticked. It makes one cheap call per model and reports, per provider, whether the key works and the model id resolves. Fix anything it flags in `tools/models.json`, then run for real. Locally: `node tools/run-elicitation.mjs --check`.
-3. To turn on the monthly schedule (1st of each month), add a repository variable `ELICITATION_ENABLED` = `true`. Until then, trigger runs manually (optionally filtered with `models`, e.g. `anthropic,google`).
+**Monthly, automatically.** The schedule runs on the 1st at 14:00 UTC, re-asking every model on the roster. This is the longitudinal series: the same question, the same prompt version, the same models over time. Gated on the repository variable `ELICITATION_ENABLED`; set it to anything other than `true` to pause.
 
-Adding a model is one entry in `tools/models.json` plus its key. Anything with an OpenAI-compatible endpoint needs no new code — set `api: "openai-compatible"` and its `baseUrl`. New *providers* also want a color and short label in `tools/import-runs.mjs` (`PROVIDER_COLORS`, `SHORT_LABELS`), or they render in the fallback color.
+**When a lab ships a new model**, three steps:
 
-Methodology guarantees encoded in the harness: the prompt is read verbatim from `public/end_states.md` between the PROMPT BEGINS/ENDS delimiters; no fallback models are configured, so a refusal or invalid response is recorded as a failed sample rather than answered by a different model; sampling parameters are omitted so every provider runs at its own defaults; the exact `api_string` is recorded per run. Local dry run: `node tools/run-elicitation.mjs --mock`.
+1. `--list` to see what the provider now serves (Actions → Run workflow → tick **list_models**, or `node tools/run-elicitation.mjs --list`). Models already on the roster are marked, so anything new stands out. Being *listed* does not mean it is callable — `gemini-2.5-pro` appears in Google's list but rejects inference on new accounts.
+2. Add it to `tools/models.json` and preflight (**check_only**, or `--check`). One cheap call per model confirms the key is accepted and the id resolves.
+3. Elicit just the new entry: Run workflow with `models: <its key>`. Existing models keep their earlier run and date until the next monthly sweep.
+
+A model whose `keyEnv` is missing is skipped, so an unkeyed provider never breaks a run.
+
+### The roster
+
+Each lab fields two models — its current flagship and a second current model, usually the flagship it replaced — so the board answers one question consistently: does a lab's newer model see a different ending than its predecessor? Google is the exception; no older Pro is callable on new accounts, so its second entry is the newest Flash, a tier comparison rather than a generational one.
+
+Runs are keyed by api model id, never by provider, which is what lets two models from the same lab sit side by side. Same-lab models share the lab's hue, darkened by roster position.
+
+Adding a model is one entry in `tools/models.json` plus its key. Anything with an OpenAI-compatible endpoint needs no new code — set `api: "openai-compatible"` and its `baseUrl`. A new *provider* also wants a colour in `tools/import-runs.mjs` (`PROVIDER_COLORS`).
+
+### Methodology guarantees encoded in the harness
+
+- The prompt is read verbatim from `public/end_states.md` between the PROMPT BEGINS/ENDS delimiters.
+- No fallback models are configured: a refusal or invalid response is recorded as a failed sample, never answered by a different model.
+- Sampling parameters are omitted, so every provider runs at its own defaults.
+- Run identity is the model id actually called. Models are unreliable narrators about their own version — one run had Gemini 3.1 Pro answer `gpt-4o` — so the self-report is stored as `model.self_reported_name` and never used as identity.
+
+Local dry run: `node tools/run-elicitation.mjs --mock`.
 
 ## Repository structure
 

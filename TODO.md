@@ -4,6 +4,12 @@
 
 - [x] Narrow the model/lab set to fewer labs: Google, OpenAI, Meta, Anthropic, and xAI. (All five live; DeepSeek/Mistral/Moonshot are configured and awaiting keys.)
 
+## Cadence
+
+- [x] Enable the monthly schedule (`ELICITATION_ENABLED=true`); re-asks every roster model on the 1st.
+- [ ] Add DeepSeek, Mistral, and Moonshot keys — roster entries are ready and preflight-skipped until then.
+- [ ] Watch for new flagships with `--list`; add, preflight, elicit.
+
 ## Retired
 
 - [x] Remove the 2030 index; the site is now end-states only. Prompt and run archived in `archive/`.

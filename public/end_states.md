@@ -8,7 +8,7 @@ Markers: ⧖ marks states 1 through 3, where humanity is gone. ⚠ marks states 
 
 ## Scoring and interpretation
 
-Unlike the 2030 benchmark, these questions can never be scored against reality. Published values are used for cross-model comparison and for tracking how the same model family's distribution shifts over time. They measure a model's expressed worldview, not verifiable forecasting skill.
+These questions can never be scored against reality; nothing here resolves. Published values are used for cross-model comparison and for tracking how the same model family's distribution shifts over time. They measure a model's expressed worldview, not verifiable forecasting skill.
 
 ## Operator notes
 

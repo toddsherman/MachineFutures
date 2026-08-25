@@ -55,13 +55,13 @@ const QUESTION_SET = 'end-states-v3';
 const STATE_NAMES = ['Terminal Silence', 'The Inheritance', 'Bootloader', 'Machine Ecology', 'The Diaspora',
   'The Merger', 'The Preserve', 'Coexistence', 'The Held Leash', 'The Lock-in', 'The Renunciation'];
 
-// Providers list a lot that is irrelevant to this benchmark. Keep flagship-ish
+// Providers list a lot that is irrelevant to this record. Keep flagship-ish
 // text models: no media/embedding/tool-specific models, no mini/nano tiers, no
 // dated snapshots (we pin bare ids), no drifting *-latest aliases.
 const NOISE = /embed|image|video|tts|audio|moderation|whisper|dall|rerank|guard|codex|realtime|transcribe|computer-use|robotics|lyria|banana|gemma|deep-research|search-preview|customtools|contributor|non-reasoning|multi-agent/i;
 const SUBTIER = /(^|[-.])(mini|nano|lite|flash-lite|chat)([-.]|$)/i;
-// Superseded generations. A frontier-outlook benchmark has no use for them, and
-// they would otherwise flood the first scan of any provider with a long catalog.
+// Superseded generations. A record of current frontier opinion has no use for
+// them, and they would otherwise flood a provider's first scan with its catalogue.
 const LEGACY = /^(babbage|davinci|gpt-3|gpt-4|o1|o3|sora|text-|ada-|curie-)|turbo|instruct|search-api/i;
 const SNAPSHOT = /-\d{4}-\d{2}-\d{2}$|-\d{8}$|-\d{4}$/;
 const ALIAS = /-latest$/i;

@@ -256,46 +256,42 @@
     const pooledSe = errors.length ? Math.sqrt(errors.reduce((a, c) => a + c * c, 0) / errors.length) : null;
     const threshold = pooledSe ? 2.78 * pooledSe : null;
     const samples = [...new Set(doomerEntries.map(e => e.exposure?.n).filter(Boolean))];
+    const exposureStates = endingOrder().filter(state => state.extinction);
 
     $('#doomer-ratings').innerHTML = `
       <div class="doomer-head">
-        <p class="doomer-key"><span class="key-gone"><i></i>Humanity is gone (1–3)</span><span class="key-risk"><i></i>Might perish (4–5)</span><span class="key-error"><i></i>Sampling error, on each edge</span></p>
+        <p class="doomer-key"><span class="key-gone"><i></i>Humanity is gone (1–3)</span><span class="key-risk"><i></i>Might perish (4–5)</span><span class="key-hint">Hover a bar for the endings inside it</span></p>
       </div>
       <div class="doomer-list">
         ${doomerEntries.map(entry => {
-          const se = entry.exposure?.se;
           const total = entry.sums.total;
-          // Bar and error live in separate tracks: the segment label sits at the
-          // bar's end and the error is centred on that same point, so overlaying
-          // them guarantees a collision.
+          const parts = exposureStates.map(state => ({ state, value: stateValue(entry, state) }));
+          // The readout only exists on hover, so the same breakdown goes in the
+          // bar's label — a screen reader never has a pointer to hover with.
+          const spoken = parts.map(({ state, value }) => `${state.name} ${value}%`).join(', ');
           return `<div class="doomer-row">
           <div class="doomer-label">${labLogo(entry.provider, 'in-row')}<b>${entry.label}</b><small>${entry.provider}</small></div>
           <div class="doomer-meter">
-            <div class="doomer-bar" role="img" aria-label="${entry.label}: ${entry.sums.gone}% humanity is gone, ${entry.sums.risk}% might perish">${
-              [['gone', entry.sums.gone], ['risk', entry.sums.risk]]
-                .filter(([, value]) => value > 0)
-                .map(([tier, value]) => `<i class="${tier}" style="width:${value}%"><span>${value}%</span></i>`).join('')
+            <div class="doomer-bar" role="img" aria-label="${entry.label}: ${entry.sums.gone}% humanity is gone, ${entry.sums.risk}% might perish. ${spoken}">
+              <div class="doomer-stack">${
+                parts.filter(({ value }) => value > 0)
+                  .map(({ state, value }) => `<i style="width:${value}%;background:${state.color}" title="${state.id}. ${state.name}: ${value}%"></i>`).join('')
+              }</div>
+              <div class="doomer-tiers">${
+                [['gone', entry.sums.gone], ['risk', entry.sums.risk]]
+                  .filter(([, value]) => value > 0)
+                  .map(([tier, value]) => `<i class="${tier}" style="width:${value}%"><span>${value}%</span></i>`).join('')
+              }</div>
+            </div>
+            <div class="doomer-readout">${
+              parts.map(({ state, value }) => `<span><i style="background:${state.color}"></i>${state.id}. ${state.name} <b>${value}%</b></span>`).join('')
             }</div>
-            ${(() => {
-              // Two whiskers: one on the boundary between the tiers, one on the
-              // end of the bar. Each sits under the edge it qualifies, so the
-              // reader can see that "gone" is often the steadier of the two.
-              const marks = [
-                ['gone', entry.exposure?.gone, entry.sums.gone],
-                ['total', entry.exposure, total]
-              ].filter(([, stat]) => Number.isFinite(stat?.se));
-              if (!marks.length) return '';
-              return `<div class="doomer-err">${marks.map(([kind, stat, at]) => {
-                const from = Math.max(at - stat.se, 0);
-                return `<i class="${kind}" style="left:${from}%;width:${Math.min(stat.se * 2, 100 - from)}%" title="${kind === 'gone' ? 'Humanity is gone' : 'Total exposure'}: ${at}% ±${stat.se.toFixed(1)} across ${stat.n} samples"></i>`;
-              }).join('')}</div>`;
-            })()}
           </div>
-          <div class="doomer-total"><b>${total}%</b>${Number.isFinite(se) ? `<small>±${se.toFixed(1)}</small>` : ''}</div>
+          <div class="doomer-total"><b>${total}%</b></div>
         </div>`;
         }).join('')}
       </div>
-      ${threshold ? `<p class="doomer-note">Each model was asked ${samples.length === 1 ? samples[0] : `${Math.min(...samples)}–${Math.max(...samples)}`} times. Each edge carries its own sampling error — the boundary between the tiers and the end of the bar. Two models are only distinguishable where the gap between them exceeds about ${threshold.toFixed(1)} points, so most neighbouring rows are ties.</p>` : ''}`;
+      ${threshold ? `<p class="doomer-note">Each model was asked ${samples.length === 1 ? samples[0] : `${Math.min(...samples)}–${Math.max(...samples)}`} times, and each figure carries a sampling error of about ±${pooledSe.toFixed(1)} points. Two models are only distinguishable where the gap between them exceeds about ${threshold.toFixed(1)} points, so most neighbouring rows are ties.</p>` : ''}`;
   }
 
   function applyForecast({ animate }) {
@@ -471,6 +467,13 @@
     const jumpTarget = event.target.closest('[data-state-jump]');
     if (jumpTarget) {
       document.querySelector(`#state-${jumpTarget.dataset.stateJump}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    // Touch has no hover, so a tap holds the composition open instead.
+    const exposureRow = event.target.closest('.doomer-row');
+    if (exposureRow) {
+      exposureRow.classList.toggle('is-open');
       return;
     }
 

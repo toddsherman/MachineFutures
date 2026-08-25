@@ -265,21 +265,12 @@ body.dialog-open { overflow: hidden; }
 .matrix-state i { flex: 0 0 auto; width: 9px; height: 22px; background: var(--state); }
 .matrix-state-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 12px var(--mono); }
 .matrix-state:hover .matrix-state-name { text-decoration: underline; }
-.matrix-state.is-summary { cursor: default; color: var(--muted); padding-left: 19px; }
-.matrix-state.is-summary .matrix-state-name { flex: 0 1 auto; font-weight: 400; text-transform: uppercase; font-size: 10px; letter-spacing: .06em; }
 
 .matrix-cell { position: relative; display: grid; place-items: center; min-height: 44px; border-left: 1px solid var(--line);
   background: color-mix(in srgb, var(--state) calc(var(--fill) * 100%), transparent); }
 .matrix-cell span { font: 700 12px var(--mono); font-variant-numeric: tabular-nums; }
-.matrix-cell.is-summary { align-items: end; background: none; }
 /* The two tiers stack from the bottom: `gone` sits on the floor and `risk`
    starts where it ends, so the bar's full height is the combined exposure. */
-.matrix-cell.is-summary i { position: absolute; left: 22%; width: 56%; background: var(--extinction); }
-.matrix-cell.is-summary i.gone { bottom: 0; }
-.matrix-cell.is-summary i.risk { background: var(--risk); }
-.matrix-cell.is-summary span { position: relative; z-index: 2; padding: 4px 0; color: var(--muted); font-size: 10px; }
-.matrix-summary { border-top: 1px solid var(--ink); }
-.matrix-summary .matrix-cell { min-height: 56px; }
 
 /* Narrow screens cannot afford a label column — it left room for four of eleven
    models. The ending's name moves onto its own line and the cells span the full
@@ -289,10 +280,21 @@ body.dialog-open { overflow: hidden; }
   .matrix { min-width: 0; }
   .matrix-row { grid-template-columns: repeat(var(--cols), minmax(26px, 1fr)); }
   .matrix-corner { display: none; }
-  .matrix-state { position: static; grid-column: 1 / -1; gap: 8px; padding: 13px 0 6px; }
+  /* The label spans every column, which would break the column rules running
+     down the table. Redraw them behind it as a repeating gradient on the same
+     1/cols rhythm as the cell borders, then knock the paper colour out behind
+     the text itself so the label stays legible over the lines. */
+  .matrix-state {
+    position: static; grid-column: 1 / -1; gap: 8px; padding: 13px 0 7px;
+    background-image: repeating-linear-gradient(to right,
+      var(--line) 0 1px, transparent 1px calc(100% / var(--cols)));
+  }
   .matrix-state i { height: 14px; width: 7px; }
-  .matrix-state-name { flex: 0 1 auto; white-space: normal; font-size: 11px; }
-  .matrix-state.is-summary { padding-left: 0; }
+  .matrix-state-name {
+    flex: 0 1 auto; white-space: normal; font-size: 11px;
+    background: var(--paper); box-shadow: -7px 0 0 var(--paper), 9px 0 0 var(--paper);
+  }
+  .matrix-state .state-mark { position: relative; background: var(--paper); box-shadow: 0 0 0 5px var(--paper); }
   .matrix-lab { padding: 4px 2px 3px; }
   .matrix-lab span { font-size: 9px; letter-spacing: .04em; }
   .matrix-model { padding: 6px 2px 8px; gap: 4px; }
@@ -300,7 +302,6 @@ body.dialog-open { overflow: hidden; }
   .matrix-model span { font-size: 9px; }
   .matrix-cell { min-height: 34px; }
   .matrix-cell span { font-size: 11px; }
-  .matrix-summary .matrix-cell { min-height: 44px; }
   .matrix-scroll { margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); }
 }
 

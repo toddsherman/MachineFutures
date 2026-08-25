@@ -126,20 +126,8 @@
         }).join('')}
       </div>`).join('');
 
-    // Summary row: the two extinction tiers stacked, per model.
-    const summary = `
-      <div class="matrix-row matrix-summary" role="row">
-        <div class="matrix-state is-summary" role="rowheader"><span class="matrix-state-name">Extinction-risk exposure</span></div>
-        ${entries.map(entry => {
-          const sums = extinctionSums(entry);
-          return `<div class="matrix-cell is-summary" role="cell" title="${entry.label}: ${sums.gone}% gone, ${sums.risk}% might perish">
-            <i class="gone" style="height:${sums.gone}%"></i><i class="risk" style="height:${sums.risk}%;bottom:${sums.gone}%"></i><span>${sums.total}</span>
-          </div>`;
-        }).join('')}
-      </div>`;
-
     $('#matrix').style.setProperty('--cols', entries.length);
-    $('#matrix').innerHTML = head + rows + summary;
+    $('#matrix').innerHTML = head + rows;
   }
 
   function renderHeroStats(entries) {

@@ -149,7 +149,18 @@ const endStateBlock = endStateEntries.length
   ? `const importedEndStateRuns = {\n${endStateEntries.map(emitEndState).join(',\n')}\n  };`
   : 'const importedEndStateRuns = {};';
 
+// Keep the header badge in step with the newest run rather than hand-editing it.
+const allDates = [...batches, ...endStateEntries].map(b => b.date).filter(Boolean).sort();
+const newest = allDates.at(-1);
+
 let data = readFileSync(dataPath, 'utf8');
+if (newest) {
+  const [y, m, d] = newest.split('-');
+  const badge = `${m}.${d}.${y.slice(2)}`;
+  const before = data;
+  data = data.replace(/const datasetDate = '[^']*';/, `const datasetDate = '${badge}';`);
+  if (data === before) console.warn('! could not update datasetDate in public/data.js');
+}
 const marker = /(\/\* BEGIN IMPORTED RUNS[\s\S]*?\*\/\n)[\s\S]*?(\n\s*\/\* END IMPORTED RUNS \*\/)/;
 if (!marker.test(data)) { console.error('✗ IMPORTED RUNS markers not found in public/data.js'); process.exit(1); }
 data = data.replace(marker, `$1  ${block}$2`);

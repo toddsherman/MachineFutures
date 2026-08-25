@@ -11,29 +11,7 @@
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <header class="site-header">
-    <a class="brand" href="#end-states" aria-label="Machine Futures home">
-      <svg class="brand-mark" viewBox="0 0 36 36" aria-hidden="true">
-        <path d="M4 9.5 18 2l14 7.5v17L18 34 4 26.5z"/>
-        <circle cx="12" cy="16" r="2.1"/><circle cx="24" cy="16" r="2.1"/>
-        <path d="M11 23h14"/>
-      </svg>
-      <span>Machine<br>Futures</span>
-    </a>
-
-    <nav class="primary-nav" aria-label="Primary navigation">
-      <a href="#end-states" data-nav="end-states">The end states</a>
-      <a href="#method" data-nav="method">Method</a>
-    </nav>
-
-    <div class="header-meta">
-      <span class="live-dot" aria-hidden="true"></span>
-      <span><b id="dataset-date">06.15.26</b> dataset</span>
-    </div>
-  </header>
-
   <main id="main">
-    <section class="view" id="view-end-states" data-view="end-states">
       <div class="end-hero shell">
         <h1>How does this<br>story <em>end?</em></h1>
         <div class="end-hero-side">
@@ -84,12 +62,11 @@
         </div>
         <div id="doomer-ratings" class="doomer-ratings"></div>
       </section>
-    </section>
 
-    <section class="view method-view" id="view-method" data-view="method" hidden>
+    <section class="method-view" id="method" aria-labelledby="method-title">
       <div class="method-hero shell">
         <p class="kicker">Transparent by design</p>
-        <h1>A benchmark,<br>not a <em>vibe.</em></h1>
+        <h1 id="method-title">A benchmark,<br>not a <em>vibe.</em></h1>
         <p class="dek">The question stays fixed. The models change. The record is public.</p>
       </div>
 
@@ -111,8 +88,14 @@
 
   <footer class="site-footer">
     <div class="footer-mark">Machine Futures</div>
-    <p>A public record of artificial foresight.<br>Five frontier models · five samples each</p>
-    <div class="footer-links"><a href="#method">Method</a><a href="end_states.md">Prompt</a><a href="https://github.com/toddsherman/MachineFutures">Source</a></div>
+    <p class="footer-note">A public record of artificial foresight.<br>
+      <span class="footer-dataset"><span class="live-dot" aria-hidden="true"></span><b id="dataset-date">—</b> dataset · <span id="footer-roster">—</span></span>
+    </p>
+    <div class="footer-links">
+      <a href="#method">Method</a>
+      <a href="end_states.md">The prompt</a>
+      <a href="https://github.com/toddsherman/MachineFutures">Source &amp; raw data</a>
+    </div>
   </footer>
 
   <dialog class="detail-dialog" id="detail-dialog">
@@ -120,7 +103,7 @@
     <div id="dialog-content"></div>
   </dialog>
 
-  <script src="data.js?v=20260825-matrix"></script>
-  <script src="app.js?v=20260825-matrix"></script>
+  <script src="data.js?v=20260825-single"></script>
+  <script src="app.js?v=20260825-single"></script>
 </body>
 </html>

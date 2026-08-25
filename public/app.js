@@ -19,30 +19,24 @@
 
   let activeEndForecast = 'Median';
 
-  // Filter state lives in the hash so any configuration is shareable:
-  //   #end-states?model=Google
-  function parseHash() {
-    const raw = location.hash.slice(1);
-    const splitAt = raw.indexOf('?');
-    return {
-      view: splitAt === -1 ? raw : raw.slice(0, splitAt),
-      params: new URLSearchParams(splitAt === -1 ? '' : raw.slice(splitAt + 1))
-    };
-  }
-
-  function applyHashState() {
-    const { view, params } = parseHash();
-    const model = params.get('model');
+  // The selected model lives in a real query param so a link is shareable:
+  //   /?model=claude-fable-5
+  // The hash is left free for section anchors (#method).
+  function applyUrlState() {
+    let model = new URLSearchParams(location.search).get('model');
+    // Links shared before the site became a single page used
+    // #end-states?model=X. Honour them, then rewrite to the current form.
+    const legacy = location.hash.match(/[?&]model=([^&]+)/);
+    if (!model && legacy) {
+      model = decodeURIComponent(legacy[1]);
+      history.replaceState(null, '', location.pathname + (endStateRuns[model] ? `?model=${encodeURIComponent(model)}` : ''));
+    }
     activeEndForecast = model && endStateRuns[model] ? model : 'Median';
-    return view;
   }
 
-  function updateHash() {
-    const view = document.documentElement.dataset.view || 'end-states';
-    const params = new URLSearchParams();
-    if (view === 'end-states' && activeEndForecast !== 'Median') params.set('model', activeEndForecast);
-    const query = params.toString();
-    history.replaceState(null, '', location.pathname + location.search + '#' + view + (query ? '?' + query : ''));
+  function updateUrl() {
+    const query = activeEndForecast === 'Median' ? '' : `?model=${encodeURIComponent(activeEndForecast)}`;
+    history.replaceState(null, '', location.pathname + query + location.hash);
   }
   const extinctionLabels = { gone: 'Humanity is gone', risk: 'Humanity might perish' };
   const extinctionMark = state => {
@@ -149,6 +143,8 @@
     $('#stat-models').textContent = entries.length;
     $('#stat-labs').textContent = labs.size;
     $('#stat-samples').textContent = samples.length === 1 ? samples[0] : `${Math.min(...samples)}–${Math.max(...samples)}`;
+    const roster = $('#footer-roster');
+    if (roster) roster.textContent = `${entries.length} models across ${labs.size} labs`;
   }
 
   function renderEndStates() {
@@ -201,15 +197,6 @@
       </div>`;
   }
 
-  function switchView(name) {
-    const valid = ['end-states', 'method'];
-    const viewName = valid.includes(name) ? name : 'end-states';
-    $$('.view').forEach(view => { view.hidden = view.dataset.view !== viewName; });
-    $$('[data-nav]').forEach(link => link.classList.toggle('active', link.dataset.nav === viewName));
-    document.documentElement.dataset.view = viewName;
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }
-
   // Each run carries a rationale per state; the dialog is where they surface.
   function openState(id) {
     const state = states.find(item => item.id === Number(id));
@@ -248,7 +235,7 @@
     if (endForecastTarget) {
       activeEndForecast = endForecastTarget.dataset.endForecast;
       renderEndStates();
-      updateHash();
+      updateUrl();
       return;
     }
 
@@ -278,14 +265,7 @@
     if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) $('#detail-dialog').close();
   });
   $('#detail-dialog').addEventListener('close', () => document.body.classList.remove('dialog-open'));
-  window.addEventListener('hashchange', () => {
-    const view = applyHashState();
-    renderEndStates();
-    switchView(view);
-  });
-
   if (datasetDate) $('#dataset-date').textContent = datasetDate;
-  const initialView = applyHashState();
+  applyUrlState();
   renderEndStates();
-  switchView(initialView);
 })();

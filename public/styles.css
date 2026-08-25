@@ -111,10 +111,13 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .strip-range { position: absolute; bottom: 0; height: 26px; background: color-mix(in srgb, var(--state) 34%, transparent); }
 /* min-width keeps the middle half visible when it collapses to a single
    figure, which happens whenever most models land on the same number. */
-.strip-iqr { position: absolute; bottom: 0; height: 26px; min-width: 3px; background: color-mix(in srgb, var(--state) 88%, var(--ink)); }
+.strip-iqr { position: absolute; bottom: 0; height: 26px; background: color-mix(in srgb, var(--state) 88%, var(--ink)); }
 /* The tick carries its own figure above the axis, so the value is readable
    without hovering or looking back up at the card header. */
-.strip-mid { position: absolute; bottom: -3px; width: 2px; height: 36px; margin-left: -1px; background: var(--ink); }
+/* A halo so the tick stays legible wherever it lands — the median often equals
+   the upper quartile, which puts it exactly on the dark block's edge. */
+.strip-mid { position: absolute; z-index: 2; bottom: -3px; width: 2px; height: 36px; margin-left: -1px; background: var(--ink);
+  box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--paper) 78%, transparent); }
 .strip-mid span { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 5px;
   padding: 0 3px; background: var(--paper); color: var(--ink); font: 800 11px/1 var(--mono); white-space: nowrap; }
 .strip-mid.at-start span { left: -1px; transform: none; }

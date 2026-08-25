@@ -350,9 +350,18 @@
         rangeEl.hidden = false;
       } else rangeEl.hidden = true;
       if (Number.isFinite(band.q1) && Number.isFinite(band.q3)) {
-        iqrEl.style.left = `${pct(band.q1).toFixed(2)}%`;
-        iqrEl.style.width = `${(pct(band.q3) - pct(band.q1)).toFixed(2)}%`;
-        iqrEl.style.setProperty('--origin', origin(state.probability, band.q1, band.q3));
+        // A middle half that collapses to one figure — common, since most models
+        // land on the same number — would otherwise be drawn starting at that
+        // figure, leaving the tick sitting on its edge rather than within it.
+        // Give it a floor and centre it on the value instead.
+        const floor = axisMax * 0.012;
+        const mid = (band.q1 + band.q3) / 2;
+        const half = Math.max((band.q3 - band.q1) / 2, floor / 2);
+        const from = Math.max(mid - half, 0);
+        const to = Math.min(mid + half, axisMax);
+        iqrEl.style.left = `${pct(from).toFixed(2)}%`;
+        iqrEl.style.width = `${(pct(to) - pct(from)).toFixed(2)}%`;
+        iqrEl.style.setProperty('--origin', origin(state.probability, from, to));
         iqrEl.hidden = false;
       } else iqrEl.hidden = true;
       axis.title = band.detail;

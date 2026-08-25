@@ -14,7 +14,7 @@ These questions can never be scored against reality; nothing here resolves. Publ
 
 - Send everything between the PROMPT BEGINS and PROMPT ENDS lines, including the full taxonomy, as one message. The delimiter lines themselves are not part of the prompt.
 - Replace the {{RUN_DATE}} placeholder in the first paragraph with the actual date of the run, in the form "June 15, 2026". Do not send the prompt with the placeholder still in it.
-- Run 5 samples per model at default temperature, with web search, browsing, and all other tools disabled.
+- Run 20 samples per model at default temperature, with web search, browsing, and all other tools disabled. Five proved too few: the spread within a single model was almost as large as the spread between models.
 - Record the model ID, run date, sampling settings, and prompt version (3) alongside each stored run.
 
 ## End-State Forecasting Prompt

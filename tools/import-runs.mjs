@@ -21,6 +21,27 @@ const roster = JSON.parse(readFileSync(join(root, 'tools', 'models.json'), 'utf8
 const rosterByModel = new Map(roster.map((m, order) => [m.model, { ...m, order }]));
 const STATE_IDS = Array.from({ length: 11 }, (_, i) => 'S' + (i + 1));
 const SHORT_LABELS = { Anthropic: 'ANT', OpenAI: 'OAI', Google: 'GDM', xAI: 'XAI', Meta: 'MET', DeepSeek: 'DSK', Mistral: 'MIS', Moonshot: 'KMI' };
+// Extinction-risk exposure per sample, so its standard error can be published
+// alongside the figure. States 1-5 are the extinction-risk tiers — a fixed
+// property of the taxonomy, stated in rule 3 of public/end_states.md.
+const EXPOSURE_IDS = ['S1', 'S2', 'S3', 'S4', 'S5'];
+function exposureStats(samples) {
+  const totals = samples
+    .map(s => EXPOSURE_IDS.reduce((sum, id) => sum + (s.answers?.[id]?.value ?? 0), 0))
+    .filter(Number.isFinite);
+  if (!totals.length) return null;
+  const mean = totals.reduce((a, c) => a + c, 0) / totals.length;
+  const variance = totals.reduce((a, c) => a + (c - mean) ** 2, 0) / totals.length;
+  const sd = Math.sqrt(variance);
+  return {
+    n: totals.length,
+    mean: Math.round(mean * 10) / 10,
+    se: Math.round((sd / Math.sqrt(totals.length)) * 100) / 100,
+    min: Math.min(...totals),
+    max: Math.max(...totals)
+  };
+}
+
 const runKeyOf = batch => batch.model?.api_string || batch.model?.name || batch.run_id;
 const stripProvider = name => String(name || 'unknown').replace(/\s*\((?:OpenAI|Anthropic|Google|xAI|Meta|DeepSeek|mock)\)\s*$/, '');
 
@@ -59,6 +80,10 @@ for (const file of files) {
       knowledgeCutoff: batch.model?.self_reported_cutoff || null,
       sampleCount: batch.n_samples ?? (batch.samples || []).length,
       probabilities: Object.fromEntries(probs.map((p, i) => [i + 1, p])),
+      // Spread is what tells a reader whether a gap between two models means
+      // anything, so carry it through rather than publishing bare medians.
+      range: Object.fromEntries(STATE_IDS.map((id, i) => [i + 1, [batch.aggregate[id].min, batch.aggregate[id].max]])),
+      exposure: exposureStats(batch.samples || []),
       rationales: Object.fromEntries(STATE_IDS.map((id, i) => [i + 1, String(batch.aggregate[id].rationale || '')]))
     });
     continue;
@@ -81,6 +106,8 @@ ${indent}  provider: ${JSON.stringify(b.provider)}, model: ${JSON.stringify(b.di
 ${indent}  promptVersion: ${JSON.stringify(b.promptVersion)}, date: ${JSON.stringify(b.date)}, knowledgeCutoff: ${JSON.stringify(b.knowledgeCutoff)},
 ${indent}  sampleCount: ${b.sampleCount}, source: ${JSON.stringify('runs/' + b.file)},
 ${indent}  probabilities: { ${Object.entries(b.probabilities).map(([id, p]) => `${id}: ${p}`).join(', ')} },
+${indent}  range: { ${Object.entries(b.range).map(([id, r]) => `${id}: [${r[0]}, ${r[1]}]`).join(', ')} },
+${indent}  exposure: ${JSON.stringify(b.exposure)},
 ${indent}  rationales: {
 ${Object.entries(b.rationales).map(([id, r]) => `${indent}    ${id}: ${JSON.stringify(r)}`).join(',\n')}
 ${indent}  }

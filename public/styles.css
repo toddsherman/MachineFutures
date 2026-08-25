@@ -132,6 +132,15 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .doomer-meter i.gone span { color: var(--paper); }
 .doomer-meter i.risk { background: var(--risk); }
 .doomer-meter span { font: 800 10px var(--mono); color: var(--ink); }
+/* Sampling error, drawn over the bar it qualifies. */
+.doomer-meter i.err { position: absolute; top: 50%; height: 11px; transform: translateY(-50%); background: none;
+  border-left: 2px solid var(--ink); border-right: 2px solid var(--ink); }
+.doomer-meter i.err::after { content: ""; position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: var(--ink); }
+.doomer-meter { position: relative; }
+.doomer-note { max-width: 62ch; margin: 22px 0 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.doomer-key .key-error i { width: 11px; height: 9px; background: none; border-left: 2px solid var(--ink); border-right: 2px solid var(--ink); position: relative; }
+.doomer-key .key-error i::after { content: ""; position: absolute; top: 50%; left: 0; right: 0; height: 2px; margin-top: -1px; background: var(--ink); }
+.answer-range { margin: 6px 0 0 27px; color: var(--muted); font: 10px var(--mono); text-transform: uppercase; letter-spacing: .04em; }
 .doomer-key { margin: 0; display: flex; gap: 18px; color: var(--muted); font: 10px var(--mono); text-transform: uppercase; }
 .doomer-key span { display: inline-flex; align-items: center; gap: 6px; }
 .doomer-key i { width: 10px; height: 10px; }

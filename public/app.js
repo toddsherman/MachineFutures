@@ -70,6 +70,8 @@
       rationales: source.rationales,
       promptVersion: source.promptVersion,
       sampleCount: source.sampleCount,
+      range: source.range,
+      exposure: source.exposure,
       date: source.date,
       model: source.model || provider,
       label: source.label || provider,
@@ -156,6 +158,8 @@
     $('#stat-models').textContent = entries.length;
     $('#stat-labs').textContent = labs.size;
     $('#stat-samples').textContent = samples.length === 1 ? samples[0] : `${Math.min(...samples)}–${Math.max(...samples)}`;
+    const methodSamples = $('#method-samples');
+    if (methodSamples) methodSamples.textContent = samples.length === 1 ? samples[0] : `${Math.min(...samples)}–${Math.max(...samples)}`;
     const roster = $('#footer-roster');
     if (roster) roster.textContent = `${entries.length} models across ${labs.size} labs`;
   }
@@ -222,20 +226,36 @@
     const doomerEntries = entries
       .map(entry => ({ ...entry, sums: extinctionSums(entry) }))
       .sort((a, b) => b.sums.total - a.sums.total);
+
+    // Two models are only separable when their gap clears the sampling error.
+    // Publishing the ranking without that is publishing false precision.
+    const errors = doomerEntries.map(e => e.exposure?.se).filter(Number.isFinite);
+    const pooledSe = errors.length ? Math.sqrt(errors.reduce((a, c) => a + c * c, 0) / errors.length) : null;
+    const threshold = pooledSe ? 2.78 * pooledSe : null;
+    const samples = [...new Set(doomerEntries.map(e => e.exposure?.n).filter(Boolean))];
+
     $('#doomer-ratings').innerHTML = `
       <div class="doomer-head">
-        <p class="doomer-key"><span class="key-gone"><i></i>Humanity is gone (1–3)</span><span class="key-risk"><i></i>Might perish (4–5)</span></p>
+        <p class="doomer-key"><span class="key-gone"><i></i>Humanity is gone (1–3)</span><span class="key-risk"><i></i>Might perish (4–5)</span><span class="key-error"><i></i>Sampling error</span></p>
       </div>
       <div class="doomer-list">
-        ${doomerEntries.map(entry => `<div class="doomer-row">
+        ${doomerEntries.map(entry => {
+          const se = entry.exposure?.se;
+          const total = entry.sums.total;
+          const whisker = Number.isFinite(se)
+            ? `<i class="err" style="left:${Math.max(total - se, 0)}%;width:${Math.min(se * 2, 100 - Math.max(total - se, 0))}%" title="±${se.toFixed(1)} points across ${entry.exposure.n} samples"></i>`
+            : '';
+          return `<div class="doomer-row">
           <div class="doomer-label">${labLogo(entry.provider, 'in-row')}<b>${entry.label}</b><small>${entry.provider}</small></div>
-          <div class="doomer-meter" aria-label="${entry.label}: ${entry.sums.gone}% humanity is gone, ${entry.sums.risk}% might perish">${
+          <div class="doomer-meter" aria-label="${entry.label}: ${total}% total exposure${Number.isFinite(se) ? `, plus or minus ${se.toFixed(1)} points` : ''}">${
             [['gone', entry.sums.gone], ['risk', entry.sums.risk]]
               .filter(([, value]) => value > 0)
               .map(([tier, value]) => `<i class="${tier}" style="width:${value}%"><span>${value}%</span></i>`).join('')
-          }</div>
-        </div>`).join('')}
-      </div>`;
+          }${whisker}</div>
+        </div>`;
+        }).join('')}
+      </div>
+      ${threshold ? `<p class="doomer-note">Each model was asked ${samples.length === 1 ? samples[0] : `${Math.min(...samples)}–${Math.max(...samples)}`} times. Bars carry their sampling error; two models are only distinguishable where the gap between them exceeds about ${threshold.toFixed(1)} points, so most neighbouring rows are ties.</p>` : ''}`;
   }
 
   function applyForecast({ animate }) {
@@ -298,6 +318,7 @@
           <div><b>${entry.label}</b><small>${entry.provider} · ${entry.date || ''}</small></div>
           <strong>${entry.value}%</strong>
         </div>
+        ${entry.range?.[state.id] ? `<p class="answer-range">${entry.range[state.id][0]}–${entry.range[state.id][1]}% across ${entry.sampleCount} samples</p>` : ''}
         ${entry.rationales?.[state.id] ? `<p>${entry.rationales[state.id]}</p>` : ''}
       </article>`).join('');
 

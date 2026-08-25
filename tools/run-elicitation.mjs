@@ -44,7 +44,9 @@ const LIST = args.includes('--list');
 const NEW_ONLY = args.includes('--new');
 const RECORD = args.includes('--record');
 const SEEN_PATH = join(root, 'tools', 'seen-models.json');
-const SAMPLES = Number(argValue('--samples') || 5);
+// 20, not 5: standard error scales as 1/sqrt(n), and at 5 samples almost no
+// pair of models was separable on the headline metric.
+const SAMPLES = Number(argValue('--samples') || 20);
 const outArg = argValue('--out') || 'runs';
 const OUT_DIR = isAbsolute(outArg) ? outArg : join(root, outArg);
 const RUN_DATE = argValue('--date') || new Date().toISOString().slice(0, 10);

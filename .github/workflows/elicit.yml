@@ -13,7 +13,7 @@ on:
       samples:
         description: 'Samples per model'
         required: false
-        default: '5'
+        default: '20'
       check_only:
         description: 'Preflight only — verify keys and model ids, elicit nothing'
         type: boolean
@@ -79,7 +79,7 @@ jobs:
           MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
         run: >
           node tools/run-elicitation.mjs
-          --samples ${{ inputs.samples || '5' }}
+          --samples ${{ inputs.samples || '20' }}
           ${{ inputs.models && format('--models {0}', inputs.models) || '' }}
 
       # Elicitation costs real money, so persist the raw batches before any

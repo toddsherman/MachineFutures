@@ -22,7 +22,7 @@ Then open `http://localhost:4173`.
 
 For each model on each dataset date:
 
-- Run the 11-end-state prompt 5 times.
+- Run the 11-end-state prompt 20 times. (Five samples left almost no pair of models separable on extinction-risk exposure; see `tools/analyse-agreement.mjs`.)
 - Store the raw samples and a normalized aggregate per run in `runs/`.
 - Use the median allocation as the value shown on the website, renormalized to integers summing to 100.
 - Preserve min, max, sample count, and the rationale nearest the median so the site can show model instability and reasoning.
@@ -35,7 +35,7 @@ The 50-question 2030 benchmark was retired in August 2026; its prompt and only r
 
 ## Automated elicitation
 
-`.github/workflows/elicit.yml` runs the end-state prompt against every model in `tools/models.json` — 5 samples each at provider-default settings, no tools — then validates, aggregates, writes `runs/` batches, regenerates `public/data.js`, and pushes an `elicitation/<run-id>` branch. Open a PR from that branch and merge to publish via Vercel.
+`.github/workflows/elicit.yml` runs the end-state prompt against every model in `tools/models.json` — 20 samples each at provider-default settings, no tools — then validates, aggregates, writes `runs/` batches, regenerates `public/data.js`, and pushes an `elicitation/<run-id>` branch. Open a PR from that branch and merge to publish via Vercel.
 
 The raw batches are also uploaded as a workflow artifact immediately after elicitation, before any step that could fail — a paid run is never lost to a downstream error.
 

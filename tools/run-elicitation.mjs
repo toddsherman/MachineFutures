@@ -22,7 +22,7 @@
 // silently answered by a different model. Sampling params are omitted
 // so every provider runs at its own defaults.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join, dirname, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -32,7 +32,8 @@ const argValue = name => { const i = args.indexOf(name); return i === -1 ? null 
 const MOCK = args.includes('--mock');
 const CHECK = args.includes('--check');
 const SAMPLES = Number(argValue('--samples') || 5);
-const OUT_DIR = join(root, argValue('--out') || 'runs');
+const outArg = argValue('--out') || 'runs';
+const OUT_DIR = isAbsolute(outArg) ? outArg : join(root, outArg);
 const RUN_DATE = argValue('--date') || new Date().toISOString().slice(0, 10);
 const ONLY = argValue('--models')?.split(',').map(s => s.trim()).filter(Boolean) || null;
 const TIER = argValue('--tier');

@@ -469,31 +469,41 @@
   // a failure to observe leaves the data on screen rather than blank. A timer
   // backs that up: observers do not fire in a background tab, and a reader
   // returning to one should not find an empty page.
-  function revealOnView(selector) {
+  // `watch` is the element whose visibility decides the moment; it can be a
+  // child of the thing being revealed. Bands wait until their axis is wholly on
+  // screen, so a card animates when it can actually be read rather than as soon
+  // as its first pixels appear.
+  function revealOnView(selector, { watch, threshold = 0.15, rootMargin = '0px' } = {}) {
     const targets = $$(selector);
     if (reduceMotion() || !('IntersectionObserver' in window)) return;
     targets.forEach(el => el.classList.add('will-reveal'));
-    // Once the reveal has had its time, drop the class entirely so the element
-    // falls back to its plain styles. The end state then never depends on a
-    // transition having run — browsers pause them in background tabs.
-    const show = el => {
-      el.classList.add('is-in');
-      setTimeout(() => el.classList.remove('will-reveal', 'is-in'), 1600);
-    };
+
+    // After the reveal has had its time the classes come off, so the end state
+    // never depends on a transition having run — browsers pause them in
+    // background tabs.
+    const settle = el => setTimeout(() => el.classList.remove('will-reveal', 'is-in'), 1600);
     const io = new IntersectionObserver((records, observer) => {
       records.forEach(record => {
         if (!record.isIntersecting) return;
-        show(record.target);
+        const host = record.target.closest(selector) || record.target;
+        host.classList.add('is-in');
         observer.unobserve(record.target);
+        settle(host);
       });
-    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.15 });
-    targets.forEach(el => io.observe(el));
-    setTimeout(() => targets.forEach(el => { if (!el.classList.contains('is-in')) show(el); }), 4000);
+    }, { threshold, rootMargin });
+    targets.forEach(el => io.observe((watch && el.querySelector(watch)) || el));
+
+    // Long-stop for anything never observed — a viewport too short to ever hold
+    // the axis whole, say. It clears the hidden state without animating, rather
+    // than firing every remaining card at once.
+    setTimeout(() => targets.forEach(el => {
+      if (!el.classList.contains('is-in')) el.classList.remove('will-reveal');
+    }), 10000);
   }
 
   if (datasetDate) $('#dataset-date').textContent = datasetDate;
   applyUrlState();
   renderEndStates();
-  revealOnView('.state-strip');
-  revealOnView('.matrix');
+  revealOnView('.state-strip', { watch: '.strip-axis', threshold: 1 });
+  revealOnView('.matrix', { threshold: 0.12 });
 })();

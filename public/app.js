@@ -87,9 +87,9 @@
   }
 
   function renderEndForecastToggle(entries) {
-    const options = [{ key: 'Median', label: 'Median', color: '#d9ff57' }, ...entries.map(entry => ({ key: entry.runKey, label: entry.label, color: entry.color }))];
+    const options = [{ key: 'Median', label: 'Median' }, ...entries.map(entry => ({ key: entry.runKey, label: entry.label, color: entry.color }))];
     $('#end-forecast-toggle').innerHTML = options.map(option =>
-      `<button type="button" class="end-toggle-button${option.key === activeEndForecast ? ' active' : ''}" style="--provider-color:${option.color}" data-end-forecast="${option.key}" aria-pressed="${option.key === activeEndForecast}"><i></i>${option.label}</button>`
+      `<button type="button" class="end-toggle-button${option.color ? '' : ' is-median'}${option.key === activeEndForecast ? ' active' : ''}"${option.color ? ` style="--provider-color:${option.color}"` : ''} data-end-forecast="${option.key}" aria-pressed="${option.key === activeEndForecast}">${option.color ? '<i></i>' : ''}${option.label}</button>`
     ).join('');
   }
 

@@ -46,11 +46,16 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .section-heading { margin-bottom: 52px; display: flex; align-items: flex-end; justify-content: space-between; gap: 60px; }
 .section-heading h2 { margin: 0; font: 900 clamp(46px, 5vw, 78px)/.88 var(--display); letter-spacing: -.065em; text-transform: uppercase; }
 .section-note { max-width: 430px; margin: 0; color: var(--muted); font-size: 16px; line-height: 1.55; }
-.end-forecast-toggle { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 8px; }
+.end-forecast-toggle { margin-bottom: 30px; display: flex; flex-wrap: wrap; gap: 8px; }
 .end-toggle-button { min-height: 38px; padding: 9px 13px; display: inline-flex; align-items: center; gap: 8px; color: var(--muted); border: 1px solid var(--line); border-radius: 99px; background: transparent; font: 700 11px var(--mono); text-transform: uppercase; cursor: pointer; transition: .2s ease; }
 .end-toggle-button i { width: 7px; height: 7px; border-radius: 50%; background: var(--provider-color); box-shadow: 0 0 0 1px rgba(17,18,15,.2); }
 .end-toggle-button:hover, .end-toggle-button.active { color: var(--ink); border-color: var(--provider-color); background: var(--provider-color); }
 .end-toggle-button:hover i, .end-toggle-button.active i { background: var(--ink); box-shadow: none; }
+/* Median is an aggregate, not a model, so it carries no swatch and no hue —
+   any tint would read as a twelfth model and sit close to the real ones. */
+.end-toggle-button.is-median { color: var(--ink); border-color: var(--ink); background: transparent; }
+.end-toggle-button.is-median:hover { background: rgba(17, 18, 15, .08); }
+.end-toggle-button.is-median.active, .end-toggle-button.is-median.active:hover { color: var(--paper); background: var(--ink); border-color: var(--ink); }
 
 .end-hero { padding-block: 22px 40px; display: grid; grid-template-columns: 1.15fr .85fr; align-items: end; gap: 6vw; }
 .end-hero .dek { margin: 0; }
@@ -59,8 +64,8 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .end-stats div { display: grid; gap: 4px; }
 .end-stats dt { color: var(--muted); font: 10px var(--mono); text-transform: uppercase; letter-spacing: .08em; }
 .end-stats dd { margin: 0; font: 900 30px/1 var(--display); letter-spacing: -.04em; }
-.end-intro { display: grid; grid-template-columns: 1fr 340px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.end-consensus { padding: 52px 60px 56px 0; border-right: 1px solid var(--line); }
+.end-intro { display: grid; grid-template-columns: minmax(0, 1fr) 340px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.end-consensus { min-width: 0; padding: 52px 60px 56px 0; border-right: 1px solid var(--line); }
 .section-heading.compact { align-items: end; }
 .section-heading.compact h2 { font-size: clamp(42px, 4vw, 64px); }
 .stacked-bar { height: 100px; display: flex; overflow: hidden; border: 1px solid var(--ink); }
@@ -196,8 +201,16 @@ body.dialog-open { overflow: hidden; }
   .end-hero { padding-block: 24px 34px; grid-template-columns: 1fr; gap: 28px; align-items: start; }
   .end-stats { gap: 24px; }
   .end-stats dd { font-size: 25px; }
-  .end-intro { grid-template-columns: 1fr; }
+  .end-intro { grid-template-columns: minmax(0, 1fr); }
   .end-consensus { padding: 40px 0 44px; border-right: 0; border-bottom: 1px solid var(--line); }
+  /* Twelve pills wrap to seven rows at this width, which would bury the chart
+     under its own controls. One swipeable row instead, bled to the edge so the
+     cut-off pill signals there is more. */
+  .end-forecast-toggle { flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain;
+    margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); margin-bottom: 24px;
+    scrollbar-width: none; }
+  .end-forecast-toggle::-webkit-scrollbar { display: none; }
+  .end-toggle-button { flex: 0 0 auto; }
   .end-leader { padding: 40px 0 44px; }
   .state-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .state-card-head { row-gap: 12px; }

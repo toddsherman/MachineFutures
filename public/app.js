@@ -94,9 +94,67 @@
     ).join('');
   }
 
+  // Cell intensity is the state's own hue at an alpha proportional to the
+  // value, so a row reads as a gradient across models. Scaled against the
+  // largest value on the board rather than 100, since nothing approaches 100.
+  function renderMatrix(entries, orderedStates) {
+    const peak = Math.max(...orderedStates.flatMap(state => entries.map(entry => stateValue(entry, state))), 1);
+    const labs = [];
+    entries.forEach(entry => {
+      const last = labs.at(-1);
+      if (last && last.provider === entry.provider) last.models.push(entry);
+      else labs.push({ provider: entry.provider, models: [entry] });
+    });
+
+    const head = `
+      <div class="matrix-row matrix-head" role="row">
+        <div class="matrix-corner" role="columnheader"></div>
+        ${labs.map(lab => `<div class="matrix-lab" style="--span:${lab.models.length}" role="columnheader"><span>${lab.provider}</span></div>`).join('')}
+      </div>
+      <div class="matrix-row matrix-subhead" role="row">
+        <div class="matrix-corner" role="columnheader"></div>
+        ${entries.map(entry => `<div class="matrix-model" role="columnheader" title="${entry.label}"><i style="--swatch:${entry.color}"></i><span>${entry.shortLabel}</span></div>`).join('')}
+      </div>`;
+
+    const rows = orderedStates.map(state => `
+      <div class="matrix-row" role="row">
+        <button class="matrix-state" role="rowheader" data-state="${state.id}" style="--state:${state.color}">
+          <i></i><span>${state.id}. ${state.name}</span>${extinctionMark(state)}
+        </button>
+        ${entries.map(entry => {
+          const value = stateValue(entry, state);
+          return `<div class="matrix-cell" role="cell" title="${entry.label} · ${state.name}: ${value}%" style="--state:${state.color};--fill:${Math.max(value / peak, 0.04).toFixed(3)}"><span>${value}</span></div>`;
+        }).join('')}
+      </div>`).join('');
+
+    // Summary row: the two extinction tiers stacked, per model.
+    const summary = `
+      <div class="matrix-row matrix-summary" role="row">
+        <div class="matrix-state is-summary" role="rowheader"><span>Extinction-risk exposure</span></div>
+        ${entries.map(entry => {
+          const sums = extinctionSums(entry);
+          return `<div class="matrix-cell is-summary" role="cell" title="${entry.label}: ${sums.gone}% gone, ${sums.risk}% might perish">
+            <i class="gone" style="height:${sums.gone}%"></i><i class="risk" style="height:${sums.risk}%;bottom:${sums.gone}%"></i><span>${sums.total}</span>
+          </div>`;
+        }).join('')}
+      </div>`;
+
+    $('#matrix').style.setProperty('--cols', entries.length);
+    $('#matrix').innerHTML = head + rows + summary;
+  }
+
+  function renderHeroStats(entries) {
+    const labs = new Set(entries.map(entry => entry.provider));
+    const samples = [...new Set(entries.map(entry => entry.sampleCount).filter(Boolean))];
+    $('#stat-models').textContent = entries.length;
+    $('#stat-labs').textContent = labs.size;
+    $('#stat-samples').textContent = samples.length === 1 ? samples[0] : `${Math.min(...samples)}–${Math.max(...samples)}`;
+  }
+
   function renderEndStates() {
     const entries = longTermEntries();
     const orderedStates = endingOrder();
+    renderHeroStats(entries);
     renderEndForecastToggle(entries);
     const activeRun = endStateRuns[activeEndForecast];
     const activeLabel = activeRun ? `${activeRun.label || activeEndForecast} forecast` : 'Median machine forecast';
@@ -121,13 +179,7 @@
       </article>`;
     }).join('');
 
-    const colors = orderedStates.map(state => state.color);
-    $('#model-bars').innerHTML = entries.map(entry => {
-      return `<div class="model-bar-row"><div class="model-bar-label"><span class="model-swatch" style="--swatch:${entry.color}"></span><b>${entry.label}</b><small>${entry.provider}</small></div><div class="model-stack">${orderedStates.map((state, index) => {
-        const value = stateValue(entry, state);
-        return `<button style="width:${value}%;--state:${colors[index]}" title="${state.name}: ${value}%" aria-label="${entry.label} ${state.name}: ${value}%" data-small="${value < 5}"><span>${value}%</span></button>`;
-      }).join('')}</div></div>`;
-    }).join('');
+    renderMatrix(entries, orderedStates);
 
     const doomerEntries = entries
       .map(entry => ({ ...entry, sums: extinctionSums(entry) }))

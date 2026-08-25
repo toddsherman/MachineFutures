@@ -35,42 +35,53 @@
   <main id="main">
     <section class="view" id="view-end-states" data-view="end-states">
       <div class="end-hero shell">
-        <div>
-          <p class="kicker">Beyond the resolution window</p>
-          <h1>How does this<br>story <em>end?</em></h1>
+        <h1>How does this<br>story <em>end?</em></h1>
+        <div class="end-hero-side">
+          <p class="dek">Eleven mutually exclusive end states. One hundred percentage points. No &ldquo;it depends.&rdquo; We ask each frontier model where humanity&rsquo;s relationship with AI ultimately settles.</p>
+          <dl class="end-stats">
+            <div><dt>Models</dt><dd id="stat-models">—</dd></div>
+            <div><dt>Labs</dt><dd id="stat-labs">—</dd></div>
+            <div><dt>Samples each</dt><dd id="stat-samples">—</dd></div>
+          </dl>
         </div>
-        <p class="dek">Eleven mutually exclusive end states. One hundred percentage points. No “it depends.” We ask each model where humanity’s relationship with AI ultimately settles.</p>
       </div>
 
       <div class="end-intro shell">
         <div class="end-consensus">
           <div class="section-heading compact">
             <div><p class="kicker" id="end-forecast-kicker">Median machine forecast</p><h2>All futures,<br>weighted.</h2></div>
-            <p class="section-note">Hover or tap a segment to identify the end state.</p>
+            <p class="section-note">Select a model to see its allocation. Tap any segment to jump to that ending.</p>
           </div>
           <div class="stacked-bar" id="consensus-bar" aria-label="Median probability by end state"></div>
           <div class="stacked-legend" id="consensus-legend"></div>
+          <div class="end-forecast-toggle" id="end-forecast-toggle" aria-label="Select end-state forecast view"></div>
         </div>
         <aside class="end-leader" id="end-leader"></aside>
       </div>
 
+      <section class="matrix-section shell" aria-labelledby="matrix-title">
+        <div class="section-heading compact">
+          <div><p class="kicker">Every model, every ending</p><h2 id="matrix-title">The whole board.</h2></div>
+          <p class="section-note">Columns are models, grouped by lab. Down a column is one model&rsquo;s theory of the future; across a row is where the labs disagree.</p>
+        </div>
+        <div class="matrix-scroll">
+          <div class="matrix" id="matrix" role="table" aria-label="Probability by end state and model"></div>
+        </div>
+      </section>
+
       <section class="states-section shell" aria-labelledby="states-title">
-        <div class="section-heading">
-          <div>
-            <p class="kicker">The full taxonomy</p>
-            <h2 id="states-title">Eleven endings</h2>
-            <div class="end-forecast-toggle" id="end-forecast-toggle" aria-label="Select end-state forecast view"></div>
-          </div>
+        <div class="section-heading compact">
+          <div><p class="kicker">The full taxonomy</p><h2 id="states-title">Eleven endings</h2></div>
+          <p class="section-note">Select any ending to read every model&rsquo;s reasoning for its number.</p>
         </div>
         <div class="state-grid" id="state-grid"></div>
       </section>
 
       <section class="model-mix shell" aria-labelledby="mix-title">
         <div class="section-heading compact">
-          <div><p class="kicker">Worldviews</p><h2 id="mix-title">Same map.<br>Different priors.</h2></div>
-          <p class="section-note">Each row sums to 100%. The shape of a model’s bar is its compressed theory of the future.</p>
+          <div><p class="kicker">Doomer rating</p><h2 id="mix-title">Extinction-risk<br>exposure.</h2></div>
+          <p class="section-note">Each model&rsquo;s total across the endings where humanity is gone (1&ndash;3) or might perish (4&ndash;5).</p>
         </div>
-        <div id="model-bars" class="model-bars"></div>
         <div id="doomer-ratings" class="doomer-ratings"></div>
       </section>
     </section>
@@ -109,7 +120,7 @@
     <div id="dialog-content"></div>
   </dialog>
 
-  <script src="data.js?v=20260824-endstates"></script>
-  <script src="app.js?v=20260824-endstates"></script>
+  <script src="data.js?v=20260825-matrix"></script>
+  <script src="app.js?v=20260825-matrix"></script>
 </body>
 </html>

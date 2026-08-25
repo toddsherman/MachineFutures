@@ -32,6 +32,16 @@ const runs = readdirSync(join(root, 'runs')).filter(f => f.endsWith('.json'))
     samples: b.samples.map(s => IDS.map(id => s.answers[id].value / 100))
   }));
 
+// runs/ accumulates history, so cross-model comparisons must use one run per
+// model — the newest — or a model gets compared against its own past self.
+const history = new Map();
+for (const r of runs) {
+  const list = history.get(r.id) || [];
+  list.push(r);
+  history.set(r.id, list.sort((a, b) => a.date.localeCompare(b.date)));
+}
+const latest = [...history.values()].map(list => list.at(-1));
+
 const norm = v => { const t = v.reduce((a, c) => a + c, 0); return v.map(x => x / t); };
 const mean = vs => norm(vs[0].map((_, i) => vs.reduce((a, v) => a + v[i], 0) / vs.length));
 const tv = (p, q) => p.reduce((a, _, i) => a + Math.abs(p[i] - q[i]), 0) / 2;
@@ -42,7 +52,7 @@ const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
 const fmt = n => n.toFixed(3);
 
 // --- 1. Self-consistency: how far apart are a model's own five samples? ---
-const self = runs.map(r => {
+const self = latest.map(r => {
   const d = [];
   for (let i = 0; i < r.samples.length; i++)
     for (let j = i + 1; j < r.samples.length; j++) d.push(tv(r.samples[i], r.samples[j]));
@@ -131,3 +141,26 @@ for (let i = 0; i < exposure.length - 1; i++) gaps.push({ a: exposure[i], b: exp
 const indistinct = gaps.filter(g => g.d < 2.78 * pooledSe);
 console.log(`  adjacent pairs in the ranking that are NOT separable: ${indistinct.length} of ${gaps.length}`);
 for (const g of indistinct) console.log(`    ${g.a.label} (${g.a.mu.toFixed(1)}%) vs ${g.b.label} (${g.b.mu.toFixed(1)}%) — gap ${g.d.toFixed(1)}`);
+
+
+// --- 8. Test-retest: same model, asked again on a later date ---
+const repeated = [...history.values()].filter(list => list.length > 1);
+if (repeated.length) {
+  console.log('\nTEST-RETEST — the same model id, re-asked on a later date');
+  console.log('(distance between run means; compare against the within-run noise floor above)\n');
+  const drifts = [];
+  for (const list of repeated) {
+    for (let i = 1; i < list.length; i++) {
+      const a = list[i - 1], b = list[i];
+      const d = tv(mean(a.samples), mean(b.samples));
+      drifts.push(d);
+      console.log(`  ${fmt(d)}   ${a.label.padEnd(17)} ${a.date} (n=${a.samples.length}) → ${b.date} (n=${b.samples.length})`);
+    }
+  }
+  console.log(`\n  mean run-to-run drift: ${fmt(avg(drifts))}`);
+  console.log(`  within-run noise floor: ${fmt(noiseFloor)}`);
+  console.log(`  ratio: ${(avg(drifts) / noiseFloor).toFixed(2)}× — under 1 means a run's aggregate is more`);
+  console.log('  reproducible than any single sample, which is what averaging is for.');
+} else {
+  console.log('\nTEST-RETEST — needs a second run of the same model id; none yet.');
+}

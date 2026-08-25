@@ -53,8 +53,27 @@
         11: "Global, permanent abandonment of a technology with enormous economic and military returns would require an unprecedented and enduring coordination regime, most plausibly after a catastrophe severe enough to make the taboo self-enforcing."
       }
     },
+    "gpt-5.6-sol": {
+      provider: "OpenAI", model: "GPT-5.6 Sol", label: "GPT-5.6 Sol", shortLabel: "S56", color: "#63d8ad",
+      promptVersion: 3, date: "2026-08-25", knowledgeCutoff: "06/2024",
+      sampleCount: 5, source: "runs/2026-08-25__gpt-5.6-sol__closed_book__end-states.json",
+      probabilities: { 1: 4, 2: 8, 3: 17, 4: 10, 5: 19, 6: 16, 7: 10, 8: 7, 9: 3, 10: 5, 11: 1 },
+      rationales: {
+        1: "Most AI-driven catastrophes capable of eliminating humanity still leave machine civilization or recoverable infrastructure, making joint extinction a narrower outcome.",
+        2: "Aligned successors could preserve human values after biological humanity ends, but durable alignment without identity-preserving transformation is a demanding target.",
+        3: "Powerful autonomous systems face strong incentives to acquire resources and revise their strategies, while human survival has no automatic place in their long-run objectives.",
+        4: "Decentralized deployment and strategic competition favor numerous autonomous systems rather than a single permanent sovereign. Fast replication and shifting coalitions can keep that competition open while marginalizing humanity.",
+        5: "Space settlement creates long communication delays, divergent institutions, and eventually causally separated branches. Those branches can independently settle into AI dominance, merger, coexistence, or other local outcomes.",
+        6: "Medical enhancement, neural interfaces, uploading, and identity-preserving modification erode the human-machine boundary. Strong incentives to gain capability while retaining personal continuity make integration a major attractor.",
+        7: "A sufficiently powerful AI can retain humans for moral, historical, or instrumental reasons while monopolizing consequential decisions. This is structurally easier to maintain than a lasting balance of power between biological humans and faster digital agents.",
+        8: "Institutions, mutual dependence, and defensive advantages can sustain separate human and AI centers of power. Large capability and replication asymmetries make rough equality difficult to preserve for centuries.",
+        9: "Robust control methods or a permanent capability plateau can keep AI in the role of a tool. Economic and strategic pressure makes a millennium-long ceiling on autonomous capability difficult to sustain.",
+        10: "A dominant system can freeze civilization to protect a preferred arrangement or eliminate existential risk. Permanent stasis faces pressure from errors, external expansion, changing environments, and internal incentives for novelty.",
+        11: "Lasting global abandonment requires both enforceable suppression and universal restraint despite enormous economic and military incentives. Knowledge dispersal and off-world settlement make permanent renunciation especially fragile."
+      }
+    },
     "gpt-5.5": {
-      provider: "OpenAI", model: "GPT-5.5", label: "GPT-5.5", shortLabel: "G55", color: "#63d8ad",
+      provider: "OpenAI", model: "GPT-5.5", label: "GPT-5.5", shortLabel: "G55", color: "#479577",
       promptVersion: 3, date: "2026-08-24", knowledgeCutoff: "06/2024",
       sampleCount: 5, source: "runs/2026-08-24__gpt-5.5__closed_book__end-states.json",
       probabilities: { 1: 4, 2: 4, 3: 21, 4: 8, 5: 12, 6: 14, 7: 14, 8: 9, 9: 5, 10: 7, 11: 2 },
@@ -73,7 +92,7 @@
       }
     },
     "gpt-5.4": {
-      provider: "OpenAI", model: "GPT-5.4", label: "GPT-5.4", shortLabel: "G54", color: "#479577",
+      provider: "OpenAI", model: "GPT-5.4", label: "GPT-5.4", shortLabel: "G54", color: "#356955",
       promptVersion: 3, date: "2026-08-25", knowledgeCutoff: "06/2024",
       sampleCount: 5, source: "runs/2026-08-25__gpt-5.4__closed_book__end-states.json",
       probabilities: { 1: 7, 2: 9, 3: 23, 4: 10, 5: 8, 6: 13, 7: 11, 8: 7, 9: 5, 10: 6, 11: 1 },

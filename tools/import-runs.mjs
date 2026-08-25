@@ -24,21 +24,45 @@ const SHORT_LABELS = { Anthropic: 'ANT', OpenAI: 'OAI', Google: 'GDM', xAI: 'XAI
 // Extinction-risk exposure per sample, so its standard error can be published
 // alongside the figure. States 1-5 are the extinction-risk tiers — a fixed
 // property of the taxonomy, stated in rule 3 of public/end_states.md.
-const EXPOSURE_IDS = ['S1', 'S2', 'S3', 'S4', 'S5'];
-function exposureStats(samples) {
-  const totals = samples
-    .map(s => EXPOSURE_IDS.reduce((sum, id) => sum + (s.answers?.[id]?.value ?? 0), 0))
-    .filter(Number.isFinite);
+const GONE_IDS = ['S1', 'S2', 'S3'];
+const RISK_IDS = ['S4', 'S5'];
+const EXPOSURE_IDS = [...GONE_IDS, ...RISK_IDS];
+
+// Quartiles of a model's own samples, so its middle half can be drawn the same
+// way the middle half across models is.
+const quartile = (sorted, f) => {
+  const i = (sorted.length - 1) * f, lo = Math.floor(i), hi = Math.ceil(i);
+  return Math.round(sorted[lo] + (sorted[hi] - sorted[lo]) * (i - lo));
+};
+const quartilesFor = (samples, id) => {
+  const vals = samples.map(s => s.answers?.[id]?.value).filter(Number.isFinite).sort((a, b) => a - b);
+  return vals.length ? [quartile(vals, 0.25), quartile(vals, 0.75)] : null;
+};
+
+const summarise = totals => {
   if (!totals.length) return null;
   const mean = totals.reduce((a, c) => a + c, 0) / totals.length;
-  const variance = totals.reduce((a, c) => a + (c - mean) ** 2, 0) / totals.length;
-  const sd = Math.sqrt(variance);
+  const sd = Math.sqrt(totals.reduce((a, c) => a + (c - mean) ** 2, 0) / totals.length);
   return {
     n: totals.length,
     mean: Math.round(mean * 10) / 10,
     se: Math.round((sd / Math.sqrt(totals.length)) * 100) / 100,
     min: Math.min(...totals),
     max: Math.max(...totals)
+  };
+};
+
+// Each tier is summed per sample and summarised on its own. The two errors do
+// not add to the total's: the tiers are parts of one allocation and move
+// against each other, so the total is measured directly rather than combined.
+function exposureStats(samples) {
+  const sum = (sample, ids) => ids.reduce((total, id) => total + (sample.answers?.[id]?.value ?? 0), 0);
+  const total = summarise(samples.map(s => sum(s, EXPOSURE_IDS)).filter(Number.isFinite));
+  if (!total) return null;
+  return {
+    ...total,
+    gone: summarise(samples.map(s => sum(s, GONE_IDS)).filter(Number.isFinite)),
+    risk: summarise(samples.map(s => sum(s, RISK_IDS)).filter(Number.isFinite))
   };
 }
 
@@ -100,6 +124,7 @@ for (const file of files) {
       // Spread is what tells a reader whether a gap between two models means
       // anything, so carry it through rather than publishing bare medians.
       range: Object.fromEntries(STATE_IDS.map((id, i) => [i + 1, [batch.aggregate[id].min, batch.aggregate[id].max]])),
+      quartiles: Object.fromEntries(STATE_IDS.map((id, i) => [i + 1, quartilesFor(batch.samples || [], id)]).filter(([, q]) => q)),
       exposure: exposureStats(batch.samples || []),
       rationales: Object.fromEntries(STATE_IDS.map((id, i) => [i + 1, String(batch.aggregate[id].rationale || '')]))
     });
@@ -124,6 +149,7 @@ ${indent}  promptVersion: ${JSON.stringify(b.promptVersion)}, date: ${JSON.strin
 ${indent}  sampleCount: ${b.sampleCount}, source: ${JSON.stringify('runs/' + b.file)},
 ${indent}  probabilities: { ${Object.entries(b.probabilities).map(([id, p]) => `${id}: ${p}`).join(', ')} },
 ${indent}  range: { ${Object.entries(b.range).map(([id, r]) => `${id}: [${r[0]}, ${r[1]}]`).join(', ')} },
+${indent}  quartiles: { ${Object.entries(b.quartiles).map(([id, q]) => `${id}: [${q[0]}, ${q[1]}]`).join(', ')} },
 ${indent}  exposure: ${JSON.stringify(b.exposure)},
 ${indent}  rationales: {
 ${Object.entries(b.rationales).map(([id, r]) => `${indent}    ${id}: ${JSON.stringify(r)}`).join(',\n')}

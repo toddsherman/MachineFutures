@@ -223,36 +223,19 @@
       return `<article class="state-card" id="state-${state.id}" style="--state:${state.color}" data-state="${state.id}" tabindex="0" role="button">
         <div class="state-card-head"><span>${String(state.id).padStart(2, '0')}</span><h3>${state.name}</h3><div class="state-card-meta"><strong></strong>${extinctionMark(state)}</div></div>
         <p>${state.description}</p>
-        ${(() => {
-          // A band, not a scatter. Eleven dots and their bars collide once an
-          // ending sits in a narrow part of a shared axis, and the card is a
-          // summary in a grid of eleven — per-model detail belongs in the
-          // dialog, where there is room to give each model its own row.
-          const vals = providerValues.map(m => m.value).sort((x, y) => x - y);
-          state.medianAcross = median(vals);
-          const at = v => (v / axisMax) * 100;
-          const q = f => { const i = (vals.length - 1) * f, lo = Math.floor(i), hi = Math.ceil(i);
-                           return vals[lo] + (vals[hi] - vals[lo]) * (i - lo); };
-          const lo = vals[0], hi = vals.at(-1), q1 = q(0.25), q3 = q(0.75);
-          // Bands grow outwards from the median tick, so the origin is that
-          // figure expressed as a share of each band's own width.
-          const origin = (v, from, to) => to === from ? '50%' : `${(((v - from) / (to - from)) * 100).toFixed(2)}%`;
-          const mid = state.medianAcross;
-          const ticks = [10, 20, 30, 40, 50].filter(t => t < axisMax - 2);
-          return `<div class="state-strip">
-            <div class="strip-axis" title="${lo}–${hi}% across ${vals.length} models · middle half ${q1.toFixed(0)}–${q3.toFixed(0)}%">
-              ${ticks.map(t => `<u style="left:${at(t)}%"></u>`).join('')}
-              <i class="strip-range" style="left:${at(lo).toFixed(2)}%;width:${(at(hi) - at(lo)).toFixed(2)}%;--origin:${origin(mid, lo, hi)}"></i>
-              <i class="strip-iqr" style="left:${at(q1).toFixed(2)}%;width:${(at(q3) - at(q1)).toFixed(2)}%;--origin:${origin(mid, q1, q3)}"></i>
-              <b class="strip-mid"><span></span></b>
-            </div>
-            <div class="strip-scale">
-              <span>0%</span>
-              ${ticks.map(t => `<span style="left:${at(t)}%">${t}</span>`).join('')}
-              <span class="strip-end">${axisMax}%</span>
-            </div>
-          </div>`;
-        })()}
+        <div class="state-strip">
+          <div class="strip-axis">
+            ${[10, 20, 30, 40, 50].filter(t => t < axisMax - 2).map(t => `<u style="left:${((t / axisMax) * 100).toFixed(2)}%"></u>`).join('')}
+            <i class="strip-range"></i>
+            <i class="strip-iqr"></i>
+            <b class="strip-mid"><span></span></b>
+          </div>
+          <div class="strip-scale">
+            <span>0%</span>
+            ${[10, 20, 30, 40, 50].filter(t => t < axisMax - 2).map(t => `<span style="left:${((t / axisMax) * 100).toFixed(2)}%">${t}</span>`).join('')}
+            <span class="strip-end">${axisMax}%</span>
+          </div>
+        </div>
         <div class="state-range"><span class="range-text"></span><em class="state-more">Why ↗</em></div>
       </article>`;
     }).join('');
@@ -276,7 +259,7 @@
 
     $('#doomer-ratings').innerHTML = `
       <div class="doomer-head">
-        <p class="doomer-key"><span class="key-gone"><i></i>Humanity is gone (1–3)</span><span class="key-risk"><i></i>Might perish (4–5)</span><span class="key-error"><i></i>Sampling error</span></p>
+        <p class="doomer-key"><span class="key-gone"><i></i>Humanity is gone (1–3)</span><span class="key-risk"><i></i>Might perish (4–5)</span><span class="key-error"><i></i>Sampling error, on each edge</span></p>
       </div>
       <div class="doomer-list">
         ${doomerEntries.map(entry => {
@@ -293,13 +276,26 @@
                 .filter(([, value]) => value > 0)
                 .map(([tier, value]) => `<i class="${tier}" style="width:${value}%"><span>${value}%</span></i>`).join('')
             }</div>
-            ${Number.isFinite(se) ? `<div class="doomer-err"><i style="left:${Math.max(total - se, 0)}%;width:${Math.min(se * 2, 100 - Math.max(total - se, 0))}%" title="±${se.toFixed(1)} points across ${entry.exposure.n} samples"></i></div>` : ''}
+            ${(() => {
+              // Two whiskers: one on the boundary between the tiers, one on the
+              // end of the bar. Each sits under the edge it qualifies, so the
+              // reader can see that "gone" is often the steadier of the two.
+              const marks = [
+                ['gone', entry.exposure?.gone, entry.sums.gone],
+                ['total', entry.exposure, total]
+              ].filter(([, stat]) => Number.isFinite(stat?.se));
+              if (!marks.length) return '';
+              return `<div class="doomer-err">${marks.map(([kind, stat, at]) => {
+                const from = Math.max(at - stat.se, 0);
+                return `<i class="${kind}" style="left:${from}%;width:${Math.min(stat.se * 2, 100 - from)}%" title="${kind === 'gone' ? 'Humanity is gone' : 'Total exposure'}: ${at}% ±${stat.se.toFixed(1)} across ${stat.n} samples"></i>`;
+              }).join('')}</div>`;
+            })()}
           </div>
           <div class="doomer-total"><b>${total}%</b>${Number.isFinite(se) ? `<small>±${se.toFixed(1)}</small>` : ''}</div>
         </div>`;
         }).join('')}
       </div>
-      ${threshold ? `<p class="doomer-note">Each model was asked ${samples.length === 1 ? samples[0] : `${Math.min(...samples)}–${Math.max(...samples)}`} times. Bars carry their sampling error; two models are only distinguishable where the gap between them exceeds about ${threshold.toFixed(1)} points, so most neighbouring rows are ties.</p>` : ''}`;
+      ${threshold ? `<p class="doomer-note">Each model was asked ${samples.length === 1 ? samples[0] : `${Math.min(...samples)}–${Math.max(...samples)}`} times. Each edge carries its own sampling error — the boundary between the tiers and the end of the bar. Two models are only distinguishable where the gap between them exceeds about ${threshold.toFixed(1)} points, so most neighbouring rows are ties.</p>` : ''}`;
   }
 
   function applyForecast({ animate }) {
@@ -325,19 +321,46 @@
       animate ? tweenNumber(value, state.probability) : (value.textContent = `${state.probability}%`);
 
       const card = $(`#state-${state.id}`);
-      const rangeText = card.querySelector('.range-text');
-      if (activeRun) {
-        const own = activeRun.range?.[state.id];
-        rangeText.textContent = own
-          ? `${own[0]}–${own[1]}% across ${activeRun.sampleCount} samples`
-          : `${state.probability}% · spread not recorded`;
-      } else {
-        const across = entriesForRange.map(entry => stateValue(entry, state));
-        rangeText.textContent = `${Math.min(...across)}–${Math.max(...across)}% across ${across.length} models`;
-      }
+
+      // Band, middle half, tick and caption all describe the same thing. On the
+      // median view that is the spread across models; with a model selected it
+      // is that model's own samples — otherwise the caption would report a
+      // range the band does not cover.
+      const across = entriesForRange.map(entry => stateValue(entry, state)).sort((a, b) => a - b);
+      const quantile = f => { const i = (across.length - 1) * f, lo = Math.floor(i), hi = Math.ceil(i);
+                              return across[lo] + (across[hi] - across[lo]) * (i - lo); };
+      const band = activeRun
+        ? { lo: activeRun.range?.[state.id]?.[0], hi: activeRun.range?.[state.id]?.[1],
+            q1: activeRun.quartiles?.[state.id]?.[0], q3: activeRun.quartiles?.[state.id]?.[1],
+            caption: `${activeRun.range?.[state.id]?.[0]}–${activeRun.range?.[state.id]?.[1]}% across ${activeRun.sampleCount} samples`,
+            detail: `${activeRun.label}: ${state.probability}% · samples ${activeRun.range?.[state.id]?.join('–')}% · middle half ${activeRun.quartiles?.[state.id]?.join('–')}%` }
+        : { lo: across[0], hi: across.at(-1), q1: quantile(0.25), q3: quantile(0.75),
+            caption: `${across[0]}–${across.at(-1)}% across ${across.length} models`,
+            detail: `${across[0]}–${across.at(-1)}% across ${across.length} models · middle half ${quantile(0.25).toFixed(0)}–${quantile(0.75).toFixed(0)}%` };
+
+      const pct = v => (v / axisMax) * 100;
+      const origin = (v, from, to) => to === from ? '50%' : `${(((v - from) / (to - from)) * 100).toFixed(2)}%`;
+      const axis = card.querySelector('.strip-axis');
+      const rangeEl = card.querySelector('.strip-range');
+      const iqrEl = card.querySelector('.strip-iqr');
+      if (Number.isFinite(band.lo) && Number.isFinite(band.hi)) {
+        rangeEl.style.left = `${pct(band.lo).toFixed(2)}%`;
+        rangeEl.style.width = `${(pct(band.hi) - pct(band.lo)).toFixed(2)}%`;
+        rangeEl.style.setProperty('--origin', origin(state.probability, band.lo, band.hi));
+        rangeEl.hidden = false;
+      } else rangeEl.hidden = true;
+      if (Number.isFinite(band.q1) && Number.isFinite(band.q3)) {
+        iqrEl.style.left = `${pct(band.q1).toFixed(2)}%`;
+        iqrEl.style.width = `${(pct(band.q3) - pct(band.q1)).toFixed(2)}%`;
+        iqrEl.style.setProperty('--origin', origin(state.probability, band.q1, band.q3));
+        iqrEl.hidden = false;
+      } else iqrEl.hidden = true;
+      axis.title = band.detail;
+      card.querySelector('.range-text').textContent = band.caption;
+
       const tick = card.querySelector('.strip-mid');
       if (tick) {
-        const at = (state.probability / axisMax) * 100;
+        const at = pct(state.probability);
         tick.style.left = `${at.toFixed(2)}%`;
         tick.querySelector('span').textContent = `${state.probability}%`;
         // Near either end the centred label would hang off the card, so it
@@ -345,6 +368,7 @@
         tick.classList.toggle('at-start', at < 9);
         tick.classList.toggle('at-end', at > 91);
       }
+
       const figure = card.querySelector('.state-card-meta strong');
       animate ? tweenNumber(figure, state.probability) : (figure.textContent = `${state.probability}%`);
       card.setAttribute('aria-label', `${state.name}: ${state.probability}% — see each model's reasoning`);

@@ -179,7 +179,10 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .doomer-label b { font: 800 13px var(--display); text-transform: uppercase; }
 .doomer-label small { color: var(--muted); font: 10px var(--mono); }
 .doomer-bar { height: 24px; display: flex; border: 1px solid var(--ink); background: rgba(17,18,15,.04); }
-.doomer-bar i { min-width: max-content; display: flex; height: 100%; align-items: center; justify-content: flex-end; padding-right: 8px; background: var(--coral); }
+/* No min-width: a label must never widen the segment it sits in, or the bar
+   stops being to scale and the error marks no longer line up with its edges.
+   A segment too narrow for its figure clips it; the row's total still shows. */
+.doomer-bar i { min-width: 0; overflow: hidden; display: flex; height: 100%; align-items: center; justify-content: flex-end; padding-right: 8px; background: var(--coral); }
 .doomer-bar i.gone { background: var(--extinction); }
 .doomer-bar i.gone span { color: var(--paper); }
 .doomer-bar i.risk { background: var(--risk); }
@@ -187,6 +190,9 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 /* Sampling error gets its own track beneath the bar. */
 .doomer-err { position: relative; height: 9px; }
 .doomer-err i { position: absolute; top: 3px; height: 3px; border-left: 2px solid var(--ink); border-right: 2px solid var(--ink); }
+/* The boundary whisker takes the colour of the tier it bounds. */
+.doomer-err i.gone { border-color: var(--extinction); }
+.doomer-err i.gone::after { background: color-mix(in srgb, var(--extinction) 78%, transparent); }
 .doomer-err i::after { content: ""; position: absolute; top: 1px; left: 0; right: 0; height: 1px; background: var(--ink); }
 .doomer-meter { display: grid; gap: 4px; }
 .doomer-total { display: flex; align-items: baseline; gap: 5px; justify-content: flex-end; }

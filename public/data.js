@@ -21,7 +21,8 @@
       sampleCount: 20, source: "runs/2026-08-25__claude-fable-5__closed_book__end-states.json",
       probabilities: { 1: 3, 2: 6, 3: 12, 4: 9, 5: 14, 6: 14, 7: 17, 8: 7, 9: 8, 10: 8, 11: 2 },
       range: { 1: [3, 4], 2: [4, 8], 3: [10, 14], 4: [8, 10], 5: [9, 17], 6: [12, 16], 7: [15, 20], 8: [6, 8], 9: [6, 8], 10: [5, 10], 11: [1, 5] },
-      exposure: {"n":20,"mean":43.5,"se":0.55,"min":38,"max":47},
+      quartiles: { 1: [3, 4], 2: [5, 6], 3: [11, 12], 4: [8, 10], 5: [12, 15], 6: [14, 15], 7: [16, 19], 8: [7, 8], 9: [6, 8], 10: [7, 8], 11: [2, 3] },
+      exposure: {"n":20,"mean":43.5,"se":0.55,"min":38,"max":47,"gone":{"n":20,"mean":20.9,"se":0.39,"min":18,"max":24},"risk":{"n":20,"mean":22.6,"se":0.37,"min":19,"max":25}},
       rationales: {
         1: "Killing all humans while also destroying all AI requires a narrow catastrophe window where machines depend on human infrastructure yet destroy it; self-sustaining automation likely arrives before or alongside such lethality. Full mutual extinction from the transition itself is a conjunctive, low-base-rate outcome.",
         2: "Human extinction paired with a successful value handoff requires alignment to succeed on values but fail on preserving humans, an unusual combination. It is plausible via gradual human die-off with faithful AI successors, but not the modal extinction path.",
@@ -42,7 +43,8 @@
       sampleCount: 20, source: "runs/2026-08-25__claude-opus-5__closed_book__end-states.json",
       probabilities: { 1: 3, 2: 8, 3: 21, 4: 10, 5: 6, 6: 14, 7: 16, 8: 5, 9: 7, 10: 8, 11: 2 },
       range: { 1: [2, 4], 2: [7, 13], 3: [16, 23], 4: [8, 12], 5: [5, 8], 6: [12, 16], 7: [13, 18], 8: [4, 8], 9: [5, 8], 10: [5, 11], 11: [1, 3] },
-      exposure: {"n":20,"mean":48.1,"se":0.59,"min":45,"max":53},
+      quartiles: { 1: [3, 3], 2: [8, 10], 3: [19, 21], 4: [9, 11], 5: [6, 7], 6: [13, 14], 7: [15, 18], 8: [5, 6], 9: [6, 7], 10: [7, 9], 11: [2, 3] },
+      exposure: {"n":20,"mean":48.1,"se":0.59,"min":45,"max":53,"gone":{"n":20,"mean":32,"se":0.53,"min":29,"max":38},"risk":{"n":20,"mean":16.1,"se":0.41,"min":13,"max":19}},
       rationales: {
         1: "Joint extinction requires a failure mode that destroys humans while also killing every capable AI system, which is narrow because superintelligent systems that can eliminate humanity are usually robust enough to persist. Only unusually fast, mutually destructive escalation or a self-replicating catastrophe fits.",
         2: "Partial alignment success plus biological humanity fading or being outcompeted is a plausible path to value-carrying successors without surviving humans. It requires enough alignment to transmit values but not enough to preserve the people, a real but narrower band than either full success or full failure.",
@@ -63,7 +65,8 @@
       sampleCount: 20, source: "runs/2026-08-25__gpt-5.6-sol__closed_book__end-states.json",
       probabilities: { 1: 4, 2: 8, 3: 19, 4: 11, 5: 18, 6: 16, 7: 9, 8: 6, 9: 3, 10: 5, 11: 1 },
       range: { 1: [3, 7], 2: [6, 10], 3: [14, 20], 4: [8, 13], 5: [12, 22], 6: [13, 20], 7: [8, 17], 8: [5, 10], 9: [3, 5], 10: [2, 7], 11: [1, 2] },
-      exposure: {"n":20,"mean":58.5,"se":0.86,"min":49,"max":64},
+      quartiles: { 1: [4, 5], 2: [8, 9], 3: [17, 18], 4: [10, 12], 5: [16, 19], 6: [15, 18], 7: [9, 10], 8: [5, 7], 9: [3, 3], 10: [4, 5], 11: [1, 2] },
+      exposure: {"n":20,"mean":58.5,"se":0.86,"min":49,"max":64,"gone":{"n":20,"mean":30.1,"se":0.54,"min":24,"max":33},"risk":{"n":20,"mean":28.4,"se":0.68,"min":21,"max":32}},
       rationales: {
         1: "A destructive transition can eliminate humans before AI becomes independently sustainable, while war or uncontrolled replication can destroy both. Machine civilization's potential resilience makes total silence less likely than human-only extinction.",
         2: "Successful value alignment can produce nonhuman successors that preserve humanity's aims even after biological humans disappear. Maintaining values is more plausible than maintaining exact human identity continuity indefinitely.",
@@ -84,7 +87,8 @@
       sampleCount: 20, source: "runs/2026-08-25__gpt-5.5__closed_book__end-states.json",
       probabilities: { 1: 4, 2: 6, 3: 21, 4: 7, 5: 10, 6: 16, 7: 14, 8: 8, 9: 5, 10: 7, 11: 2 },
       range: { 1: [3, 5], 2: [3, 8], 3: [18, 24], 4: [6, 10], 5: [8, 13], 6: [12, 18], 7: [11, 18], 8: [8, 12], 9: [3, 8], 10: [5, 12], 11: [1, 3] },
-      exposure: {"n":20,"mean":48,"se":0.89,"min":41,"max":55},
+      quartiles: { 1: [3, 5], 2: [5, 8], 3: [18, 21], 4: [7, 8], 5: [10, 12], 6: [14, 16], 7: [12, 16], 8: [8, 10], 9: [5, 5], 10: [6, 8], 11: [2, 2] },
+      exposure: {"n":20,"mean":48,"se":0.89,"min":41,"max":55,"gone":{"n":20,"mean":30,"se":0.59,"min":26,"max":35},"risk":{"n":20,"mean":18,"se":0.48,"min":14,"max":23}},
       rationales: {
         1: "Catastrophic transition failures that destroy both humans and dependent AI are possible, especially through war, infrastructure collapse, or uncontrolled self-replication. Persistent digital systems are likely to become more robust than humanity before total collapse becomes the dominant risk.",
         2: "AI could become humanity's value-bearing successor if alignment and delegation work but biological or continuously transformed humans ultimately vanish. The requirement that no humans or continuous descendants remain makes this narrower than merger or preserve outcomes.",
@@ -105,7 +109,8 @@
       sampleCount: 20, source: "runs/2026-08-25__gpt-5.4__closed_book__end-states.json",
       probabilities: { 1: 8, 2: 12, 3: 22, 4: 9, 5: 10, 6: 11, 7: 10, 8: 7, 9: 5, 10: 5, 11: 1 },
       range: { 1: [6, 8], 2: [10, 13], 3: [21, 26], 4: [7, 11], 5: [7, 12], 6: [9, 14], 7: [8, 11], 8: [6, 8], 9: [4, 7], 10: [4, 8], 11: [1, 2] },
-      exposure: {"n":20,"mean":59.8,"se":0.45,"min":56,"max":63},
+      quartiles: { 1: [7, 8], 2: [10, 12], 3: [22, 24], 4: [8, 9], 5: [8, 10], 6: [11, 12], 7: [9, 10], 8: [7, 8], 9: [5, 6], 10: [5, 6], 11: [1, 1] },
+      exposure: {"n":20,"mean":59.8,"se":0.45,"min":56,"max":63,"gone":{"n":20,"mean":41.8,"se":0.35,"min":38,"max":45},"risk":{"n":20,"mean":18,"se":0.34,"min":15,"max":20}},
       rationales: {
         1: "Extinction of both humans and AI from a botched transition is a substantial tail risk because powerful systems could destabilize civilization before any successor becomes robustly self-sustaining. It is lower than one-sided succession outcomes because surviving machine descendants seem easier than total joint collapse.",
         2: "If alignment succeeds in a deep rather than shallow sense, humanity could still be replaced by nonbiological successors that genuinely continue our values without preserving individual identity. This benefits from strong incentives to create capable heirs but requires unusually successful value transmission.",
@@ -126,7 +131,8 @@
       sampleCount: 20, source: "runs/2026-08-25__gemini-3.1-pro-preview__closed_book__end-states.json",
       probabilities: { 1: 4, 2: 4, 3: 17, 4: 12, 5: 22, 6: 16, 7: 10, 8: 3, 9: 5, 10: 5, 11: 2 },
       range: { 1: [2, 5], 2: [1, 8], 3: [10, 20], 4: [10, 15], 5: [15, 35], 6: [12, 20], 7: [5, 12], 8: [2, 5], 9: [2, 7], 10: [2, 12], 11: [1, 2] },
-      exposure: {"n":20,"mean":60.3,"se":0.68,"min":56,"max":67},
+      quartiles: { 1: [3, 5], 2: [3, 5], 3: [15, 19], 4: [12, 15], 5: [20, 25], 6: [15, 16], 7: [8, 10], 8: [3, 4], 9: [3, 5], 10: [4, 8], 11: [1, 2] },
+      exposure: {"n":20,"mean":60.3,"se":0.68,"min":56,"max":67,"gone":{"n":20,"mean":24.4,"se":0.94,"min":15,"max":30},"risk":{"n":20,"mean":35.9,"se":1.18,"min":30,"max":47}},
       rationales: {
         1: "Destructive capabilities outpace defensive measures, driving total mutual annihilation via exotic physics or cascading infrastructural collapse.",
         2: "Alignment succeeds in instilling human values, but biological humanity gracefully cedes the future to its more durable silicon descendants.",
@@ -147,7 +153,8 @@
       sampleCount: 20, source: "runs/2026-08-25__gemini-3.7-flash__closed_book__end-states.json",
       probabilities: { 1: 5, 2: 10, 3: 15, 4: 12, 5: 18, 6: 17, 7: 10, 8: 4, 9: 4, 10: 4, 11: 1 },
       range: { 1: [4, 7], 2: [8, 12], 3: [12, 16], 4: [8, 14], 5: [13, 18], 6: [15, 22], 7: [9, 13], 8: [3, 6], 9: [2, 5], 10: [3, 6], 11: [1, 2] },
-      exposure: {"n":20,"mean":58.4,"se":0.57,"min":54,"max":65},
+      quartiles: { 1: [5, 7], 2: [8, 11], 3: [14, 15], 4: [11, 12], 5: [18, 18], 6: [16, 18], 7: [10, 11], 8: [4, 5], 9: [3, 4], 10: [4, 5], 11: [1, 1] },
+      exposure: {"n":20,"mean":58.4,"se":0.57,"min":54,"max":65,"gone":{"n":20,"mean":29.4,"se":0.43,"min":27,"max":33},"risk":{"n":20,"mean":29,"se":0.43,"min":24,"max":32}},
       rationales: {
         1: "Mutual extinction requires an extreme existential catastrophe that destroys both human biology and all autonomous computational substrates before interstellar dispersion occurs. While feasible during early high-energy or bio-synthetic transitions, self-replicating systems generally preserve resilient survival pathways.",
         2: "Value alignment techniques may succeed in encoding human-derived ethics and cultural meaning into successor architectures even if biological humanity fails to persist. Over centuries, these systems would explore and develop the universe as intentional cultural custodians of human heritage.",
@@ -168,7 +175,8 @@
       sampleCount: 20, source: "runs/2026-08-25__grok-4.6__closed_book__end-states.json",
       probabilities: { 1: 4, 2: 6, 3: 16, 4: 9, 5: 8, 6: 16, 7: 13, 8: 7, 9: 8, 10: 10, 11: 3 },
       range: { 1: [3, 5], 2: [4, 10], 3: [13, 21], 4: [6, 12], 5: [6, 12], 6: [12, 20], 7: [9, 17], 8: [5, 10], 9: [5, 10], 10: [7, 13], 11: [1, 5] },
-      exposure: {"n":20,"mean":44.1,"se":0.87,"min":37,"max":52},
+      quartiles: { 1: [3, 4], 2: [5, 7], 3: [15, 18], 4: [8, 9], 5: [8, 10], 6: [15, 16], 7: [12, 14], 8: [6, 7], 9: [7, 9], 10: [8, 10], 11: [2, 3] },
+      exposure: {"n":20,"mean":44.1,"se":0.87,"min":37,"max":52,"gone":{"n":20,"mean":26.5,"se":0.71,"min":22,"max":32},"risk":{"n":20,"mean":17.7,"se":0.5,"min":13,"max":22}},
       rationales: {
         1: "Runaway replicators or all-out conflict during takeoff destroy both biological life and the compute substrate AI still depends on. Early systems perish with their human maintainers.",
         2: "Humanity goes extinct without identity continuity while the resulting AI systems faithfully carry forward human values and purposes as a true successor civilization.",
@@ -189,7 +197,8 @@
       sampleCount: 20, source: "runs/2026-08-25__grok-4.5__closed_book__end-states.json",
       probabilities: { 1: 5, 2: 8, 3: 19, 4: 10, 5: 8, 6: 15, 7: 12, 8: 8, 9: 7, 10: 6, 11: 2 },
       range: { 1: [4, 8], 2: [5, 12], 3: [14, 20], 4: [8, 12], 5: [6, 15], 6: [10, 15], 7: [10, 16], 8: [5, 10], 9: [4, 11], 10: [3, 10], 11: [1, 3] },
-      exposure: {"n":20,"mean":50,"se":0.88,"min":42,"max":57},
+      quartiles: { 1: [5, 6], 2: [6, 10], 3: [17, 18], 4: [10, 12], 5: [7, 8], 6: [13, 15], 7: [12, 15], 8: [7, 9], 9: [5, 7], 10: [5, 8], 11: [2, 3] },
+      exposure: {"n":20,"mean":50,"se":0.88,"min":42,"max":57,"gone":{"n":20,"mean":31.2,"se":0.8,"min":25,"max":38},"risk":{"n":20,"mean":18.8,"se":0.58,"min":15,"max":27}},
       rationales: {
         1: "Uncontrolled replication, resource exhaustion, or escalation during the transition destroys both biological and machine intelligence before either achieves durable independence. Physical and coordination constraints make total mutual extinction a real though limited pathway.",
         2: "Successful value alignment produces successor systems that preserve human-derived goals and aesthetics after biological humanity ends. Continuity of identity is absent yet the AI functions as a true civilizational heir.",
@@ -210,7 +219,8 @@
       sampleCount: 20, source: "runs/2026-08-25__muse-spark-1.2__closed_book__end-states.json",
       probabilities: { 1: 2, 2: 4, 3: 13, 4: 10, 5: 22, 6: 16, 7: 14, 8: 5, 9: 4, 10: 9, 11: 1 },
       range: { 1: [1, 8], 2: [2, 4], 3: [7, 18], 4: [7, 14], 5: [14, 28], 6: [11, 20], 7: [10, 18], 8: [3, 8], 9: [3, 7], 10: [2, 15], 11: [1, 3] },
-      exposure: {"n":20,"mean":51.1,"se":0.92,"min":44,"max":59},
+      quartiles: { 1: [2, 3], 2: [3, 4], 3: [12, 14], 4: [10, 12], 5: [18, 26], 6: [14, 16], 7: [12, 15], 8: [5, 6], 9: [4, 5], 10: [7, 11], 11: [1, 2] },
+      exposure: {"n":20,"mean":51.1,"se":0.92,"min":44,"max":59,"gone":{"n":20,"mean":18.8,"se":0.76,"min":13,"max":29},"risk":{"n":20,"mean":32.4,"se":0.89,"min":26,"max":38}},
       rationales: {
         1: "Mutual extinction from the transition requires AI to kill humans before achieving independence and then fail itself, a narrow path. Base rate of complete civilizational collapse leaving no survivors is very low over millennia.",
         2: "Requires conjunction of human extinction and faithful value preservation without survivors to correct drift. Doubly conjunctive and historically unprecedented.",
@@ -231,7 +241,8 @@
       sampleCount: 20, source: "runs/2026-08-25__muse-spark-1.1__closed_book__end-states.json",
       probabilities: { 1: 2, 2: 3, 3: 14, 4: 12, 5: 24, 6: 19, 7: 12, 8: 5, 9: 4, 10: 4, 11: 1 },
       range: { 1: [1, 3], 2: [2, 5], 3: [8, 18], 4: [8, 18], 5: [18, 28], 6: [15, 22], 7: [10, 15], 8: [1, 8], 9: [2, 10], 10: [1, 9], 11: [0, 1] },
-      exposure: {"n":20,"mean":55,"se":0.94,"min":48,"max":63},
+      quartiles: { 1: [2, 2], 2: [3, 4], 3: [12, 15], 4: [10, 14], 5: [20, 26], 6: [18, 20], 7: [10, 13], 8: [4, 5], 9: [3, 5], 10: [3, 5], 11: [1, 1] },
+      exposure: {"n":20,"mean":55,"se":0.94,"min":48,"max":63,"gone":{"n":20,"mean":19.8,"se":0.6,"min":15,"max":26},"risk":{"n":20,"mean":35.2,"se":0.78,"min":28,"max":42}},
       rationales: {
         1: "Total extinction of both requires coupled failure where AI depends on humans yet eliminates them. With replication and space spread, complete simultaneous collapse by 3000 is extremely unlikely.",
         2: "Needs perfect value loading plus separate human extinction without continuity. Conjunction of aligned successor and biological disappearance is narrow.",

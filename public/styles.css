@@ -278,9 +278,26 @@ body.dialog-open { overflow: hidden; }
 .matrix-summary { border-top: 1px solid var(--ink); }
 .matrix-summary .matrix-cell { min-height: 56px; }
 
+/* Narrow screens cannot afford a label column — it left room for four of eleven
+   models. The ending's name moves onto its own line and the cells span the full
+   width, so the whole row is visible at once. Cells keep a 26px floor, so a
+   roster large enough to need it still falls back to horizontal scrolling. */
 @media (max-width: 900px) {
-  .matrix { --label: 168px; --cell: 44px; }
-  .matrix-state > span { font-size: 11px; }
+  .matrix { min-width: 0; }
+  .matrix-row { grid-template-columns: repeat(var(--cols), minmax(26px, 1fr)); }
+  .matrix-corner { display: none; }
+  .matrix-state { position: static; grid-column: 1 / -1; gap: 8px; padding: 13px 0 6px; }
+  .matrix-state i { height: 14px; width: 7px; }
+  .matrix-state > span { white-space: normal; font-size: 11px; }
+  .matrix-state.is-summary { padding-left: 0; }
+  .matrix-lab { padding: 4px 2px 3px; }
+  .matrix-lab span { font-size: 9px; letter-spacing: .04em; }
+  .matrix-model { padding: 6px 2px 8px; gap: 4px; }
+  .matrix-model i { max-width: 18px; height: 3px; }
+  .matrix-model span { font-size: 9px; }
+  .matrix-cell { min-height: 34px; }
+  .matrix-cell span { font-size: 11px; }
+  .matrix-summary .matrix-cell { min-height: 44px; }
   .matrix-scroll { margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); }
 }
 

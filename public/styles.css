@@ -270,6 +270,14 @@ body.dialog-open { overflow: hidden; }
    left to mean "which ending" and nothing else. */
 .state-mark { display: inline-block; width: 1.05em; height: 1.05em; margin-left: .62em; vertical-align: -.16em; flex: 0 0 auto; }
 .state-mark svg { display: block; width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.state-mark[data-mark] { cursor: help; }
+/* Fixed, and parented to the open dialog when there is one, so neither the
+   matrix's scroll container nor the top layer can clip it. */
+.mark-tip { position: fixed; z-index: 60; max-width: 300px; padding: 9px 12px; background: var(--paper); border: 1px solid var(--ink); box-shadow: 3px 3px 0 rgba(17,18,15,.14); pointer-events: none; opacity: 0; visibility: hidden; transition: opacity .12s ease; }
+.mark-tip.is-on { opacity: 1; visibility: visible; }
+.mark-tip b { display: block; margin-bottom: 5px; color: var(--ink); font: 800 10px var(--mono); text-transform: uppercase; letter-spacing: .06em; }
+.mark-tip span { display: block; color: var(--muted); font: 12px/1.5 var(--sans); }
+@media (prefers-reduced-motion: reduce) { .mark-tip { transition: none; } }
 .stacked-legend .state-mark { font-size: 1.16em; }
 .end-leader h2 .state-mark { font-size: .58em; margin-left: .7em; vertical-align: -.02em; }
 .state-card-meta .state-mark { margin-left: 0; font-size: 18px; }

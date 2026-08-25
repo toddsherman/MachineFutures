@@ -39,6 +39,12 @@
     history.replaceState(null, '', location.pathname + query + location.hash);
   }
   const extinctionLabels = { gone: 'Humanity is gone', risk: 'Humanity might perish' };
+  // Straight from rule 3 of the taxonomy, so the marks explain themselves in
+  // the same words the models were given.
+  const extinctionTips = {
+    gone: 'Endings 1–3. Humans died or were destroyed without continuity of individual identity.',
+    risk: 'Endings 4–5. Humanity survives in some versions of the ending and perishes in others.'
+  };
   const MARK_SHAPES = {
     gone: '<circle cx="11" cy="11" r="9.1"/><path d="M7.3 6.7h7.4M7.3 15.3h7.4M7.7 7l6.6 8M14.3 7l-6.6 8"/>',
     risk: '<path d="M11 3.2 20.1 18.5H1.9Z"/><path d="M11 9.1v3.9M11 15.8h.01"/>'
@@ -47,7 +53,8 @@
     const tier = state.extinction;
     if (!tier) return '';
     const label = extinctionLabels[tier];
-    return `<span class="state-mark is-${tier}" role="img" title="${label}" aria-label="${label}"><svg viewBox="0 0 22 22" aria-hidden="true">${MARK_SHAPES[tier]}</svg></span>`;
+    // No title attribute: it would double up with the tooltip below.
+    return `<span class="state-mark is-${tier}" role="img" data-mark="${tier}" aria-label="${label}. ${extinctionTips[tier]}"><svg viewBox="0 0 22 22" aria-hidden="true">${MARK_SHAPES[tier]}</svg></span>`;
   };
 
   const stateValue = (run, state) => run.probabilities[state.id];
@@ -449,6 +456,59 @@
     document.body.classList.add('dialog-open');
   }
 
+  // Shape is the only thing telling the two marks apart now, so the naming has
+  // to be reachable on hover. One floating element rather than a CSS tooltip:
+  // the marks sit inside the matrix's horizontal scroll container, which would
+  // clip a pseudo-element.
+  const markTip = document.createElement('div');
+  markTip.className = 'mark-tip';
+  markTip.setAttribute('aria-hidden', 'true');
+  let markTipFor = null;
+
+  const hideMarkTip = () => {
+    markTipFor = null;
+    markTip.classList.remove('is-on');
+  };
+
+  function showMarkTip(mark) {
+    const tier = mark.dataset.mark;
+    if (!tier || markTipFor === mark) return;
+    markTipFor = mark;
+    markTip.innerHTML = `<b>${extinctionLabels[tier]}</b><span>${extinctionTips[tier]}</span>`;
+    // A modal dialog paints in the top layer, above anything parented to the
+    // body — so inside one, the tooltip has to live in the dialog.
+    const host = mark.closest('dialog[open]') || document.body;
+    if (markTip.parentNode !== host) host.appendChild(markTip);
+    // Measure from a corner: a left already near the viewport edge would
+    // squeeze the box and give the wrong width to centre against.
+    markTip.style.left = '0px';
+    markTip.style.top = '0px';
+    const anchorBox = mark.getBoundingClientRect();
+    const box = markTip.getBoundingClientRect();
+    const margin = 10;
+    const left = Math.min(Math.max(anchorBox.left + anchorBox.width / 2 - box.width / 2, margin), window.innerWidth - box.width - margin);
+    const above = anchorBox.top - box.height - 8;
+    markTip.style.left = `${Math.round(left)}px`;
+    markTip.style.top = `${Math.round(above < margin ? anchorBox.bottom + 8 : above)}px`;
+    markTip.classList.add('is-on');
+  }
+
+  document.addEventListener('pointerover', event => {
+    const mark = event.target.closest?.('.state-mark[data-mark]');
+    if (mark) showMarkTip(mark);
+    else if (markTipFor) hideMarkTip();
+  });
+
+  // Keyboard parity without adding a tab stop per mark: the mark shows its
+  // tooltip when the control wrapping it takes focus.
+  document.addEventListener('focusin', event => {
+    const mark = event.target.closest?.('button, .state-card')?.querySelector('.state-mark[data-mark]');
+    if (mark) showMarkTip(mark);
+    else hideMarkTip();
+  });
+
+  window.addEventListener('scroll', hideMarkTip, true);
+
   document.addEventListener('click', event => {
     const endForecastTarget = event.target.closest('[data-end-forecast]');
     if (endForecastTarget) {
@@ -482,6 +542,7 @@
   });
 
   document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') hideMarkTip();
     if (event.key !== 'Enter' && event.key !== ' ') return;
     const card = event.target.closest?.('.state-card[data-state]');
     if (!card) return;

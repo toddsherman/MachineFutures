@@ -105,14 +105,20 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 /* Card summary: where the eleven models sit on this ending. Full range as a
    light band, middle half solid, published figure as a tick. No per-model marks
    — they collide whenever an ending occupies a narrow slice of the axis. */
-.state-strip { margin-top: auto; padding-top: 22px; padding-bottom: 14px; }
-.strip-axis { position: relative; height: 26px; border-bottom: 1px solid var(--ink); }
-.strip-axis u { position: absolute; top: 6px; bottom: 0; width: 1px; background: var(--line); }
-.strip-range { position: absolute; bottom: 0; height: 14px; background: color-mix(in srgb, var(--state) 34%, transparent); }
+.state-strip { margin-top: auto; padding-top: 34px; padding-bottom: 14px; }
+.strip-axis { position: relative; height: 42px; border-bottom: 1px solid var(--ink); }
+.strip-axis u { position: absolute; top: 8px; bottom: 0; width: 1px; background: var(--line); }
+.strip-range { position: absolute; bottom: 0; height: 26px; background: color-mix(in srgb, var(--state) 34%, transparent); }
 /* min-width keeps the middle half visible when it collapses to a single
    figure, which happens whenever most models land on the same number. */
-.strip-iqr { position: absolute; bottom: 0; height: 14px; min-width: 3px; background: color-mix(in srgb, var(--state) 88%, var(--ink)); }
-.strip-mid { position: absolute; bottom: -3px; width: 2px; height: 22px; margin-left: -1px; background: var(--ink); }
+.strip-iqr { position: absolute; bottom: 0; height: 26px; min-width: 3px; background: color-mix(in srgb, var(--state) 88%, var(--ink)); }
+/* The tick carries its own figure above the axis, so the value is readable
+   without hovering or looking back up at the card header. */
+.strip-mid { position: absolute; bottom: -3px; width: 2px; height: 36px; margin-left: -1px; background: var(--ink); }
+.strip-mid span { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 5px;
+  padding: 0 3px; background: var(--paper); color: var(--ink); font: 800 11px/1 var(--mono); white-space: nowrap; }
+.strip-mid.at-start span { left: -1px; transform: none; }
+.strip-mid.at-end span { left: auto; right: -1px; transform: none; }
 
 /* The bands open outwards from the median tick, which is the one mark already
    in place, so the spread reads as growing away from the consensus. */
@@ -142,8 +148,16 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .answer-track .strip-mid { position: absolute; bottom: -2px; width: 2px; height: 15px; margin-left: -1px; background: var(--paper); }
 .answer-plot > span { color: #8f8e86; font: 10px var(--mono); text-align: right; font-variant-numeric: tabular-nums; }
 
-.answer-scale { margin-top: 0; margin-bottom: 14px; }
-.answer-scale .strip-scale { color: #85857d; }
+/* The axis reads as an axis: a rule with ticks hanging off it, not a row of
+   floating figures. */
+.answer-scale { margin-top: 0; margin-bottom: 6px; }
+.answer-scale .strip-scale { height: 22px; margin-top: 0; padding-top: 13px;
+  border-bottom: 1px solid rgba(242, 239, 230, .3); color: #b4b3aa; font-size: 10px; }
+.answer-scale .strip-scale span { bottom: auto; top: 0; }
+.answer-scale .strip-scale span::after { content: ""; position: absolute; top: 13px; left: 50%; width: 1px; height: 5px;
+  background: rgba(242, 239, 230, .34); }
+.answer-scale .strip-scale span:first-child::after { left: 0; }
+.answer-scale .strip-scale .strip-end::after { left: auto; right: 0; }
 
 .state-range { margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--muted); font: 10px var(--mono); text-transform: uppercase; }
 .state-more { margin-left: auto; color: var(--ink); font-style: normal; font-weight: 700; opacity: 0; transition: opacity .18s ease; }
@@ -391,27 +405,7 @@ body.dialog-open { overflow: hidden; }
      eleven cards unscrollably tall. */
   .state-card { min-height: 0; }
   .state-card > p { margin-top: 22px; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
-  /* Interval strip: one axis per ending, a dot per model with its sampling
-   range. Dots are translucent so overlap reads as agreement. Three lanes keep
-   near-identical figures from hiding one another entirely. */
-.state-strip { margin-top: auto; padding-top: 20px; }
-.strip-axis { position: relative; height: 34px; border-bottom: 1px solid var(--ink); }
-.strip-model { position: absolute; inset: 0; pointer-events: none; }
-/* Error bar: the range this model's own samples covered, with end caps. */
-.strip-model i { position: absolute; bottom: calc(6px + var(--lane) * 9px); height: 3px;
-  border-left: 1px solid var(--ink); border-right: 1px solid var(--ink); }
-.strip-model i::after { content: ""; position: absolute; top: 1px; left: 0; right: 0; height: 1px;
-  background: color-mix(in srgb, var(--ink) 55%, transparent); }
-.strip-model b { position: absolute; margin-left: -4px; bottom: calc(3.5px + var(--lane) * 9px); width: 8px; height: 8px; border-radius: 50%;
-  background: color-mix(in srgb, var(--state) 88%, var(--ink)); box-shadow: 0 0 0 1px var(--ink); pointer-events: auto; cursor: help; }
-.strip-model:hover b, .strip-model.is-active b { background: var(--ink); transform: scale(1.35); }
-.strip-model.is-active i { border-color: var(--ink); }
-.strip-model.is-active i::after { background: var(--ink); }
-/* Shared ticks, so every card is read against the same ruler. */
-.strip-axis u { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); text-decoration: none; }
-.strip-axis u span { position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); color: var(--muted); font: 9px var(--mono); }
-.state-strip { padding-bottom: 16px; }
-.state-range { margin-top: 20px; }
+  .state-range { margin-top: 20px; }
   .state-more { opacity: 1; }
 }
 

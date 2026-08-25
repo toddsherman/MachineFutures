@@ -244,7 +244,7 @@
               ${ticks.map(t => `<u style="left:${at(t)}%"></u>`).join('')}
               <i class="strip-range" style="left:${at(lo).toFixed(2)}%;width:${(at(hi) - at(lo)).toFixed(2)}%;--origin:${origin(mid, lo, hi)}"></i>
               <i class="strip-iqr" style="left:${at(q1).toFixed(2)}%;width:${(at(q3) - at(q1)).toFixed(2)}%;--origin:${origin(mid, q1, q3)}"></i>
-              <b class="strip-mid"></b>
+              <b class="strip-mid"><span></span></b>
             </div>
             <div class="strip-scale">
               <span>0%</span>
@@ -336,7 +336,15 @@
         rangeText.textContent = `${Math.min(...across)}–${Math.max(...across)}% across ${across.length} models`;
       }
       const tick = card.querySelector('.strip-mid');
-      if (tick) tick.style.left = `${((state.probability / axisMax) * 100).toFixed(2)}%`;
+      if (tick) {
+        const at = (state.probability / axisMax) * 100;
+        tick.style.left = `${at.toFixed(2)}%`;
+        tick.querySelector('span').textContent = `${state.probability}%`;
+        // Near either end the centred label would hang off the card, so it
+        // anchors to the tick instead.
+        tick.classList.toggle('at-start', at < 9);
+        tick.classList.toggle('at-end', at > 91);
+      }
       const figure = card.querySelector('.state-card-meta strong');
       animate ? tweenNumber(figure, state.probability) : (figure.textContent = `${state.probability}%`);
       card.setAttribute('aria-label', `${state.name}: ${state.probability}% — see each model's reasoning`);

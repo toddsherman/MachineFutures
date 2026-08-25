@@ -1,5 +1,5 @@
 {
-  "_comment": "Roster for tools/run-elicitation.mjs. A model whose keyEnv is absent from the environment is skipped, so the keys you configure decide which models run. Each lab lists its current flagship first and its immediate predecessor second; roster order sets the colour shade (flagship = the lab's base hue, predecessor darkened). Run --list to see everything a provider serves, --check to verify keys and ids.",
+  "_comment": "Roster for tools/run-elicitation.mjs. A model whose keyEnv is absent from the environment is skipped, so the keys you configure decide which models run. Each lab fields two models: its current flagship first, then a second current model \u2014 usually the flagship it replaced. Google is the exception: no older Pro is still callable on new accounts, so its second entry is the newest Flash. Roster order sets the colour shade (first = the lab's base hue, later entries darkened). Run --list to see everything a provider serves, --check to verify keys and ids.",
   "_verified": "Model ids listed live from each provider's models endpoint on 2026-08-24. New pairings (claude-opus-5, gpt-5.4, gemini-2.5-pro, grok-4.5, muse-spark-1.1) are confirmed present but not yet preflighted for inference. Always pin an explicit version, never an alias like gemini-pro-latest: aliases drift to new models and break longitudinal comparability.",
   "models": [
     {
@@ -57,11 +57,11 @@
     {
       "key": "google-prev",
       "provider": "Google",
-      "label": "Gemini 2.5 Pro",
-      "shortLabel": "G25",
+      "label": "Gemini 3.7 Flash",
+      "shortLabel": "G37",
       "tier": "frontier",
       "api": "google",
-      "model": "gemini-2.5-pro",
+      "model": "gemini-3.7-flash",
       "keyEnv": "GEMINI_API_KEY"
     },
     {

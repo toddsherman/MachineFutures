@@ -1,0 +1,58 @@
+name: Watch for new models
+
+# Weekly check for models a provider has started serving that are not yet on
+# the roster. Opens (or updates) a single issue so new flagships get noticed
+# without anyone having to remember to look.
+
+on:
+  schedule:
+    - cron: '0 13 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Look for models not on the roster
+        id: scan
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          META_API_KEY: ${{ secrets.META_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
+        run: |
+          set +e
+          node tools/run-elicitation.mjs --new > new-models.txt 2>&1
+          echo "exit=$?" >> "$GITHUB_OUTPUT"
+          cat new-models.txt
+          cat new-models.txt >> "$GITHUB_STEP_SUMMARY"
+
+      # Exit code 3 means the scan found something. Reuse one open issue rather
+      # than filing a fresh one every week.
+      - name: Report new models
+        if: steps.scan.outputs.exit == '3'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TITLE="New models available to add to the roster"
+          BODY=$(printf 'The weekly scan found models these providers now serve that are not on `tools/models.json`:\n\n```\n%s\n```\n\nTo add one: put it in `tools/models.json`, run the elicit workflow with **check_only** to confirm it is callable, then run it with `models: <its key>`.\n\nTo stop asking a model without losing its published forecast, set `"status": "paused"` (or `"retired"`) on its roster entry.\n\n_Scan run: %s_\n' "$(cat new-models.txt)" "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}")
+          EXISTING=$(gh issue list --state open --search "$TITLE in:title" --json number -q '.[0].number // empty')
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --body "$BODY"
+          else
+            gh issue create --title "$TITLE" --body "$BODY"
+          fi

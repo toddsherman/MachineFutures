@@ -1,5 +1,5 @@
 {
-  "_comment": "Roster for tools/run-elicitation.mjs. A model whose keyEnv is absent from the environment is skipped, so the keys you configure decide which models run. Each lab fields two models: its current flagship first, then a second current model \u2014 usually the flagship it replaced. Google is the exception: no older Pro is still callable on new accounts, so its second entry is the newest Flash. Roster order sets the colour shade (first = the lab's base hue, later entries darkened). Run --list to see everything a provider serves, --check to verify keys and ids.",
+  "_comment": "Roster for tools/run-elicitation.mjs. A model whose keyEnv is absent from the environment is skipped, so the keys you configure decide which models run. Roster order sets both display order and colour shade within a lab (first = the lab's base hue, later entries darkened). status: omit or 'active' to elicit it; 'paused' to stop asking while keeping its published forecast; 'retired' for a model the provider has withdrawn. Paused and retired entries are never called but are still used to label and order their historical runs, so keep them here rather than deleting them. Run --list to see everything a provider serves, --new for just what is not yet on this roster, --check to verify keys and ids.",
   "_verified": "Model ids listed live from each provider's models endpoint on 2026-08-24. New pairings (claude-opus-5, gpt-5.4, gemini-2.5-pro, grok-4.5, muse-spark-1.1) are confirmed present but not yet preflighted for inference. Always pin an explicit version, never an alias like gemini-pro-latest: aliases drift to new models and break longitudinal comparability.",
   "models": [
     {
@@ -21,6 +21,17 @@
       "api": "anthropic",
       "model": "claude-opus-5",
       "keyEnv": "ANTHROPIC_API_KEY"
+    },
+    {
+      "key": "openai-sol",
+      "provider": "OpenAI",
+      "label": "GPT-5.6 Sol",
+      "shortLabel": "S56",
+      "tier": "frontier",
+      "api": "openai-compatible",
+      "baseUrl": "https://api.openai.com/v1",
+      "model": "gpt-5.6-sol",
+      "keyEnv": "OPENAI_API_KEY"
     },
     {
       "key": "openai",

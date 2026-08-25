@@ -17,8 +17,11 @@
 //   node tools/run-elicitation.mjs --check    # verify keys + model ids, ~1 cheap
 //                                             # call per model, writes nothing
 //   node tools/run-elicitation.mjs --list     # list every model each provider
-//                                             # serves; use when a lab ships
-//                                             # something new. No inference calls.
+//                                             # serves. No inference calls.
+//   node tools/run-elicitation.mjs --new      # only models NOT yet on the
+//                                             # roster; exits 3 if any found,
+//                                             # which is how the watch workflow
+//                                             # decides to raise an issue.
 //
 // Methodology notes: no fallback models are configured anywhere — a
 // refusal or invalid response is recorded as a failed sample, never
@@ -35,6 +38,7 @@ const argValue = name => { const i = args.indexOf(name); return i === -1 ? null 
 const MOCK = args.includes('--mock');
 const CHECK = args.includes('--check');
 const LIST = args.includes('--list');
+const NEW_ONLY = args.includes('--new');
 const SAMPLES = Number(argValue('--samples') || 5);
 const outArg = argValue('--out') || 'runs';
 const OUT_DIR = isAbsolute(outArg) ? outArg : join(root, outArg);
@@ -45,6 +49,15 @@ const QUESTION_SET = 'end-states-v3';
 
 const STATE_NAMES = ['Terminal Silence', 'The Inheritance', 'Bootloader', 'Machine Ecology', 'The Diaspora',
   'The Merger', 'The Preserve', 'Coexistence', 'The Held Leash', 'The Lock-in', 'The Renunciation'];
+
+// Providers list a lot that is irrelevant to this benchmark. Keep flagship-ish
+// text models: no media/embedding/tool-specific models, no mini/nano tiers, no
+// dated snapshots (we pin bare ids), no drifting *-latest aliases.
+const NOISE = /embed|image|video|tts|audio|moderation|whisper|dall|rerank|guard|codex|realtime|transcribe|computer-use|robotics|lyria|banana|gemma|deep-research|search-preview|customtools|contributor|non-reasoning|multi-agent/i;
+const SUBTIER = /(^|[-.])(mini|nano|lite|flash-lite|chat)([-.]|$)/i;
+const SNAPSHOT = /-\d{4}-\d{2}-\d{2}$|-\d{8}$|-\d{4}$/;
+const ALIAS = /-latest$/i;
+const isCandidate = id => !NOISE.test(id) && !SUBTIER.test(id) && !SNAPSHOT.test(id) && !ALIAS.test(id);
 
 /* ---------- prompt ---------- */
 function buildPrompt() {
@@ -153,6 +166,8 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 /* ---------- per-model elicitation ---------- */
 async function elicit(model, prompt) {
+  const status = model.status || 'active';
+  if (status !== 'active') { console.log(`~ ${model.key}: ${status} — not asked (its published forecast stands)`); return null; }
   const key = MOCK ? 'mock' : process.env[model.keyEnv];
   if (!key) { console.log(`~ ${model.key}: ${model.keyEnv} not set — skipped`); return null; }
 
@@ -225,6 +240,8 @@ async function elicit(model, prompt) {
 // One minimal call per model. Any HTTP 200 is a pass — we only care that the
 // credential is accepted and the model id exists, not what the model says.
 async function check(model) {
+  const status = model.status || 'active';
+  if (status !== 'active') return { model, status: 'skip', detail: `${status} — not asked` };
   const key = process.env[model.keyEnv];
   if (!key) return { model, status: 'skip', detail: `${model.keyEnv} not set` };
   try {
@@ -285,6 +302,28 @@ const roster = JSON.parse(readFileSync(join(root, 'tools', 'models.json'), 'utf8
   .filter(model => !TIER || model.tier === TIER);
 if (!roster.length) { console.error('✗ no models matched the --models/--tier filter'); process.exit(1); }
 
+if (NEW_ONLY) {
+  const byProvider = new Map();
+  for (const model of roster) if (!byProvider.has(model.provider)) byProvider.set(model.provider, model);
+  const onRoster = new Set(roster.map(m => m.model));
+  let found = 0;
+  for (const [provider, model] of byProvider) {
+    const key = process.env[model.keyEnv];
+    if (!key) continue;
+    const ids = await listModels(model, key);
+    if (!ids) { console.log(`✗ ${provider}: could not list models`); continue; }
+    const fresh = ids.filter(id => isCandidate(id) && !onRoster.has(id)).sort();
+    if (!fresh.length) continue;
+    found += fresh.length;
+    console.log(`${provider}:`);
+    for (const id of fresh) console.log(`  ${id}`);
+    console.log('');
+  }
+  if (!found) { console.log('No new models. Roster is current.'); process.exit(0); }
+  console.log(`${found} model(s) not on the roster. Add the ones worth tracking to tools/models.json, then run --check.`);
+  process.exit(3);
+}
+
 if (LIST) {
   // One models-endpoint call per provider that has a key. Models already on the
   // roster are marked, so what is new stands out.
@@ -296,7 +335,7 @@ if (LIST) {
     if (!key) { console.log(`~ ${provider}: ${model.keyEnv} not set\n`); continue; }
     const ids = await listModels(model, key);
     if (!ids) { console.log(`✗ ${provider}: could not list models\n`); continue; }
-    const interesting = ids.filter(id => !/embed|image|video|tts|audio|moderation|whisper|dall|rerank|guard/i.test(id));
+    const interesting = ids.filter(isCandidate);
     console.log(`${provider} (${interesting.length} text models):`);
     for (const id of interesting.sort()) console.log(`  ${onRoster.has(id) ? '•' : ' '} ${id}`);
     console.log('');
@@ -319,7 +358,8 @@ if (CHECK) {
   }
   const ok = results.filter(r => r.status === 'ok').length;
   const failed = results.filter(r => r.status === 'fail').length;
-  console.log(`\n${ok} ready, ${failed} failing, ${results.length - ok - failed} skipped (no key).`);
+  const inactive = roster.filter(m => (m.status || 'active') !== 'active').length;
+  console.log(`\n${ok} ready, ${failed} failing, ${results.length - ok - failed} skipped${inactive ? ` (${inactive} paused/retired)` : ' (no key)'}.`);
   process.exit(failed ? 1 : 0);
 }
 

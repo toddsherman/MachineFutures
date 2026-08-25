@@ -197,6 +197,10 @@
   // Structure is built once. Selecting a model then rewrites values in place —
   // rebuilding the markup would restart every element at its final state and
   // there would be nothing for a transition to animate between.
+  // px per percentage point in the card chips. Chosen so the largest value or
+  // sample maximum on the board still fits the 46px track.
+  const SCALE = 1.6;
+
   function renderEndStates() {
     const entries = longTermEntries();
     const orderedStates = endingOrder();
@@ -213,7 +217,16 @@
       return `<article class="state-card" id="state-${state.id}" style="--state:${state.color}" data-state="${state.id}" tabindex="0" role="button">
         <div class="state-card-head"><span>${String(state.id).padStart(2, '0')}</span><h3>${state.name}</h3><div class="state-card-meta"><strong></strong>${extinctionMark(state)}</div></div>
         <p>${state.description}</p>
-        <div class="state-models">${providerValues.map(item => `<span title="${item.label}: ${item.value}%"><strong>${item.value}%</strong><i style="height:${Math.max(item.value * 1.8, 4)}px"></i><small>${item.shortLabel}</small></span>`).join('')}</div>
+        <div class="state-models">${providerValues.map(item => {
+          // Bar is the model's published figure; the whisker is the range its
+          // own samples covered, so a tall bar with a long whisker reads as
+          // "high, but the model was not consistent about it".
+          const span = item.range?.[state.id];
+          const px = v => Math.max(v * SCALE, 2);
+          const whisker = span && span[1] > span[0]
+            ? `<em style="bottom:${px(span[0]).toFixed(1)}px;height:${((span[1] - span[0]) * SCALE).toFixed(1)}px"></em>` : '';
+          return `<span title="${item.label}: ${item.value}%${span ? ` (${span[0]}–${span[1]}% across ${item.sampleCount} samples)` : ''}"><strong>${item.value}%</strong><span class="chip-track"><i style="height:${px(item.value).toFixed(1)}px"></i>${whisker}</span><small>${item.shortLabel}</small></span>`;
+        }).join('')}</div>
         <div class="state-range"><span class="range-text"></span><em class="state-more">Why ↗</em></div>
       </article>`;
     }).join('');

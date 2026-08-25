@@ -39,10 +39,15 @@
     history.replaceState(null, '', location.pathname + query + location.hash);
   }
   const extinctionLabels = { gone: 'Humanity is gone', risk: 'Humanity might perish' };
+  const MARK_SHAPES = {
+    gone: '<circle cx="11" cy="11" r="9.1"/><path d="M7.3 6.7h7.4M7.3 15.3h7.4M7.7 7l6.6 8M14.3 7l-6.6 8"/>',
+    risk: '<path d="M11 3.2 20.1 18.5H1.9Z"/><path d="M11 9.1v3.9M11 15.8h.01"/>'
+  };
   const extinctionMark = state => {
-    if (state.extinction === 'gone') return `<span class="extinction-mark" role="img" title="${extinctionLabels.gone}" aria-label="${extinctionLabels.gone}"><span></span></span>`;
-    if (state.extinction === 'risk') return `<span class="risk-mark" role="img" title="${extinctionLabels.risk}" aria-label="${extinctionLabels.risk}">⚠︎</span>`;
-    return '';
+    const tier = state.extinction;
+    if (!tier) return '';
+    const label = extinctionLabels[tier];
+    return `<span class="state-mark is-${tier}" role="img" title="${label}" aria-label="${label}"><svg viewBox="0 0 22 22" aria-hidden="true">${MARK_SHAPES[tier]}</svg></span>`;
   };
 
   const stateValue = (run, state) => run.probabilities[state.id];
@@ -113,7 +118,7 @@
     const rows = orderedStates.map(state => `
       <div class="matrix-row" role="row">
         <button class="matrix-state" role="rowheader" data-state="${state.id}" style="--state:${state.color}">
-          <i></i><span>${state.id}. ${state.name}</span>${extinctionMark(state)}
+          <i></i><span class="matrix-state-name">${state.id}. ${state.name}</span>${extinctionMark(state)}
         </button>
         ${entries.map(entry => {
           const value = stateValue(entry, state);
@@ -124,7 +129,7 @@
     // Summary row: the two extinction tiers stacked, per model.
     const summary = `
       <div class="matrix-row matrix-summary" role="row">
-        <div class="matrix-state is-summary" role="rowheader"><span>Extinction-risk exposure</span></div>
+        <div class="matrix-state is-summary" role="rowheader"><span class="matrix-state-name">Extinction-risk exposure</span></div>
         ${entries.map(entry => {
           const sums = extinctionSums(entry);
           return `<div class="matrix-cell is-summary" role="cell" title="${entry.label}: ${sums.gone}% gone, ${sums.risk}% might perish">

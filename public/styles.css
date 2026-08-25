@@ -169,21 +169,16 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .dialog-footnote { margin-top: 35px; color: #74746d; font: 10px var(--mono); text-transform: uppercase; }
 body.dialog-open { overflow: hidden; }
 
-.extinction-mark { display: inline-grid; place-items: center; width: 1.05em; height: 1.05em; margin-left: .62em; color: var(--extinction); border: .11em solid currentColor; border-radius: 50%; vertical-align: -.13em; }
-.extinction-mark > span { width: .52em; height: .64em; background:
-  linear-gradient(45deg, transparent 43%, currentColor 45% 55%, transparent 57%),
-  linear-gradient(-45deg, transparent 43%, currentColor 45% 55%, transparent 57%),
-  linear-gradient(currentColor, currentColor) top / 100% .11em no-repeat,
-  linear-gradient(currentColor, currentColor) bottom / 100% .11em no-repeat;
-}
-.stacked-legend .extinction-mark { font-size: 1.16em; }
-.end-leader h2 .extinction-mark { font-size: .58em; margin-left: .7em; vertical-align: .03em; }
-.state-card-meta .extinction-mark { flex: 0 0 auto; margin-left: 0; font-size: 18px; }
-
-.risk-mark { margin-left: .62em; color: var(--risk); font-size: 1.1em; line-height: 1; vertical-align: -.02em; font-style: normal; }
-.stacked-legend .risk-mark { font-size: 1.22em; }
-.end-leader h2 .risk-mark { font-size: .62em; margin-left: .7em; vertical-align: .06em; }
-.state-card-meta .risk-mark { flex: 0 0 auto; margin-left: 0; font-size: 19px; }
+/* One shape system for both tiers: same box, same stroke weight, so the hazard
+   triangle carries the same visual weight as the extinction circle. */
+.state-mark { display: inline-block; width: 1.05em; height: 1.05em; margin-left: .62em; vertical-align: -.16em; flex: 0 0 auto; }
+.state-mark svg { display: block; width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.state-mark.is-gone { color: var(--extinction); }
+.state-mark.is-risk { color: var(--risk); }
+.stacked-legend .state-mark { font-size: 1.16em; }
+.end-leader h2 .state-mark { font-size: .58em; margin-left: .7em; vertical-align: -.02em; }
+.state-card-meta .state-mark { margin-left: 0; font-size: 18px; }
+.matrix-state .state-mark { font-size: 15px; margin-left: 8px; }
 
 @media (max-width: 1100px) {
   :root { --gutter: 22px; }
@@ -199,6 +194,12 @@ body.dialog-open { overflow: hidden; }
   .end-consensus { padding: 40px 0 44px; border-right: 0; border-bottom: 1px solid var(--line); }
   .end-leader { padding: 40px 0 44px; }
   .state-grid { grid-template-columns: repeat(2, 1fr); }
+  /* Give the title its own line so a long single word cannot run under the
+     percentage — "BOOTLOADER" at display size leaves no room beside it. */
+  .state-card-head { grid-template-columns: auto 1fr; row-gap: 12px; }
+  .state-card-head > span { grid-column: 1; grid-row: 1; }
+  .state-card-meta { grid-column: 2; grid-row: 1; justify-self: end; }
+  .state-card-head h3 { grid-column: 1 / -1; grid-row: 2; font-size: 32px; }
   .states-section, .model-mix, .matrix-section { padding-block: 52px; }
   .doomer-row { grid-template-columns: 150px minmax(0, 1fr); }
   .method-grid { grid-template-columns: repeat(2, 1fr); }
@@ -260,10 +261,10 @@ body.dialog-open { overflow: hidden; }
 
 .matrix-state { display: flex; align-items: center; gap: 10px; padding: 0 16px 0 0; border: 0; text-align: left; cursor: pointer; font: inherit; }
 .matrix-state i { flex: 0 0 auto; width: 9px; height: 22px; background: var(--state); }
-.matrix-state > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 12px var(--mono); }
-.matrix-state:hover > span { text-decoration: underline; }
+.matrix-state-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 12px var(--mono); }
+.matrix-state:hover .matrix-state-name { text-decoration: underline; }
 .matrix-state.is-summary { cursor: default; color: var(--muted); padding-left: 19px; }
-.matrix-state.is-summary span { font-weight: 400; text-transform: uppercase; font-size: 10px; letter-spacing: .06em; }
+.matrix-state.is-summary .matrix-state-name { flex: 0 1 auto; font-weight: 400; text-transform: uppercase; font-size: 10px; letter-spacing: .06em; }
 
 .matrix-cell { position: relative; display: grid; place-items: center; min-height: 44px; border-left: 1px solid var(--line);
   background: color-mix(in srgb, var(--state) calc(var(--fill) * 100%), transparent); }
@@ -288,7 +289,7 @@ body.dialog-open { overflow: hidden; }
   .matrix-corner { display: none; }
   .matrix-state { position: static; grid-column: 1 / -1; gap: 8px; padding: 13px 0 6px; }
   .matrix-state i { height: 14px; width: 7px; }
-  .matrix-state > span { white-space: normal; font-size: 11px; }
+  .matrix-state-name { flex: 0 1 auto; white-space: normal; font-size: 11px; }
   .matrix-state.is-summary { padding-left: 0; }
   .matrix-lab { padding: 4px 2px 3px; }
   .matrix-lab span { font-size: 9px; letter-spacing: .04em; }

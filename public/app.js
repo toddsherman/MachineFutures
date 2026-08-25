@@ -165,6 +165,7 @@
     if (roster) roster.textContent = `${entries.length} models across ${labs.size} labs`;
   }
 
+  let axisMax = 40;
   const MOTION_MS = 500;
   const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -212,7 +213,7 @@
     $('#consensus-legend').innerHTML = orderedStates.map(state =>
       `<button data-state-jump="${state.id}"><i style="--state:${state.color}"></i><span>${state.id}. ${state.name}${extinctionMark(state)}</span><b></b></button>`).join('');
 
-    const axisMax = Math.ceil(Math.max(...orderedStates.flatMap(state =>
+    axisMax = Math.ceil(Math.max(...orderedStates.flatMap(state =>
       entries.map(entry => entry.range?.[state.id]?.[1] ?? stateValue(entry, state)))) / 5) * 5;
 
     $('#state-grid').innerHTML = orderedStates.map(state => {
@@ -221,27 +222,22 @@
         <div class="state-card-head"><span>${String(state.id).padStart(2, '0')}</span><h3>${state.name}</h3><div class="state-card-meta"><strong></strong>${extinctionMark(state)}</div></div>
         <p>${state.description}</p>
         ${(() => {
-          // One axis per ending, scaled to what the models actually said rather
-          // than 0-100, so a tight cluster stays legible. Each model is a dot at
-          // its figure with a line for its sampling range; overlapping dots are
-          // agreement, a wide scatter is disagreement.
-          // One scale for every card, from zero, so position means the same
-          // thing everywhere: a clump at the left is an ending everyone
-          // dismisses, a wide scatter is one they argue about. Per-card scaling
-          // would make those two look alike.
+          // A band, not a scatter. Eleven dots and their bars collide once an
+          // ending sits in a narrow part of a shared axis, and the card is a
+          // summary in a grid of eleven — per-model detail belongs in the
+          // dialog, where there is room to give each model its own row.
+          const vals = providerValues.map(m => m.value).sort((x, y) => x - y);
           const at = v => (v / axisMax) * 100;
+          const q = f => { const i = (vals.length - 1) * f, lo = Math.floor(i), hi = Math.ceil(i);
+                           return vals[lo] + (vals[hi] - vals[lo]) * (i - lo); };
+          const lo = vals[0], hi = vals.at(-1), q1 = q(0.25), q3 = q(0.75);
           return `<div class="state-strip">
-            <div class="strip-axis">
-              ${providerValues.map((m, i) => {
-                const r = m.range?.[state.id];
-                const line = r && r[1] > r[0] ? `<i style="left:${at(r[0]).toFixed(2)}%;width:${(at(r[1]) - at(r[0])).toFixed(2)}%"></i>` : '';
-                // The wrapper spans the whole axis so the dot and its error bar
-                // can both be placed as a share of it; a shrink-to-fit wrapper
-                // has no width for those percentages to resolve against.
-                const tip = `${m.label}: ${m.value}%${r ? ` (${r[0]}–${r[1]}% across ${m.sampleCount} samples)` : ''}`;
-                return `<span class="strip-model" data-model="${m.runKey}" style="--lane:${i % 3}">${line}<b style="left:${at(m.value).toFixed(2)}%" title="${tip}"></b></span>`;
-              }).join('')}
-              ${[10, 20, 30].filter(t => t < axisMax).map(t => `<u style="left:${at(t)}%"><span>${t}</span></u>`).join('')}
+            <div class="strip-axis" title="${lo}–${hi}% across ${vals.length} models · middle half ${q1.toFixed(0)}–${q3.toFixed(0)}%">
+              ${[10, 20, 30].filter(t => t < axisMax).map(t => `<u style="left:${at(t)}%"></u>`).join('')}
+              <i class="strip-range" style="left:${at(lo).toFixed(2)}%;width:${(at(hi) - at(lo)).toFixed(2)}%"></i>
+              <i class="strip-iqr" style="left:${at(q1).toFixed(2)}%;width:${(at(q3) - at(q1)).toFixed(2)}%"></i>
+              <!-- the tick is placed per selection, since the figure it marks changes -->
+              <b class="strip-mid"></b>
             </div>
           </div>`;
         })()}
@@ -327,8 +323,8 @@
         const across = entriesForRange.map(entry => stateValue(entry, state));
         rangeText.textContent = `${Math.min(...across)}–${Math.max(...across)}% across ${across.length} models`;
       }
-      card.querySelectorAll('.strip-model').forEach(dot =>
-        dot.classList.toggle('is-active', Boolean(activeRun) && dot.dataset.model === activeEndForecast));
+      const tick = card.querySelector('.strip-mid');
+      if (tick) tick.style.left = `${((state.probability / axisMax) * 100).toFixed(2)}%`;
       const figure = card.querySelector('.state-card-meta strong');
       animate ? tweenNumber(figure, state.probability) : (figure.textContent = `${state.probability}%`);
       card.setAttribute('aria-label', `${state.name}: ${state.probability}% — see each model's reasoning`);
@@ -361,6 +357,9 @@
       .map(entry => ({ ...entry, value: stateValue(entry, state) }))
       .sort((a, b) => b.value - a.value);
     const consensus = median(entries.map(entry => entry.value));
+    const highs = entries.map(e => e.range?.[state.id]?.[1] ?? e.value);
+    const scaleMax = Math.max(Math.ceil(Math.max(...highs) / 5) * 5, 5);
+    const pos = v => (v / scaleMax) * 100;
     const rows = entries.map(entry => `
       <article class="model-answer">
         <div class="model-answer-head">
@@ -368,7 +367,13 @@
           <div><b>${entry.label}</b><small>${entry.provider} · ${entry.date || ''}</small></div>
           <strong>${entry.value}%</strong>
         </div>
-        ${entry.range?.[state.id] ? `<p class="answer-range">${entry.range[state.id][0]}–${entry.range[state.id][1]}% across ${entry.sampleCount} samples</p>` : ''}
+        <div class="answer-plot">
+          <div class="answer-track">
+            ${entry.range?.[state.id] ? `<i style="left:${pos(entry.range[state.id][0]).toFixed(2)}%;width:${(pos(entry.range[state.id][1]) - pos(entry.range[state.id][0])).toFixed(2)}%"></i>` : ''}
+            <b style="left:${pos(entry.value).toFixed(2)}%"></b>
+          </div>
+          <span>${entry.range?.[state.id] ? `${entry.range[state.id][0]}–${entry.range[state.id][1]}%` : '—'}</span>
+        </div>
         ${entry.rationales?.[state.id] ? `<p>${entry.rationales[state.id]}</p>` : ''}
       </article>`).join('');
 
@@ -381,7 +386,7 @@
         <div><strong>${entries.length}</strong><span>models</span></div>
       </div>
       <p class="dialog-description">${state.description}</p>
-      <div class="dialog-subhead"><h3>How each model sees it</h3><span>Median of ${entries[0]?.sampleCount ?? 5} samples</span></div>
+      <div class="dialog-subhead"><h3>How each model sees it</h3><span>Dot is the published figure; bar is the range across ${entries[0]?.sampleCount ?? 5} samples</span></div>
       <div class="model-answer-list">${rows}</div>`;
     $('#detail-dialog').showModal();
     document.body.classList.add('dialog-open');

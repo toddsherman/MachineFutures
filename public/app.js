@@ -187,7 +187,6 @@
       .sort((a, b) => b.sums.total - a.sums.total);
     $('#doomer-ratings').innerHTML = `
       <div class="doomer-head">
-        <div><p class="kicker">Doomer rating</p><h3>Extinction-risk exposure</h3></div>
         <p class="doomer-key"><span class="key-gone"><i></i>Humanity is gone (1–3)</span><span class="key-risk"><i></i>Might perish (4–5)</span></p>
       </div>
       <div class="doomer-list">

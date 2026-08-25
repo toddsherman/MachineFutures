@@ -132,12 +132,18 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 }
 
 /* Dialog: one row per model, so each gets a readable bar of its own. */
-.answer-plot { display: grid; grid-template-columns: minmax(0, 1fr) 74px; align-items: center; gap: 12px; margin: 9px 0 0 27px; }
-.answer-track { position: relative; height: 12px; border-bottom: 1px solid rgba(242, 239, 230, .18); }
-.answer-track i { position: absolute; bottom: 3px; height: 3px; background: rgba(242, 239, 230, .32);
-  border-left: 1px solid var(--paper); border-right: 1px solid var(--paper); }
-.answer-track b { position: absolute; bottom: 1px; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%; background: var(--acid); }
-.answer-plot span { color: #8f8e86; font: 10px var(--mono); text-align: right; }
+/* The same marks as the cards, on the dialog's dark ground: a band for the
+   sample range in the ending's colour, a tick at the published figure. */
+.answer-plot { display: grid; grid-template-columns: minmax(0, 1fr) 74px; align-items: center; gap: 14px; margin: 10px 0 0 27px; }
+.answer-track { position: relative; height: 16px; border-bottom: 1px solid rgba(242, 239, 230, .22); }
+.answer-track u { position: absolute; top: 2px; bottom: 0; width: 1px; background: rgba(242, 239, 230, .1); }
+.answer-track .strip-range { position: absolute; bottom: 0; height: 10px; min-width: 3px;
+  background: color-mix(in srgb, var(--state) 62%, transparent); }
+.answer-track .strip-mid { position: absolute; bottom: -2px; width: 2px; height: 15px; margin-left: -1px; background: var(--paper); }
+.answer-plot > span { color: #8f8e86; font: 10px var(--mono); text-align: right; font-variant-numeric: tabular-nums; }
+
+.answer-scale { margin-top: 0; margin-bottom: 14px; }
+.answer-scale .strip-scale { color: #85857d; }
 
 .state-range { margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--muted); font: 10px var(--mono); text-transform: uppercase; }
 .state-more { margin-left: auto; color: var(--ink); font-style: normal; font-weight: 700; opacity: 0; transition: opacity .18s ease; }

@@ -369,9 +369,10 @@
       .map(entry => ({ ...entry, value: stateValue(entry, state) }))
       .sort((a, b) => b.value - a.value);
     const consensus = median(entries.map(entry => entry.value));
-    const highs = entries.map(e => e.range?.[state.id]?.[1] ?? e.value);
-    const scaleMax = Math.max(Math.ceil(Math.max(...highs) / 5) * 5, 5);
-    const pos = v => (v / scaleMax) * 100;
+    // Same ruler as the cards, so a position carries over from the page.
+    const pos = v => (v / axisMax) * 100;
+    const ticks = [10, 20, 30, 40, 50].filter(t => t < axisMax - 2);
+    const gridlines = ticks.map(t => `<u style="left:${pos(t)}%"></u>`).join('');
     const rows = entries.map(entry => `
       <article class="model-answer">
         <div class="model-answer-head">
@@ -381,14 +382,16 @@
         </div>
         <div class="answer-plot">
           <div class="answer-track">
-            ${entry.range?.[state.id] ? `<i style="left:${pos(entry.range[state.id][0]).toFixed(2)}%;width:${(pos(entry.range[state.id][1]) - pos(entry.range[state.id][0])).toFixed(2)}%"></i>` : ''}
-            <b style="left:${pos(entry.value).toFixed(2)}%"></b>
+            ${gridlines}
+            ${entry.range?.[state.id] ? `<i class="strip-range" style="left:${pos(entry.range[state.id][0]).toFixed(2)}%;width:${(pos(entry.range[state.id][1]) - pos(entry.range[state.id][0])).toFixed(2)}%"></i>` : ''}
+            <b class="strip-mid" style="left:${pos(entry.value).toFixed(2)}%"></b>
           </div>
           <span>${entry.range?.[state.id] ? `${entry.range[state.id][0]}–${entry.range[state.id][1]}%` : '—'}</span>
         </div>
         ${entry.rationales?.[state.id] ? `<p>${entry.rationales[state.id]}</p>` : ''}
       </article>`).join('');
 
+    $('#dialog-content').style.setProperty('--state', state.color);
     $('#dialog-content').innerHTML = `
       <div class="dialog-kicker"><span>${String(state.id).padStart(2, '0')}</span>${state.family}</div>
       <h2>${state.name}${extinctionMark(state)}</h2>
@@ -398,7 +401,15 @@
         <div><strong>${entries.length}</strong><span>models</span></div>
       </div>
       <p class="dialog-description">${state.description}</p>
-      <div class="dialog-subhead"><h3>How each model sees it</h3><span>Dot is the published figure; bar is the range across ${entries[0]?.sampleCount ?? 5} samples</span></div>
+      <div class="dialog-subhead"><h3>How each model sees it</h3><span>Band is the range across ${entries[0]?.sampleCount ?? 5} samples; tick is the published figure</span></div>
+      <div class="answer-plot answer-scale">
+        <div class="strip-scale">
+          <span>0%</span>
+          ${ticks.map(t => `<span style="left:${pos(t)}%">${t}</span>`).join('')}
+          <span class="strip-end">${axisMax}%</span>
+        </div>
+        <span></span>
+      </div>
       <div class="model-answer-list">${rows}</div>`;
     $('#detail-dialog').showModal();
     document.body.classList.add('dialog-open');

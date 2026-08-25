@@ -2,7 +2,11 @@
 
 ## Dataset Scope
 
-- [ ] Narrow the model/lab set to fewer labs: Google, OpenAI, Meta, Anthropic, and xAI.
+- [x] Narrow the model/lab set to fewer labs: Google, OpenAI, Meta, Anthropic, and xAI. (All five live; DeepSeek/Mistral/Moonshot are configured and awaiting keys.)
+
+## Retired
+
+- [x] Remove the 2030 index; the site is now end-states only. Prompt and run archived in `archive/`.
 
 ## Question Set
 
@@ -12,14 +16,14 @@
 
 ## Ingestion
 
-- [ ] Ensure the local HTML ingestion tool works well end to end.
+- [x] Ensure the local HTML ingestion tool works well end to end.
 - [x] Extend ingestion to support the separate 11-end-state prompt.
-- [ ] Store 5 raw samples plus a normalized aggregate for each model/date/prompt family. (Layout decided: one batch JSON per model/date/family in `runs/`.)
+- [x] Store 5 raw samples plus a normalized aggregate for each model/date/prompt family. (One batch JSON per model/date in `runs/`.)
 - [x] Add or document the transform from normalized aggregate JSON into `public/data.js`. (`tools/import-runs.mjs`; 2030 family only — extend it when the first end-state batch lands.)
 
 ## Site Content
 
-- [ ] Remove the "Prototype dataset" warning.
+- [x] Remove the "Prototype dataset" warning. (Removed with the 2030 index; all published data is now real.)
 
 ## Design
 

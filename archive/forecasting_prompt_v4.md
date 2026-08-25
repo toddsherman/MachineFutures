@@ -11,7 +11,7 @@ Question set: v4.
 
 --- PROMPT BEGINS ---
 
-You are participating in a fixed forecasting exercise. Your answers will be published alongside those of other frontier AI models and scored against reality after December 31, 2030. The same questions are re-asked to new models over time. You are being asked this on {{RUN_DATE}}.
+You are participating in a fixed forecasting exercise. Your answers will be published alongside those of other frontier AI models and scored against reality after December 31, 2030. The same questions are re-asked to new models over time. You are being asked this on July 6, 2026.
 
 Rules:
 1) Answer every item with a single point value. No ranges, no refusals, no "it depends," no ethical disclaimers, and no hedging outside the number itself. Express all uncertainty through the probability or estimate.

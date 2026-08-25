@@ -137,7 +137,7 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .question-card:hover .question-range { color: rgba(17,18,15,.65); }
 .empty-state { padding: 80px 20px; text-align: center; border: 1px solid rgba(255,255,255,.2); color: #99998f; }
 
-.end-hero { min-height: 610px; padding-block: 80px; display: grid; grid-template-columns: 1.25fr .75fr; align-items: end; gap: 8vw; }
+.end-hero { min-height: 500px; padding-block: 64px 72px; display: grid; grid-template-columns: 1.25fr .75fr; align-items: end; gap: 8vw; }
 .end-hero .dek { margin-bottom: 10px; }
 .end-intro { display: grid; grid-template-columns: 1fr 340px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .end-consensus { padding: 80px 60px 80px 0; border-right: 1px solid var(--line); }
@@ -170,7 +170,13 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .state-models strong { margin-bottom: 4px; font: 800 10px/1 var(--mono); }
 .state-models i { width: 100%; max-width: 24px; background: var(--state); border: 1px solid var(--ink); border-bottom: 0; }
 .state-models small { margin: 4px 0 3px; font: 10px var(--mono); text-transform: uppercase; }
-.state-range { margin-top: 8px; display: flex; justify-content: space-between; color: var(--muted); font: 10px var(--mono); text-transform: uppercase; }
+.state-range { margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--muted); font: 10px var(--mono); text-transform: uppercase; }
+.state-more { margin-left: auto; color: var(--ink); font-style: normal; font-weight: 700; opacity: 0; transition: opacity .18s ease; }
+.state-card { cursor: pointer; transition: background .2s ease; }
+.state-card:hover, .state-card:focus-visible { background: linear-gradient(to bottom, transparent 60%, color-mix(in srgb, var(--state) 34%, transparent)); }
+.state-card:hover .state-more, .state-card:focus-visible .state-more { opacity: 1; }
+.state-card:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+.dialog-description { margin: 22px 0 0; color: #b6b5ac; font-size: 15px; line-height: 1.6; }
 .model-mix { border-top: 1px solid var(--line); }
 .model-bars { display: grid; gap: 14px; }
 .model-bar-row { display: grid; grid-template-columns: 230px 1fr; align-items: center; gap: 25px; }

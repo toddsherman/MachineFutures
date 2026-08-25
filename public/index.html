@@ -4,15 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#11120f">
-  <meta name="description" content="A living record of what frontier AI models predict about 2030—and the far future of humanity and AI.">
-  <title>Machine Futures — What the machines think</title>
+  <meta name="description" content="Frontier AI models allocate 100 points across eleven ways the story of humanity and AI could end. A living record, re-asked as new models arrive.">
+  <title>Machine Futures — How does this story end?</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
 
   <header class="site-header">
-    <a class="brand" href="#2030" aria-label="Machine Futures home">
+    <a class="brand" href="#end-states" aria-label="Machine Futures home">
       <svg class="brand-mark" viewBox="0 0 36 36" aria-hidden="true">
         <path d="M4 9.5 18 2l14 7.5v17L18 34 4 26.5z"/>
         <circle cx="12" cy="16" r="2.1"/><circle cx="24" cy="16" r="2.1"/>
@@ -22,7 +22,6 @@
     </a>
 
     <nav class="primary-nav" aria-label="Primary navigation">
-      <a href="#2030" data-nav="2030">The 2030 index</a>
       <a href="#end-states" data-nav="end-states">The end states</a>
       <a href="#method" data-nav="method">Method</a>
     </nav>
@@ -34,79 +33,7 @@
   </header>
 
   <main id="main">
-    <section class="view" id="view-2030" data-view="2030">
-      <div class="hero shell">
-        <div class="hero-copy">
-          <p class="kicker">A longitudinal forecast by frontier AI</p>
-          <h1>What do the<br><em>machines</em> think?</h1>
-          <p class="dek">We ask the leading AI models the same 50 questions about 2030—then keep asking as new generations arrive. This is a living record of how the machines change their minds.</p>
-          <a class="text-link" href="#index-start">Explore all 50 predictions <span>↓</span></a>
-        </div>
-
-        <div class="hero-orbit" aria-label="Six model providers in the current forecast">
-          <div class="orbit-center">
-            <span class="orbit-number">50</span>
-            <span class="orbit-label">questions<br>about 2030</span>
-          </div>
-          <div id="orbit-models"></div>
-          <svg class="orbit-lines" viewBox="0 0 520 520" aria-hidden="true">
-            <circle cx="260" cy="260" r="188"/><circle cx="260" cy="260" r="126"/>
-            <path d="M260 72v376M72 260h376M127 127l266 266M393 127 127 393"/>
-          </svg>
-        </div>
-      </div>
-
-      <div class="ticker" aria-label="Dataset summary">
-        <div><strong id="stat-models">6</strong><span>frontier models</span></div>
-        <div><strong>50</strong><span>questions</span></div>
-        <div><strong>11</strong><span>possible end states</span></div>
-        <div><strong id="stat-runs">12</strong><span>forecast runs</span></div>
-        <div><strong>2030</strong><span>resolution year</span></div>
-      </div>
-
-      <section class="signal-section shell" aria-labelledby="signals-title">
-        <div class="section-heading">
-          <div>
-            <p class="kicker">Signal report / current round</p>
-            <h2 id="signals-title">Where the machines<br>agree—and don’t.</h2>
-          </div>
-          <p class="section-note">Consensus is the median forecast across the latest run from each provider. “Spread” is the gap between the highest and lowest model.</p>
-        </div>
-        <div class="signal-grid" id="signal-grid"></div>
-      </section>
-
-      <section class="index-section" id="index-start" aria-labelledby="index-title">
-        <div class="shell">
-          <div class="section-heading index-heading">
-            <div>
-              <p class="kicker">The full forecast</p>
-              <h2 id="index-title">The 2030 index</h2>
-            </div>
-            <p class="section-note">Select any question to see every model’s forecast, rationale, and movement over time.</p>
-          </div>
-
-          <div class="index-controls">
-            <div class="filter-row">
-              <span class="filter-title">Topic</span>
-              <div class="category-list" id="category-list" aria-label="Filter by category"></div>
-            </div>
-            <div class="filter-row">
-              <span class="filter-title">Model view</span>
-              <div class="category-list" id="provider-list" aria-label="View forecasts by model provider"></div>
-            </div>
-          </div>
-
-          <div class="index-summary">
-            <span id="result-count">50 questions</span>
-            <span class="legend"><i></i><span id="forecast-label">median</span><b></b> model range</span>
-          </div>
-          <div class="question-grid" id="question-grid"></div>
-          <div class="empty-state" id="empty-state" hidden>No questions in this view.</div>
-        </div>
-      </section>
-    </section>
-
-    <section class="view" id="view-end-states" data-view="end-states" hidden>
+    <section class="view" id="view-end-states" data-view="end-states">
       <div class="end-hero shell">
         <div>
           <p class="kicker">Beyond the resolution window</p>
@@ -152,32 +79,29 @@
       <div class="method-hero shell">
         <p class="kicker">Transparent by design</p>
         <h1>A benchmark,<br>not a <em>vibe.</em></h1>
-        <p class="dek">The questions stay fixed. The models change. Reality gets the last word.</p>
+        <p class="dek">The question stays fixed. The models change. The record is public.</p>
       </div>
 
       <div class="method-grid shell">
-        <article><span>01</span><h2>Fixed questions</h2><p>Every model receives the same 50 precisely resolvable questions and the same 11 long-horizon end states.</p></article>
-        <article><span>02</span><h2>Closed book</h2><p>Models answer from internal knowledge and reasoning only. No browsing, tools, ranges, refusals, or qualitative hedging.</p></article>
-        <article><span>03</span><h2>Point forecasts</h2><p>Each answer is a single probability or numeric estimate, paired with a rationale of no more than two sentences.</p></article>
-        <article><span>04</span><h2>Versioned forever</h2><p>Each run records model version, knowledge cutoff, and date. New releases add to the timeline instead of replacing history.</p></article>
-        <article><span>05</span><h2>Scored by reality</h2><p>Probability questions resolve after December 31, 2030 and can be scored with proper calibration metrics such as the Brier score.</p></article>
-        <article><span>06</span><h2>Raw data available</h2><p>The public dataset will include every model response, rationale, prompt version, and aggregate—without smoothing away disagreement.</p></article>
+        <article><span>01</span><h2>One fixed question</h2><p>Every model receives the same taxonomy of eleven mutually exclusive end states and allocates exactly 100 whole percentage points across them.</p></article>
+        <article><span>02</span><h2>Closed book</h2><p>Models answer from internal knowledge and reasoning only. No browsing, no tools, no ranges, no refusals, no hedging outside the number itself.</p></article>
+        <article><span>03</span><h2>Five samples each</h2><p>Each model is asked five times at its own default settings. We publish the median allocation and the rationale nearest that median.</p></article>
+        <article><span>04</span><h2>Automated and dated</h2><p>Runs are elicited by a scheduled harness that records the exact model id it called, the date, and the prompt version. New releases add to the timeline instead of replacing history.</p></article>
+        <article><span>05</span><h2>Not scoreable</h2><p>Unlike a 2030 benchmark, these questions never resolve. The numbers measure a model’s expressed worldview and how it shifts over time—not forecasting skill.</p></article>
+        <article><span>06</span><h2>Raw data available</h2><p>Every raw sample, rationale, and aggregate is committed alongside the site, without smoothing away disagreement.</p></article>
       </div>
 
       <div class="prompt-block shell">
-        <div><p class="kicker">The instruments</p><h2>Read the exact prompts</h2><p>No secret sauce. The benchmark only matters if someone else can reproduce it.</p></div>
-        <div class="prompt-buttons">
-        <a class="button" href="forecasting_prompt.md">Open the 2030 prompt <span>↗</span></a>
-          <a class="button" href="end_states.md">Open the end-state prompt <span>↗</span></a>
-        </div>
+        <div><p class="kicker">The instrument</p><h2>Read the exact prompt</h2><p>No secret sauce. The benchmark only matters if someone else can reproduce it.</p></div>
+        <a class="button" href="end_states.md">Open the end-state prompt <span>↗</span></a>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="footer-mark">Machine Futures</div>
-    <p>A public record of artificial foresight.<br>Illustrative prototype data · June 2026</p>
-    <div class="footer-links"><a href="#method">Method</a><a href="forecasting_prompt.md">2030 prompt</a><a href="end_states.md">End-state prompt</a></div>
+    <p>A public record of artificial foresight.<br>Five frontier models · five samples each</p>
+    <div class="footer-links"><a href="#method">Method</a><a href="end_states.md">Prompt</a><a href="https://github.com/toddsherman/MachineFutures">Source</a></div>
   </footer>
 
   <dialog class="detail-dialog" id="detail-dialog">
@@ -185,12 +109,7 @@
     <div id="dialog-content"></div>
   </dialog>
 
-  <div class="prototype-note" id="prototype-note">
-    <span><b>Prototype dataset</b> — values are illustrative until real model outputs are imported.</span>
-    <button type="button" aria-label="Dismiss notice">Got it</button>
-  </div>
-
-  <script src="data.js?v=20260706-real-runs"></script>
-  <script src="app.js?v=20260706-real-runs"></script>
+  <script src="data.js?v=20260824-endstates"></script>
+  <script src="app.js?v=20260824-endstates"></script>
 </body>
 </html>

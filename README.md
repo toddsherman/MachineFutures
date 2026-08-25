@@ -1,6 +1,8 @@
 # Machine Futures
 
-A responsive, data-driven site for publishing longitudinal forecasts from frontier AI models.
+A responsive, data-driven site publishing what frontier AI models think about the long-run end state of humanity's relationship with AI.
+
+Each model allocates exactly 100 percentage points across eleven mutually exclusive end states, five times, at its own default settings. The site shows the median allocation per model, the spread between models, and each model's reasoning per state.
 
 ## Public site
 
@@ -14,32 +16,34 @@ Then open `http://localhost:4173`.
 
 ## Private authoring tool
 
-`forecast-ingest_1.html` is an owner-only local utility. It lives outside `public/` and is therefore excluded from production deployments. Open it locally to validate model JSON, aggregate repeated samples, and download normalized data.
+`forecast-ingest_1.html` is an owner-only local utility for pasting model output by hand, kept for one-off runs and models without an API. It lives outside `public/` and is excluded from production deployments. (It still understands the retired 2030 format as well.)
 
 ## Plan of record
 
-The 2030 benchmark and the 11 end-state taxonomy are run as separate prompts because they ask for different forecasting modes.
-
 For each model on each dataset date:
 
-- Run the 50-question 2030 benchmark prompt 5 times.
 - Run the 11-end-state prompt 5 times.
-- Store the raw samples and a normalized aggregate for each prompt family.
-- Use the median aggregate as the default value shown on the website.
-- Preserve min, max, sample count, and representative rationale text so the site can show model instability or spread over time.
+- Store the raw samples and a normalized aggregate per run in `runs/`.
+- Use the median allocation as the value shown on the website, renormalized to integers summing to 100.
+- Preserve min, max, sample count, and the rationale nearest the median so the site can show model instability and reasoning.
 
-The authoring path is model output -> local ingester -> batch JSON in `runs/` -> `node tools/import-runs.mjs` -> git push -> Vercel deploy. The importer rewrites the IMPORTED RUNS and IMPORTED END-STATE RUNS blocks in `public/data.js` from every batch in `runs/`; imported runs replace the synthetic placeholder runs (2030) or hand-entered forecasts (end states) for their provider.
+The authoring path is `tools/run-elicitation.mjs` (or the local ingester for manual runs) -> batch JSON in `runs/` -> `node tools/import-runs.mjs` -> git push -> Vercel deploy. The importer rewrites the IMPORTED END-STATE RUNS block in `public/data.js` with each provider's newest run and updates the dataset badge date.
+
+Run identity always comes from the model id actually called, never the model's self-report — models are unreliable narrators about their own version. The self-report is stored as `model.self_reported_name` for interest.
+
+The 50-question 2030 benchmark was retired in August 2026; its prompt and only real run are in `archive/`.
 
 ## Automated elicitation
 
-`.github/workflows/elicit.yml` runs the end-state prompt against every model in `tools/models.json` — 5 samples each at provider-default settings, no tools — then validates, aggregates, writes `runs/` batches, regenerates `public/data.js`, and opens a pull request. Merging the PR publishes via Vercel.
+`.github/workflows/elicit.yml` runs the end-state prompt against every model in `tools/models.json` — 5 samples each at provider-default settings, no tools — then validates, aggregates, writes `runs/` batches, regenerates `public/data.js`, and pushes an `elicitation/<run-id>` branch. Open a PR from that branch and merge to publish via Vercel.
+
+The raw batches are also uploaded as a workflow artifact immediately after elicitation, before any step that could fail — a paid run is never lost to a downstream error.
 
 Setup, in the GitHub repo settings:
 
 1. Add API-key secrets (Settings → Secrets and variables → Actions → Secrets), one per provider you want on the board: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, `XAI_API_KEY`, `META_API_KEY`, `DEEPSEEK_API_KEY`, `MISTRAL_API_KEY`, `MOONSHOT_API_KEY`. **Models whose key is missing are skipped**, so the keys you configure decide the roster.
-2. Enable "Allow GitHub Actions to create and approve pull requests" (Settings → Actions → General).
-3. Run the preflight before the first real run: Actions → Elicit end-state forecasts → Run workflow with **check_only** ticked. It makes one cheap call per model and reports, per provider, whether the key works and the model id resolves. Fix anything it flags in `tools/models.json`, then run for real. Locally: `node tools/run-elicitation.mjs --check`.
-4. To turn on the monthly schedule (1st of each month), add a repository variable `ELICITATION_ENABLED` = `true`. Until then, trigger runs manually (optionally filtered with `models`, e.g. `anthropic,google`).
+2. Run the preflight before the first real run: Actions → Elicit end-state forecasts → Run workflow with **check_only** ticked. It makes one cheap call per model and reports, per provider, whether the key works and the model id resolves. Fix anything it flags in `tools/models.json`, then run for real. Locally: `node tools/run-elicitation.mjs --check`.
+3. To turn on the monthly schedule (1st of each month), add a repository variable `ELICITATION_ENABLED` = `true`. Until then, trigger runs manually (optionally filtered with `models`, e.g. `anthropic,google`).
 
 Adding a model is one entry in `tools/models.json` plus its key. Anything with an OpenAI-compatible endpoint needs no new code — set `api: "openai-compatible"` and its `baseUrl`. New *providers* also want a color and short label in `tools/import-runs.mjs` (`PROVIDER_COLORS`, `SHORT_LABELS`), or they render in the fallback color.
 
@@ -48,15 +52,14 @@ Methodology guarantees encoded in the harness: the prompt is read verbatim from 
 ## Repository structure
 
 - `public/` — the complete deployable website
-- `public/data.js` — questions, model runs, and long-term forecasts
+- `public/data.js` — the end-state taxonomy and imported forecasts
 - `public/end_states.md` — 11-end-state prompt and taxonomy
-- `public/forecasting_prompt.md` — 50-question 2030 benchmark prompt
 - `forecast-ingest_1.html` — private local ingestion utility
 - `runs/` — raw sample batches + aggregates exported by the ingester (committed, never deployed)
 - `tools/import-runs.mjs` — imports `runs/*.json` into `public/data.js`
 - `tools/run-elicitation.mjs` — automated end-state elicitation harness (used by the workflow)
 - `tools/models.json` — model roster: provider, API adapter, model id, key env var
 - `.github/workflows/elicit.yml` — scheduled/manual elicitation → PR pipeline
+- `archive/` — the retired 2030 benchmark prompt and its one real run
 - `vercel.json` — restricts Vercel output to `public/`
 
-The included forecasts are explicitly marked as illustrative. Replace the generated run data in `public/data.js` with parsed model outputs before publication.

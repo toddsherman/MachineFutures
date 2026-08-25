@@ -134,18 +134,18 @@
       </div>
       <div class="matrix-row matrix-subhead" role="row">
         <div class="matrix-corner" role="columnheader"></div>
-        ${entries.map(entry => `<div class="matrix-model" role="columnheader" title="${entry.label}"><span>${entry.shortLabel}</span></div>`).join('')}
+        ${entries.map((entry, col) => `<div class="matrix-model" role="columnheader" title="${entry.label}" style="--c:${col}"><span>${entry.shortLabel}</span></div>`).join('')}
       </div>`;
 
-    const rows = orderedStates.map(state => `
+    const rows = orderedStates.map((state, row) => `
       <div class="matrix-row" role="row">
         <button class="matrix-state" role="rowheader" data-state="${state.id}" style="--state:${state.color}">
           <i></i><span class="matrix-state-name">${state.id}. ${state.name}</span>${extinctionMark(state)}
         </button>
-        ${entries.map(entry => {
+        ${entries.map((entry, col) => {
           const value = stateValue(entry, state);
           const spread = entry.range?.[state.id];
-          return `<div class="matrix-cell" role="cell" title="${entry.label} · ${state.name}: ${value}%${spread ? ` (${spread[0]}–${spread[1]}% across ${entry.sampleCount} samples)` : ''}" style="--state:${state.color};--fill:${Math.max(value / peak, 0.04).toFixed(3)}"><span>${value}</span></div>`;
+          return `<div class="matrix-cell" role="cell" title="${entry.label} · ${state.name}: ${value}%${spread ? ` (${spread[0]}–${spread[1]}% across ${entry.sampleCount} samples)` : ''}" style="--state:${state.color};--fill:${Math.max(value / peak, 0.04).toFixed(3)};--r:${row};--c:${col}"><span>${value}</span></div>`;
         }).join('')}
       </div>`).join('');
 
@@ -213,8 +213,10 @@
     $('#consensus-legend').innerHTML = orderedStates.map(state =>
       `<button data-state-jump="${state.id}"><i style="--state:${state.color}"></i><span>${state.id}. ${state.name}${extinctionMark(state)}</span><b></b></button>`).join('');
 
-    axisMax = Math.ceil(Math.max(...orderedStates.flatMap(state =>
-      entries.map(entry => entry.range?.[state.id]?.[1] ?? stateValue(entry, state)))) / 5) * 5;
+    // Fixed for every ending: zero to the highest figure any one sample from
+    // any model produced, so a position means the same thing on every card.
+    axisMax = Math.max(...orderedStates.flatMap(state =>
+      entries.map(entry => entry.range?.[state.id]?.[1] ?? stateValue(entry, state))));
 
     $('#state-grid').innerHTML = orderedStates.map(state => {
       const providerValues = entries.map(entry => ({ ...entry, value: stateValue(entry, state) })).sort((a, b) => b.value - a.value);
@@ -227,17 +229,27 @@
           // summary in a grid of eleven — per-model detail belongs in the
           // dialog, where there is room to give each model its own row.
           const vals = providerValues.map(m => m.value).sort((x, y) => x - y);
+          state.medianAcross = median(vals);
           const at = v => (v / axisMax) * 100;
           const q = f => { const i = (vals.length - 1) * f, lo = Math.floor(i), hi = Math.ceil(i);
                            return vals[lo] + (vals[hi] - vals[lo]) * (i - lo); };
           const lo = vals[0], hi = vals.at(-1), q1 = q(0.25), q3 = q(0.75);
+          // Bands grow outwards from the median tick, so the origin is that
+          // figure expressed as a share of each band's own width.
+          const origin = (v, from, to) => to === from ? '50%' : `${(((v - from) / (to - from)) * 100).toFixed(2)}%`;
+          const mid = state.medianAcross;
+          const ticks = [10, 20, 30, 40, 50].filter(t => t < axisMax - 2);
           return `<div class="state-strip">
             <div class="strip-axis" title="${lo}–${hi}% across ${vals.length} models · middle half ${q1.toFixed(0)}–${q3.toFixed(0)}%">
-              ${[10, 20, 30].filter(t => t < axisMax).map(t => `<u style="left:${at(t)}%"></u>`).join('')}
-              <i class="strip-range" style="left:${at(lo).toFixed(2)}%;width:${(at(hi) - at(lo)).toFixed(2)}%"></i>
-              <i class="strip-iqr" style="left:${at(q1).toFixed(2)}%;width:${(at(q3) - at(q1)).toFixed(2)}%"></i>
-              <!-- the tick is placed per selection, since the figure it marks changes -->
+              ${ticks.map(t => `<u style="left:${at(t)}%"></u>`).join('')}
+              <i class="strip-range" style="left:${at(lo).toFixed(2)}%;width:${(at(hi) - at(lo)).toFixed(2)}%;--origin:${origin(mid, lo, hi)}"></i>
+              <i class="strip-iqr" style="left:${at(q1).toFixed(2)}%;width:${(at(q3) - at(q1)).toFixed(2)}%;--origin:${origin(mid, q1, q3)}"></i>
               <b class="strip-mid"></b>
+            </div>
+            <div class="strip-scale">
+              <span>0%</span>
+              ${ticks.map(t => `<span style="left:${at(t)}%">${t}</span>`).join('')}
+              <span class="strip-end">${axisMax}%</span>
             </div>
           </div>`;
         })()}
@@ -432,7 +444,37 @@
     if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) $('#detail-dialog').close();
   });
   $('#detail-dialog').addEventListener('close', () => document.body.classList.remove('dialog-open'));
+  // Both reveals run when the section first comes into view, so the sweep is
+  // seen rather than finished before the reader arrives.
+  // Content is visible by default; the hidden starting state is added here, so
+  // a failure to observe leaves the data on screen rather than blank. A timer
+  // backs that up: observers do not fire in a background tab, and a reader
+  // returning to one should not find an empty page.
+  function revealOnView(selector) {
+    const targets = $$(selector);
+    if (reduceMotion() || !('IntersectionObserver' in window)) return;
+    targets.forEach(el => el.classList.add('will-reveal'));
+    // Once the reveal has had its time, drop the class entirely so the element
+    // falls back to its plain styles. The end state then never depends on a
+    // transition having run — browsers pause them in background tabs.
+    const show = el => {
+      el.classList.add('is-in');
+      setTimeout(() => el.classList.remove('will-reveal', 'is-in'), 1600);
+    };
+    const io = new IntersectionObserver((records, observer) => {
+      records.forEach(record => {
+        if (!record.isIntersecting) return;
+        show(record.target);
+        observer.unobserve(record.target);
+      });
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.15 });
+    targets.forEach(el => io.observe(el));
+    setTimeout(() => targets.forEach(el => { if (!el.classList.contains('is-in')) show(el); }), 4000);
+  }
+
   if (datasetDate) $('#dataset-date').textContent = datasetDate;
   applyUrlState();
   renderEndStates();
+  revealOnView('.state-strip');
+  revealOnView('.matrix');
 })();

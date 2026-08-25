@@ -2,7 +2,7 @@
 
 A responsive, data-driven site publishing what frontier AI models think about the long-run end state of humanity's relationship with AI.
 
-Each model allocates exactly 100 percentage points across eleven mutually exclusive end states, five times, at its own default settings. The site shows the median allocation per model, the spread between models, and each model's reasoning per state.
+Each model allocates exactly 100 percentage points across eleven mutually exclusive end states, twenty times, at its own default settings. The site shows the median allocation per model, renormalized to integers summing to 100, the spread between models, and each model's reasoning per state.
 
 ## Public site
 
@@ -26,6 +26,10 @@ For each model on each dataset date:
 - Store the raw samples and a normalized aggregate per run in `runs/`.
 - Use the median allocation as the value shown on the website, renormalized to integers summing to 100.
 - Preserve min, max, sample count, and the rationale nearest the median so the site can show model instability and reasoning.
+
+The site's headline "median machine forecast" is the coordinate-wise median across models, renormalized the same way. Eleven allocations that each sum to 100 need not have a median that does — as published they sum to 99 — so the aggregate is normalized once and the same vector drives the legend, the bar, the cards and the leader.
+
+Extinction-risk exposure is the sum of the five extinction-risk medians, and the error quoted beneath that chart is bootstrapped from the model's own samples so it describes that estimator rather than the mean of per-sample totals. The two disagree enough to reorder the board, which is why `exposurePublished` exists alongside `exposure`.
 
 The authoring path is `tools/run-elicitation.mjs` (or the local ingester for manual runs) -> batch JSON in `runs/` -> `node tools/import-runs.mjs` -> git push -> Vercel deploy. The importer rewrites the IMPORTED END-STATE RUNS block in `public/data.js` with each provider's newest run and updates the dataset badge date.
 
@@ -57,7 +61,7 @@ Each lab fields two models — its current flagship and a second current model, 
 
 Runs are keyed by api model id, never by provider, which is what lets two models from the same lab sit side by side. Same-lab models share the lab's hue, darkened by roster position.
 
-Adding a model is one entry in `tools/models.json` plus its key. Anything with an OpenAI-compatible endpoint needs no new code — set `api: "openai-compatible"` and its `baseUrl`. A new *provider* also wants a colour in `tools/import-runs.mjs` (`PROVIDER_COLORS`).
+Adding a model is one entry in `tools/models.json` plus its key. Anything with an OpenAI-compatible endpoint needs no new code — set `api: "openai-compatible"` and its `baseUrl`. A new *provider* also wants a lab mark in `LAB_LOGOS` in `public/app.js` and a short label in `SHORT_LABELS` in `tools/import-runs.mjs`; models fall back to the first two letters of the provider name without them.
 
 ### Methodology guarantees encoded in the harness
 
@@ -66,7 +70,7 @@ Adding a model is one entry in `tools/models.json` plus its key. Anything with a
 - Sampling parameters are omitted, so every provider runs at its own defaults.
 - Run identity is the model id actually called. Models are unreliable narrators about their own version — one run had Gemini 3.1 Pro answer `gpt-4o` — so the self-report is stored as `model.self_reported_name` and never used as identity.
 
-Local dry run: `node tools/run-elicitation.mjs --mock`.
+Local dry run: `node tools/run-elicitation.mjs --mock`. Mock batches are written to `runs/.mock/` (gitignored) so a dry run can never overwrite a paid one.
 
 ## Repository structure
 
@@ -78,6 +82,7 @@ Local dry run: `node tools/run-elicitation.mjs --mock`.
 - `tools/import-runs.mjs` — imports `runs/*.json` into `public/data.js`
 - `tools/run-elicitation.mjs` — automated end-state elicitation harness (used by the workflow)
 - `tools/models.json` — model roster: provider, API adapter, model id, key env var
+- `tools/check-site.mjs` — invariant check on `public/data.js`, run in CI after import
 - `.github/workflows/elicit.yml` — scheduled/manual elicitation → PR pipeline
 - `archive/` — the retired 2030 benchmark prompt and its one real run
 - `vercel.json` — restricts Vercel output to `public/`

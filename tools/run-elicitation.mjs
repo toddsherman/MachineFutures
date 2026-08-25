@@ -46,13 +46,30 @@ const RECORD = args.includes('--record');
 const SEEN_PATH = join(root, 'tools', 'seen-models.json');
 // 20, not 5: standard error scales as 1/sqrt(n), and at 5 samples almost no
 // pair of models was separable on the headline metric.
-const SAMPLES = Number(argValue('--samples') || 20);
-const outArg = argValue('--out') || 'runs';
+// Validated, not just coerced: this number multiplies a paid API call by
+// every model on the roster. Unvalidated, "abc" silently produced zero
+// samples, "-5" produced none, and "100000" would have spent real money.
+const SAMPLES = (() => {
+  const raw = argValue('--samples');
+  if (raw === null || raw === '') return 20;
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < 1 || n > 200) {
+    console.error(`✗ --samples must be a whole number from 1 to 200, received ${JSON.stringify(raw)}`);
+    process.exit(1);
+  }
+  return n;
+})();
+// A dry run must not land in runs/: --mock defaults there would overwrite a
+// real batch with fabricated samples, and the importer would publish them.
+const outArg = argValue('--out') || (MOCK ? join('runs', '.mock') : 'runs');
 const OUT_DIR = isAbsolute(outArg) ? outArg : join(root, outArg);
 const RUN_DATE = argValue('--date') || new Date().toISOString().slice(0, 10);
 const ONLY = argValue('--models')?.split(',').map(s => s.trim()).filter(Boolean) || null;
 const TIER = argValue('--tier');
 const QUESTION_SET = 'end-states-v3';
+// A reasoning model can legitimately take minutes; a stalled connection can
+// take forever. Timed out requests are retried like any other failure.
+const REQUEST_TIMEOUT_MS = 5 * 60 * 1000;
 
 const STATE_NAMES = ['Terminal Silence', 'The Inheritance', 'Bootloader', 'Machine Ecology', 'The Diaspora',
   'The Merger', 'The Preserve', 'Coexistence', 'The Held Leash', 'The Lock-in', 'The Renunciation'];
@@ -83,7 +100,7 @@ function buildPrompt() {
 
 /* ---------- provider adapters (raw HTTP, zero dependencies) ---------- */
 async function post(url, headers, body) {
-  const res = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify(body) });
+  const res = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify(body), signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
   const text = await res.text();
   if (!res.ok) { const err = new Error(`HTTP ${res.status}: ${text.slice(0, 400)}`); err.status = res.status; throw err; }
   return JSON.parse(text);
@@ -288,7 +305,7 @@ async function check(model) {
 async function listModels(model, key) {
   try {
     if (model.api === 'google') {
-      const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200', { headers: { 'x-goog-api-key': key } });
+      const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200', { headers: { 'x-goog-api-key': key }, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
       if (!res.ok) return null;
       const json = await res.json();
       return (json.models || [])
@@ -296,18 +313,31 @@ async function listModels(model, key) {
         .map(m => String(m.name).replace(/^models\//, ''));
     }
     if (model.api === 'anthropic') {
-      const res = await fetch('https://api.anthropic.com/v1/models?limit=100', { headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01' } });
+      const res = await fetch('https://api.anthropic.com/v1/models?limit=100', { headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01' }, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
       if (!res.ok) return null;
       return ((await res.json()).data || []).map(m => m.id);
     }
-    const res = await fetch(`${model.baseUrl}/models`, { headers: { authorization: `Bearer ${key}` } });
+    const res = await fetch(`${model.baseUrl}/models`, { headers: { authorization: `Bearer ${key}` }, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
     if (!res.ok) return null;
     return ((await res.json()).data || []).map(m => m.id);
   } catch { return null; }
 }
 
 /* ---------- main ---------- */
-const roster = JSON.parse(readFileSync(join(root, 'tools', 'models.json'), 'utf8')).models
+const allModels = JSON.parse(readFileSync(join(root, 'tools', 'models.json'), 'utf8')).models;
+// A typo in --models used to silently narrow the run rather than fail it, so a
+// dispatch asking for "gpt-5.6" quietly elicited nothing and the workflow
+// still reported success.
+if (ONLY) {
+  const known = new Set(allModels.map(model => model.key));
+  const unknown = ONLY.filter(key => !known.has(key));
+  if (unknown.length) {
+    console.error(`✗ unknown model key(s): ${unknown.join(', ')}`);
+    console.error(`  roster: ${[...known].join(', ')}`);
+    process.exit(1);
+  }
+}
+const roster = allModels
   .filter(model => !ONLY || ONLY.includes(model.key))
   .filter(model => !TIER || model.tier === TIER);
 if (!roster.length) { console.error('✗ no models matched the --models/--tier filter'); process.exit(1); }

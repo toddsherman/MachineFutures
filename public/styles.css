@@ -367,7 +367,8 @@ body.dialog-open { overflow: hidden; }
 .matrix-row { display: grid; grid-template-columns: var(--label) repeat(var(--cols), var(--cell)); }
 .matrix-row + .matrix-row { border-top: 1px solid var(--line); }
 
-.matrix-corner, .matrix-state { position: sticky; left: 0; z-index: 2; background: var(--paper); }
+.matrix-corner, .matrix-rowheader { position: sticky; left: 0; z-index: 2; background: var(--paper); }
+.matrix-rowheader { display: flex; min-width: 0; }
 .method-view { border-top: 1px solid var(--line); scroll-margin-top: 12px; }
 .matrix-lab { grid-column: span var(--span); display: grid; place-items: center; padding: 10px 6px 8px; border-left: 1px solid var(--line); }
 .matrix-lab .lab-logo { width: 17px; height: 17px; color: var(--ink); }
@@ -375,7 +376,7 @@ body.dialog-open { overflow: hidden; }
 .matrix-model span { font: 700 10px var(--mono); }
 .matrix-subhead { border-bottom: 1px solid var(--ink); }
 
-.matrix-state { display: flex; align-items: center; gap: 10px; padding: 0 16px 0 0; border: 0; text-align: left; cursor: pointer; font: inherit; }
+.matrix-state { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 0 16px 0 0; border: 0; background: none; text-align: left; cursor: pointer; font: inherit; }
 .matrix-state i { flex: 0 0 auto; width: 9px; height: 22px; background: var(--state); }
 .matrix-state-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 12px var(--mono); }
 .matrix-state:hover .matrix-state-name { text-decoration: underline; }
@@ -398,11 +399,12 @@ body.dialog-open { overflow: hidden; }
      down the table. Redraw them behind it as a repeating gradient on the same
      1/cols rhythm as the cell borders, then knock the paper colour out behind
      the text itself so the label stays legible over the lines. */
-  .matrix-state {
-    position: static; grid-column: 1 / -1; gap: 8px; padding: 13px 0 7px;
+  .matrix-rowheader {
+    position: static; grid-column: 1 / -1;
     background-image: repeating-linear-gradient(to right,
       var(--line) 0 1px, transparent 1px calc(100% / var(--cols)));
   }
+  .matrix-state { gap: 8px; padding: 13px 0 7px; }
   .matrix-state i { height: 14px; width: 7px; }
   .matrix-state-name {
     flex: 0 1 auto; white-space: normal; font-size: 11px;

@@ -57,6 +57,12 @@
     return `<span class="state-mark is-${tier}" role="img" data-mark="${tier}" aria-label="${label}. ${extinctionTips[tier]}"><svg viewBox="0 0 22 22" aria-hidden="true">${MARK_SHAPES[tier]}</svg></span>`;
   };
 
+  // Rationales are model-authored: they arrive from a provider API, pass
+  // through the importer verbatim, and land in innerHTML. Anything rendered
+  // from a run has to be escaped, in attributes as well as in text.
+  const ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ESCAPES[c]);
+
   const stateValue = (run, state) => run.probabilities[state.id];
   const endingOrder = () => [...states].sort((a, b) => a.id - b.id);
   const extinctionSums = run => {
@@ -65,8 +71,31 @@
     return { ...sums, total: sums.gone + sums.risk };
   };
 
+  // Largest-remainder, matching tools/import-runs.mjs. Coordinate-wise medians
+  // of eleven allocations that each sum to 100 need not sum to 100 themselves
+  // — as published they sum to 99 — and the bar used to divide by that 99
+  // while the legend printed the raw figures, so widths and labels described
+  // two different vectors. Normalise once here and everything downstream
+  // (legend, bar, cards, leader, dialog) reads the same numbers.
+  function normalizeTo100(values) {
+    const total = values.reduce((sum, v) => sum + v, 0);
+    if (!total) return values.map(() => 0);
+    const scaled = values.map(v => (v / total) * 100);
+    const out = scaled.map(Math.floor);
+    const shortfall = 100 - out.reduce((sum, v) => sum + v, 0);
+    scaled
+      .map((v, i) => [v - out[i], i])
+      .sort((a, b) => b[0] - a[0])
+      .slice(0, shortfall)
+      .forEach(([, i]) => { out[i] += 1; });
+    return out;
+  }
+
   function stateMedians() {
-    return endingOrder().map(state => ({ ...state, probability: median(Object.values(endStateRuns).map(run => stateValue(run, state))) }));
+    const ordered = endingOrder();
+    const medians = ordered.map(state => median(Object.values(endStateRuns).map(run => stateValue(run, state))));
+    const normalized = normalizeTo100(medians);
+    return ordered.map((state, i) => ({ ...state, probability: normalized[i] }));
   }
 
   function longTermEntries() {
@@ -79,10 +108,11 @@
       sampleCount: source.sampleCount,
       range: source.range,
       exposure: source.exposure,
+      exposurePublished: source.exposurePublished,
       date: source.date,
-      model: source.model || provider,
-      label: source.label || provider,
-      shortLabel: source.shortLabel || provider.slice(0, 2)
+      model: source.model || source.provider || runKey,
+      label: source.label || source.model || source.provider || runKey,
+      shortLabel: source.shortLabel || (source.provider || runKey).slice(0, 2).toUpperCase()
     }));
   }
 
@@ -111,14 +141,14 @@
     Moonshot: '<path d="m1.053 16.91 9.538 2.55a21 20.981 0 0 0 .06 2.031l5.956 1.592a12 11.99 0 0 1-15.554-6.172m-1.02-5.79 11.352 3.035a21 20.981 0 0 0-.469 2.01l10.817 2.89a12 11.99 0 0 1-1.845 2.004L.658 15.918a12 11.99 0 0 1-.625-4.796m1.593-5.146L13.573 9.17a21 20.981 0 0 0-1.01 1.874l11.297 3.02a21 20.981 0 0 1-.67 2.362l-11.55-3.087L.125 10.26a12 11.99 0 0 1 1.499-4.285ZM6.067 1.58l11.285 3.016a21 20.981 0 0 0-1.688 1.719l7.824 2.091a21 20.981 0 0 1 .513 2.664L2.107 5.218a12 11.99 0 0 1 3.96-3.638M21.68 4.866 7.222 1.003A12 11.99 0 0 1 21.68 4.866"/>',
   };
   const labLogo = (provider, cls = '') =>
-    `<span class="lab-logo ${cls}" role="img" aria-label="${provider}">${LAB_LOGOS[provider]
+    `<span class="lab-logo ${cls}" role="img" aria-label="${esc(provider)}">${LAB_LOGOS[provider]
       ? `<svg viewBox="0 0 24 24" aria-hidden="true">${LAB_LOGOS[provider]}</svg>`
-      : `<b>${provider.slice(0, 2)}</b>`}</span>`;
+      : `<b>${esc(provider.slice(0, 2))}</b>`}</span>`;
 
   function renderEndForecastToggle(entries) {
     const options = [{ key: 'Median', label: 'Median' }, ...entries.map(entry => ({ key: entry.runKey, label: entry.label, provider: entry.provider }))];
     $('#end-forecast-toggle').innerHTML = options.map(option =>
-      `<button type="button" class="end-toggle-button${option.provider ? '' : ' is-median'}${option.key === activeEndForecast ? ' active' : ''}" data-end-forecast="${option.key}" aria-pressed="${option.key === activeEndForecast}">${option.provider ? labLogo(option.provider) : ''}${option.label}</button>`
+      `<button type="button" class="end-toggle-button${option.provider ? '' : ' is-median'}${option.key === activeEndForecast ? ' active' : ''}" data-end-forecast="${esc(option.key)}" aria-pressed="${option.key === activeEndForecast}">${option.provider ? labLogo(option.provider) : ''}${esc(option.label)}</button>`
     ).join('');
   }
 
@@ -137,22 +167,24 @@
     const head = `
       <div class="matrix-row matrix-head" role="row">
         <div class="matrix-corner" role="columnheader"></div>
-        ${labs.map(lab => `<div class="matrix-lab" style="--span:${lab.models.length}" role="columnheader" title="${lab.provider}">${labLogo(lab.provider)}</div>`).join('')}
+        ${labs.map(lab => `<div class="matrix-lab" style="--span:${lab.models.length}" role="columnheader" aria-colspan="${lab.models.length}" title="${esc(lab.provider)}">${labLogo(lab.provider)}</div>`).join('')}
       </div>
       <div class="matrix-row matrix-subhead" role="row">
         <div class="matrix-corner" role="columnheader"></div>
-        ${entries.map((entry, col) => `<div class="matrix-model" role="columnheader" title="${entry.label}" style="--c:${col}"><span>${entry.shortLabel}</span></div>`).join('')}
+        ${entries.map((entry, col) => `<div class="matrix-model" role="columnheader" title="${esc(entry.label)}" style="--c:${col}"><span>${esc(entry.shortLabel)}</span></div>`).join('')}
       </div>`;
 
     const rows = orderedStates.map((state, row) => `
       <div class="matrix-row" role="row">
-        <button class="matrix-state" role="rowheader" data-state="${state.id}" style="--state:${state.color}">
-          <i></i><span class="matrix-state-name">${state.id}. ${state.name}</span>${extinctionMark(state)}
-        </button>
+        <div class="matrix-rowheader" role="rowheader">
+          <button class="matrix-state" type="button" data-state="${state.id}" style="--state:${state.color}" aria-label="${esc(state.name)} — see each model's reasoning">
+            <i></i><span class="matrix-state-name">${state.id}. ${esc(state.name)}</span>${extinctionMark(state)}
+          </button>
+        </div>
         ${entries.map((entry, col) => {
           const value = stateValue(entry, state);
           const spread = entry.range?.[state.id];
-          return `<div class="matrix-cell" role="cell" title="${entry.label} · ${state.name}: ${value}%${spread ? ` (${spread[0]}–${spread[1]}% across ${entry.sampleCount} samples)` : ''}" style="--state:${state.color};--fill:${Math.max(value / peak, 0.04).toFixed(3)};--r:${row};--c:${col}"><span>${value}</span></div>`;
+          return `<div class="matrix-cell" role="cell" title="${esc(entry.label)} · ${esc(state.name)}: ${value}%${spread ? ` (${spread[0]}–${spread[1]}% across ${entry.sampleCount} samples)` : ''}" style="--state:${state.color};--fill:${Math.max(value / peak, 0.04).toFixed(3)};--r:${row};--c:${col}"><span>${value}</span></div>`;
         }).join('')}
       </div>`).join('');
 
@@ -215,10 +247,12 @@
     renderHeroStats(entries);
     renderEndForecastToggle(entries);
 
+    // The visible glyph is just the ending's number, so the name and the
+    // current share go in an aria-label, refreshed per selection below.
     $('#consensus-bar').innerHTML = orderedStates.map(state =>
-      `<button style="--state:${state.color}" data-state-jump="${state.id}"><span>${state.id}</span></button>`).join('');
+      `<button type="button" style="--state:${state.color}" data-state-jump="${state.id}"><span>${state.id}</span></button>`).join('');
     $('#consensus-legend').innerHTML = orderedStates.map(state =>
-      `<button data-state-jump="${state.id}"><i style="--state:${state.color}"></i><span>${state.id}. ${state.name}${extinctionMark(state)}</span><b></b></button>`).join('');
+      `<button data-state-jump="${state.id}"><i style="--state:${state.color}"></i><span>${state.id}. ${esc(state.name)}${extinctionMark(state)}</span><b></b></button>`).join('');
 
     // Fixed for every ending: zero to the highest figure any one sample from
     // any model produced, so a position means the same thing on every card.
@@ -228,8 +262,8 @@
     $('#state-grid').innerHTML = orderedStates.map(state => {
       const providerValues = entries.map(entry => ({ ...entry, value: stateValue(entry, state) })).sort((a, b) => b.value - a.value);
       return `<article class="state-card" id="state-${state.id}" style="--state:${state.color}" data-state="${state.id}" tabindex="0" role="button">
-        <div class="state-card-head"><span>${String(state.id).padStart(2, '0')}</span><h3>${state.name}</h3><div class="state-card-meta"><strong></strong>${extinctionMark(state)}</div></div>
-        <p>${state.description}</p>
+        <div class="state-card-head"><span>${String(state.id).padStart(2, '0')}</span><h3>${esc(state.name)}</h3><div class="state-card-meta"><strong></strong>${extinctionMark(state)}</div></div>
+        <p>${esc(state.description)}</p>
         <div class="state-strip">
           <div class="strip-axis">
             ${[10, 20, 30, 40, 50].filter(t => t < axisMax - 2).map(t => `<u style="left:${((t / axisMax) * 100).toFixed(2)}%"></u>`).join('')}
@@ -259,7 +293,11 @@
 
     // Two models are only separable when their gap clears the sampling error.
     // Publishing the ranking without that is publishing false precision.
-    const errors = doomerEntries.map(e => e.exposure?.se).filter(Number.isFinite);
+    // exposurePublished, not exposure: the bar shows a sum of renormalized
+    // medians, and exposure.se measures the mean of per-sample totals — a
+    // different estimator that ranks the models differently. Its bootstrap
+    // describes the number actually drawn.
+    const errors = doomerEntries.map(e => e.exposurePublished?.se).filter(Number.isFinite);
     const pooledSe = errors.length ? Math.sqrt(errors.reduce((a, c) => a + c * c, 0) / errors.length) : null;
     const threshold = pooledSe ? 2.78 * pooledSe : null;
     const samples = [...new Set(doomerEntries.map(e => e.exposure?.n).filter(Boolean))];
@@ -275,14 +313,14 @@
           const parts = exposureStates.map(state => ({ state, value: stateValue(entry, state) }));
           // The readout only exists on hover, so the same breakdown goes in the
           // bar's label — a screen reader never has a pointer to hover with.
-          const spoken = parts.map(({ state, value }) => `${state.name} ${value}%`).join(', ');
+          const spoken = parts.map(({ state, value }) => `${esc(state.name)} ${value}%`).join(', ');
           return `<div class="doomer-row">
-          <div class="doomer-label">${labLogo(entry.provider, 'in-row')}<b>${entry.label}</b><small>${entry.provider}</small></div>
+          <div class="doomer-label">${labLogo(entry.provider, 'in-row')}<b>${esc(entry.label)}</b><small>${esc(entry.provider)}</small></div>
           <div class="doomer-meter">
-            <div class="doomer-bar" role="img" aria-label="${entry.label}: ${entry.sums.gone}% humanity is gone, ${entry.sums.risk}% might perish. ${spoken}">
+            <div class="doomer-bar" role="img" aria-label="${esc(entry.label)}: ${entry.sums.gone}% humanity is gone, ${entry.sums.risk}% might perish. ${spoken}">
               <div class="doomer-stack">${
                 parts.filter(({ value }) => value > 0)
-                  .map(({ state, value }) => `<i style="width:${value}%;background:${state.color}" title="${state.id}. ${state.name}: ${value}%"></i>`).join('')
+                  .map(({ state, value }) => `<i style="width:${value}%;background:${state.color}" title="${state.id}. ${esc(state.name)}: ${value}%"></i>`).join('')
               }</div>
               <div class="doomer-tiers">${
                 [['gone', entry.sums.gone], ['risk', entry.sums.risk]]
@@ -291,14 +329,14 @@
               }</div>
             </div>
             <div class="doomer-readout">${
-              parts.map(({ state, value }) => `<span><i style="background:${state.color}"></i>${state.id}. ${state.name} <b>${value}%</b></span>`).join('')
+              parts.map(({ state, value }) => `<span><i style="background:${state.color}"></i>${state.id}. ${esc(state.name)} <b>${value}%</b></span>`).join('')
             }</div>
           </div>
           <div class="doomer-total"><b>${total}%</b></div>
         </div>`;
         }).join('')}
       </div>
-      ${threshold ? `<p class="doomer-note">Each model was asked ${samples.length === 1 ? samples[0] : `${Math.min(...samples)}–${Math.max(...samples)}`} times, and each figure carries a sampling error of about ±${pooledSe.toFixed(1)} points. Two models are only distinguishable where the gap between them exceeds about ${threshold.toFixed(1)} points, so most neighbouring rows are ties.</p>` : ''}`;
+      ${threshold ? `<p class="doomer-note">Each model was asked ${samples.length === 1 ? samples[0] : `${Math.min(...samples)}–${Math.max(...samples)}`} times. Each published figure carries a bootstrap standard error of about ±${pooledSe.toFixed(1)} points. Two models are only distinguishable where the gap between them exceeds about ${threshold.toFixed(1)} points, so most neighbouring rows are ties.</p>` : ''}`;
   }
 
   function applyForecast({ animate }) {
@@ -319,6 +357,8 @@
       segment.style.width = `${(state.probability / total) * 100}%`;
       const spread = activeRun?.range?.[state.id];
       segment.title = `${state.name}: ${state.probability}%${spread ? ` (${spread[0]}–${spread[1]}% across samples)` : ''}${state.extinction ? ` · ${extinctionLabels[state.extinction]}` : ''}`;
+
+      segment.setAttribute('aria-label', `${state.name}: ${state.probability}% — jump to this ending`);
 
       const value = legend.children[index].querySelector('b');
       animate ? tweenNumber(value, state.probability) : (value.textContent = `${state.probability}%`);
@@ -389,7 +429,7 @@
     const leader = [...selectedStates].sort((a, b) => b.probability - a.probability)[0];
     const leaderEl = $('#end-leader');
     const paint = () => {
-      leaderEl.innerHTML = `<p class="kicker">Most likely ending</p><span class="leader-number">${leader.id}</span><h2>${leader.name}${extinctionMark(leader)}</h2><strong>${leader.probability}%</strong><p>${leader.description}</p>`;
+      leaderEl.innerHTML = `<p class="kicker">Most likely ending</p><span class="leader-number">${leader.id}</span><h2>${esc(leader.name)}${extinctionMark(leader)}</h2><strong>${leader.probability}%</strong><p>${esc(leader.description)}</p>`;
     };
     // The leader can become a different ending entirely, so it crossfades
     // rather than counting between two unrelated states.
@@ -421,7 +461,7 @@
       <article class="model-answer">
         <div class="model-answer-head">
           ${labLogo(entry.provider, 'in-row')}
-          <div><b>${entry.label}</b><small>${entry.provider} · ${entry.date || ''}</small></div>
+          <div><b>${esc(entry.label)}</b><small>${esc(entry.provider)} · ${esc(entry.date || '')}</small></div>
           <strong>${entry.value}%</strong>
         </div>
         <div class="answer-plot">
@@ -437,19 +477,19 @@
           </div>
           <span class="answer-range">${entry.range?.[state.id] ? `${entry.range[state.id][0]}–${entry.range[state.id][1]}%` : '—'}</span>
         </div>
-        ${entry.rationales?.[state.id] ? `<p>${entry.rationales[state.id]}</p>` : ''}
+        ${entry.rationales?.[state.id] ? `<p>${esc(entry.rationales[state.id])}</p>` : ''}
       </article>`).join('');
 
     $('#dialog-content').style.setProperty('--state', state.color);
     $('#dialog-content').innerHTML = `
-      <div class="dialog-kicker"><span>${String(state.id).padStart(2, '0')}</span>${state.family}</div>
-      <h2>${state.name}${extinctionMark(state)}</h2>
+      <div class="dialog-kicker"><span>${String(state.id).padStart(2, '0')}</span>${esc(state.family)}</div>
+      <h2 id="dialog-title">${esc(state.name)}${extinctionMark(state)}</h2>
       <div class="dialog-summary">
         <div><strong>${consensus}%</strong><span>median forecast</span></div>
         <div><strong>${entries.at(-1).value}–${entries[0].value}%</strong><span>model range</span></div>
         <div><strong>${entries.length}</strong><span>models</span></div>
       </div>
-      <p class="dialog-description">${state.description}</p>
+      <p class="dialog-description">${esc(state.description)}</p>
       <div class="dialog-subhead"><h3>How each model sees it</h3><span>Band is the range across ${entries[0]?.sampleCount ?? 5} samples; tick is the published figure</span></div>
       <div class="model-answer-list">${rows}</div>`;
     $('#detail-dialog').showModal();

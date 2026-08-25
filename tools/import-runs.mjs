@@ -39,6 +39,67 @@ const quartilesFor = (samples, id) => {
   return vals.length ? [quartile(vals, 0.25), quartile(vals, 0.75)] : null;
 };
 
+// Deterministic PRNG, seeded per model, so re-running the importer reproduces
+// public/data.js byte for byte rather than jittering the bootstrap each time.
+const mulberry32 = seed => () => {
+  seed = (seed + 0x6D2B79F5) | 0;
+  let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+};
+const seedFrom = text => {
+  let h = 2166136261;
+  for (const ch of String(text)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+};
+
+const median = sorted => {
+  const n = sorted.length;
+  return n % 2 ? sorted[(n - 1) / 2] : (sorted[n / 2 - 1] + sorted[n / 2]) / 2;
+};
+const columnsOf = samples => STATE_IDS.map(id =>
+  samples.map(s => s.answers?.[id]?.value).filter(Number.isFinite).sort((a, b) => a - b));
+
+// The figure the site publishes for a state is the coordinate-wise median of
+// that model's samples, renormalized. Anything claiming to be its uncertainty
+// has to describe that estimator.
+function publishedVector(samples) {
+  const cols = columnsOf(samples);
+  if (cols.some(col => !col.length)) return null;
+  return renormalize(
+    cols.map(median),
+    cols.map(col => [col[0], col.at(-1)]),
+    cols.map(col => [quartile(col, 0.25), quartile(col, 0.75)])
+  );
+}
+
+// Bootstrap rather than a closed form: the published total is a sum of five
+// renormalized medians, which has no tidy standard error. Resampling the run's
+// own samples measures the spread of the number actually shown. The mean of
+// per-sample totals was standing in for this, and the two disagree enough to
+// reorder the board — 61 vs 59.8 for one model, 59 vs 60.3 for another.
+function publishedExposure(samples, seedKey, draws = 2000) {
+  if (samples.length < 2) return null;
+  const vector = publishedVector(samples);
+  if (!vector) return null;
+  const exposureAt = vec => EXPOSURE_IDS.reduce((sum, id) => sum + vec[STATE_IDS.indexOf(id)], 0);
+  const random = mulberry32(seedFrom(seedKey));
+  const totals = [];
+  for (let draw = 0; draw < draws; draw++) {
+    const resample = Array.from({ length: samples.length }, () => samples[Math.floor(random() * samples.length)]);
+    const vec = publishedVector(resample);
+    if (vec) totals.push(exposureAt(vec));
+  }
+  if (totals.length < 2) return null;
+  const mean = totals.reduce((a, c) => a + c, 0) / totals.length;
+  const sd = Math.sqrt(totals.reduce((a, c) => a + (c - mean) ** 2, 0) / (totals.length - 1));
+  return {
+    value: exposureAt(vector),
+    se: Math.round((sd) * 100) / 100,
+    draws: totals.length
+  };
+}
+
 const summarise = totals => {
   if (!totals.length) return null;
   const mean = totals.reduce((a, c) => a + c, 0) / totals.length;
@@ -109,6 +170,19 @@ for (const file of files) {
     if (!provider) { problems.push(`${file}: batch has no model.provider`); continue; }
     const missing = STATE_IDS.filter(id => { const a = batch.aggregate?.[id]; return !a || !a.n || typeof a.median !== 'number'; });
     if (missing.length) { problems.push(`${file}: aggregate missing ${missing.join(', ')}`); continue; }
+    const outOfRange = STATE_IDS.filter(id => {
+      const a = batch.aggregate[id];
+      return !(a.median >= 0 && a.median <= 100) || !(a.min >= 0) || !(a.max <= 100) || a.min > a.median || a.median > a.max;
+    });
+    if (outOfRange.length) { problems.push(`${file}: median/min/max outside 0-100 or out of order for ${outOfRange.join(', ')}`); continue; }
+    const sampleList = batch.samples || [];
+    if (!sampleList.length) { problems.push(`${file}: no samples`); continue; }
+    const badSample = sampleList.findIndex(sample => {
+      const values = STATE_IDS.map(id => sample.answers?.[id]?.value);
+      if (values.some(v => !Number.isInteger(v) || v < 0 || v > 100)) return true;
+      return values.reduce((a, c) => a + c, 0) !== 100;
+    });
+    if (badSample !== -1) { problems.push(`${file}: sample ${badSample} is not eleven integers summing to 100`); continue; }
     const medians = STATE_IDS.map(id => batch.aggregate[id].median);
     const quartiles = Object.fromEntries(STATE_IDS.map((id, i) => [i + 1, quartilesFor(batch.samples || [], id)]).filter(([, q]) => q));
     const probs = renormalize(
@@ -116,6 +190,7 @@ for (const file of files) {
       STATE_IDS.map(id => [batch.aggregate[id].min, batch.aggregate[id].max]),
       STATE_IDS.map((id, i) => quartiles[i + 1] || null)
     );
+    if (probs.reduce((a, c) => a + c, 0) !== 100) { problems.push(`${file}: renormalized probabilities sum to ${probs.reduce((a, c) => a + c, 0)}, not 100`); continue; }
     endStateBatches.push({
       file,
       runKey: runKeyOf(batch),
@@ -131,6 +206,8 @@ for (const file of files) {
       range: Object.fromEntries(STATE_IDS.map((id, i) => [i + 1, [batch.aggregate[id].min, batch.aggregate[id].max]])),
       quartiles,
       exposure: exposureStats(batch.samples || []),
+      // Keyed on the run so the bootstrap is reproducible per model.
+      exposurePublished: publishedExposure(batch.samples || [], runKeyOf(batch)),
       rationales: Object.fromEntries(STATE_IDS.map((id, i) => [i + 1, String(batch.aggregate[id].rationale || '')]))
     });
     continue;
@@ -156,6 +233,7 @@ ${indent}  probabilities: { ${Object.entries(b.probabilities).map(([id, p]) => `
 ${indent}  range: { ${Object.entries(b.range).map(([id, r]) => `${id}: [${r[0]}, ${r[1]}]`).join(', ')} },
 ${indent}  quartiles: { ${Object.entries(b.quartiles).map(([id, q]) => `${id}: [${q[0]}, ${q[1]}]`).join(', ')} },
 ${indent}  exposure: ${JSON.stringify(b.exposure)},
+${indent}  exposurePublished: ${JSON.stringify(b.exposurePublished)},
 ${indent}  rationales: {
 ${Object.entries(b.rationales).map(([id, r]) => `${indent}    ${id}: ${JSON.stringify(r)}`).join(',\n')}
 ${indent}  }

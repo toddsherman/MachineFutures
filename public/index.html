@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="theme-color" content="#11120f">
   <meta name="description" content="Frontier AI models allocate 100 points across eleven ways the story of humanity and AI could end. A living record, re-asked as new models arrive.">
   <title>Machine Futures — How does this story end?</title>
@@ -98,7 +99,7 @@
     </div>
   </footer>
 
-  <dialog class="detail-dialog" id="detail-dialog">
+  <dialog class="detail-dialog" id="detail-dialog" aria-labelledby="dialog-title">
     <button class="dialog-close" id="dialog-close" aria-label="Close detail">×</button>
     <div id="dialog-content"></div>
   </dialog>

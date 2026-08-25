@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   issues: write
 
 jobs:
@@ -35,10 +35,23 @@ jobs:
           MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
         run: |
           set +e
-          node tools/run-elicitation.mjs --new > new-models.txt 2>&1
+          node tools/run-elicitation.mjs --new --record > new-models.txt 2>&1
           echo "exit=$?" >> "$GITHUB_OUTPUT"
           cat new-models.txt
           cat new-models.txt >> "$GITHUB_STEP_SUMMARY"
+
+      # Commit the refreshed baseline so the same models are not reported again
+      # next week. Runs even when nothing new turned up, since the catalogue may
+      # still have shifted.
+      - name: Update baseline
+        run: |
+          set -euo pipefail
+          if git diff --quiet tools/seen-models.json; then echo "Baseline unchanged."; exit 0; fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tools/seen-models.json
+          git commit -m "Update model-catalogue baseline"
+          git push
 
       # Exit code 3 means the scan found something. Reuse one open issue rather
       # than filing a fresh one every week.

@@ -18,16 +18,19 @@
 //                                             # call per model, writes nothing
 //   node tools/run-elicitation.mjs --list     # list every model each provider
 //                                             # serves. No inference calls.
-//   node tools/run-elicitation.mjs --new      # only models NOT yet on the
-//                                             # roster; exits 3 if any found,
-//                                             # which is how the watch workflow
-//                                             # decides to raise an issue.
+//   node tools/run-elicitation.mjs --new      # models that have appeared since
+//                                             # the last scan (baseline in
+//                                             # tools/seen-models.json); exits 3
+//                                             # if any, which is how the watch
+//                                             # workflow decides to raise an
+//                                             # issue. Add --record to update
+//                                             # the baseline.
 //
 // Methodology notes: no fallback models are configured anywhere — a
 // refusal or invalid response is recorded as a failed sample, never
 // silently answered by a different model. Sampling params are omitted
 // so every provider runs at its own defaults.
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, dirname, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -39,6 +42,8 @@ const MOCK = args.includes('--mock');
 const CHECK = args.includes('--check');
 const LIST = args.includes('--list');
 const NEW_ONLY = args.includes('--new');
+const RECORD = args.includes('--record');
+const SEEN_PATH = join(root, 'tools', 'seen-models.json');
 const SAMPLES = Number(argValue('--samples') || 5);
 const outArg = argValue('--out') || 'runs';
 const OUT_DIR = isAbsolute(outArg) ? outArg : join(root, outArg);
@@ -55,9 +60,12 @@ const STATE_NAMES = ['Terminal Silence', 'The Inheritance', 'Bootloader', 'Machi
 // dated snapshots (we pin bare ids), no drifting *-latest aliases.
 const NOISE = /embed|image|video|tts|audio|moderation|whisper|dall|rerank|guard|codex|realtime|transcribe|computer-use|robotics|lyria|banana|gemma|deep-research|search-preview|customtools|contributor|non-reasoning|multi-agent/i;
 const SUBTIER = /(^|[-.])(mini|nano|lite|flash-lite|chat)([-.]|$)/i;
+// Superseded generations. A frontier-outlook benchmark has no use for them, and
+// they would otherwise flood the first scan of any provider with a long catalog.
+const LEGACY = /^(babbage|davinci|gpt-3|gpt-4|o1|o3|sora|text-|ada-|curie-)|turbo|instruct|search-api/i;
 const SNAPSHOT = /-\d{4}-\d{2}-\d{2}$|-\d{8}$|-\d{4}$/;
 const ALIAS = /-latest$/i;
-const isCandidate = id => !NOISE.test(id) && !SUBTIER.test(id) && !SNAPSHOT.test(id) && !ALIAS.test(id);
+const isCandidate = id => !NOISE.test(id) && !SUBTIER.test(id) && !SNAPSHOT.test(id) && !ALIAS.test(id) && !LEGACY.test(id);
 
 /* ---------- prompt ---------- */
 function buildPrompt() {
@@ -303,24 +311,41 @@ const roster = JSON.parse(readFileSync(join(root, 'tools', 'models.json'), 'utf8
 if (!roster.length) { console.error('✗ no models matched the --models/--tier filter'); process.exit(1); }
 
 if (NEW_ONLY) {
+  // Report only what has appeared since the last scan. Without a baseline every
+  // provider's entire back catalogue reads as "new" forever.
+  let seen = {};
+  if (existsSync(SEEN_PATH)) seen = JSON.parse(readFileSync(SEEN_PATH, 'utf8')).providers || {};
+  const firstScan = !Object.keys(seen).length;
+
   const byProvider = new Map();
   for (const model of roster) if (!byProvider.has(model.provider)) byProvider.set(model.provider, model);
   const onRoster = new Set(roster.map(m => m.model));
+  const current = { ...seen };
   let found = 0;
+
   for (const [provider, model] of byProvider) {
     const key = process.env[model.keyEnv];
     if (!key) continue;
     const ids = await listModels(model, key);
     if (!ids) { console.log(`✗ ${provider}: could not list models`); continue; }
-    const fresh = ids.filter(id => isCandidate(id) && !onRoster.has(id)).sort();
-    if (!fresh.length) continue;
+    const candidates = ids.filter(isCandidate).sort();
+    current[provider] = candidates;
+    const known = new Set([...(seen[provider] || []), ...onRoster]);
+    const fresh = candidates.filter(id => !known.has(id));
+    if (!fresh.length || firstScan) continue;
     found += fresh.length;
     console.log(`${provider}:`);
     for (const id of fresh) console.log(`  ${id}`);
     console.log('');
   }
-  if (!found) { console.log('No new models. Roster is current.'); process.exit(0); }
-  console.log(`${found} model(s) not on the roster. Add the ones worth tracking to tools/models.json, then run --check.`);
+
+  if (RECORD) {
+    writeFileSync(SEEN_PATH, JSON.stringify({ updated: RUN_DATE, providers: current }, null, 2) + '\n');
+    console.log(`Baseline recorded in tools/seen-models.json (${Object.values(current).flat().length} models across ${Object.keys(current).length} providers).`);
+  }
+  if (firstScan) { console.log('First scan — recorded the current catalogue as the baseline. Future scans report only what appears after this.'); process.exit(0); }
+  if (!found) { console.log('No new models since the last scan.'); process.exit(0); }
+  console.log(`${found} new model(s). Add the ones worth tracking to tools/models.json, then run --check.`);
   process.exit(3);
 }
 

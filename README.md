@@ -41,7 +41,36 @@ The 50-question 2030 benchmark was retired in August 2026; its prompt and only r
 
 `.github/workflows/elicit.yml` runs the end-state prompt against every model in `tools/models.json` — 20 samples each at provider-default settings, no tools — then validates, aggregates, writes `runs/` batches, regenerates `public/data.js`, and pushes an `elicitation/<run-id>` branch. Open a PR from that branch and merge to publish via Vercel.
 
-The raw batches are also uploaded as a workflow artifact immediately after elicitation, before any step that could fail — a paid run is never lost to a downstream error.
+### Not losing the data
+
+`runs/` is the irreplaceable half of this repository: `public/data.js` can be regenerated from it at any time, and it cannot be regenerated from anything. Elicitation costs real money, so the pipeline is built around never paying twice.
+
+- **Every sample is checkpointed the moment it validates**, to `runs/.partial/<run-id>.jsonl`. A run that dies partway keeps everything it had already bought.
+- **The batches are uploaded as an artifact even when the run fails.** The elicitation step is `continue-on-error` with an `always()` upload, because one model running out of credit used to fail the step and skip the upload, discarding every batch already collected.
+- **Re-dispatch with `resume_from_run_id`** to restore a previous run's batches and checkpoints. Models that already finished are not asked again, and half-finished models resume from their checkpoint — a re-run pays for the shortfall, not the sweep.
+- **Batches are never overwritten.** A second run on the same date writes `…__r2.json` beside the original. The importer prefers the newest date, breaks ties on sample count, and refuses to publish a batch that would drop a model's sample count without `--force`.
+- **Writes are atomic** (temp file plus rename), so a crash mid-write cannot leave truncated JSON.
+- **Every batch carries a SHA-256 digest** of its samples. `tools/verify-runs.mjs` and the importer both check it, so a batch altered after it was written is caught rather than published. Batches predating this carry a backfilled digest, which attests to their content from that point on — not to their origin.
+
+### When a call fails
+
+Errors are sorted into three kinds, because the right response differs:
+
+- **transient** — timeouts, dropped sockets, 429s, 5xx. Retried up to four times with exponential backoff and jitter, honouring `Retry-After`. Timeouts and dropped sockets carry no HTTP status and were previously not retried at all.
+- **quota** — the provider says the account is out of money. Recognised across providers by body text as well as status, since OpenAI returns 429 for both "slow down" and "you're broke". The model stops immediately rather than spending eighteen minutes of backoff on a call that cannot succeed.
+- **permanent** — a bad model id, a refusal, an unparseable answer. The attempt fails and the next sample is tried.
+
+The attempt budget is `ceil(samples × 1.5) + 5`, and each model has a 45-minute wall-clock budget so one sick provider cannot starve the models after it.
+
+### Knowing you have run out of credit
+
+Three signals, in increasing order of how hard they are to miss:
+
+1. The job summary on the run page: a per-model table of samples collected and failures by kind, with any billing message quoted in full.
+2. Exit code 4 and a `quota_exhausted` step output, distinct from an ordinary failure.
+3. A GitHub issue labelled `billing`, opened automatically — one at a time, not one a month — so it reaches your inbox rather than waiting in the Actions tab.
+
+`.github/workflows/preflight.yml` also runs `--check` on the 25th of each month, a week before the paid sweep, and opens a `preflight` issue if any model is not callable. One cheap call per model, so a lapsed card is found before the run that needs it.
 
 ### Ongoing cadence
 
@@ -83,6 +112,10 @@ Local dry run: `node tools/run-elicitation.mjs --mock`. Mock batches are written
 - `tools/run-elicitation.mjs` — automated end-state elicitation harness (used by the workflow)
 - `tools/models.json` — model roster: provider, API adapter, model id, key env var
 - `tools/check-site.mjs` — invariant check on `public/data.js`, run in CI after import
+- `tools/verify-runs.mjs` — integrity check on the raw batches in `runs/` (`--backfill-integrity` to add digests to older files)
+- `tools/test-classify.mjs` — asserts the harness sorts provider errors into transient / quota / permanent correctly
+- `.github/workflows/ci.yml` — parses the app, verifies `runs/`, and checks that `public/data.js` is reproducible from it
+- `.github/workflows/preflight.yml` — monthly key-and-model canary ahead of the paid sweep
 - `.github/workflows/elicit.yml` — scheduled/manual elicitation → PR pipeline
 - `archive/` — the retired 2030 benchmark prompt and its one real run
 - `vercel.json` — restricts Vercel output to `public/`

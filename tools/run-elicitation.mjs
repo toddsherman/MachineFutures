@@ -30,7 +30,8 @@
 // refusal or invalid response is recorded as a failed sample, never
 // silently answered by a different model. Sampling params are omitted
 // so every provider runs at its own defaults.
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, appendFileSync, renameSync, rmSync, mkdirSync, existsSync } from 'node:fs';
+import { createHash, randomUUID } from 'node:crypto';
 import { join, dirname, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -66,10 +67,84 @@ const OUT_DIR = isAbsolute(outArg) ? outArg : join(root, outArg);
 const RUN_DATE = argValue('--date') || new Date().toISOString().slice(0, 10);
 const ONLY = argValue('--models')?.split(',').map(s => s.trim()).filter(Boolean) || null;
 const TIER = argValue('--tier');
+const FORCE = args.includes('--force');
 const QUESTION_SET = 'end-states-v3';
 // A reasoning model can legitimately take minutes; a stalled connection can
 // take forever. Timed out requests are retried like any other failure.
 const REQUEST_TIMEOUT_MS = 5 * 60 * 1000;
+const HTTP_TRIES = 4;
+// One provider having a bad hour must not consume the job's whole budget and
+// take the models after it down with it.
+const MODEL_BUDGET_MS = 45 * 60 * 1000;
+// Samples resume from here if a run dies partway, so a re-dispatch pays for
+// the shortfall instead of the whole model again.
+const PARTIAL_DIR = join(OUT_DIR, '.partial');
+
+// Providers disagree about how they say "you are out of money", and status
+// alone cannot separate it from "slow down" — OpenAI returns 429 for both.
+// Getting this wrong costs 18 minutes of backoff per exhausted model and then
+// reports it as an ordinary failure.
+const QUOTA_SIGNS = /insufficient[_ ]quota|insufficient[_ ]credit|credit balance is too low|billing|not_?enough_?credit|exceeded your current quota|quota[_ ]exceeded|RESOURCE_EXHAUSTED|payment[_ ]required|arrears|account is not active/i;
+
+function classify(error) {
+  const status = error.status;
+  const text = `${error.message || ''} ${error.body || ''}`;
+  if (status === 402 || QUOTA_SIGNS.test(text)) return 'quota';
+  if (status === 429 || (status >= 500 && status <= 599)) return 'transient';
+  // No status means the request never completed: a timeout, a dropped socket,
+  // a DNS blip. These were falling through to "permanent" and burning an
+  // attempt without a single retry.
+  if (status === undefined && (error.name === 'TimeoutError' || error.name === 'AbortError' || error instanceof TypeError)) return 'transient';
+  return 'permanent';
+}
+
+// Honour Retry-After when the provider sends one; otherwise exponential with
+// jitter, so a whole roster does not march back in lockstep.
+function backoffMs(tryNumber, retryAfterMs) {
+  if (Number.isFinite(retryAfterMs) && retryAfterMs > 0) return Math.min(retryAfterMs, 120000);
+  const base = Math.min(15000 * 2 ** (tryNumber - 1), 120000);
+  return Math.round(base * (0.5 + Math.random() * 0.5));
+}
+
+const parseRetryAfter = header => {
+  if (!header) return null;
+  const seconds = Number(header);
+  if (Number.isFinite(seconds)) return seconds * 1000;
+  const at = Date.parse(header);
+  return Number.isFinite(at) ? Math.max(at - Date.now(), 0) : null;
+};
+
+// Temp file plus rename: a crash mid-write must not leave truncated JSON that
+// the importer then refuses, with the paid samples inside it.
+function writeAtomic(file, contents) {
+  const tmp = `${file}.${randomUUID()}.tmp`;
+  writeFileSync(tmp, contents);
+  renameSync(tmp, file);
+}
+
+// Batches are never overwritten. A rerun on the same date becomes a revision
+// beside the original rather than replacing it — that path already cost one
+// real 20-sample run.
+function reserveBatchPath(dir, runId) {
+  let file = join(dir, `${runId}.json`);
+  if (!existsSync(file) || FORCE) return { file, runId };
+  for (let revision = 2; revision < 100; revision++) {
+    const revisedId = `${runId}__r${revision}`;
+    file = join(dir, `${revisedId}.json`);
+    if (!existsSync(file)) return { file, runId: revisedId };
+  }
+  throw new Error(`more than 99 revisions of ${runId}`);
+}
+
+// Lets the importer and tools/verify-runs.mjs detect a batch that was
+// truncated, hand-edited, or corrupted after it was written.
+const integrityOf = samples => ({
+  algorithm: 'sha256',
+  n_samples: samples.length,
+  digest: createHash('sha256')
+    .update(JSON.stringify(samples.map(s => ({ sample: s.sample, answers: s.answers }))))
+    .digest('hex')
+});
 
 const STATE_NAMES = ['Terminal Silence', 'The Inheritance', 'Bootloader', 'Machine Ecology', 'The Diaspora',
   'The Merger', 'The Preserve', 'Coexistence', 'The Held Leash', 'The Lock-in', 'The Renunciation'];
@@ -102,7 +177,13 @@ function buildPrompt() {
 async function post(url, headers, body) {
   const res = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify(body), signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
   const text = await res.text();
-  if (!res.ok) { const err = new Error(`HTTP ${res.status}: ${text.slice(0, 400)}`); err.status = res.status; throw err; }
+  if (!res.ok) {
+    const err = new Error(`HTTP ${res.status}: ${text.slice(0, 400)}`);
+    err.status = res.status;
+    err.body = text.slice(0, 2000);
+    err.retryAfterMs = parseRetryAfter(res.headers.get('retry-after'));
+    throw err;
+  }
   return JSON.parse(text);
 }
 
@@ -190,6 +271,33 @@ function aggregate(samples) {
 
 const slug = s => (s || 'model').toLowerCase().replace(/[^a-z0-9.]+/g, '-').replace(/^-+|-+$/g, '');
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const signatureOf = answers => JSON.stringify(Object.values(answers).map(a => [a.value, a.rationale]));
+
+// JSONL, appended one line per validated sample: a partial file is still
+// readable if the process dies mid-run, which a single JSON array would not be.
+function appendSample(path, sample) {
+  mkdirSync(dirname(path), { recursive: true });
+  appendFileSync(path, JSON.stringify(sample) + '\n');
+}
+
+function resumeSamples(path, model) {
+  if (!existsSync(path)) return [];
+  const kept = [];
+  const lines = readFileSync(path, 'utf8').split('\n').filter(Boolean);
+  for (const [index, line] of lines.entries()) {
+    try {
+      const sample = JSON.parse(line);
+      // A checkpoint is only worth resuming if it still validates: a half
+      // written final line, or a file from an older prompt version, is not.
+      const values = STATE_NAMES.map((_, i) => sample.answers?.['S' + (i + 1)]?.value);
+      if (values.some(v => !Number.isInteger(v)) || values.reduce((a, c) => a + c, 0) !== 100) throw new Error('not a valid allocation');
+      kept.push({ ...sample, sample: kept.length + 1 });
+    } catch (error) {
+      console.warn(`! ${model.key}: discarding checkpoint line ${index + 1} — ${error.message}`);
+    }
+  }
+  return kept;
+}
 
 /* ---------- per-model elicitation ---------- */
 async function elicit(model, prompt) {
@@ -198,12 +306,46 @@ async function elicit(model, prompt) {
   const key = MOCK ? 'mock' : process.env[model.keyEnv];
   if (!key) { console.log(`~ ${model.key}: ${model.keyEnv} not set — skipped`); return null; }
 
-  const samples = [];
+  const runId = `${RUN_DATE}__${slug(model.model)}__closed_book__end-states`;
+  const partialPath = join(PARTIAL_DIR, `${runId}.jsonl`);
+
+  // A re-dispatch after a partial failure restores the previous run's batches,
+  // so a model that already finished must not be bought a second time.
+  const existingPath = join(OUT_DIR, `${runId}.json`);
+  if (!FORCE && existsSync(existingPath)) {
+    try {
+      const existing = JSON.parse(readFileSync(existingPath, 'utf8'));
+      const have = (existing.samples || []).length;
+      if (have >= SAMPLES) {
+        console.log(`= ${model.key}: complete batch already on disk (${have} samples) — not re-asking`);
+        return { ok: true, reused: true, key: model.key, label: model.label, samples: have, target: SAMPLES, quota: null, failures: [] };
+      }
+      console.log(`  ${model.key}: existing batch has ${have}/${SAMPLES} samples — topping it up`);
+    } catch {
+      console.warn(`! ${model.key}: existing batch at ${existingPath} is unreadable — writing a revision beside it`);
+    }
+  }
+
+  // Resume: samples already paid for on an earlier attempt at this run are
+  // read back, and only the shortfall is asked for.
+  const samples = resumeSamples(partialPath, model);
   const failures = [];
   const seen = new Map();
-  const maxAttempts = SAMPLES + 4;
+  samples.forEach(s => seen.set(signatureOf(s.answers), s.sample));
+  if (samples.length) console.log(`  ${model.key}: resuming with ${samples.length} sample(s) already on disk`);
+  if (samples.length >= SAMPLES) console.log(`  ${model.key}: already complete from a previous attempt`);
+
+  // Proportional, not SAMPLES + 4: at 20 samples that left only four spare
+  // attempts, so a model failing one call in five quietly returned a short run.
+  const maxAttempts = Math.ceil(SAMPLES * 1.5) + 5;
+  const startedAt = Date.now();
+  let quotaExhausted = null;
 
   for (let attempt = 1; samples.length < SAMPLES && attempt <= maxAttempts; attempt++) {
+    if (!MOCK && Date.now() - startedAt > MODEL_BUDGET_MS) {
+      console.warn(`! ${model.key}: ${Math.round(MODEL_BUDGET_MS / 60000)} minute budget reached with ${samples.length}/${SAMPLES} samples — moving on`);
+      break;
+    }
     try {
       let text;
       if (MOCK) text = mockResponse(model, attempt - 1);
@@ -211,26 +353,43 @@ async function elicit(model, prompt) {
         for (let httpTry = 1; ; httpTry++) {
           try { text = await adapters[model.api](model, prompt, key); break; }
           catch (error) {
-            const retryable = error.status === 429 || error.status >= 500;
-            if (!retryable || httpTry >= 3) throw error;
-            await sleep(httpTry * 15000);
+            const kind = classify(error);
+            if (kind !== 'transient' || httpTry >= HTTP_TRIES) throw error;
+            const wait = backoffMs(httpTry, error.retryAfterMs);
+            console.warn(`! ${model.key}: ${error.message.slice(0, 120)} — retrying in ${Math.round(wait / 1000)}s (${httpTry}/${HTTP_TRIES - 1})`);
+            await sleep(wait);
           }
         }
       }
       const { meta, answers } = parseAndValidate(text);
-      const sig = JSON.stringify(Object.values(answers).map(a => [a.value, a.rationale]));
+      const sig = signatureOf(answers);
       if (seen.has(sig)) console.warn(`! ${model.key}: sample ${samples.length + 1} is identical to sample ${seen.get(sig)} (kept — an API run, not a paste error, but worth noting)`);
       else seen.set(sig, samples.length + 1);
-      samples.push({ sample: samples.length + 1, meta, answers, raw: text });
+      const sample = { sample: samples.length + 1, meta, answers };
+      samples.push(sample);
+      // Checkpoint before anything else can fail. Everything above this line
+      // has already been paid for.
+      appendSample(partialPath, sample);
       console.log(`  ${model.key}: sample ${samples.length}/${SAMPLES} ok`);
     } catch (error) {
-      failures.push({ attempt, reason: String(error.message || error) });
-      console.warn(`! ${model.key}: attempt ${attempt} failed — ${error.message}`);
+      const kind = classify(error);
+      failures.push({ attempt, kind, reason: String(error.message || error).slice(0, 500) });
+      console.warn(`! ${model.key}: attempt ${attempt} failed (${kind}) — ${error.message}`);
+      if (kind === 'quota') {
+        // Asking again cannot succeed, and each further attempt costs minutes
+        // of backoff that the models after this one need.
+        quotaExhausted = String(error.message || error).slice(0, 300);
+        console.error(`✗ ${model.key}: out of quota or credit — stopping this model`);
+        break;
+      }
     }
     if (!MOCK) await sleep(1500);
   }
 
-  if (!samples.length) { console.error(`✗ ${model.key}: no valid samples after ${maxAttempts} attempts`); return { ok: false }; }
+  if (!samples.length) {
+    console.error(`✗ ${model.key}: no valid samples${quotaExhausted ? ' — quota exhausted' : ` after ${maxAttempts} attempts`}`);
+    return { ok: false, key: model.key, label: model.label, samples: 0, target: SAMPLES, quota: quotaExhausted, failures };
+  }
   if (samples.length < SAMPLES) console.warn(`! ${model.key}: only ${samples.length}/${SAMPLES} valid samples`);
 
   // Identity comes from the roster — the model id we actually called — never
@@ -239,7 +398,7 @@ async function elicit(model, prompt) {
   // self-report is kept alongside as data, clearly marked as a claim.
   const selfReported = [...new Set(samples.map(s => s.meta.model).filter(Boolean))];
   const batch = {
-    run_id: `${RUN_DATE}__${slug(model.model)}__closed_book__end-states`,
+    run_id: runId,
     prompt_family: 'end_states',
     asked_on: RUN_DATE,
     question_set: QUESTION_SET,
@@ -254,13 +413,20 @@ async function elicit(model, prompt) {
     n_samples: samples.length,
     samples: samples.map(s => ({ sample: s.sample, answers: s.answers })),
     aggregate: aggregate(samples),
-    harness: { version: 1, mode: MOCK ? 'mock' : 'api', target_samples: SAMPLES, failures }
+    integrity: integrityOf(samples),
+    harness: { version: 2, mode: MOCK ? 'mock' : 'api', target_samples: SAMPLES, complete: samples.length >= SAMPLES, quota_exhausted: Boolean(quotaExhausted), failures }
   };
-  const file = join(OUT_DIR, batch.run_id + '.json');
   mkdirSync(OUT_DIR, { recursive: true });
-  writeFileSync(file, JSON.stringify(batch, null, 2) + '\n');
-  console.log(`✓ ${model.key}: wrote ${file} (${samples.length} samples, ${failures.length} failed attempts)`);
-  return { ok: true };
+  const reserved = reserveBatchPath(OUT_DIR, batch.run_id);
+  if (reserved.runId !== batch.run_id) {
+    console.warn(`! ${model.key}: ${batch.run_id}.json exists — writing revision ${reserved.runId} rather than replacing it`);
+    batch.run_id = reserved.runId;
+  }
+  writeAtomic(reserved.file, JSON.stringify(batch, null, 2) + '\n');
+  // Only now is the checkpoint redundant.
+  rmSync(partialPath, { force: true });
+  console.log(`✓ ${model.key}: wrote ${reserved.file} (${samples.length} samples, ${failures.length} failed attempts)`);
+  return { ok: true, key: model.key, label: model.label, samples: samples.length, target: SAMPLES, quota: quotaExhausted, failures };
 }
 
 /* ---------- preflight: does the key work and does the model id resolve? ---------- */
@@ -423,12 +589,66 @@ if (CHECK) {
 const prompt = buildPrompt();
 console.log(`Eliciting ${SAMPLES} samples for ${roster.length} model(s), run date ${RUN_DATE}${MOCK ? ' [MOCK]' : ''}`);
 
-let wrote = 0, hardFailures = 0;
+const results = [];
 for (const model of roster) {
   const result = await elicit(model, prompt);
-  if (result?.ok) wrote++;
-  else if (result) hardFailures++;
+  if (result) results.push(result);
 }
-console.log(`Done: ${wrote} batch(es) written, ${hardFailures} model(s) failed, ${roster.length - wrote - hardFailures} skipped.`);
-if (!wrote) { console.error('✗ nothing elicited — check API keys and model ids in tools/models.json'); process.exit(1); }
+const wrote = results.filter(r => r.ok && !r.reused).length;
+const reused = results.filter(r => r.reused).length;
+const hardFailures = results.filter(r => !r.ok).length;
+const quotaHit = results.filter(r => r.quota);
+const short = results.filter(r => r.ok && r.samples < r.target);
+
+console.log(`Done: ${wrote} batch(es) written${reused ? `, ${reused} reused from a previous run` : ''}, ${hardFailures} model(s) failed, ${roster.length - wrote - reused - hardFailures} skipped.`);
+for (const r of short) console.warn(`! ${r.key}: short run — ${r.samples}/${r.target} samples`);
+for (const r of quotaHit) console.error(`✗ ${r.key}: QUOTA/CREDIT — ${r.quota}`);
+
+// A run that ends red in the Actions tab says nothing about why. The job
+// summary is the first thing shown on the run page, so the state of every
+// model — and any exhausted account — is legible without opening logs.
+if (process.env.GITHUB_STEP_SUMMARY) {
+  const countBy = (r, kind) => r.failures.filter(f => f.kind === kind).length;
+  const rows = results.map(r => {
+    const status = r.quota ? '💳 quota/credit' : !r.ok ? '❌ failed' : r.samples < r.target ? '⚠️ short' : '✅ complete';
+    return `| ${r.label} (\`${r.key}\`) | ${status} | ${r.samples}/${r.target} | ${countBy(r, 'transient')} | ${countBy(r, 'quota')} | ${countBy(r, 'permanent')} |`;
+  });
+  const lines = [
+    `## Elicitation ${RUN_DATE}`,
+    '',
+    `${wrote} batch(es) written · ${hardFailures} model(s) failed · target ${SAMPLES} samples each`,
+    '',
+    '| Model | Status | Samples | Transient | Quota | Permanent |',
+    '| --- | --- | ---: | ---: | ---: | ---: |',
+    ...rows
+  ];
+  if (quotaHit.length) {
+    lines.push('', '### Out of quota or credit', '',
+      'These providers rejected calls for billing reasons. Top up or raise the limit, then re-run — samples already collected are resumed from the checkpoint rather than paid for twice.', '',
+      ...quotaHit.map(r => `- **${r.label}** (\`${r.key}\`): ${r.quota}`));
+  }
+  appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\n') + '\n');
+}
+
+// Step outputs, so the workflow can branch on *why* the run failed rather
+// than parsing logs or guessing from an exit code.
+if (process.env.GITHUB_OUTPUT) {
+  appendFileSync(process.env.GITHUB_OUTPUT, [
+    `quota_exhausted=${quotaHit.length ? 'true' : 'false'}`,
+    `quota_models=${quotaHit.map(r => r.label).join(', ')}`,
+    `batches_written=${wrote}`,
+    `models_failed=${hardFailures}`,
+    `short_runs=${short.length}`
+  ].join('\n') + '\n');
+}
+
+if (!wrote && !reused) {
+  console.error(quotaHit.length
+    ? `✗ nothing elicited — ${quotaHit.length} model(s) out of quota or credit; top up and re-run (collected samples resume from the checkpoint)`
+    : '✗ nothing elicited — check API keys and model ids in tools/models.json');
+  process.exit(quotaHit.length ? 4 : 1);
+}
+// Exit 4 is distinct so the workflow can raise a billing alert specifically,
+// rather than reporting "a model failed" for something only money fixes.
+if (quotaHit.length) process.exit(4);
 if (hardFailures) process.exit(2);

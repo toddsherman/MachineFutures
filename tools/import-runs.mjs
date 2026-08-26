@@ -8,11 +8,13 @@
 //
 // Usage: node tools/import-runs.mjs
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const runsDir = join(root, 'runs');
+const FORCE = process.argv.includes('--force');
 const dataPath = join(root, 'public', 'data.js');
 
 // The roster is the source of display identity and ordering. Batches whose
@@ -177,6 +179,15 @@ for (const file of files) {
     if (outOfRange.length) { problems.push(`${file}: median/min/max outside 0-100 or out of order for ${outOfRange.join(', ')}`); continue; }
     const sampleList = batch.samples || [];
     if (!sampleList.length) { problems.push(`${file}: no samples`); continue; }
+    // Batches written by harness v2 carry a digest. A mismatch means the file
+    // was truncated or edited after it was written, and it must not be published.
+    if (batch.integrity?.digest) {
+      const digest = createHash('sha256')
+        .update(JSON.stringify(sampleList.map(s => ({ sample: s.sample, answers: s.answers }))))
+        .digest('hex');
+      if (digest !== batch.integrity.digest) { problems.push(`${file}: integrity digest mismatch — the samples changed after the batch was written`); continue; }
+      if (batch.integrity.n_samples !== sampleList.length) { problems.push(`${file}: declares ${batch.integrity.n_samples} samples, holds ${sampleList.length}`); continue; }
+    }
     const badSample = sampleList.findIndex(sample => {
       const values = STATE_IDS.map(id => sample.answers?.[id]?.value);
       if (values.some(v => !Number.isInteger(v) || v < 0 || v > 100)) return true;
@@ -222,9 +233,28 @@ const indent = '    ';
 // One entry per model (not per provider), newest asked_on wins. Keying by the
 // api model id is what lets two models from the same lab sit side by side.
 const endStateByModel = {};
+const byModel = new Map();
 for (const b of endStateBatches) {
-  if (!endStateByModel[b.runKey] || b.date >= endStateByModel[b.runKey].date) endStateByModel[b.runKey] = b;
+  if (!byModel.has(b.runKey)) byModel.set(b.runKey, []);
+  byModel.get(b.runKey).push(b);
 }
+for (const [runKey, batches] of byModel) {
+  // Newest date wins, but a tie goes to the batch with more samples: a rerun
+  // on the same day used to replace a twenty-sample run with a three-sample
+  // one purely because it was read second.
+  const ranked = [...batches].sort((a, b) => b.date.localeCompare(a.date) || b.sampleCount - a.sampleCount);
+  const chosen = ranked[0];
+  const richest = [...batches].sort((a, b) => b.sampleCount - a.sampleCount)[0];
+  if (chosen.sampleCount < richest.sampleCount && !FORCE) {
+    problems.push(`${chosen.file}: publishing it would drop ${runKey} from ${richest.sampleCount} samples (${richest.file}) to ${chosen.sampleCount}. Re-run the model, or pass --force to publish the smaller batch anyway.`);
+    continue;
+  }
+  if (chosen.sampleCount < richest.sampleCount) {
+    console.warn(`! ${runKey}: forced downgrade ${richest.sampleCount} → ${chosen.sampleCount} samples`);
+  }
+  endStateByModel[runKey] = chosen;
+}
+if (problems.length) { problems.forEach(p => console.error('✗ ' + p)); process.exit(1); }
 const emitEndState = b => `${indent}${JSON.stringify(b.runKey)}: {
 ${indent}  provider: ${JSON.stringify(b.provider)}, model: ${JSON.stringify(b.displayLabel)}, label: ${JSON.stringify(b.displayLabel)}, shortLabel: ${JSON.stringify(b.short)},
 ${indent}  promptVersion: ${JSON.stringify(b.promptVersion)}, date: ${JSON.stringify(b.date)}, knowledgeCutoff: ${JSON.stringify(b.knowledgeCutoff)},

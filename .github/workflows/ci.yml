@@ -1,0 +1,49 @@
+name: CI
+
+# runs/ is the irreplaceable half of this repository — public/data.js can be
+# regenerated from it, and it cannot be regenerated from anything. Check it on
+# every push rather than only after an elicitation.
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Parse the application
+        run: |
+          set -euo pipefail
+          node --check public/app.js
+          node --check public/data.js
+
+      - name: Verify raw batches
+        run: node tools/verify-runs.mjs
+
+      - name: Verify published data
+        run: node tools/check-site.mjs
+
+      - name: Error classification
+        run: node tools/test-classify.mjs
+
+      # The importer must be a pure function of runs/: if re-running it changes
+      # public/data.js, the committed file was hand-edited or is out of date.
+      - name: Published data matches runs/
+        run: |
+          set -euo pipefail
+          node tools/import-runs.mjs
+          if ! git diff --quiet public/data.js; then
+            echo "::error::public/data.js does not match what tools/import-runs.mjs produces from runs/."
+            git --no-pager diff --stat public/data.js
+            exit 1
+          fi
+          echo "public/data.js is reproducible from runs/"

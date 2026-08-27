@@ -429,7 +429,7 @@
     const leader = [...selectedStates].sort((a, b) => b.probability - a.probability)[0];
     const leaderEl = $('#end-leader');
     const paint = () => {
-      leaderEl.innerHTML = `<p class="kicker">Most likely ending</p><span class="leader-number">${leader.id}</span><h2>${esc(leader.name)}${extinctionMark(leader)}</h2><strong>${leader.probability}%</strong><p>${esc(leader.description)}</p>`;
+      leaderEl.innerHTML = `<p class="kicker">Most likely ending</p><h2>${esc(leader.name)}${extinctionMark(leader)}</h2><strong>${leader.probability}%</strong><p>${esc(leader.description)}</p>`;
     };
     // The leader can become a different ending entirely, so it crossfades
     // rather than counting between two unrelated states.

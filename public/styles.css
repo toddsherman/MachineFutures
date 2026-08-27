@@ -86,9 +86,8 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .stacked-legend button:hover span { text-decoration: underline; }
 .stacked-legend i { width: 8px; height: 8px; background: var(--state); }
 .stacked-legend b { font-size: 12px; }
-.end-leader { padding: 52px 0 56px 46px; position: relative; }
-.end-leader .leader-number { position: absolute; top: 45px; right: 0; color: rgba(17,18,15,.08); font: 900 150px/.8 var(--display); }
-.end-leader h2 { max-width: 260px; margin: 65px 0 0; font: 900 42px/.9 var(--display); text-transform: uppercase; letter-spacing: -.05em; }
+.end-leader { padding: 52px 0 56px 46px; }
+.end-leader h2 { max-width: 260px; margin: 22px 0 0; font: 900 42px/.9 var(--display); text-transform: uppercase; letter-spacing: -.05em; }
 .end-leader strong { display: block; margin: 20px 0 35px; font: 900 82px/.8 var(--display); letter-spacing: -.06em; }
 .end-leader > p:last-child { color: var(--muted); font-size: 15px; line-height: 1.55; }
 .state-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }

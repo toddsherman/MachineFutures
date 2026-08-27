@@ -305,7 +305,7 @@
 
     $('#doomer-ratings').innerHTML = `
       <div class="doomer-head">
-        <p class="doomer-key"><span class="key-gone"><i></i>Humanity is gone (1–3)</span><span class="key-risk"><i></i>Might perish (4–5)</span><span class="key-hint">Hover a bar for the endings inside it</span></p>
+        <p class="doomer-key"><span class="key-gone"><i></i>Humanity is gone (1–3)</span><span class="key-risk"><i></i>Might perish (4–5)</span><span class="key-hint"><span class="on-hover">Hover a bar for the endings inside it</span><span class="on-tap">Tap a bar for the endings inside it</span></span></p>
       </div>
       <div class="doomer-list">
         ${doomerEntries.map(entry => {
@@ -570,10 +570,14 @@
       return;
     }
 
-    // Touch has no hover, so a tap holds the composition open instead.
+    // Touch has no hover, so a tap holds the composition open instead. Only
+    // one at a time: the readouts overhang the rows beneath them, and several
+    // open at once would stack on top of each other.
     const exposureRow = event.target.closest('.doomer-row');
     if (exposureRow) {
-      exposureRow.classList.toggle('is-open');
+      const wasOpen = exposureRow.classList.contains('is-open');
+      $$('.doomer-row.is-open').forEach(row => row.classList.remove('is-open'));
+      exposureRow.classList.toggle('is-open', !wasOpen);
       return;
     }
 

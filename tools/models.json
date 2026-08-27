@@ -131,6 +131,17 @@
       "shortLabel": "DSK"
     },
     {
+      "key": "deepseek-prev",
+      "provider": "DeepSeek",
+      "label": "DeepSeek V4 Flash",
+      "tier": "mid",
+      "api": "openai-compatible",
+      "baseUrl": "https://api.deepseek.com/v1",
+      "model": "deepseek-v4-flash",
+      "keyEnv": "DEEPSEEK_API_KEY",
+      "shortLabel": "DSF"
+    },
+    {
       "key": "mistral",
       "provider": "Mistral",
       "label": "Mistral Medium 3.5",
@@ -139,10 +150,32 @@
       "baseUrl": "https://api.mistral.ai/v1",
       "model": "mistral-medium-3.5",
       "keyEnv": "MISTRAL_API_KEY",
+      "shortLabel": "M35"
+    },
+    {
+      "key": "mistral-prev",
+      "provider": "Mistral",
+      "label": "Mistral Medium 3",
+      "tier": "mid",
+      "api": "openai-compatible",
+      "baseUrl": "https://api.mistral.ai/v1",
+      "model": "mistral-medium-3",
+      "keyEnv": "MISTRAL_API_KEY",
       "shortLabel": "MM3"
     },
     {
       "key": "moonshot",
+      "provider": "Moonshot",
+      "label": "Kimi K3",
+      "tier": "frontier",
+      "api": "openai-compatible",
+      "baseUrl": "https://api.moonshot.ai/v1",
+      "model": "kimi-k3",
+      "keyEnv": "MOONSHOT_API_KEY",
+      "shortLabel": "K3"
+    },
+    {
+      "key": "moonshot-prev",
       "provider": "Moonshot",
       "label": "Kimi K2.6",
       "tier": "extended",
@@ -150,7 +183,7 @@
       "baseUrl": "https://api.moonshot.ai/v1",
       "model": "kimi-k2.6",
       "keyEnv": "MOONSHOT_API_KEY",
-      "shortLabel": "KMI"
+      "shortLabel": "K26"
     }
   ]
 }

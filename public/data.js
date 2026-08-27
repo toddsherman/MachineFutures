@@ -292,7 +292,7 @@
       }
     },
     "mistral-medium-3.5": {
-      provider: "Mistral", model: "Mistral Medium 3.5", label: "Mistral Medium 3.5", shortLabel: "MM3",
+      provider: "Mistral", model: "Mistral Medium 3.5", label: "Mistral Medium 3.5", shortLabel: "M35",
       promptVersion: 3, date: "2026-08-27", knowledgeCutoff: "07/2024",
       sampleCount: 20, source: "runs/2026-08-27__mistral-medium-3.5__closed_book__end-states.json",
       probabilities: { 1: 5, 2: 8, 3: 7, 4: 10, 5: 12, 6: 16, 7: 10, 8: 19, 9: 5, 10: 6, 11: 2 },
@@ -315,7 +315,7 @@
       }
     },
     "kimi-k2.6": {
-      provider: "Moonshot", model: "Kimi K2.6", label: "Kimi K2.6", shortLabel: "KMI",
+      provider: "Moonshot", model: "Kimi K2.6", label: "Kimi K2.6", shortLabel: "K26",
       promptVersion: 3, date: "2026-08-27", knowledgeCutoff: "04/2024",
       sampleCount: 20, source: "runs/2026-08-27__kimi-k2.6__closed_book__end-states.json",
       probabilities: { 1: 3, 2: 8, 3: 18, 4: 8, 5: 10, 6: 21, 7: 14, 8: 4, 9: 3, 10: 7, 11: 4 },

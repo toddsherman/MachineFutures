@@ -200,6 +200,13 @@
     $('#stat-samples').textContent = samples.length === 1 ? samples[0] : `${Math.min(...samples)}–${Math.max(...samples)}`;
     const methodSamples = $('#method-samples');
     if (methodSamples) methodSamples.textContent = samples.length === 1 ? samples[0] : `${Math.min(...samples)}–${Math.max(...samples)}`;
+    const errors = entries.map(entry => entry.exposurePublished?.se).filter(Number.isFinite);
+    const threshold = $('#method-threshold');
+    if (threshold && errors.length) {
+      const pooled = Math.sqrt(errors.reduce((sum, se) => sum + se * se, 0) / errors.length);
+      threshold.textContent = (2.78 * pooled).toFixed(1);
+    }
+
     const roster = $('#footer-roster');
     if (roster) roster.textContent = `${entries.length} models across ${labs.size} labs`;
   }

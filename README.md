@@ -82,7 +82,7 @@ Three signals, in increasing order of how hard they are to miss:
 2. Add it to `tools/models.json` and preflight (**check_only**, or `--check`). One cheap call per model confirms the key is accepted and the id resolves.
 3. Elicit just the new entry: Run workflow with `models: <its key>`. Existing models keep their earlier run and date until the next monthly sweep.
 
-A model whose `keyEnv` is missing is skipped, so an unkeyed provider never breaks a run.
+A model whose `keyEnv` is missing is skipped, so an unkeyed provider never breaks a run. That silence is the one hazard: a secret stored under the wrong name looks identical to a lab you chose not to key. The workflows therefore accept two aliases created by hand — `MINSTRAL_API_KEY` for Mistral and `KIMI_API_KEY` for Moonshot — alongside the canonical names. Rename the secrets and the aliases become dead weight worth deleting.
 
 ### The roster
 

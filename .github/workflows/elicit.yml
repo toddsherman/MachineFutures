@@ -24,6 +24,9 @@ on:
         type: boolean
         required: false
         default: false
+      budget_minutes:
+        description: 'Per-model wall-clock budget in minutes (default 45; slow reasoning models need more)'
+        required: false
       resume_from_run_id:
         description: 'Restore batches and checkpoints from a previous run id, and pay only for what is missing'
         required: false
@@ -117,10 +120,12 @@ jobs:
           MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY || secrets.KIMI_API_KEY }}
           SAMPLES: ${{ inputs.samples || '20' }}
           MODELS: ${{ inputs.models }}
+          BUDGET_MINUTES: ${{ inputs.budget_minutes }}
         run: |
           set -euo pipefail
           argv=(--samples "$SAMPLES")
           if [ -n "${MODELS:-}" ]; then argv+=(--models "$MODELS"); fi
+          if [ -n "${BUDGET_MINUTES:-}" ]; then argv+=(--budget-minutes "$BUDGET_MINUTES"); fi
           node tools/run-elicitation.mjs "${argv[@]}"
 
       # Elicitation costs real money, so the batches are persisted before any

@@ -74,8 +74,10 @@ const QUESTION_SET = 'end-states-v3';
 const REQUEST_TIMEOUT_MS = 5 * 60 * 1000;
 const HTTP_TRIES = 4;
 // One provider having a bad hour must not consume the job's whole budget and
-// take the models after it down with it.
-const MODEL_BUDGET_MS = 45 * 60 * 1000;
+// take the models after it down with it. Raise it with --budget-minutes for
+// the slow reasoning models: DeepSeek and Kimi both need well over an hour
+// for twenty samples.
+const MODEL_BUDGET_MS = Number(argValue('--budget-minutes') || 45) * 60 * 1000;
 // Samples resume from here if a run dies partway, so a re-dispatch pays for
 // the shortfall instead of the whole model again.
 const PARTIAL_DIR = join(OUT_DIR, '.partial');
@@ -310,8 +312,13 @@ async function elicit(model, prompt) {
   const partialPath = join(PARTIAL_DIR, `${runId}.jsonl`);
 
   // A re-dispatch after a partial failure restores the previous run's batches,
-  // so a model that already finished must not be bought a second time.
+  // so a model that already finished must not be bought a second time — and a
+  // model that finished short is carried forward rather than re-bought. The
+  // checkpoint is deleted once a batch is written, so a short batch has no
+  // checkpoint left and its own samples are the only thing to resume from.
   const existingPath = join(OUT_DIR, `${runId}.json`);
+  let carried = [];
+  let toppingUp = false;
   if (!FORCE && existsSync(existingPath)) {
     try {
       const existing = JSON.parse(readFileSync(existingPath, 'utf8'));
@@ -320,7 +327,18 @@ async function elicit(model, prompt) {
         console.log(`= ${model.key}: complete batch already on disk (${have} samples) — not re-asking`);
         return { ok: true, reused: true, key: model.key, label: model.label, samples: have, target: SAMPLES, quota: null, failures: [] };
       }
-      console.log(`  ${model.key}: existing batch has ${have}/${SAMPLES} samples — topping it up`);
+      if (have) {
+        const reported = Array.isArray(existing.model?.self_reported_name)
+          ? existing.model.self_reported_name[0]
+          : existing.model?.self_reported_name;
+        carried = existing.samples.map((sample, index) => ({
+          ...sample,
+          sample: index + 1,
+          meta: sample.meta || { model: reported ?? null, cutoff: existing.model?.self_reported_cutoff ?? null, asOf: existing.asked_on ?? null }
+        }));
+        toppingUp = true;
+        console.log(`  ${model.key}: carrying ${have} sample(s) forward from the existing batch — buying ${SAMPLES - have} more`);
+      }
     } catch {
       console.warn(`! ${model.key}: existing batch at ${existingPath} is unreadable — writing a revision beside it`);
     }
@@ -328,7 +346,7 @@ async function elicit(model, prompt) {
 
   // Resume: samples already paid for on an earlier attempt at this run are
   // read back, and only the shortfall is asked for.
-  const samples = resumeSamples(partialPath, model);
+  const samples = carried.length ? carried : resumeSamples(partialPath, model);
   const failures = [];
   const seen = new Map();
   samples.forEach(s => seen.set(signatureOf(s.answers), s.sample));
@@ -396,7 +414,7 @@ async function elicit(model, prompt) {
   // from the model's self-report. Models are unreliable narrators about their
   // own version (an observed run had Gemini 3.1 Pro answer "gpt-4o"). The
   // self-report is kept alongside as data, clearly marked as a claim.
-  const selfReported = [...new Set(samples.map(s => s.meta.model).filter(Boolean))];
+  const selfReported = [...new Set(samples.map(s => s.meta?.model).filter(Boolean))];
   const batch = {
     run_id: runId,
     prompt_family: 'end_states',
@@ -408,7 +426,7 @@ async function elicit(model, prompt) {
       provider: model.provider,
       api_string: model.model,
       self_reported_name: selfReported.length === 1 ? selfReported[0] : selfReported,
-      self_reported_cutoff: samples[0].meta.cutoff
+      self_reported_cutoff: samples.find(s => s.meta?.cutoff)?.meta.cutoff ?? null
     },
     n_samples: samples.length,
     samples: samples.map(s => ({ sample: s.sample, answers: s.answers })),
@@ -417,7 +435,9 @@ async function elicit(model, prompt) {
     harness: { version: 2, mode: MOCK ? 'mock' : 'api', target_samples: SAMPLES, complete: samples.length >= SAMPLES, quota_exhausted: Boolean(quotaExhausted), failures }
   };
   mkdirSync(OUT_DIR, { recursive: true });
-  const reserved = reserveBatchPath(OUT_DIR, batch.run_id);
+  // A top-up is a strict superset of the batch it grew from, so it replaces
+  // that file rather than landing beside it as a revision.
+  const reserved = toppingUp ? { file: existingPath, runId: batch.run_id } : reserveBatchPath(OUT_DIR, batch.run_id);
   if (reserved.runId !== batch.run_id) {
     console.warn(`! ${model.key}: ${batch.run_id}.json exists — writing revision ${reserved.runId} rather than replacing it`);
     batch.run_id = reserved.runId;

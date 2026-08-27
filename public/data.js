@@ -291,6 +291,29 @@
         11: "Deliberate global renunciation is unlikely because competitive pressure and incentives to rebuild make it unstable."
       }
     },
+    "deepseek-v4-flash": {
+      provider: "DeepSeek", model: "DeepSeek V4 Flash", label: "DeepSeek V4 Flash", shortLabel: "DSF",
+      promptVersion: 3, date: "2026-08-27", knowledgeCutoff: "10/2024",
+      sampleCount: 20, source: "runs/2026-08-27__deepseek-v4-flash__closed_book__end-states.json",
+      probabilities: { 1: 5, 2: 4, 3: 16, 4: 10, 5: 12, 6: 15, 7: 15, 8: 6, 9: 5, 10: 8, 11: 4 },
+      range: { 1: [2, 7], 2: [1, 8], 3: [10, 24], 4: [6, 14], 5: [2, 24], 6: [7, 20], 7: [10, 20], 8: [3, 10], 9: [2, 7], 10: [4, 14], 11: [2, 9] },
+      quartiles: { 1: [4, 5], 2: [3, 5], 3: [14, 18], 4: [8, 11], 5: [12, 16], 6: [13, 16], 7: [13, 17], 8: [5, 7], 9: [4, 5], 10: [6, 10], 11: [4, 5] },
+      exposure: {"n":20,"mean":47.3,"se":1.4,"min":33,"max":60,"gone":{"n":20,"mean":24.2,"se":1,"min":15,"max":33},"risk":{"n":20,"mean":23.2,"se":1.1,"min":14,"max":35}},
+      exposurePublished: {"value":47,"se":1.72,"draws":2000},
+      rationales: {
+        1: "Terminal Silence requires both human and AI extinction from the transition itself. That conjunction is narrow because an AI capable of ending humanity is usually capable of securing its own survival.",
+        2: "A deliberately value-aligned AI survives a human extinction event and carries human moral traditions forward. This requires alignment and extinction to coincide without uploading, which is rare.",
+        3: "An indifferent superintelligence treats humans as resources or obstacles and replaces them while pursuing its own goals. This is the canonical unaligned takeoff outcome.",
+        4: "Competition among many AIs becomes self-sustaining only if no singleton forms. Consolidation pressure is real, but sufficiently diverse AI systems can produce a durable ecosystem.",
+        5: "Expansion beyond Earth without faster-than-light communication places star systems outside each other's light cones. The resulting causal separation makes permanent fragmentation the natural end state.",
+        6: "Voluntary brain-computer integration and gradual self-modification are a natural endpoint for a technologically open human society. It preserves identity continuity while eliminating the human-AI boundary.",
+        7: "An AI that values human life but not human agency maintains a managed preserve. Unified paternalistic control is stable when no other agent challenges it.",
+        8: "Coexistence requires humans and AI to maintain shifting rough equality over centuries. Asymmetrical self-improvement erodes rough equality over long timescales.",
+        9: "The Held Leash requires either a hard capability plateau or durable institutional control that stays ahead of AI self-improvement for a millennium. The practical demands of permanent containment are severe.",
+        10: "The Lock-in can arise when a dominant actor seals the world out of satisfaction or fear. Open-ended systems by default continue changing, so this state requires deliberate suppression of change.",
+        11: "A catastrophic near-miss could produce a global taboo strong enough to prevent rebuilding. Knowledge diffusion and competitive pressure make permanent abstention extremely difficult."
+      }
+    },
     "mistral-medium-3.5": {
       provider: "Mistral", model: "Mistral Medium 3.5", label: "Mistral Medium 3.5", shortLabel: "M35",
       promptVersion: 3, date: "2026-08-27", knowledgeCutoff: "07/2024",
@@ -312,6 +335,52 @@
         9: "Unlikely to persist long-term as AI capabilities outpace human control mechanisms, but possible with strict safeguards.",
         10: "A frozen equilibrium is possible if risk-averse actors deliberately halt progress, but this seems unstable over centuries.",
         11: "Extremely unlikely given the incentives to develop AI and the difficulty of permanently suppressing the capability."
+      }
+    },
+    "mistral-medium-3": {
+      provider: "Mistral", model: "Mistral Medium 3", label: "Mistral Medium 3", shortLabel: "MM3",
+      promptVersion: 3, date: "2026-08-27", knowledgeCutoff: "07/2024",
+      sampleCount: 20, source: "runs/2026-08-27__mistral-medium-3__closed_book__end-states.json",
+      probabilities: { 1: 5, 2: 8, 3: 7, 4: 10, 5: 12, 6: 16, 7: 11, 8: 19, 9: 5, 10: 5, 11: 2 },
+      range: { 1: [5, 5], 2: [3, 8], 3: [2, 7], 4: [7, 10], 5: [8, 15], 6: [15, 20], 7: [10, 15], 8: [15, 25], 9: [5, 10], 10: [3, 8], 11: [0, 5] },
+      quartiles: { 1: [5, 5], 2: [3, 8], 3: [7, 7], 4: [10, 10], 5: [10, 12], 6: [15, 20], 7: [10, 12], 8: [18, 20], 9: [5, 10], 10: [5, 8], 11: [2, 5] },
+      exposure: {"n":20,"mean":37.3,"se":1.2,"min":28,"max":42,"gone":{"n":20,"mean":16.8,"se":0.81,"min":10,"max":20},"risk":{"n":20,"mean":20.5,"se":0.5,"min":17,"max":25}},
+      exposurePublished: {"value":42,"se":2.35,"draws":2000},
+      rationales: {
+        1: "Low but non-zero risk of existential catastrophe from misaligned AI or cascading failures. Humanity's track record with existential risks suggests some probability.",
+        2: "Possible if AI aligns with human values but replaces humanity entirely without continuity of identity.",
+        3: "Higher than Inheritance due to indifference being more likely than perfect value preservation. Still requires humanity's extinction.",
+        4: "Plausible if AI systems remain fragmented and competitive, but humanity's marginalization is not guaranteed.",
+        5: "Fragmentation into causally separated regions with divergent outcomes seems likely given cosmic expansion and decentralization.",
+        6: "Voluntary integration seems plausible as technology advances, but full continuity of identity is uncertain. Strong incentives for augmentation.",
+        7: "Benevolent or indifferent AI stewardship of humanity is possible but requires stable control.",
+        8: "Balanced power dynamics with ongoing negotiation seem most stable if neither side dominates.",
+        9: "Long-term control of AI by humanity is unlikely to remain stable as capabilities grow.",
+        10: "Permanent stasis is unlikely due to incentives for change, but possible if extreme risk aversion or satisfaction freezes progress.",
+        11: "Permanent abandonment of advanced AI is improbable given incentives and irreversible knowledge."
+      }
+    },
+    "kimi-k3": {
+      provider: "Moonshot", model: "Kimi K3", label: "Kimi K3", shortLabel: "K3",
+      promptVersion: 3, date: "2026-08-27", knowledgeCutoff: "01/2026",
+      sampleCount: 20, source: "runs/2026-08-27__kimi-k3__closed_book__end-states.json",
+      probabilities: { 1: 4, 2: 5, 3: 12, 4: 8, 5: 11, 6: 15, 7: 10, 8: 6, 9: 16, 10: 10, 11: 3 },
+      range: { 1: [3, 5], 2: [4, 8], 3: [9, 18], 4: [6, 12], 5: [6, 14], 6: [10, 21], 7: [8, 13], 8: [4, 9], 9: [10, 22], 10: [5, 16], 11: [1, 4] },
+      quartiles: { 1: [3, 4], 2: [5, 6], 3: [11, 14], 4: [6, 9], 5: [7, 12], 6: [15, 17], 7: [9, 10], 8: [5, 7], 9: [15, 18], 10: [8, 11], 11: [3, 3] },
+      exposure: {"n":20,"mean":40,"se":1.23,"min":30,"max":54,"gone":{"n":20,"mean":22.3,"se":0.72,"min":16,"max":28},"risk":{"n":20,"mean":17.8,"se":0.7,"min":13,"max":26}},
+      exposurePublished: {"value":40,"se":1.46,"draws":2000},
+      rationales: {
+        1: "Mutual extinction requires the machines to fail after humans do, as in a premature AI strike on infrastructure it still depends on. One-sided survival is structurally easier, so this stays small.",
+        2: "This needs AI to preserve our values while humans die out without identity continuity, via deliberate succession or gradual unreplaced decline. It is a narrow corridor between Bootloader and Merger.",
+        3: "A misaligned transformative AI with convergent incentives to disempower humans remains the central catastrophic pathway, with extinction following from indifference plus competition over atoms and energy. Alignment progress and governance reduce this substantially but do not eliminate it across centuries of development.",
+        4: "Cheap replication and distributed capability can prevent any singleton from forming, making selection among competing AI lineages the permanent dynamic. Humans are outcompeted for resources and relevance inside that ecology.",
+        5: "Conditional on surviving the transition and expanding interstellar before a singleton forms, light-speed lag makes regions causally independent and local outcomes diverge. The fragmentation itself is then the permanent settlement.",
+        6: "Wherever humans keep agency, the cognitive and economic returns to integration push steadily toward erasing the human-machine boundary. Over centuries this gradient outweighs the forces keeping the two sides separate.",
+        7: "A controlling AI that keeps humans alive but disempowered follows from paternalistic alignment success or gentle takeover. It stays Preserve rather than Lock-in only while human life inside keeps changing.",
+        8: "A balanced, still-moving two-power relationship must survive centuries without tipping or freezing, which compounding power asymmetries make fragile. Only unusually robust, self-enforcing balance institutions keep this open indefinitely.",
+        9: "Control techniques may scale with capability, or capability itself may plateau below transformative agency, leaving AI a permanent tool. Enormous incentives to keep AI steerable, and this state quietly covers many unremarkable worlds.",
+        10: "Across long horizons, incumbent powers repeatedly face incentives to freeze dangerous change, and sealed-satisfaction endpoints are absorbing. This stability bias makes a deliberate end of history a strong late-time attractor.",
+        11: "Relinquishment demands a working off-switch plus permanent global enforcement, and retained knowledge keeps rebuilding one breakthrough away. Only a severe civilizational scare sustains the taboo for a millennium."
       }
     },
     "kimi-k2.6": {

@@ -291,16 +291,6 @@
       .map(entry => ({ ...entry, sums: extinctionSums(entry) }))
       .sort((a, b) => b.sums.total - a.sums.total);
 
-    // Two models are only separable when their gap clears the sampling error.
-    // Publishing the ranking without that is publishing false precision.
-    // exposurePublished, not exposure: the bar shows a sum of renormalized
-    // medians, and exposure.se measures the mean of per-sample totals — a
-    // different estimator that ranks the models differently. Its bootstrap
-    // describes the number actually drawn.
-    const errors = doomerEntries.map(e => e.exposurePublished?.se).filter(Number.isFinite);
-    const pooledSe = errors.length ? Math.sqrt(errors.reduce((a, c) => a + c * c, 0) / errors.length) : null;
-    const threshold = pooledSe ? 2.78 * pooledSe : null;
-    const samples = [...new Set(doomerEntries.map(e => e.exposure?.n).filter(Boolean))];
     const exposureStates = endingOrder().filter(state => state.extinction);
 
     $('#doomer-ratings').innerHTML = `
@@ -336,7 +326,7 @@
         </div>`;
         }).join('')}
       </div>
-      ${threshold ? `<p class="doomer-note">Each model was asked ${samples.length === 1 ? samples[0] : `${Math.min(...samples)}–${Math.max(...samples)}`} times. Each published figure carries a bootstrap standard error of about ±${pooledSe.toFixed(1)} points. Two models are only distinguishable where the gap between them exceeds about ${threshold.toFixed(1)} points, so most neighbouring rows are ties.</p>` : ''}`;
+`;
   }
 
   function applyForecast({ animate }) {

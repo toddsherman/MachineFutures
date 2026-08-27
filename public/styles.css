@@ -374,7 +374,7 @@ body.dialog-open { overflow: hidden; }
 
 /* Matrix: endings down, models across, grouped by lab. Scales with the roster —
    a new model is one more column, not another full-width block. */
-.matrix-section { border-top: 1px solid var(--line); }
+.matrix-section, .states-section { border-top: 1px solid var(--line); }
 .matrix-scroll { margin-top: 34px; overflow-x: auto; overscroll-behavior-x: contain; }
 .matrix { --label: 250px; --cell: minmax(46px, 1fr); min-width: max-content; }
 .matrix-row { display: grid; grid-template-columns: var(--label) repeat(var(--cols), var(--cell)); }

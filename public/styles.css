@@ -42,7 +42,7 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 
 .states-section, .model-mix, .matrix-section { padding-block: 76px; }
 .section-heading { margin-bottom: 52px; display: flex; align-items: flex-end; justify-content: space-between; gap: 48px; }
-.section-heading h2, .leader-title { margin: 0; font: 900 clamp(46px, 7vw, 112px)/.78 var(--display); letter-spacing: -.085em; text-transform: uppercase; }
+.section-heading h2, .leader-title, .method-hero h1 { margin: 0; font: 900 clamp(46px, 7vw, 112px)/.78 var(--display); letter-spacing: -.085em; text-transform: uppercase; }
 /* The note can no longer share a line with type this size, so cap it and let
    the heading take the width it needs. */
 .section-heading .section-note { max-width: 34ch; }
@@ -68,7 +68,6 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .end-intro { display: grid; grid-template-columns: minmax(0, 1fr) 340px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .end-consensus { min-width: 0; padding: 52px 60px 56px 0; border-right: 1px solid var(--line); }
 .section-heading.compact { align-items: end; }
-.end-consensus .section-heading h2 { font-size: clamp(40px, 5vw, 80px); }
 .stacked-bar { height: 100px; display: flex; overflow: hidden; border: 1px solid var(--ink); }
 .stacked-bar button, .model-stack button { min-width: 2px; padding: 0; display: grid; place-items: center; border: 0; border-right: 1px solid rgba(17,18,15,.4); background: var(--state); cursor: pointer; }
 .stacked-bar button:hover { filter: brightness(1.15); }
@@ -337,11 +336,10 @@ body.dialog-open { overflow: hidden; }
 
 @media (max-width: 560px) {
   :root { --gutter: 14px; }
-  .hero h1, .end-hero h1, .method-hero h1 { font-size: clamp(44px, 16vw, 86px); }
+  .hero h1, .end-hero h1 { font-size: clamp(44px, 16vw, 86px); }
   .signal-section, .states-section, .model-mix { padding-block: 76px; }
   .section-heading { margin-bottom: 36px; }
-  .section-heading h2, .leader-title { font-size: clamp(38px, 12vw, 52px); }
-  .end-consensus .section-heading h2 { font-size: clamp(36px, 11vw, 48px); }
+  .section-heading h2, .leader-title, .method-hero h1 { font-size: clamp(38px, 12vw, 52px); }
   .stacked-bar { height: 72px; }
   .stacked-legend { grid-template-columns: 1fr; }
   .state-grid { grid-template-columns: 1fr; }

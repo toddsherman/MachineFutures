@@ -32,8 +32,6 @@ a { color: inherit; }
 .footer-note { margin: 0; }
 .footer-dataset { margin-top: 10px; display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font: 11px var(--mono); text-transform: uppercase; }
 .footer-dataset b { color: var(--paper); }
-.kicker { margin: 0 0 22px; font: 700 12px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
-.kicker::before { content: ""; display: inline-block; width: 28px; border-top: 1px solid; margin: 0 10px 3px 0; }
 h1, h2, h3, p { margin-top: 0; }
 .hero h1, .end-hero h1, .method-hero h1 { margin: 0; font: 900 clamp(62px, 8vw, 128px)/.78 var(--display); letter-spacing: -.085em; text-transform: uppercase; }
 h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-order: stroke fill; font-style: normal; }
@@ -43,8 +41,11 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .text-link:hover span { transform: translateY(3px); }
 
 .states-section, .model-mix, .matrix-section { padding-block: 76px; }
-.section-heading { margin-bottom: 52px; display: flex; align-items: flex-end; justify-content: space-between; gap: 60px; }
-.section-heading h2 { margin: 0; font: 900 clamp(46px, 5vw, 78px)/.88 var(--display); letter-spacing: -.065em; text-transform: uppercase; }
+.section-heading { margin-bottom: 52px; display: flex; align-items: flex-end; justify-content: space-between; gap: 48px; }
+.section-heading h2, .leader-title { margin: 0; font: 900 clamp(46px, 7vw, 112px)/.78 var(--display); letter-spacing: -.085em; text-transform: uppercase; }
+/* The note can no longer share a line with type this size, so cap it and let
+   the heading take the width it needs. */
+.section-heading .section-note { flex: 0 1 34ch; }
 .section-note { max-width: 430px; margin: 0; color: var(--muted); font-size: 16px; line-height: 1.55; }
 .end-forecast-toggle { margin-bottom: 30px; display: flex; flex-wrap: wrap; gap: 8px; }
 .end-toggle-button { min-height: 38px; padding: 9px 13px; display: inline-flex; align-items: center; gap: 8px; color: var(--muted); border: 1px solid var(--line); border-radius: 99px; background: transparent; font: 700 11px var(--mono); text-transform: uppercase; cursor: pointer; }
@@ -66,7 +67,8 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .end-intro { display: grid; grid-template-columns: minmax(0, 1fr) 340px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .end-consensus { min-width: 0; padding: 52px 60px 56px 0; border-right: 1px solid var(--line); }
 .section-heading.compact { align-items: end; }
-.section-heading.compact h2 { font-size: clamp(42px, 4vw, 64px); }
+.end-consensus .section-heading h2 { font-size: clamp(40px, 5vw, 80px); }
+.leader-title { font-size: clamp(30px, 2.6vw, 40px); }
 .stacked-bar { height: 100px; display: flex; overflow: hidden; border: 1px solid var(--ink); }
 .stacked-bar button, .model-stack button { min-width: 2px; padding: 0; display: grid; place-items: center; border: 0; border-right: 1px solid rgba(17,18,15,.4); background: var(--state); cursor: pointer; }
 .stacked-bar button:hover { filter: brightness(1.15); }
@@ -87,7 +89,7 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .stacked-legend i { width: 8px; height: 8px; background: var(--state); }
 .stacked-legend b { font-size: 12px; }
 .end-leader { padding: 52px 0 56px 46px; }
-.end-leader h2 { max-width: 260px; margin: 22px 0 0; font: 900 42px/.9 var(--display); text-transform: uppercase; letter-spacing: -.05em; }
+.leader-name { max-width: 260px; margin: 26px 0 0; font: 900 42px/.9 var(--display); text-transform: uppercase; letter-spacing: -.05em; }
 .end-leader strong { display: block; margin: 20px 0 35px; font: 900 82px/.8 var(--display); letter-spacing: -.06em; }
 .end-leader > p:last-child { color: var(--muted); font-size: 15px; line-height: 1.55; }
 .state-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
@@ -338,7 +340,9 @@ body.dialog-open { overflow: hidden; }
   .hero h1, .end-hero h1, .method-hero h1 { font-size: clamp(44px, 16vw, 86px); }
   .signal-section, .states-section, .model-mix { padding-block: 76px; }
   .section-heading { margin-bottom: 36px; }
-  .section-heading h2 { font-size: 46px; }
+  .section-heading h2 { font-size: clamp(38px, 12vw, 52px); }
+  .end-consensus .section-heading h2 { font-size: clamp(36px, 11vw, 48px); }
+  .leader-title { font-size: 28px; }
   .stacked-bar { height: 72px; }
   .stacked-legend { grid-template-columns: 1fr; }
   .state-grid { grid-template-columns: 1fr; }

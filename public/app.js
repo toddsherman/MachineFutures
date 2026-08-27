@@ -339,7 +339,10 @@
   function applyForecast({ animate }) {
     const activeRun = endStateRuns[activeEndForecast];
     const activeLabel = activeRun ? `${activeRun.label || activeEndForecast} forecast` : 'Median machine forecast';
-    $('#end-forecast-title').textContent = activeLabel;
+    const [lead, ...tail] = activeLabel.split(' ');
+    $('#end-forecast-title').innerHTML = tail.length
+      ? `${esc(lead)} <em>${esc(tail.join(' '))}</em>`
+      : `<em>${esc(activeLabel)}</em>`;
 
     const selectedStates = selectedEndStates();
     const entriesForRange = longTermEntries();
@@ -426,7 +429,7 @@
     const leader = [...selectedStates].sort((a, b) => b.probability - a.probability)[0];
     const leaderEl = $('#end-leader');
     const paint = () => {
-      leaderEl.innerHTML = `<p class="kicker">Most likely ending</p><h2>${esc(leader.name)}</h2><strong>${leader.probability}%</strong><p>${esc(leader.description)}</p>`;
+      leaderEl.innerHTML = `<h2 class="leader-title">Most likely <em>ending</em></h2><p class="leader-name">${esc(leader.name)}</p><strong>${leader.probability}%</strong><p>${esc(leader.description)}</p>`;
     };
     // The leader can become a different ending entirely, so it crossfades
     // rather than counting between two unrelated states.

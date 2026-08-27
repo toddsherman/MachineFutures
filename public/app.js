@@ -426,11 +426,18 @@
       card.setAttribute('aria-label', `${state.name}: ${state.probability}% — see each model's reasoning`);
     });
 
-    const leader = [...selectedStates].sort((a, b) => b.probability - a.probability)[0];
+    // Always the median across models, never the selected model: this panel
+    // states the board's answer, and tying it to the selector turned one
+    // model's opinion into the headline as you browsed.
+    const leader = [...stateMedians()].sort((a, b) => b.probability - a.probability)[0];
     const leaderEl = $('#end-leader');
     const paint = () => {
       leaderEl.innerHTML = `<h2 class="leader-title">Most likely <em>ending</em></h2><p class="leader-name">${esc(leader.name)}</p><strong>${leader.probability}%</strong><p>${esc(leader.description)}</p>`;
     };
+    // Selecting a model no longer moves this panel, so there is nothing to
+    // animate: without this it would re-tween the same figure on every click.
+    if (Number(leaderEl.dataset.leader) === leader.id && leaderEl.dataset.leaderValue === String(leader.probability)) return;
+    leaderEl.dataset.leaderValue = String(leader.probability);
     // The leader can become a different ending entirely, so it crossfades
     // rather than counting between two unrelated states.
     if (!animate || reduceMotion() || Number(leaderEl.dataset.leader) === leader.id) {

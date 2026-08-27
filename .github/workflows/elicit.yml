@@ -178,7 +178,10 @@ jobs:
 
       - name: Import into site data
         if: ${{ !inputs.check_only && !inputs.list_models }}
-        run: node tools/import-runs.mjs
+        run: |
+          set -euo pipefail
+          node tools/import-runs.mjs
+          node tools/export-data.mjs
 
       # Syntax alone was checked before, and only on the generated file — a
       # run could publish a valid-JS allocation that did not sum to 100, or an
@@ -204,7 +207,7 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "$BRANCH"
-          git add runs public/data.js
+          git add runs public/data.js data
           if git diff --cached --quiet; then
             echo "No changes to commit."; exit 0
           fi

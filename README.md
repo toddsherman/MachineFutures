@@ -31,7 +31,7 @@ The site's headline "median machine forecast" is the coordinate-wise median acro
 
 Extinction-risk exposure is the sum of the five extinction-risk medians, and the error quoted beneath that chart is bootstrapped from the model's own samples so it describes that estimator rather than the mean of per-sample totals. The two disagree enough to reorder the board, which is why `exposurePublished` exists alongside `exposure`.
 
-The authoring path is `tools/run-elicitation.mjs` (or the local ingester for manual runs) -> batch JSON in `runs/` -> `node tools/import-runs.mjs` -> git push -> Vercel deploy. The importer rewrites the IMPORTED END-STATE RUNS block in `public/data.js` with each provider's newest run and updates the dataset badge date.
+The authoring path is `tools/run-elicitation.mjs` (or the local ingester for manual runs) -> batch JSON in `runs/` -> `node tools/import-runs.mjs` -> `node tools/export-data.mjs` -> git push -> Vercel deploy. The importer rewrites the IMPORTED END-STATE RUNS block in `public/data.js` with each provider's newest run and updates the dataset badge date.
 
 Run identity always comes from the model id actually called, never the model's self-report — models are unreliable narrators about their own version. The self-report is stored as `model.self_reported_name` for interest.
 
@@ -111,6 +111,8 @@ Local dry run: `node tools/run-elicitation.mjs --mock`. Mock batches are written
 - `tools/import-runs.mjs` — imports `runs/*.json` into `public/data.js`
 - `tools/run-elicitation.mjs` — automated end-state elicitation harness (used by the workflow)
 - `tools/models.json` — model roster: provider, API adapter, model id, key env var
+- `data/` — generated, downloadable copy of everything published (CSV + JSON)
+- `tools/export-data.mjs` — rebuilds `data/` from `public/data.js` and `runs/`
 - `tools/check-site.mjs` — invariant check on `public/data.js`, run in CI after import
 - `tools/verify-runs.mjs` — integrity check on the raw batches in `runs/` (`--backfill-integrity` to add digests to older files)
 - `tools/test-classify.mjs` — asserts the harness sorts provider errors into transient / quota / permanent correctly

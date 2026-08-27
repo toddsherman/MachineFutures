@@ -226,27 +226,27 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .method-view { padding-bottom: 84px; }
 .method-hero { padding-block: 76px 46px; display: flex; flex-direction: column; }
 .method-hero .dek { margin: 26px 0 0; }
-.method-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--ink); }
+.method-list { margin-block: 0; padding: 0; list-style: none; border-top: 1px solid var(--ink); }
 .method-list li {
-  display: grid; grid-template-columns: 22px minmax(0, 1fr); column-gap: 16px;
-  padding: 26px 0 28px; border-bottom: 1px solid var(--line);
+  display: grid; grid-template-columns: 18px minmax(0, 1fr); column-gap: 14px;
+  padding: 20px 0 22px; border-bottom: 1px solid var(--line);
 }
 .method-list li:last-child { border-bottom: 1px solid var(--ink); }
-/* A drawn square rather than list-style, so the bullet keeps the site's
-   hard-edged geometry and sits on the cap height of the heading beside it. */
+/* A drawn square rather than list-style, so the marker keeps the site's
+   hard-edged geometry and sits on the cap height of the line beside it. */
 .method-list li::before {
   content: ""; grid-column: 1; grid-row: 1;
-  width: 10px; height: 10px; margin-top: 12px; background: var(--ink);
+  width: 7px; height: 7px; margin-top: 7px; background: var(--ink);
 }
-.method-list h2 { grid-column: 2; grid-row: 1; margin: 0; font: 900 30px var(--display); letter-spacing: -.04em; text-transform: uppercase; }
-.method-list p { grid-column: 2; grid-row: 2; margin: 10px 0 0; max-width: 68ch; color: var(--muted); font-size: 16px; line-height: 1.55; }
+.method-list h2 { grid-column: 2; grid-row: 1; margin: 0; font: 800 17px var(--display); letter-spacing: -.01em; text-transform: uppercase; }
+.method-list p { grid-column: 2; grid-row: 2; margin: 6px 0 0; max-width: 74ch; color: var(--muted); font-size: 15px; line-height: 1.55; }
 .method-link {
-  grid-column: 2; grid-row: 3; justify-self: start; margin-top: 14px;
-  display: inline-flex; align-items: center; gap: 7px;
+  grid-column: 2; grid-row: 3; justify-self: start; margin-top: 10px;
+  display: inline-flex; align-items: center; gap: 6px;
   border-bottom: 1px solid var(--ink); padding-bottom: 2px;
-  font: 800 11px var(--mono); text-transform: uppercase; letter-spacing: .06em;
+  font: 800 10px var(--mono); text-transform: uppercase; letter-spacing: .05em;
 }
-.method-link span { font-size: 12px; }
+.method-link span { font-size: 11px; }
 .method-link:hover { color: var(--muted); border-bottom-color: var(--muted); }
 .button { padding: 17px 21px; display: inline-flex; gap: 28px; flex: 0 0 auto; color: var(--paper); background: var(--ink); text-decoration: none; font: 700 12px var(--mono); text-transform: uppercase; }
 .prompt-buttons { display: flex; flex-direction: column; gap: 12px; flex: 0 0 auto; }
@@ -355,9 +355,10 @@ body.dialog-open { overflow: hidden; }
   .doomer-total { grid-column: 2; grid-row: 1; }
   .doomer-meter { grid-column: 1 / -1; grid-row: 2; }
   .method-hero { padding-block: 52px 34px; }
-  .method-list li { grid-template-columns: 16px minmax(0, 1fr); column-gap: 12px; padding: 22px 0 24px; }
-  .method-list li::before { width: 8px; height: 8px; margin-top: 9px; }
-  .method-list h2 { font-size: 24px; }
+  .method-list li { grid-template-columns: 14px minmax(0, 1fr); column-gap: 11px; padding: 18px 0 20px; }
+  .method-list li::before { width: 6px; height: 6px; margin-top: 6px; }
+  .method-list h2 { font-size: 15px; }
+  .method-list p { font-size: 14px; }
   .site-footer { grid-template-columns: 1fr; min-height: 320px; padding: 45px 20px; align-items: start; }
   .detail-dialog { width: 100%; }
   #dialog-content { padding: 45px 20px 70px; }

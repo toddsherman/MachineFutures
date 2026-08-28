@@ -1,0 +1,14 @@
+{
+  "name": "machine-futures",
+  "private": true,
+  "type": "module",
+  "description": "A public record of what frontier AI models think about the long-run end state of humanity's relationship with AI.",
+  "scripts": {
+    "check": "node tools/verify-runs.mjs && node tools/check-site.mjs && node --test tools/test-classify.mjs tools/test-harness.mjs",
+    "test:browser": "playwright test",
+    "serve": "python3 -m http.server 4173 --directory public"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0"
+  }
+}

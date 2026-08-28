@@ -32,8 +32,8 @@ jobs:
       - name: Verify published data
         run: node tools/check-site.mjs
 
-      - name: Error classification
-        run: node tools/test-classify.mjs
+      - name: Unit and harness tests
+        run: node --test tools/test-classify.mjs tools/test-harness.mjs
 
       # The importer must be a pure function of runs/: if re-running it changes
       # public/data.js, the committed file was hand-edited or is out of date.
@@ -48,3 +48,30 @@ jobs:
             exit 1
           fi
           echo "public/data.js and data/ are reproducible from runs/"
+
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+
+      # The runner has none of the condensed faces the design asks for, so it
+      # renders the pessimistic fallback — which is exactly the case that
+      # clipped headings on iOS.
+      - name: Layout and behaviour
+        run: npx playwright test
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

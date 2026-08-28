@@ -664,6 +664,8 @@
   if (datasetDate) $('#dataset-date').textContent = datasetDate;
   applyUrlState();
   renderEndStates();
+  window.MF_TEST = { normalizeTo100, stateMedians, extinctionSums, esc, median };
+
   revealOnView('.state-strip', { watch: '.strip-axis', threshold: 1 });
   revealOnView('.matrix', { threshold: 0.12 });
 })();

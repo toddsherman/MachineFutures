@@ -101,6 +101,18 @@ Adding a model is one entry in `tools/models.json` plus its key. Anything with a
 
 Local dry run: `node tools/run-elicitation.mjs --mock`. Mock batches are written to `runs/.mock/` (gitignored) so a dry run can never overwrite a paid one.
 
+## Tests
+
+`npm run check` runs everything that needs no browser: the raw batches, the published data, the error classifier, and the harness. `npm run test:browser` runs the layout suite.
+
+Three tiers, because the failures come in three kinds:
+
+- **Data** — `verify-runs` and `check-site` assert that every sample is a valid allocation, every digest matches, and no published figure sits outside the spread it is drawn against.
+- **Harness** — `test-harness` covers the failures that lose or duplicate paid data: a dry run must not touch a real batch, a rerun must not shrink one, a short batch must be topped up rather than re-bought, and a damaged file must be set aside rather than overwritten. Every one of those is a bug this repository shipped.
+- **Layout** — `tests/site.spec.mjs` in Chromium and WebKit at three widths. This tier exists because a whole class of defect is invisible without a real engine: a band that draws at zero width, a `flex-basis` that becomes a height once the heading stacks, a media query that loses to a more specific selector, a heading that overflows only in the font iOS actually falls back to. The CI runner has none of the condensed faces the design asks for, so it renders the pessimistic fallback — which is the case that clipped headings on a phone.
+
+The suite is checked by reintroducing each fixed bug and confirming it fails; a test that has never failed proves nothing.
+
 ## Repository structure
 
 - `public/` — the complete deployable website
@@ -116,6 +128,8 @@ Local dry run: `node tools/run-elicitation.mjs --mock`. Mock batches are written
 - `tools/check-site.mjs` — invariant check on `public/data.js`, run in CI after import
 - `tools/verify-runs.mjs` — integrity check on the raw batches in `runs/` (`--backfill-integrity` to add digests to older files)
 - `tools/test-classify.mjs` — asserts the harness sorts provider errors into transient / quota / permanent correctly
+- `tools/test-harness.mjs` — behaviour tests for the elicitation harness, run against `--mock` so they cost nothing
+- `tests/site.spec.mjs` — layout and behaviour tests in a real browser
 - `.github/workflows/ci.yml` — parses the app, verifies `runs/`, and checks that `public/data.js` is reproducible from it
 - `.github/workflows/preflight.yml` — monthly key-and-model canary ahead of the paid sweep
 - `.github/workflows/elicit.yml` — scheduled/manual elicitation → PR pipeline

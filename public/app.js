@@ -77,24 +77,41 @@
   // while the legend printed the raw figures, so widths and labels described
   // two different vectors. Normalise once here and everything downstream
   // (legend, bar, cards, leader, dialog) reads the same numbers.
-  function normalizeTo100(values) {
+  function normalizeTo100(values, soft, hard) {
     const total = values.reduce((sum, v) => sum + v, 0);
     if (!total) return values.map(() => 0);
     const scaled = values.map(v => (v / total) * 100);
     const out = scaled.map(Math.floor);
     const shortfall = 100 - out.reduce((sum, v) => sum + v, 0);
-    scaled
-      .map((v, i) => [v - out[i], i])
-      .sort((a, b) => b[0] - a[0])
-      .slice(0, shortfall)
-      .forEach(([, i]) => { out[i] += 1; });
+    const order = scaled.map((v, i) => [v - out[i], i]).sort((a, b) => b[0] - a[0]).map(([, i]) => i);
+    const ceiling = (bounds, i) => (Number.isFinite(bounds?.[i]) ? bounds[i] : Infinity);
+
+    // Offer each remainder first to a state still inside its middle half
+    // across models, then to one still inside the full spread, and only then
+    // without a bound.
+    let given = 0;
+    for (const bounds of [soft, hard, null]) {
+      if (given >= shortfall) break;
+      for (const i of order) {
+        if (given >= shortfall) break;
+        if (bounds && out[i] + 1 > ceiling(bounds, i)) continue;
+        out[i] += 1;
+        given += 1;
+      }
+    }
     return out;
   }
 
   function stateMedians() {
     const ordered = endingOrder();
-    const medians = ordered.map(state => median(Object.values(endStateRuns).map(run => stateValue(run, state))));
-    const normalized = normalizeTo100(medians);
+    const runs = Object.values(endStateRuns);
+    const columns = ordered.map(state => runs.map(run => stateValue(run, state)).sort((a, b) => a - b));
+    const at = (col, f) => { const i = (col.length - 1) * f, lo = Math.floor(i), hi = Math.ceil(i); return col[lo] + (col[hi] - col[lo]) * (i - lo); };
+    const normalized = normalizeTo100(
+      columns.map(median),
+      columns.map(col => at(col, 0.75)),
+      columns.map(col => col.at(-1))
+    );
     return ordered.map((state, i) => ({ ...state, probability: normalized[i] }));
   }
 
@@ -386,27 +403,25 @@
       const axis = card.querySelector('.strip-axis');
       const rangeEl = card.querySelector('.strip-range');
       const iqrEl = card.querySelector('.strip-iqr');
-      if (Number.isFinite(band.lo) && Number.isFinite(band.hi)) {
-        rangeEl.style.left = `${pct(band.lo).toFixed(2)}%`;
-        rangeEl.style.width = `${(pct(band.hi) - pct(band.lo)).toFixed(2)}%`;
-        rangeEl.style.setProperty('--origin', origin(state.probability, band.lo, band.hi));
-        rangeEl.hidden = false;
-      } else rangeEl.hidden = true;
-      if (Number.isFinite(band.q1) && Number.isFinite(band.q3)) {
-        // A middle half that collapses to one figure — common, since most models
-        // land on the same number — would otherwise be drawn starting at that
-        // figure, leaving the tick sitting on its edge rather than within it.
-        // Give it a floor and centre it on the value instead.
-        const floor = axisMax * 0.012;
-        const mid = (band.q1 + band.q3) / 2;
-        const half = Math.max((band.q3 - band.q1) / 2, floor / 2);
+      // A band whose ends coincide draws at zero width and disappears, which
+      // reads as a broken chart rather than as the thing it means: every
+      // sample landed on the same figure. Both bands take the same minimum,
+      // centred on the value, so the tick sits within its band rather than on
+      // the edge of a band that is not there.
+      const floor = axisMax * 0.012;
+      const placeBand = (el, lo, hi) => {
+        if (!Number.isFinite(lo) || !Number.isFinite(hi)) { el.hidden = true; return; }
+        const mid = (lo + hi) / 2;
+        const half = Math.max((hi - lo) / 2, floor / 2);
         const from = Math.max(mid - half, 0);
         const to = Math.min(mid + half, axisMax);
-        iqrEl.style.left = `${pct(from).toFixed(2)}%`;
-        iqrEl.style.width = `${(pct(to) - pct(from)).toFixed(2)}%`;
-        iqrEl.style.setProperty('--origin', origin(state.probability, from, to));
-        iqrEl.hidden = false;
-      } else iqrEl.hidden = true;
+        el.style.left = `${pct(from).toFixed(2)}%`;
+        el.style.width = `${(pct(to) - pct(from)).toFixed(2)}%`;
+        el.style.setProperty('--origin', origin(state.probability, from, to));
+        el.hidden = false;
+      };
+      placeBand(rangeEl, band.lo, band.hi);
+      placeBand(iqrEl, band.q1, band.q3);
       axis.title = band.detail;
       card.querySelector('.range-text').textContent = band.caption;
 

@@ -51,10 +51,29 @@ for (const [key, run] of entries) {
 const median = list => { const s = [...list].sort((a, b) => a - b); const n = s.length; return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2; };
 const medians = STATE_IDS.map(id => median(entries.map(([, run]) => run.probabilities[id])));
 const total = medians.reduce((a, c) => a + c, 0);
+const columns = STATE_IDS.map(id => entries.map(([, run]) => run.probabilities[id]).sort((a, b) => a - b));
+const quantile = (column, f) => { const k = (column.length - 1) * f, lo = Math.floor(k), hi = Math.ceil(k); return column[lo] + (column[hi] - column[lo]) * (k - lo); };
 const scaled = medians.map(v => (v / total) * 100);
 const out = scaled.map(Math.floor);
-scaled.map((v, i) => [v - out[i], i]).sort((a, b) => b[0] - a[0]).slice(0, 100 - out.reduce((a, c) => a + c, 0)).forEach(([, i]) => { out[i] += 1; });
+const order = scaled.map((v, i) => [v - out[i], i]).sort((a, b) => b[0] - a[0]).map(([, i]) => i);
+let given = 0;
+const shortfall = 100 - out.reduce((a, c) => a + c, 0);
+for (const bounds of [columns.map(c => quantile(c, 0.75)), columns.map(c => c.at(-1)), null]) {
+  if (given >= shortfall) break;
+  for (const i of order) {
+    if (given >= shortfall) break;
+    if (bounds && out[i] + 1 > bounds[i]) continue;
+    out[i] += 1; given += 1;
+  }
+}
 if (out.reduce((a, c) => a + c, 0) !== 100) problems.push(`headline aggregate normalises to ${out.reduce((a, c) => a + c, 0)}, not 100`);
+for (const [i, id] of STATE_IDS.entries()) {
+  const column = entries.map(([, run]) => run.probabilities[id]).sort((a, b) => a - b);
+  const at = f => { const k = (column.length - 1) * f, lo = Math.floor(k), hi = Math.ceil(k); return column[lo] + (column[hi] - column[lo]) * (k - lo); };
+  if (out[i] < at(0.25) || out[i] > at(0.75)) {
+    problems.push(`headline S${id} published ${out[i]}% outside the models' middle half ${at(0.25)}-${at(0.75)}%`);
+  }
+}
 
 if (problems.length) { problems.forEach(p => console.error('✗ ' + p)); process.exit(1); }
 console.log(`✓ ${entries.length} runs valid — each sums to 100, sits inside its sample range, and carries an exposure error for the figure drawn`);

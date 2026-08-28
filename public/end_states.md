@@ -1,7 +1,5 @@
 # Machine Futures End States
 
-Prompt version: 3 — July 2026. (Version 1, June 2026, used different state names, a different numbering, and none of the boundary rules below. Version 2, July 2026, introduced the current taxonomy but asked for a fabricated `current_datetime` timestamp instead of `as_of_date`. Forecasts elicited under earlier versions are marked as such in the published dataset.)
-
 Eleven mutually exclusive end states used by Machine Futures to ask where humanity's relationship with AI ultimately settles.
 
 Markers: ⧖ marks states 1 through 3, where humanity is gone. ⚠ marks states 4 and 5, where humanity survives in some versions and perishes in others. "Humanity is gone" means humans died or were destroyed without continuity of individual identity. Voluntary transformation with continuity — merger, uploading, radical self-modification — belongs in The Merger, or in The Lock-in if the transformed state is sealed and static.

@@ -120,6 +120,42 @@ test.describe('every model view', () => {
   });
 });
 
+test.describe('the charts are actually painted', () => {
+  test('every band is visible once its card is on screen', async ({ page }) => {
+    await settle(page);
+    const cards = page.locator('.state-card');
+    const count = await cards.count();
+    const invisible = [];
+    for (let i = 0; i < count; i++) {
+      await cards.nth(i).scrollIntoViewIfNeeded();
+      await page.waitForTimeout(1000);   // longer than the reveal's own rescue
+      // getBoundingClientRect, not offsetWidth: a band scaled to zero still has
+      // layout width, and reporting that is how this went unnoticed.
+      const blank = await cards.nth(i).evaluate(card => {
+        const out = [];
+        for (const sel of ['.strip-range', '.strip-iqr']) {
+          const el = card.querySelector(sel);
+          if (el.hidden) continue;
+          if (el.getBoundingClientRect().width < 0.5) {
+            out.push(`S${card.dataset.state} ${sel} paints at zero (layout ${el.offsetWidth}px, transform ${getComputedStyle(el).transform})`);
+          }
+        }
+        return out;
+      });
+      invisible.push(...blank);
+    }
+    expect(invisible).toEqual([]);
+  });
+
+  test('no strip is left waiting for an animation', async ({ page }) => {
+    await settle(page);
+    await page.waitForTimeout(4500);   // past the long-stop
+    const stuck = await page.evaluate(() => [...document.querySelectorAll('.state-strip.will-reveal, .matrix.will-reveal')]
+      .map(el => el.className));
+    expect(stuck).toEqual([]);
+  });
+});
+
 test.describe('behaviour', () => {
   test('the leader panel ignores the model selector', async ({ page }) => {
     await settle(page);

@@ -654,12 +654,26 @@
     }, { threshold, rootMargin });
     targets.forEach(el => io.observe((watch && el.querySelector(watch)) || el));
 
-    // Long-stop for anything never observed — a viewport too short to ever hold
-    // the axis whole, say. It clears the hidden state without animating, rather
-    // than firing every remaining card at once.
-    setTimeout(() => targets.forEach(el => {
-      if (!el.classList.contains('is-in')) el.classList.remove('will-reveal');
-    }), 10000);
+    // The animation waits for the whole axis to be on screen. A short viewport,
+    // a zoomed page, or a scroll that never quite frames a card can miss that
+    // threshold — and because the hidden state is opt-in, missing it leaves the
+    // chart blank rather than unanimated. This second observer gives up on the
+    // animation and shows the element once it has simply been on screen.
+    const rescue = new IntersectionObserver(records => {
+      records.forEach(record => {
+        if (!record.isIntersecting) return;
+        const host = record.target.closest(selector) || record.target;
+        rescue.unobserve(record.target);
+        setTimeout(() => {
+          if (!host.classList.contains('is-in')) host.classList.remove('will-reveal');
+        }, 700);
+      });
+    }, { threshold: 0 });
+    targets.forEach(el => rescue.observe(el));
+
+    // Long-stop for anything never scrolled to at all. Four seconds, not ten:
+    // nothing is worth showing a reader an empty chart for ten seconds.
+    setTimeout(() => targets.forEach(el => el.classList.remove('will-reveal')), 4000);
   }
 
   if (datasetDate) $('#dataset-date').textContent = datasetDate;

@@ -35,6 +35,7 @@ a { color: inherit; }
 h1, h2, h3, p { margin-top: 0; }
 .hero h1, .end-hero h1, .method-hero h1 { margin: 0; font: 900 clamp(62px, 8vw, 128px)/.78 var(--display); letter-spacing: -.085em; text-transform: uppercase; }
 h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-order: stroke fill; font-style: normal; }
+.hero h1, .end-hero h1, .method-hero h1, .section-heading h2, .leader-title { overflow-wrap: break-word; }
 .dek { max-width: 680px; font-size: clamp(20px, 1.7vw, 27px); line-height: 1.45; letter-spacing: -.025em; }
 .text-link { display: inline-flex; align-items: center; gap: 28px; padding-bottom: 7px; border-bottom: 1px solid; font: 700 13px var(--mono); text-decoration: none; text-transform: uppercase; }
 .text-link span { font-size: 18px; transition: transform .2s ease; }

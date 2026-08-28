@@ -22,7 +22,7 @@ test.describe('layout', () => {
           return r.width > 0 && r.right > doc.clientWidth + 1 && !el.closest('[style*="overflow"], .matrix-scroll, .end-forecast-toggle');
         })
         .slice(0, 5)
-        .map(el => `${el.tagName}.${(el.className || '').toString().split(' ')[0]}`);
+        .map(el => `${el.tagName}.${(el.className || '').toString().split(' ')[0]} "${el.innerText.replace(/\s+/g, ' ').trim().slice(0, 30)}"`);
       return { by: doc.scrollWidth - doc.clientWidth, wide };
     });
     expect(overflow.by, `elements past the right edge: ${overflow.wide.join(', ')}`).toBeLessThanOrEqual(0);

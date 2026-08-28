@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="theme-color" content="#11120f">
-  <meta name="description" content="Frontier AI models allocate 100 points across eleven ways the story of humanity and AI could end. A living record, re-asked as new models arrive.">
-  <title>Machine Futures — How does this story end?</title>
+  <meta name="description" content="We asked the leading AI models to assign 100 percentage points across 11 mutually exclusive end states for humanity&rsquo;s relationship with AI. A living record, re-asked as new models arrive.">
+  <title>Machine Futures — What is AI&rsquo;s predictions about AI?</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' fill='%23f2efe6'/%3E%3Cg fill='none' stroke='%2311120f' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M4 9.5 18 2l14 7.5v17L18 34 4 26.5z'/%3E%3Cpath d='M11 23h14'/%3E%3C/g%3E%3Ccircle cx='12' cy='16' r='2.1' fill='%2311120f'/%3E%3Ccircle cx='24' cy='16' r='2.1' fill='%2311120f'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -15,16 +15,13 @@
 
   <main id="main">
       <div class="end-hero shell">
-        <h1>How does this<br>story <em>end?</em></h1>
-        <div class="end-hero-side">
-          <p class="dek">We ask the leading AI models to assign 100 percentage points across eleven mutually exclusive end states for humanity&rsquo;s relationship with AI.</p>
-          <dl class="end-stats">
-            <div><dt>Models</dt><dd id="stat-models">—</dd></div>
-            <div><dt>Labs</dt><dd id="stat-labs">—</dd></div>
-            <div><dt>Samples each</dt><dd id="stat-samples">—</dd></div>
-          </dl>
-        </div>
+        <h1>What is AI&rsquo;s<br>predictions <em>about AI?</em></h1>
+        <p class="dek">We asked <b id="dek-models">—</b> of the leading AI models from <b id="dek-labs">—</b> labs to assign 100 percentage points across 11 mutually exclusive end states for humanity&rsquo;s relationship with AI.</p>
       </div>
+
+      <section class="end-leader-section shell" aria-labelledby="leader-title">
+        <div class="end-leader" id="end-leader"></div>
+      </section>
 
       <div class="end-intro shell">
         <div class="end-consensus">
@@ -36,7 +33,6 @@
           <div class="stacked-bar" id="consensus-bar" aria-label="Median probability by end state"></div>
           <div class="stacked-legend" id="consensus-legend"></div>
         </div>
-        <aside class="end-leader" id="end-leader"></aside>
       </div>
 
       <section class="states-section shell" aria-labelledby="states-title">

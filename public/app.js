@@ -212,9 +212,10 @@
   function renderHeroStats(entries) {
     const labs = new Set(entries.map(entry => entry.provider));
     const samples = [...new Set(entries.map(entry => entry.sampleCount).filter(Boolean))];
-    $('#stat-models').textContent = entries.length;
-    $('#stat-labs').textContent = labs.size;
-    $('#stat-samples').textContent = samples.length === 1 ? samples[0] : `${Math.min(...samples)}–${Math.max(...samples)}`;
+    const dekModels = $('#dek-models');
+    if (dekModels) dekModels.textContent = entries.length;
+    const dekLabs = $('#dek-labs');
+    if (dekLabs) dekLabs.textContent = labs.size;
     const methodSamples = $('#method-samples');
     if (methodSamples) methodSamples.textContent = samples.length === 1 ? samples[0] : `${Math.min(...samples)}–${Math.max(...samples)}`;
     const errors = entries.map(entry => entry.exposurePublished?.se).filter(Number.isFinite);
@@ -447,7 +448,7 @@
     const leader = [...stateMedians()].sort((a, b) => b.probability - a.probability)[0];
     const leaderEl = $('#end-leader');
     const paint = () => {
-      leaderEl.innerHTML = `<h2 class="leader-title">Most likely <em>ending</em></h2><p class="leader-name">${esc(leader.name)}</p><strong>${leader.probability}%</strong><p>${esc(leader.description)}</p>`;
+      leaderEl.innerHTML = `<h2 class="leader-title" id="leader-title">Most likely <em>ending</em></h2><p class="leader-name">${esc(leader.name)}</p><strong>${leader.probability}%</strong><p>${esc(leader.description)}</p>`;
     };
     // Selecting a model no longer moves this panel, so there is nothing to
     // animate: without this it would re-tween the same figure on every click.

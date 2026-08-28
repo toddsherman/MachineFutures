@@ -58,15 +58,12 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .end-toggle-button.is-median:hover { background: rgba(17, 18, 15, .08); }
 .end-toggle-button.is-median.active, .end-toggle-button.is-median.active:hover { color: var(--paper); background: var(--ink); border-color: var(--ink); }
 
-.end-hero { padding-block: 22px 40px; display: grid; grid-template-columns: 1.15fr .85fr; align-items: end; gap: 6vw; }
-.end-hero .dek { margin: 0; }
-.end-hero-side { display: grid; gap: 26px; }
-.end-stats { margin: 0; display: flex; flex-wrap: wrap; gap: 34px; }
-.end-stats div { display: grid; gap: 4px; }
-.end-stats dt { color: var(--muted); font: 10px var(--mono); text-transform: uppercase; letter-spacing: .08em; }
-.end-stats dd { margin: 0; font: 900 30px/1 var(--display); letter-spacing: -.04em; }
-.end-intro { display: grid; grid-template-columns: minmax(0, 1fr) 340px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.end-consensus { min-width: 0; padding: 52px 60px 56px 0; border-right: 1px solid var(--line); }
+.end-hero { padding-block: 22px 40px; display: grid; gap: 26px; }
+.end-hero .dek { margin: 0; max-width: 46ch; }
+.end-hero .dek b { font-weight: 900; }
+/* Both bands run the full width now, stacked, rather than sharing a row. */
+.end-intro { border-bottom: 1px solid var(--line); }
+.end-consensus { min-width: 0; padding: 52px 0 56px; }
 .section-heading.compact { align-items: end; }
 .stacked-bar { height: 100px; display: flex; overflow: hidden; border: 1px solid var(--ink); }
 .stacked-bar button, .model-stack button { min-width: 2px; padding: 0; display: grid; place-items: center; border: 0; border-right: 1px solid rgba(17,18,15,.4); background: var(--state); cursor: pointer; }
@@ -87,10 +84,15 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .stacked-legend button:hover span { text-decoration: underline; }
 .stacked-legend i { width: 8px; height: 8px; background: var(--state); }
 .stacked-legend b { font-size: 12px; }
-.end-leader { padding: 52px 0 56px 46px; }
-.leader-name { max-width: 260px; margin: 26px 0 0; font: 900 42px/.9 var(--display); text-transform: uppercase; letter-spacing: -.05em; }
-.end-leader strong { display: block; margin: 20px 0 35px; font: 900 82px/.8 var(--display); letter-spacing: -.06em; }
-.end-leader > p:last-child { color: var(--muted); font-size: 15px; line-height: 1.55; }
+.end-leader-section { padding: 52px 0 56px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+/* Freed from the 340px column, the panel sets its answer beside its
+   description rather than stacking everything down a narrow strip. */
+.end-leader { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; column-gap: 60px; }
+.end-leader .leader-title { grid-column: 1 / -1; }
+.leader-name { max-width: none; }
+.leader-name { margin: 26px 0 0; font: 900 42px/.9 var(--display); text-transform: uppercase; letter-spacing: -.05em; }
+.end-leader strong { display: block; margin: 18px 0 0; font: 900 clamp(64px, 8vw, 112px)/.8 var(--display); letter-spacing: -.06em; }
+.end-leader > p:last-child { grid-column: 2; grid-row: 2 / span 2; margin: 26px 0 0; max-width: 52ch; color: var(--muted); font-size: 16px; line-height: 1.6; }
 .state-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
 .state-card { min-height: 420px; padding: 24px; display: flex; flex-direction: column; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: linear-gradient(to bottom, transparent 80%, color-mix(in srgb, var(--state) 20%, transparent)); }
 .state-card-head { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 16px; row-gap: 16px; }
@@ -316,11 +318,10 @@ body.dialog-open { overflow: hidden; }
 
 @media (max-width: 820px) {
   .section-heading, .section-heading.compact { align-items: start; flex-direction: column; gap: 22px; }
-  .end-hero { padding-block: 24px 34px; grid-template-columns: 1fr; gap: 28px; align-items: start; }
-  .end-stats { gap: 24px; }
-  .end-stats dd { font-size: 25px; }
-  .end-intro { grid-template-columns: minmax(0, 1fr); }
-  .end-consensus { padding: 40px 0 44px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .end-hero { padding-block: 24px 34px; gap: 22px; }
+  .end-consensus { padding: 40px 0 44px; }
+  .end-leader { grid-template-columns: minmax(0, 1fr); column-gap: 0; }
+  .end-leader > p:last-child { grid-column: 1; grid-row: auto; margin-top: 20px; }
   /* Twelve pills wrap to seven rows at this width, which would bury the chart
      under its own controls. One swipeable row instead, bled to the edge so the
      cut-off pill signals there is more. */
@@ -329,7 +330,7 @@ body.dialog-open { overflow: hidden; }
     scrollbar-width: none; }
   .end-forecast-toggle::-webkit-scrollbar { display: none; }
   .end-toggle-button { flex: 0 0 auto; }
-  .end-leader { padding: 40px 0 44px; }
+  .end-leader-section { padding: 40px 0 44px; }
   .state-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .state-card-head { row-gap: 12px; }
   .state-card-head h3 { font-size: 32px; }

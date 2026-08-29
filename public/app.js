@@ -140,7 +140,6 @@
     // whichever the roster happens to list first.
     const pick = value => rows.filter(r => r.value === value).sort((a, b) => a.spread - b.spread)[0];
     return {
-      models: runList.length,
       first: ranks.filter(r => r === 1).length,
       second: ranks.filter(r => r === 2).length,
       top: pick(Math.max(...values)), bottom: pick(Math.min(...values))
@@ -482,7 +481,7 @@
     const paint = () => {
       const support = supportFor(leader.id);
       const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
-      leaderEl.innerHTML = `<h2 class="leader-title" id="leader-title">Most likely <em>ending</em></h2><p class="leader-name">${esc(leader.name)}</p><strong>${leader.probability}%</strong><p class="leader-description">${esc(leader.description)}</p><p class="leader-method">Each ending's figure is the median across all ${support.models} models, so no single model can pull the board. ${plural(support.first, 'model')} picked this as their highest-weighted prediction, and ${support.second} more had it as their second. ${esc(support.top.label)} from ${esc(support.top.provider)} put the most weight on it, at ${support.top.value}%; ${esc(support.bottom.label)} from ${esc(support.bottom.provider)} the least, at ${support.bottom.value}%.</p>`;
+      leaderEl.innerHTML = `<h2 class="leader-title" id="leader-title">Most likely <em>ending</em></h2><p class="leader-name">${esc(leader.name)}</p><strong>${leader.probability}%</strong><p class="leader-description">${esc(leader.description)}</p><p class="leader-method">${plural(support.first, 'model')} picked this as their highest-weighted prediction, and ${support.second} more had it as their second. ${esc(support.top.label)} from ${esc(support.top.provider)} put the most weight on it, at ${support.top.value}%; ${esc(support.bottom.label)} from ${esc(support.bottom.provider)} the least, at ${support.bottom.value}%.</p>`;
     };
     // Selecting a model no longer moves this panel, so there is nothing to
     // animate: without this it would re-tween the same figure on every click.

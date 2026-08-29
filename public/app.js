@@ -125,26 +125,26 @@
       return 1 + endingOrder().filter(other => run.probabilities[other.id] > value).length;
     };
     const ranks = runList.map(rankIn);
-    const rows = runList.map(run => ({ label: run.label, provider: run.provider, value: run.probabilities[stateId] }));
+    const rows = runList.map(run => {
+      const band = run.range?.[stateId];
+      return {
+        label: run.label, provider: run.provider, value: run.probabilities[stateId],
+        // How far that model's own samples moved. Infinity for a run with no
+        // recorded spread, so it never wins a tie-break it cannot justify.
+        spread: band ? band[1] - band[0] : Infinity
+      };
+    });
     const values = rows.map(r => r.value);
-    const at = value => rows.filter(r => r.value === value);
+    // Two models often land on the same figure. The tie goes to whichever said
+    // it most consistently — the narrower sample range — rather than to
+    // whichever the roster happens to list first.
+    const pick = value => rows.filter(r => r.value === value).sort((a, b) => a.spread - b.spread)[0];
     return {
       models: runList.length,
       first: ranks.filter(r => r === 1).length,
       second: ranks.filter(r => r === 2).length,
-      // Extremes come back as groups: two models often land on the same figure,
-      // and naming one of them would be a coin toss presented as a fact.
-      top: at(Math.max(...values)), bottom: at(Math.min(...values))
+      top: pick(Math.max(...values)), bottom: pick(Math.min(...values))
     };
-  }
-
-  // "A and B from Lab" when a tie is within one lab, plain names when it spans
-  // more than one.
-  function nameGroup(group) {
-    const names = group.map(g => esc(g.label));
-    const joined = names.length === 1 ? names[0] : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`;
-    const labs = [...new Set(group.map(g => g.provider))];
-    return labs.length === 1 ? `${joined} from ${esc(labs[0])}` : joined;
   }
 
   function longTermEntries() {
@@ -482,7 +482,7 @@
     const paint = () => {
       const support = supportFor(leader.id);
       const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
-      leaderEl.innerHTML = `<h2 class="leader-title" id="leader-title">Most likely <em>ending</em></h2><p class="leader-name">${esc(leader.name)}</p><strong>${leader.probability}%</strong><p class="leader-description">${esc(leader.description)}</p><p class="leader-method">Each ending's figure is the median across all ${support.models} models, so no single model can pull the board. ${plural(support.first, 'model')} picked this as their highest-weighted prediction, and ${support.second} more had it as their second. ${nameGroup(support.top)} put the most weight on it, at ${support.top[0].value}%; ${nameGroup(support.bottom)} the least, at ${support.bottom[0].value}%.</p>`;
+      leaderEl.innerHTML = `<h2 class="leader-title" id="leader-title">Most likely <em>ending</em></h2><p class="leader-name">${esc(leader.name)}</p><strong>${leader.probability}%</strong><p class="leader-description">${esc(leader.description)}</p><p class="leader-method">Each ending's figure is the median across all ${support.models} models, so no single model can pull the board. ${plural(support.first, 'model')} picked this as their highest-weighted prediction, and ${support.second} more had it as their second. ${esc(support.top.label)} from ${esc(support.top.provider)} put the most weight on it, at ${support.top.value}%; ${esc(support.bottom.label)} from ${esc(support.bottom.provider)} the least, at ${support.bottom.value}%.</p>`;
     };
     // Selecting a model no longer moves this panel, so there is nothing to
     // animate: without this it would re-tween the same figure on every click.

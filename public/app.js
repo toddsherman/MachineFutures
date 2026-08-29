@@ -124,6 +124,7 @@
   // frame or reduced motion all leave the answer on screen, which is the whole
   // requirement for an effect wrapped around a fact.
   let leaderSettled = false;
+  let settleCancelled = false;
   function settleLeader(panel, leader) {
     if (leaderSettled || reduceMotion() || !('IntersectionObserver' in window)) return;
     leaderSettled = true;
@@ -165,8 +166,9 @@
     const io = new IntersectionObserver((records, observer) => {
       if (!records.some(r => r.isIntersecting)) return;
       observer.disconnect();
+      if (settleCancelled) return;
       run();
-    }, { threshold: 0.4 });
+    }, { threshold: 0.15 });
     io.observe(panel);
     // If it is never scrolled to, nothing needs to happen: the answer is
     // already the text on screen.
@@ -300,10 +302,11 @@
   function renderHeroStats(entries) {
     const labs = new Set(entries.map(entry => entry.provider));
     const samples = [...new Set(entries.map(entry => entry.sampleCount).filter(Boolean))];
-    const dekModels = $('#dek-models');
-    if (dekModels) dekModels.textContent = entries.length;
-    const dekLabs = $('#dek-labs');
-    if (dekLabs) dekLabs.textContent = labs.size;
+    for (const [id, value] of [['#dek-models', entries.length], ['#dek-labs', labs.size],
+                              ['#origin-models', entries.length], ['#origin-labs', labs.size]]) {
+      const el = $(id);
+      if (el) el.textContent = value;
+    }
     const methodSamples = $('#method-samples');
     if (methodSamples) methodSamples.textContent = samples.length === 1 ? samples[0] : `${Math.min(...samples)}–${Math.max(...samples)}`;
     const errors = entries.map(entry => entry.exposurePublished?.se).filter(Number.isFinite);
@@ -680,7 +683,9 @@
   // nine seconds says more about how far apart the models are than any single
   // one of them does.
   let sweepTimer = null;
+  let sweepCancelled = false;
   function stopSweep() {
+    sweepCancelled = true;
     if (!sweepTimer) return;
     clearInterval(sweepTimer);
     sweepTimer = null;
@@ -697,6 +702,7 @@
     const io = new IntersectionObserver((records, observer) => {
       if (!records.some(r => r.isIntersecting)) return;
       observer.disconnect();
+      if (sweepCancelled) return;
       let step = 0;
       sweepTimer = setInterval(() => {
         if (step < order.length) selectForecast(order[step++]);
@@ -738,7 +744,6 @@
   });
 
   document.addEventListener('pointerdown', stopSweep, { once: true });
-  document.addEventListener('wheel', stopSweep, { once: true, passive: true });
 
   document.addEventListener('keydown', event => {
     stopSweep();
@@ -812,7 +817,7 @@
   if (datasetDate) $('#dataset-date').textContent = datasetDate;
   applyUrlState();
   renderEndStates();
-  window.MF_TEST = { normalizeTo100, stateMedians, extinctionSums, esc, median, stopSweep, replayLeader: () => { leaderSettled = false; settleLeader($('#end-leader'), stateMedians().slice().sort((a, b) => b.probability - a.probability)[0]); } };
+  window.MF_TEST = { normalizeTo100, stateMedians, extinctionSums, esc, median, stopSweep, disableLeaderSettle: () => { leaderSettled = true; settleCancelled = true; }, replayLeader: () => { leaderSettled = false; settleCancelled = false; settleLeader($('#end-leader'), stateMedians().slice().sort((a, b) => b.probability - a.probability)[0]); } };
 
   sweepForecasts($('.end-consensus'));
 

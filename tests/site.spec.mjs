@@ -15,6 +15,7 @@ const settle = async page => {
   await page.evaluate(() => {
     document.documentElement.style.scrollBehavior = 'auto';
     window.MF_TEST?.stopSweep();
+    window.MF_TEST?.disableLeaderSettle();
   });
 };
 
@@ -174,6 +175,7 @@ test.describe('the leader settles on its answer', () => {
       const top = window.MF_TEST.stateMedians().slice().sort((a, b) => b.probability - a.probability)[0];
       const expected = { name: top.name, figure: `${top.probability}%` };
       const seen = new Set(), blurs = new Set();
+      document.querySelector('.end-leader-section').scrollIntoView();
       const t0 = performance.now();
       window.MF_TEST.replayLeader();
       const poll = () => {

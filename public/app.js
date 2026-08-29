@@ -115,33 +115,17 @@
     return endingOrder().map((state, i) => ({ ...state, probability: normalized[i] }));
   }
 
-  // How much of the leader's margin is the models, and how much is which
-  // models happen to be on the board? Drawing the roster again with
-  // replacement answers that directly. A fixed seed keeps the published figure
-  // from moving between page loads, and the result is computed once.
-  let stability = null;
-  function leaderStability() {
-    if (stability) return stability;
+  // How many models put this ending at the top of their own allocation, and
+  // how many put it second. A rank, not a share: it says how many independent
+  // boards agree, which the median alone does not.
+  function supportFor(stateId) {
     const runList = Object.values(endStateRuns);
-    const board = aggregateOf(runList);
-    const top = board.indexOf(Math.max(...board));
-    const runnerUp = board.map((value, index) => ({ value, index })).filter(x => x.index !== top).sort((a, b) => b.value - a.value)[0];
-    let seed = 20260828;
-    const random = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
-    const draws = 2000;
-    let outright = 0;
-    for (let d = 0; d < draws; d++) {
-      const resample = Array.from({ length: runList.length }, () => runList[Math.floor(random() * runList.length)]);
-      const values = aggregateOf(resample);
-      const best = Math.max(...values);
-      if (values[top] === best && values.filter(v => v === best).length === 1) outright += 1;
-    }
-    stability = {
-      outright: Math.round((outright / draws) * 100),
-      runnerUp: endingOrder()[runnerUp.index].name,
-      gap: board[top] - runnerUp.value
+    const rankIn = run => {
+      const value = run.probabilities[stateId];
+      return 1 + endingOrder().filter(other => run.probabilities[other.id] > value).length;
     };
-    return stability;
+    const ranks = runList.map(rankIn);
+    return { models: runList.length, first: ranks.filter(r => r === 1).length, second: ranks.filter(r => r === 2).length };
   }
 
   function longTermEntries() {
@@ -477,9 +461,9 @@
     const leader = [...stateMedians()].sort((a, b) => b.probability - a.probability)[0];
     const leaderEl = $('#end-leader');
     const paint = () => {
-      const firm = leaderStability();
-      const models = Object.keys(endStateRuns).length;
-      leaderEl.innerHTML = `<h2 class="leader-title" id="leader-title">Most likely <em>ending</em></h2><p class="leader-name">${esc(leader.name)}</p><strong>${leader.probability}%</strong><p class="leader-description">${esc(leader.description)}</p><p class="leader-method">Each ending's figure is the median across all ${models} models, renormalised so the eleven still sum to 100 — a median rather than an average, so no single model can pull the board. ${leader.probability}% makes this the highest of eleven, not a likely outcome: ${esc(firm.runnerUp)} is ${firm.gap} point${firm.gap === 1 ? '' : 's'} behind, and drawing the ${models} models again at random leaves this ending outright on top in about ${firm.outright}% of boards.</p>`;
+      const support = supportFor(leader.id);
+      const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+      leaderEl.innerHTML = `<h2 class="leader-title" id="leader-title">Most likely <em>ending</em></h2><p class="leader-name">${esc(leader.name)}</p><strong>${leader.probability}%</strong><p class="leader-description">${esc(leader.description)}</p><p class="leader-method">Each ending's figure is the median across all ${support.models} models, so no single model can pull the board. ${plural(support.first, 'model')} picked this as their highest-weighted prediction, and ${support.second} more had it as their second.</p>`;
     };
     // Selecting a model no longer moves this panel, so there is nothing to
     // animate: without this it would re-tween the same figure on every click.

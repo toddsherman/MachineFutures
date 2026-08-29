@@ -445,10 +445,11 @@
   function applyForecast({ animate }) {
     const activeRun = endStateRuns[activeEndForecast];
     const activeLabel = activeRun ? `${activeRun.label || activeEndForecast} forecast` : 'Median machine forecast';
-    const [lead, ...tail] = activeLabel.split(' ');
-    $('#end-forecast-title').innerHTML = tail.length
-      ? `${esc(lead)} <em>${esc(tail.join(' '))}</em>`
-      : `<em>${esc(activeLabel)}</em>`;
+    const words = activeLabel.split(' ');
+    const trailing = words.pop();
+    $('#end-forecast-title').innerHTML = words.length
+      ? `${esc(words.join(' '))} <em>${esc(trailing)}</em>`
+      : `<em>${esc(trailing)}</em>`;
 
     const selectedStates = selectedEndStates();
     const entriesForRange = longTermEntries();

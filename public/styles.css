@@ -50,6 +50,7 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .section-note { max-width: 430px; margin: 0; color: var(--muted); font-size: 16px; line-height: 1.55; }
 .end-forecast-toggle { margin-bottom: 34px; display: flex; flex-wrap: wrap; gap: 8px; }
 .end-consensus .section-heading { margin-bottom: 24px; }
+#end-forecast-title em { display: block; }
 .end-toggle-button { min-height: 38px; padding: 9px 13px; display: inline-flex; align-items: center; gap: 8px; color: var(--muted); border: 1px solid var(--line); border-radius: 99px; background: transparent; font: 700 11px var(--mono); text-transform: uppercase; cursor: pointer; }
 .end-toggle-button:hover { color: var(--ink); border-color: var(--ink); background: rgba(17, 18, 15, .07); }
 .end-toggle-button.active { color: var(--paper); border-color: var(--ink); background: var(--ink); }

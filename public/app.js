@@ -481,7 +481,8 @@
     const paint = () => {
       const support = supportFor(leader.id);
       const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
-      leaderEl.innerHTML = `<h2 class="leader-title" id="leader-title">Most likely <em>ending</em></h2><p class="leader-name">${esc(leader.name)}</p><strong>${leader.probability}%</strong><p class="leader-description">${esc(leader.description)}</p><p class="leader-method">${plural(support.first, 'model')} picked this as their highest-weighted prediction, and ${support.second} more had it as their second. ${esc(support.top.label)} from ${esc(support.top.provider)} put the most weight on it, at ${support.top.value}%; ${esc(support.bottom.label)} from ${esc(support.bottom.provider)} the least, at ${support.bottom.value}%.</p>`;
+      leaderEl.style.setProperty('--state', leader.color);
+      leaderEl.innerHTML = `<h2 class="leader-title" id="leader-title">Most likely <em>ending</em></h2><p class="leader-name"><span class="leader-index" aria-hidden="true">${String(leader.id).padStart(2, '0')}</span>${esc(leader.name)}</p><strong>${leader.probability}%</strong><span class="leader-unit">Median across ${Object.keys(endStateRuns).length} models &middot; of 100 points</span><p class="leader-description">${esc(leader.description)}</p><p class="leader-method">${plural(support.first, 'model')} picked this as their highest-weighted prediction, and ${support.second} more had it as their second. ${esc(support.top.label)} from ${esc(support.top.provider)} put the most weight on it, at ${support.top.value}%; ${esc(support.bottom.label)} from ${esc(support.bottom.provider)} the least, at ${support.bottom.value}%.</p>`;
     };
     // Selecting a model no longer moves this panel, so there is nothing to
     // animate: without this it would re-tween the same figure on every click.

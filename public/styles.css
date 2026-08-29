@@ -91,8 +91,13 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .end-leader { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; column-gap: 60px; }
 .end-leader .leader-title { grid-column: 1 / -1; }
 .leader-name { max-width: none; }
-.leader-name { margin: 26px 0 0; font: 900 42px/.9 var(--display); text-transform: uppercase; letter-spacing: -.05em; }
-.end-leader strong { display: block; margin: 18px 0 0; font: 900 clamp(64px, 8vw, 112px)/.8 var(--display); letter-spacing: -.06em; }
+.leader-name { display: flex; align-items: center; gap: 16px; margin: 26px 0 0; font: 900 42px/.9 var(--display); text-transform: uppercase; letter-spacing: -.05em; }
+/* Same chip the state cards use, so the panel names one of the eleven rather
+   than floating free of them. */
+.leader-index { flex: 0 0 auto; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; background: var(--state); font: 800 13px var(--mono); letter-spacing: 0; }
+/* A bare percentage invites reading as a confidence or a share of models. */
+.leader-unit { display: block; margin-top: 10px; color: var(--muted); font: 10px var(--mono); text-transform: uppercase; letter-spacing: .06em; }
+.end-leader strong { display: block; margin: 22px 0 0; font: 900 clamp(64px, 8vw, 112px)/.8 var(--display); letter-spacing: -.06em; }
 .leader-description { grid-column: 2; grid-row: 2; margin: 26px 0 0; max-width: 52ch; color: var(--muted); font-size: 16px; line-height: 1.6; }
 .leader-method { grid-column: 2; grid-row: 3; margin: 18px 0 0; max-width: 52ch; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font: 13px/1.6 var(--sans); }
 .state-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }

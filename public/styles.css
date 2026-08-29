@@ -93,7 +93,8 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .leader-name { max-width: none; }
 .leader-name { margin: 26px 0 0; font: 900 42px/.9 var(--display); text-transform: uppercase; letter-spacing: -.05em; }
 .end-leader strong { display: block; margin: 18px 0 0; font: 900 clamp(64px, 8vw, 112px)/.8 var(--display); letter-spacing: -.06em; }
-.end-leader > p:last-child { grid-column: 2; grid-row: 2 / span 2; margin: 26px 0 0; max-width: 52ch; color: var(--muted); font-size: 16px; line-height: 1.6; }
+.leader-description { grid-column: 2; grid-row: 2; margin: 26px 0 0; max-width: 52ch; color: var(--muted); font-size: 16px; line-height: 1.6; }
+.leader-method { grid-column: 2; grid-row: 3; margin: 18px 0 0; max-width: 52ch; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font: 13px/1.6 var(--sans); }
 .state-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
 .state-card { min-height: 420px; padding: 24px; display: flex; flex-direction: column; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: linear-gradient(to bottom, transparent 80%, color-mix(in srgb, var(--state) 20%, transparent)); }
 .state-card-head { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 16px; row-gap: 16px; }
@@ -322,7 +323,7 @@ body.dialog-open { overflow: hidden; }
   .end-hero { padding-block: 24px 34px; gap: 22px; }
   .end-consensus { padding: 40px 0 44px; }
   .end-leader { grid-template-columns: minmax(0, 1fr); column-gap: 0; }
-  .end-leader > p:last-child { grid-column: 1; grid-row: auto; margin-top: 20px; }
+  .leader-description, .leader-method { grid-column: 1; grid-row: auto; margin-top: 20px; }
   /* Twelve pills wrap to seven rows at this width, which would bury the chart
      under its own controls. One swipeable row instead, bled to the edge so the
      cut-off pill signals there is more. */

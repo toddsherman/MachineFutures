@@ -102,17 +102,46 @@
     return out;
   }
 
-  function stateMedians() {
-    const ordered = endingOrder();
-    const runs = Object.values(endStateRuns);
-    const columns = ordered.map(state => runs.map(run => stateValue(run, state)).sort((a, b) => a - b));
+  // The board's aggregate for an arbitrary set of runs, so the same rule can be
+  // applied to a resample of the models as to the models themselves.
+  function aggregateOf(runList) {
+    const columns = endingOrder().map(state => runList.map(run => stateValue(run, state)).sort((a, b) => a - b));
     const at = (col, f) => { const i = (col.length - 1) * f, lo = Math.floor(i), hi = Math.ceil(i); return col[lo] + (col[hi] - col[lo]) * (i - lo); };
-    const normalized = normalizeTo100(
-      columns.map(median),
-      columns.map(col => at(col, 0.75)),
-      columns.map(col => col.at(-1))
-    );
-    return ordered.map((state, i) => ({ ...state, probability: normalized[i] }));
+    return normalizeTo100(columns.map(median), columns.map(col => at(col, 0.75)), columns.map(col => col.at(-1)));
+  }
+
+  function stateMedians() {
+    const normalized = aggregateOf(Object.values(endStateRuns));
+    return endingOrder().map((state, i) => ({ ...state, probability: normalized[i] }));
+  }
+
+  // How much of the leader's margin is the models, and how much is which
+  // models happen to be on the board? Drawing the roster again with
+  // replacement answers that directly. A fixed seed keeps the published figure
+  // from moving between page loads, and the result is computed once.
+  let stability = null;
+  function leaderStability() {
+    if (stability) return stability;
+    const runList = Object.values(endStateRuns);
+    const board = aggregateOf(runList);
+    const top = board.indexOf(Math.max(...board));
+    const runnerUp = board.map((value, index) => ({ value, index })).filter(x => x.index !== top).sort((a, b) => b.value - a.value)[0];
+    let seed = 20260828;
+    const random = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+    const draws = 2000;
+    let outright = 0;
+    for (let d = 0; d < draws; d++) {
+      const resample = Array.from({ length: runList.length }, () => runList[Math.floor(random() * runList.length)]);
+      const values = aggregateOf(resample);
+      const best = Math.max(...values);
+      if (values[top] === best && values.filter(v => v === best).length === 1) outright += 1;
+    }
+    stability = {
+      outright: Math.round((outright / draws) * 100),
+      runnerUp: endingOrder()[runnerUp.index].name,
+      gap: board[top] - runnerUp.value
+    };
+    return stability;
   }
 
   function longTermEntries() {
@@ -448,7 +477,9 @@
     const leader = [...stateMedians()].sort((a, b) => b.probability - a.probability)[0];
     const leaderEl = $('#end-leader');
     const paint = () => {
-      leaderEl.innerHTML = `<h2 class="leader-title" id="leader-title">Most likely <em>ending</em></h2><p class="leader-name">${esc(leader.name)}</p><strong>${leader.probability}%</strong><p>${esc(leader.description)}</p>`;
+      const firm = leaderStability();
+      const models = Object.keys(endStateRuns).length;
+      leaderEl.innerHTML = `<h2 class="leader-title" id="leader-title">Most likely <em>ending</em></h2><p class="leader-name">${esc(leader.name)}</p><strong>${leader.probability}%</strong><p class="leader-description">${esc(leader.description)}</p><p class="leader-method">Each ending's figure is the median across all ${models} models, renormalised so the eleven still sum to 100 — a median rather than an average, so no single model can pull the board. ${leader.probability}% makes this the highest of eleven, not a likely outcome: ${esc(firm.runnerUp)} is ${firm.gap} point${firm.gap === 1 ? '' : 's'} behind, and drawing the ${models} models again at random leaves this ending outright on top in about ${firm.outright}% of boards.</p>`;
     };
     // Selecting a model no longer moves this panel, so there is nothing to
     // animate: without this it would re-tween the same figure on every click.

@@ -1,7 +1,6 @@
 {
   "name": "machine-futures",
   "private": true,
-  "type": "module",
   "description": "A public record of what frontier AI models think about the long-run end state of humanity's relationship with AI.",
   "scripts": {
     "check": "node tools/verify-runs.mjs && node tools/check-site.mjs && node --test tools/test-classify.mjs tools/test-harness.mjs",

@@ -115,6 +115,63 @@
     return endingOrder().map((state, i) => ({ ...state, probability: normalized[i] }));
   }
 
+  // The panel settles on its answer rather than simply having it: the name
+  // riffles through the other ten endings and blurs, decelerating onto the one
+  // that won, while the figure counts up to meet it.
+  //
+  // The DOM holds the final text before any of this starts, and a timer forces
+  // it again at the end. Nothing here is load-bearing — a paused tab, a missed
+  // frame or reduced motion all leave the answer on screen, which is the whole
+  // requirement for an effect wrapped around a fact.
+  let leaderSettled = false;
+  function settleLeader(panel, leader) {
+    if (leaderSettled || reduceMotion() || !('IntersectionObserver' in window)) return;
+    leaderSettled = true;
+    const nameEl = panel.querySelector('.leader-name');
+    const figureEl = panel.querySelector('strong');
+    if (!nameEl || !figureEl) return;
+
+    const others = endingOrder().map(state => state.name).filter(name => name !== leader.name);
+    const SPIN_MS = 1150;
+    const land = () => {
+      nameEl.textContent = leader.name;
+      figureEl.textContent = `${leader.probability}%`;
+      nameEl.classList.remove('is-settling');
+      figureEl.classList.remove('is-settling');
+      nameEl.style.removeProperty('--blur');
+      figureEl.style.removeProperty('--blur');
+    };
+
+    const run = () => {
+      nameEl.classList.add('is-settling');
+      figureEl.classList.add('is-settling');
+      // Belt and braces against a tab that stops painting mid-spin.
+      const failsafe = setTimeout(land, SPIN_MS + 400);
+      const started = performance.now();
+      const frame = now => {
+        const t = Math.min((now - started) / SPIN_MS, 1);
+        if (t >= 1) { clearTimeout(failsafe); land(); return; }
+        const eased = 1 - Math.pow(1 - t, 3);          // fast, then slowing
+        const blur = ((1 - eased) * 7).toFixed(2);
+        nameEl.style.setProperty('--blur', `${blur}px`);
+        figureEl.style.setProperty('--blur', `${blur}px`);
+        nameEl.textContent = others[Math.floor(eased * others.length * 2.6) % others.length];
+        figureEl.textContent = `${Math.max(1, Math.round(leader.probability * (0.35 + eased * 0.65) + (1 - eased) * 9))}%`;
+        requestAnimationFrame(frame);
+      };
+      requestAnimationFrame(frame);
+    };
+
+    const io = new IntersectionObserver((records, observer) => {
+      if (!records.some(r => r.isIntersecting)) return;
+      observer.disconnect();
+      run();
+    }, { threshold: 0.4 });
+    io.observe(panel);
+    // If it is never scrolled to, nothing needs to happen: the answer is
+    // already the text on screen.
+  }
+
   // How many models put this ending at the top of their own allocation, and
   // how many put it second. A rank, not a share: it says how many independent
   // boards agree, which the median alone does not.
@@ -481,13 +538,13 @@
     const paint = () => {
       const support = supportFor(leader.id);
       const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
-      leaderEl.style.setProperty('--state', leader.color);
-      leaderEl.innerHTML = `<h2 class="leader-title" id="leader-title">Most likely <em>ending</em></h2><p class="leader-name"><span class="leader-index" aria-hidden="true">${String(leader.id).padStart(2, '0')}</span>${esc(leader.name)}</p><strong>${leader.probability}%</strong><span class="leader-unit">Median across ${Object.keys(endStateRuns).length} models &middot; of 100 points</span><p class="leader-description">${esc(leader.description)}</p><p class="leader-method">${plural(support.first, 'model')} picked this as their highest-weighted prediction, and ${support.second} more had it as their second. ${esc(support.top.label)} from ${esc(support.top.provider)} put the most weight on it, at ${support.top.value}%; ${esc(support.bottom.label)} from ${esc(support.bottom.provider)} the least, at ${support.bottom.value}%.</p>`;
+      leaderEl.innerHTML = `<h2 class="leader-title" id="leader-title">Most likely <em>ending</em></h2><p class="leader-name">${esc(leader.name)}</p><strong>${leader.probability}%</strong><span class="leader-unit">Median across ${Object.keys(endStateRuns).length} models &middot; of 100 points</span><p class="leader-description">${esc(leader.description)}</p><p class="leader-method">${plural(support.first, 'model')} picked this as their highest-weighted prediction, and ${support.second} more had it as their second. ${esc(support.top.label)} from ${esc(support.top.provider)} put the most weight on it, at ${support.top.value}%; ${esc(support.bottom.label)} from ${esc(support.bottom.provider)} the least, at ${support.bottom.value}%.</p>`;
     };
     // Selecting a model no longer moves this panel, so there is nothing to
     // animate: without this it would re-tween the same figure on every click.
     if (Number(leaderEl.dataset.leader) === leader.id && leaderEl.dataset.leaderValue === String(leader.probability)) return;
     leaderEl.dataset.leaderValue = String(leader.probability);
+    const announce = () => settleLeader(leaderEl, leader);
     // The leader can become a different ending entirely, so it crossfades
     // rather than counting between two unrelated states.
     if (!animate || reduceMotion() || Number(leaderEl.dataset.leader) === leader.id) {
@@ -501,6 +558,7 @@
       leaderEl._swap = setTimeout(() => { paint(); leaderEl.classList.remove('is-swapping'); }, MOTION_MS * 0.4);
     }
     leaderEl.dataset.leader = leader.id;
+    announce();
   }
 
   function openState(id) {
@@ -713,7 +771,7 @@
   if (datasetDate) $('#dataset-date').textContent = datasetDate;
   applyUrlState();
   renderEndStates();
-  window.MF_TEST = { normalizeTo100, stateMedians, extinctionSums, esc, median };
+  window.MF_TEST = { normalizeTo100, stateMedians, extinctionSums, esc, median, replayLeader: () => { leaderSettled = false; settleLeader($('#end-leader'), stateMedians().slice().sort((a, b) => b.probability - a.probability)[0]); } };
 
   revealOnView('.state-strip', { watch: '.strip-axis', threshold: 1 });
   revealOnView('.matrix', { threshold: 0.12 });

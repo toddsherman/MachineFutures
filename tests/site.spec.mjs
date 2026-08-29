@@ -6,6 +6,12 @@ import { test, expect } from '@playwright/test';
 const settle = async page => {
   await page.goto('/');
   await page.waitForFunction(() => document.querySelectorAll('.state-card').length === 11);
+  // The leader riffles through the endings on load; wait for it to land, or a
+  // test reads a passing frame and believes it.
+  await page.waitForFunction(() => {
+    const top = window.MF_TEST?.stateMedians().slice().sort((a, b) => b.probability - a.probability)[0];
+    return top && document.querySelector('.leader-name')?.textContent === top.name;
+  });
   await page.evaluate(() => { document.documentElement.style.scrollBehavior = 'auto'; });
 };
 
@@ -153,6 +159,66 @@ test.describe('the charts are actually painted', () => {
     const stuck = await page.evaluate(() => [...document.querySelectorAll('.state-strip.will-reveal, .matrix.will-reveal')]
       .map(el => el.className));
     expect(stuck).toEqual([]);
+  });
+});
+
+test.describe('the leader settles on its answer', () => {
+  test('it riffles through endings and lands on the right one', async ({ page }) => {
+    await settle(page);
+    const result = await page.evaluate(() => new Promise(resolve => {
+      const name = document.querySelector('.leader-name');
+      const figure = document.querySelector('.end-leader strong');
+      const top = window.MF_TEST.stateMedians().slice().sort((a, b) => b.probability - a.probability)[0];
+      const expected = { name: top.name, figure: `${top.probability}%` };
+      const seen = new Set(), blurs = new Set();
+      const t0 = performance.now();
+      window.MF_TEST.replayLeader();
+      const poll = () => {
+        seen.add(name.textContent);
+        blurs.add(getComputedStyle(name).filter);
+        if (performance.now() - t0 < 1700) requestAnimationFrame(poll);
+        else resolve({ expected, namesShown: seen.size, blurred: [...blurs].some(f => f !== 'none'),
+          finalName: name.textContent, finalFigure: figure.textContent,
+          filterCleared: getComputedStyle(name).filter === 'none',
+          classCleared: !name.classList.contains('is-settling') });
+      };
+      requestAnimationFrame(poll);
+    }));
+    expect(result.namesShown, 'the name never changed — the riffle did not run').toBeGreaterThan(3);
+    expect(result.blurred, 'no blur was ever applied').toBe(true);
+    expect(result.finalName, 'it did not land on the leading ending').toBe(result.expected.name);
+    expect(result.finalFigure).toBe(result.expected.figure);
+    expect(result.filterCleared, 'the blur was left on the element').toBe(true);
+    expect(result.classCleared, 'the settling class was left behind').toBe(true);
+  });
+
+  test('the answer is on screen before any of it starts', async ({ page }) => {
+    // The effect wraps a fact; it must never be the thing that produces it.
+    await page.goto('/');
+    await page.waitForSelector('.leader-name');
+    const atFirstPaint = await page.evaluate(() => ({
+      name: document.querySelector('.leader-name').textContent,
+      figure: document.querySelector('.end-leader strong').textContent
+    }));
+    expect(atFirstPaint.name.length).toBeGreaterThan(2);
+    expect(atFirstPaint.figure).toMatch(/^\d+%$/);
+  });
+
+  test('reduced motion gets the answer with no riffle', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await settle(page);
+    const out = await page.evaluate(() => new Promise(resolve => {
+      const name = document.querySelector('.leader-name');
+      const before = name.textContent;
+      window.MF_TEST.replayLeader();
+      const seen = new Set([before]);
+      let n = 0;
+      const poll = () => { seen.add(name.textContent); if (++n < 40) requestAnimationFrame(poll);
+        else resolve({ namesShown: seen.size, final: name.textContent, before }); };
+      requestAnimationFrame(poll);
+    }));
+    expect(out.namesShown, 'the name should never change under reduced motion').toBe(1);
+    expect(out.final).toBe(out.before);
   });
 });
 

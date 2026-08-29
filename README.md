@@ -127,6 +127,7 @@ The suite is checked by reintroducing each fixed bug and confirming it fails; a 
 - `tools/export-data.mjs` — rebuilds `data/` from `public/data.js` and `runs/`
 - `tools/check-site.mjs` — invariant check on `public/data.js`, run in CI after import
 - `tools/verify-runs.mjs` — integrity check on the raw batches in `runs/` (`--backfill-integrity` to add digests to older files)
+- `tools/check-links.mjs` — fetches every published link signed-out, so a page that only works for its author fails CI
 - `tools/test-classify.mjs` — asserts the harness sorts provider errors into transient / quota / permanent correctly
 - `tools/test-harness.mjs` — behaviour tests for the elicitation harness, run against `--mock` so they cost nothing
 - `tests/site.spec.mjs` — layout and behaviour tests in a real browser

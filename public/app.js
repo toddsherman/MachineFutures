@@ -665,16 +665,52 @@
 
   window.addEventListener('scroll', hideMarkTip, true);
 
+  function selectForecast(key) {
+    activeEndForecast = key;
+    $$('.end-toggle-button').forEach(button => {
+      const on = button.dataset.endForecast === activeEndForecast;
+      button.classList.toggle('active', on);
+      button.setAttribute('aria-pressed', on);
+    });
+    applyForecast({ animate: true });
+  }
+
+  // On reaching the forecast, the board plays itself once: every model in turn,
+  // half a second each, ending back on the median. Seventeen allocations in
+  // nine seconds says more about how far apart the models are than any single
+  // one of them does.
+  let sweepTimer = null;
+  function stopSweep() {
+    if (!sweepTimer) return;
+    clearInterval(sweepTimer);
+    sweepTimer = null;
+  }
+
+  function sweepForecasts(panel) {
+    // Not if motion is unwelcome, and not if the reader asked for one model by
+    // URL — that is a request for that model, not for a tour.
+    if (reduceMotion() || !('IntersectionObserver' in window)) return;
+    if (activeEndForecast !== 'Median') return;
+    const order = Object.keys(endStateRuns);
+    if (!order.length) return;
+
+    const io = new IntersectionObserver((records, observer) => {
+      if (!records.some(r => r.isIntersecting)) return;
+      observer.disconnect();
+      let step = 0;
+      sweepTimer = setInterval(() => {
+        if (step < order.length) selectForecast(order[step++]);
+        else { stopSweep(); selectForecast('Median'); }
+      }, 500);
+    }, { threshold: 0.35 });
+    io.observe(panel);
+  }
+
   document.addEventListener('click', event => {
     const endForecastTarget = event.target.closest('[data-end-forecast]');
     if (endForecastTarget) {
-      activeEndForecast = endForecastTarget.dataset.endForecast;
-      $$('.end-toggle-button').forEach(button => {
-        const on = button.dataset.endForecast === activeEndForecast;
-        button.classList.toggle('active', on);
-        button.setAttribute('aria-pressed', on);
-      });
-      applyForecast({ animate: true });
+      stopSweep();
+      selectForecast(endForecastTarget.dataset.endForecast);
       updateUrl();
       return;
     }
@@ -701,7 +737,11 @@
     if (stateTarget) openState(stateTarget.dataset.state);
   });
 
+  document.addEventListener('pointerdown', stopSweep, { once: true });
+  document.addEventListener('wheel', stopSweep, { once: true, passive: true });
+
   document.addEventListener('keydown', event => {
+    stopSweep();
     if (event.key === 'Escape') hideMarkTip();
     if (event.key !== 'Enter' && event.key !== ' ') return;
     const card = event.target.closest?.('.state-card[data-state]');
@@ -772,7 +812,9 @@
   if (datasetDate) $('#dataset-date').textContent = datasetDate;
   applyUrlState();
   renderEndStates();
-  window.MF_TEST = { normalizeTo100, stateMedians, extinctionSums, esc, median, replayLeader: () => { leaderSettled = false; settleLeader($('#end-leader'), stateMedians().slice().sort((a, b) => b.probability - a.probability)[0]); } };
+  window.MF_TEST = { normalizeTo100, stateMedians, extinctionSums, esc, median, stopSweep, replayLeader: () => { leaderSettled = false; settleLeader($('#end-leader'), stateMedians().slice().sort((a, b) => b.probability - a.probability)[0]); } };
+
+  sweepForecasts($('.end-consensus'));
 
   revealOnView('.state-strip', { watch: '.strip-axis', threshold: 1 });
   revealOnView('.matrix', { threshold: 0.12 });

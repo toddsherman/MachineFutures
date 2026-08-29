@@ -32,6 +32,11 @@ jobs:
       - name: Verify published data
         run: node tools/check-site.mjs
 
+      # Fetched with no credentials: a private repo, or anything else behind a
+      # login, resolves for its author and 404s for a visitor.
+      - name: Check every published link
+        run: node tools/check-links.mjs
+
       - name: Unit and harness tests
         run: node --test tools/test-classify.mjs tools/test-harness.mjs
 

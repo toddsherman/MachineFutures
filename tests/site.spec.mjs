@@ -12,7 +12,10 @@ const settle = async page => {
     const top = window.MF_TEST?.stateMedians().slice().sort((a, b) => b.probability - a.probability)[0];
     return top && document.querySelector('.leader-name')?.textContent === top.name;
   });
-  await page.evaluate(() => { document.documentElement.style.scrollBehavior = 'auto'; });
+  await page.evaluate(() => {
+    document.documentElement.style.scrollBehavior = 'auto';
+    window.MF_TEST?.stopSweep();
+  });
 };
 
 test.describe('layout', () => {
@@ -219,6 +222,58 @@ test.describe('the leader settles on its answer', () => {
     }));
     expect(out.namesShown, 'the name should never change under reduced motion').toBe(1);
     expect(out.final).toBe(out.before);
+  });
+});
+
+test.describe('the forecast plays itself', () => {
+  test('it steps through every model and returns to the median', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('.end-toggle-button');
+    const result = await page.evaluate(() => new Promise(resolve => {
+      const seen = [];
+      const active = () => document.querySelector('.end-toggle-button.active')?.dataset.endForecast;
+      let last = active();
+      const t0 = performance.now();
+      const watch = setInterval(() => {
+        const now = active();
+        if (now !== last) { seen.push({ at: Math.round(performance.now() - t0), key: now }); last = now; }
+        if (performance.now() - t0 > 12000) {
+          clearInterval(watch);
+          const gaps = seen.slice(1).map((s, i) => s.at - seen[i].at).sort((a, b) => a - b);
+          resolve({ visited: seen.map(s => s.key), models: Object.keys(window.MF_DATA.endStateRuns).length,
+                    medianGap: gaps[Math.floor(gaps.length / 2)], ended: active() });
+        }
+      }, 30);
+      document.querySelector('.end-consensus').scrollIntoView();
+    }));
+    const models = result.visited.filter(k => k !== 'Median');
+    expect(models.length, 'the sweep did not visit every model').toBe(result.models);
+    expect(new Set(models).size, 'a model was shown twice').toBe(result.models);
+    expect(result.medianGap, 'the step should be about half a second').toBeGreaterThan(400);
+    expect(result.medianGap).toBeLessThan(700);
+    expect(result.ended, 'it should come to rest on the median').toBe('Median');
+  });
+
+  test('a click takes it over', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('.end-toggle-button');
+    await page.evaluate(() => document.querySelector('.end-consensus').scrollIntoView());
+    await page.waitForTimeout(1200);                       // let the sweep get going
+    const chosen = await page.locator('.end-toggle-button').nth(4).getAttribute('data-end-forecast');
+    await page.locator('.end-toggle-button').nth(4).click();
+    await page.waitForTimeout(2000);                       // four steps would have passed
+    const still = await page.evaluate(() => document.querySelector('.end-toggle-button.active')?.dataset.endForecast);
+    expect(still, 'the sweep kept going after the reader chose a model').toBe(chosen);
+  });
+
+  test('reduced motion gets no sweep', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+    await page.waitForSelector('.end-toggle-button');
+    await page.evaluate(() => document.querySelector('.end-consensus').scrollIntoView());
+    await page.waitForTimeout(2000);
+    const active = await page.evaluate(() => document.querySelector('.end-toggle-button.active')?.dataset.endForecast);
+    expect(active, 'the selection moved under reduced motion').toBe('Median');
   });
 });
 

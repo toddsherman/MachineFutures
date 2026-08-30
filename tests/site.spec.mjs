@@ -114,8 +114,11 @@ test.describe('every model view', () => {
           if (centre < range.offsetLeft - 1 || centre > range.offsetLeft + range.offsetWidth + 1) bad.push(`S${id}: the published figure sits outside its full range`);
           if (range.offsetLeft + range.offsetWidth > axisW + 1) bad.push(`S${id}: the range runs off the axis`);
           const onCard = parseInt(card.querySelector('.state-card-meta strong').textContent, 10);
-          const inLegend = parseInt(document.querySelectorAll('#consensus-legend > button b')[id - 1].textContent, 10);
-          if (onCard !== inLegend) bad.push(`S${id}: card says ${onCard}%, legend says ${inLegend}%`);
+          const median = window.MF_TEST.stateMedians().find(m => String(m.id) === id).probability;
+          if (onCard !== median) bad.push(`S${id}: card says ${onCard}%, the median is ${median}%`);
+          if (!/across \d+ models/.test(card.querySelector('.range-text').textContent)) {
+            bad.push(`S${id}: the card's caption stopped describing the spread across models`);
+          }
         });
         const legend = [...document.querySelectorAll('#consensus-legend > button b')].map(b => parseInt(b.textContent, 10));
         const sum = legend.reduce((a, c) => a + c, 0);
@@ -163,6 +166,26 @@ test.describe('the charts are actually painted', () => {
     const stuck = await page.evaluate(() => [...document.querySelectorAll('.state-strip.will-reveal, .matrix.will-reveal')]
       .map(el => el.className));
     expect(stuck).toEqual([]);
+  });
+});
+
+test.describe('the selector governs one chart only', () => {
+  test('choosing a model leaves the ending cards alone', async ({ page }) => {
+    await settle(page);
+    const snapshot = () => page.evaluate(() => ({
+      cards: [...document.querySelectorAll('.state-card')].map(c => `${c.dataset.state}:${c.querySelector('.state-card-meta strong').textContent}:${c.querySelector('.range-text').textContent}`),
+      legend: [...document.querySelectorAll('#consensus-legend > button b')].map(b => b.textContent).join(','),
+      title: document.querySelector('#end-forecast-title').innerText.replace(/\s+/g, ' ').trim()
+    }));
+    const before = await snapshot();
+    for (const i of [5, 12, 16]) {
+      await page.locator('.end-toggle-button').nth(i).click();
+      await page.waitForTimeout(800);
+      const after = await snapshot();
+      expect(after.cards, 'the ending cards followed the selector').toEqual(before.cards);
+      expect(after.title, 'the chart title did not follow the selector').not.toBe(before.title);
+      expect(after.legend, 'the chart did not follow the selector').not.toBe(before.legend);
+    }
   });
 });
 

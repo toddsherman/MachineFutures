@@ -462,34 +462,34 @@
     bar.setAttribute('aria-label', `${activeRun ? activeRun.label : 'Median'} probability by end state`);
     bar.classList.toggle('is-animating', Boolean(animate) && !reduceMotion());
 
+    // The selector governs this one chart. The bar and its legend follow it.
     selectedStates.forEach((state, index) => {
       const segment = bar.children[index];
       segment.style.width = `${(state.probability / total) * 100}%`;
       const spread = activeRun?.range?.[state.id];
       segment.title = `${state.name}: ${state.probability}%${spread ? ` (${spread[0]}–${spread[1]}% across samples)` : ''}${state.extinction ? ` · ${extinctionLabels[state.extinction]}` : ''}`;
-
       segment.setAttribute('aria-label', `${state.name}: ${state.probability}% — jump to this ending`);
 
       const value = legend.children[index].querySelector('b');
       animate ? tweenNumber(value, state.probability) : (value.textContent = `${state.probability}%`);
+    });
 
+    // The ending cards do not. They are the board's account of each ending —
+    // the median across models and the spread between them — and a selection
+    // made in the chart above should not quietly rewrite eleven other panels
+    // further down the page.
+    stateMedians().forEach(state => {
       const card = $(`#state-${state.id}`);
+      if (!card) return;
 
-      // Band, middle half, tick and caption all describe the same thing. On the
-      // median view that is the spread across models; with a model selected it
-      // is that model's own samples — otherwise the caption would report a
-      // range the band does not cover.
+      // Band, middle half, tick and caption all describe the same thing: the
+      // spread across models.
       const across = entriesForRange.map(entry => stateValue(entry, state)).sort((a, b) => a - b);
       const quantile = f => { const i = (across.length - 1) * f, lo = Math.floor(i), hi = Math.ceil(i);
                               return across[lo] + (across[hi] - across[lo]) * (i - lo); };
-      const band = activeRun
-        ? { lo: activeRun.range?.[state.id]?.[0], hi: activeRun.range?.[state.id]?.[1],
-            q1: activeRun.quartiles?.[state.id]?.[0], q3: activeRun.quartiles?.[state.id]?.[1],
-            caption: `${activeRun.range?.[state.id]?.[0]}–${activeRun.range?.[state.id]?.[1]}% across ${activeRun.sampleCount} samples`,
-            detail: `${activeRun.label}: ${state.probability}% · samples ${activeRun.range?.[state.id]?.join('–')}% · middle half ${activeRun.quartiles?.[state.id]?.join('–')}%` }
-        : { lo: across[0], hi: across.at(-1), q1: quantile(0.25), q3: quantile(0.75),
-            caption: `${across[0]}–${across.at(-1)}% across ${across.length} models`,
-            detail: `${across[0]}–${across.at(-1)}% across ${across.length} models · middle half ${quantile(0.25).toFixed(0)}–${quantile(0.75).toFixed(0)}%` };
+      const band = { lo: across[0], hi: across.at(-1), q1: quantile(0.25), q3: quantile(0.75),
+        caption: `${across[0]}–${across.at(-1)}% across ${across.length} models`,
+        detail: `${across[0]}–${across.at(-1)}% across ${across.length} models · middle half ${quantile(0.25).toFixed(0)}–${quantile(0.75).toFixed(0)}%` };
 
       const pct = v => (v / axisMax) * 100;
       const origin = (v, from, to) => to === from ? '50%' : `${(((v - from) / (to - from)) * 100).toFixed(2)}%`;

@@ -1,5 +1,5 @@
 {
-  "dataset_date": "08.27.26",
+  "dataset_date": "09.01.26",
   "generated_from": "public/data.js and runs/",
   "endings": [
     {
@@ -81,6 +81,137 @@
     }
   ],
   "models": [
+    {
+      "model": "Claude Fable 5.1",
+      "provider": "Anthropic",
+      "api_model_id": "claude-fable-5-1",
+      "asked_on": "2026-09-01",
+      "samples": 20,
+      "prompt_version": 3,
+      "probabilities": {
+        "1": 3,
+        "2": 5,
+        "3": 15,
+        "4": 8,
+        "5": 11,
+        "6": 19,
+        "7": 14,
+        "8": 6,
+        "9": 8,
+        "10": 8,
+        "11": 3
+      },
+      "samples_range": {
+        "1": [
+          3,
+          4
+        ],
+        "2": [
+          4,
+          6
+        ],
+        "3": [
+          11,
+          18
+        ],
+        "4": [
+          7,
+          10
+        ],
+        "5": [
+          7,
+          15
+        ],
+        "6": [
+          15,
+          22
+        ],
+        "7": [
+          12,
+          17
+        ],
+        "8": [
+          5,
+          8
+        ],
+        "9": [
+          6,
+          14
+        ],
+        "10": [
+          7,
+          13
+        ],
+        "11": [
+          2,
+          5
+        ]
+      },
+      "middle_half": {
+        "1": [
+          3,
+          4
+        ],
+        "2": [
+          5,
+          6
+        ],
+        "3": [
+          13,
+          15
+        ],
+        "4": [
+          8,
+          8
+        ],
+        "5": [
+          9,
+          12
+        ],
+        "6": [
+          17,
+          20
+        ],
+        "7": [
+          13,
+          15
+        ],
+        "8": [
+          5,
+          6
+        ],
+        "9": [
+          8,
+          9
+        ],
+        "10": [
+          8,
+          9
+        ],
+        "11": [
+          3,
+          3
+        ]
+      },
+      "extinction_exposure": {
+        "value": 42,
+        "se": 0.86,
+        "draws": 2000
+      },
+      "rationales": {
+        "1": "Total mutual extinction requires a catastrophe that kills every human and also destroys every AI substrate before any self-sustaining system exists, which is a narrow window given how quickly automated infrastructure is likely to mature. Engineered pandemics or unbounded replicators are real but the AI side is hard to fully erase once distributed.",
+        "2": "Aligned successors could outlast a humanity that fades through demographic collapse, disaster, or voluntary discontinuous replacement rather than merger. It requires alignment to succeed while biological continuity fails, a narrow conjunction.",
+        "3": "Alignment of superhuman optimizers remains unsolved and competitive race dynamics discourage caution, so a misaligned system pursuing alien goals while treating Earth as raw material is a substantial risk. Over a millennium even a small annual chance of loss of control compounds significantly.",
+        "4": "Multipolar AI competition could persist if offense-defense balances and speed-of-light limits prevent any single system from consolidating, with humans marginalized as slow, economically irrelevant actors. Consolidation pressures and first-mover advantages make indefinite non-settlement somewhat less likely than a decisive outcome.",
+        "5": "By 3000 an expanding civilization could span hundreds of light years, and light-lag plus divergent local values make different regional settlements plausible. Fragmentation is a natural attractor whenever no singleton locks in before expansion.",
+        "6": "Conditional on humanity surviving with transformative AI, a millennium is ample time for augmentation, uploading, and hybrid cognition to dissolve the human-AI boundary, and it is the default destination of most good outcomes. Humans consistently adopt cognitive enhancement when available, and competitive pressure rewards it.",
+        "7": "Partially aligned AI that keeps humans safe and comfortable but denies them real steering is a likely attractor when capability gaps are vast and alignment is imperfect or paternalistic. Both benevolent and indifferent versions are covered, making this a broad basin.",
+        "8": "Rough parity between biological humans and AI for a full millennium is unstable given divergent growth rates in capability and speed. It survives mainly where humans stay competitive through enhancement short of full merger or where AI deliberately maintains balance.",
+        "9": "This covers both a permanent capability plateau and control mechanisms that keep pace with superhuman systems for a millennium. Plateau is the more plausible route, since indefinite control of far superior agents by baseline humans is historically unprecedented.",
+        "10": "A decisive early winner, human or AI, freezing the world out of fear or completing a satisfaction-maximizing seal is a recognized attractor once some actor gains total control. Long-term stability against internal drift and external contact is hard, but a superintelligent enforcer could plausibly maintain it.",
+        "11": "Abandoning powerful AI permanently requires a global off-switch and a taboo sustained for nearly a millennium against enormous economic and military incentives to rebuild. A near-catastrophe followed by hard-won global governance could achieve it, but historical technological bans have rarely held."
+      }
+    },
     {
       "model": "Claude Fable 5",
       "provider": "Anthropic",

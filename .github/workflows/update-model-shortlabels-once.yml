@@ -1,0 +1,101 @@
+name: One-time model shorthand update
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/update-model-shortlabels-once.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: model-shortlabel-one-time-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Update model shorthand labels
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = 'tools/models.json';
+          const roster = JSON.parse(fs.readFileSync(path, 'utf8'));
+          const labels = new Map([
+            ['claude-fable-5-1', 'F5.1'],
+            ['claude-fable-5', 'F5'],
+            ['claude-opus-5', 'OP5'],
+            ['gpt-5.6-sol', 'S5.6'],
+            ['gpt-5.5', 'G5.5'],
+            ['gpt-5.4', 'G5.4'],
+            ['gemini-3.1-pro-preview', 'G3.1'],
+            ['gemini-3.7-flash', 'G3.7'],
+            ['grok-4.6', 'GR4.6'],
+            ['grok-4.5', 'GR4.5'],
+            ['muse-spark-1.2', 'MS1.2'],
+            ['muse-spark-1.1', 'MS1.1'],
+            ['deepseek-v4-pro', 'DS4'],
+            ['deepseek-v4-flash', 'DS4F'],
+            ['mistral-medium-3.5', 'M3.5'],
+            ['mistral-medium-3', 'M3'],
+            ['kimi-k3', 'K3'],
+            ['kimi-k2.6', 'K2.6']
+          ]);
+          const seen = new Set();
+          let changed = 0;
+          for (const model of roster.models) {
+            const next = labels.get(model.model);
+            if (!next) continue;
+            seen.add(model.model);
+            if (model.shortLabel !== next) {
+              console.log(`${model.model}: ${model.shortLabel} -> ${next}`);
+              model.shortLabel = next;
+              changed += 1;
+            }
+          }
+          const missing = [...labels.keys()].filter((model) => !seen.has(model));
+          if (missing.length) {
+            throw new Error(`Missing expected roster models: ${missing.join(', ')}`);
+          }
+          fs.writeFileSync(path, `${JSON.stringify(roster, null, 2)}\n`);
+          console.log(`Updated ${changed} shorthand labels.`);
+          NODE
+
+      - name: Regenerate published data
+        run: |
+          set -euo pipefail
+          node tools/import-runs.mjs
+          node tools/export-data.mjs
+
+      - name: Check generated site data
+        run: |
+          set -euo pipefail
+          node --check public/data.js
+          node --check public/app.js
+          node tools/verify-runs.mjs
+          node tools/check-site.mjs
+
+      - name: Commit shorthand update and remove this workflow
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/update-model-shortlabels-once.yml
+          git add tools/models.json public/data.js data
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "Update model shorthand labels"
+          git push origin HEAD:main

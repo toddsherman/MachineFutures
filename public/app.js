@@ -414,13 +414,13 @@
         <p class="doomer-key"><span class="key-gone"><i></i>Humanity is gone (1–3)</span><span class="key-risk"><i></i>Might perish (4–5)</span><span class="key-hint"><span class="on-hover">Hover a bar for the endings inside it</span><span class="on-tap">Tap a bar for the endings inside it</span></span></p>
       </div>
       <div class="doomer-list">
-        ${doomerEntries.map(entry => {
+        ${doomerEntries.map((entry, index) => {
           const total = entry.sums.total;
           const parts = exposureStates.map(state => ({ state, value: stateValue(entry, state) }));
           // The readout only exists on hover, so the same breakdown goes in the
           // bar's label — a screen reader never has a pointer to hover with.
           const spoken = parts.map(({ state, value }) => `${esc(state.name)} ${value}%`).join(', ');
-          return `<div class="doomer-row">
+          return `<div class="doomer-row" style="--r:${index}">
           <div class="doomer-label">${labLogo(entry.provider, 'in-row')}<b>${esc(entry.label)}</b><small>${esc(entry.provider)}</small></div>
           <div class="doomer-meter">
             <div class="doomer-bar" role="img" aria-label="${esc(entry.label)}: ${entry.sums.gone}% humanity is gone, ${entry.sums.risk}% might perish. ${spoken}">
@@ -772,7 +772,7 @@
   // child of the thing being revealed. Bands wait until their axis is wholly on
   // screen, so a card animates when it can actually be read rather than as soon
   // as its first pixels appear.
-  function revealOnView(selector, { watch, threshold = 0.15, rootMargin = '0px' } = {}) {
+  function revealOnView(selector, { watch, threshold = 0.15, rootMargin = '0px', delay = 0 } = {}) {
     const targets = $$(selector);
     if (reduceMotion() || !('IntersectionObserver' in window)) return;
     targets.forEach(el => el.classList.add('will-reveal'));
@@ -780,13 +780,14 @@
     // After the reveal has had its time the classes come off, so the end state
     // never depends on a transition having run — browsers pause them in
     // background tabs.
-    const settle = el => setTimeout(() => el.classList.remove('will-reveal', 'is-in'), 1600);
+    const settle = el => setTimeout(() => el.classList.remove('will-reveal', 'is-in'), delay + 1600);
     const io = new IntersectionObserver((records, observer) => {
       records.forEach(record => {
         if (!record.isIntersecting) return;
         const host = record.target.closest(selector) || record.target;
-        host.classList.add('is-in');
         observer.unobserve(record.target);
+        if (delay) setTimeout(() => host.classList.add('is-in'), delay);
+        else host.classList.add('is-in');
         settle(host);
       });
     }, { threshold, rootMargin });
@@ -804,7 +805,7 @@
         rescue.unobserve(record.target);
         setTimeout(() => {
           if (!host.classList.contains('is-in')) host.classList.remove('will-reveal');
-        }, 1500);
+        }, delay + 1500);
       });
     }, { threshold: 0 });
     targets.forEach(el => rescue.observe(el));
@@ -825,4 +826,5 @@
 
   revealOnView('.state-strip', { watch: '.strip-axis', threshold: 1 });
   revealOnView('.matrix', { threshold: 0.12 });
+  revealOnView('.doomer-list', { threshold: 0.15, delay: 500 });
 })();

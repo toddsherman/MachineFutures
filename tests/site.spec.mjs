@@ -160,6 +160,55 @@ test.describe('the charts are actually painted', () => {
     expect(invisible).toEqual([]);
   });
 
+  test('the exposure bars wipe left to right after a hold', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('.doomer-row');
+    const out = await page.evaluate(() => new Promise(resolve => {
+      const list = document.querySelector('.doomer-list');
+      const bar = list.querySelector('.doomer-row .doomer-bar');
+      document.documentElement.style.scrollBehavior = 'auto';
+      const t0 = performance.now();
+      const samples = [];
+      list.scrollIntoView();
+      let delaysWhileAnimating = [];
+      const poll = () => {
+        samples.push({ at: Math.round(performance.now() - t0), clip: getComputedStyle(bar).clipPath, cls: list.className });
+        if (list.classList.contains('is-in') && !delaysWhileAnimating.length) {
+          delaysWhileAnimating = [...list.querySelectorAll('.doomer-row')].map(r => getComputedStyle(r.querySelector('.doomer-bar')).transitionDelay);
+        }
+        if (performance.now() - t0 < 2200) requestAnimationFrame(poll);
+        else {
+          const started = samples.find(x => x.cls.includes('is-in'));
+          const partial = samples.filter(x => /inset\(0px [0-9.]+%/.test(x.clip));
+          resolve({ heldFor: started ? started.at : null, partialFrames: partial.length,
+                    firstClip: samples.find(x => /inset/.test(x.clip))?.clip ?? null,
+                    finalClip: samples.at(-1).clip,
+                    rowDelays: delaysWhileAnimating });
+        }
+      };
+      requestAnimationFrame(poll);
+    }));
+    expect(out.heldFor, 'it should wait about half a second before drawing').toBeGreaterThan(400);
+    expect(out.heldFor).toBeLessThan(900);
+    expect(out.firstClip, 'it should start fully clipped').toContain('100%');
+    expect(out.partialFrames, 'no partly-revealed frame: it appeared rather than wiped').toBeGreaterThan(0);
+    expect(['inset(0px)', 'none'], `ended partly clipped: ${out.finalClip}`).toContain(out.finalClip);
+    // Rows step, so the wipe runs down the chart rather than all at once.
+    const delays = out.rowDelays.map(d => parseFloat(d));
+    expect(delays.at(-1), 'the last row should start after the first').toBeGreaterThan(delays[0]);
+  });
+
+  test('reduced motion shows the exposure bars outright', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+    await page.waitForSelector('.doomer-row');
+    const clip = await page.evaluate(() => {
+      document.querySelector('.doomer-list').scrollIntoView();
+      return getComputedStyle(document.querySelector('.doomer-bar')).clipPath;
+    });
+    expect(clip, 'the bars should not be clipped under reduced motion').toBe('none');
+  });
+
   test('content reached late still animates', async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('.state-card');
@@ -198,11 +247,11 @@ test.describe('the charts are actually painted', () => {
         y += 400;
         window.scrollTo(0, y);
         if (y < document.documentElement.scrollHeight) setTimeout(step, 120);
-        else setTimeout(resolve, 2000);   // past the rescue window
+        else setTimeout(resolve, 2800);   // past the rescue window and the exposure hold
       };
       step();
     }));
-    const stuck = await page.evaluate(() => [...document.querySelectorAll('.state-strip.will-reveal, .matrix.will-reveal')]
+    const stuck = await page.evaluate(() => [...document.querySelectorAll('.state-strip.will-reveal, .matrix.will-reveal, .doomer-list.will-reveal')]
       .map(el => `${el.className} at y=${Math.round(el.getBoundingClientRect().top + window.scrollY)}`));
     expect(stuck).toEqual([]);
   });

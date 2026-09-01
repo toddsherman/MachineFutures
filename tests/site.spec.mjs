@@ -141,7 +141,7 @@ test.describe('the charts are actually painted', () => {
     const invisible = [];
     for (let i = 0; i < count; i++) {
       await cards.nth(i).scrollIntoViewIfNeeded();
-      await page.waitForTimeout(1000);   // longer than the reveal's own rescue
+      await page.waitForTimeout(1800);   // longer than the reveal's own rescue
       // getBoundingClientRect, not offsetWidth: a band scaled to zero still has
       // layout width, and reporting that is how this went unnoticed.
       const blank = await cards.nth(i).evaluate(card => {
@@ -160,11 +160,50 @@ test.describe('the charts are actually painted', () => {
     expect(invisible).toEqual([]);
   });
 
-  test('no strip is left waiting for an animation', async ({ page }) => {
+  test('content reached late still animates', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('.state-card');
+    // A page-load timer once cleared every element's hidden state after four
+    // seconds, so anything a reader reached after that simply appeared. The
+    // class alone does not prove the animation ran — `is-in` lands either way
+    // — so this samples the painted transform.
+    const out = await page.evaluate(() => new Promise(resolve => {
+      const strip = document.querySelectorAll('.state-strip')[8];
+      const band = strip.querySelector('.strip-range');
+      setTimeout(() => {
+        document.documentElement.style.scrollBehavior = 'auto';
+        strip.scrollIntoView();
+        const seen = [];
+        let n = 0;
+        const poll = () => {
+          seen.push(getComputedStyle(band).transform);
+          if (++n < 30) requestAnimationFrame(poll);
+          else resolve({ midFlight: seen.filter(t => t !== 'none' && t !== 'matrix(1, 0, 0, 1, 0, 0)').length, classes: strip.className });
+        };
+        requestAnimationFrame(poll);
+      }, 5000);
+    }));
+    expect(out.midFlight, `the band never scaled, it just appeared (classes: ${out.classes})`).toBeGreaterThan(0);
+  });
+
+  test('nothing the reader has scrolled past stays hidden', async ({ page }) => {
     await settle(page);
-    await page.waitForTimeout(4500);   // past the long-stop
+    // Elements below the fold keep their hidden state on purpose — that is
+    // what makes them animate when reached. The guarantee is narrower: once a
+    // reader has been past something, it must not still be waiting.
+    await page.evaluate(() => new Promise(resolve => {
+      document.documentElement.style.scrollBehavior = 'auto';
+      let y = 0;
+      const step = () => {
+        y += 400;
+        window.scrollTo(0, y);
+        if (y < document.documentElement.scrollHeight) setTimeout(step, 120);
+        else setTimeout(resolve, 2000);   // past the rescue window
+      };
+      step();
+    }));
     const stuck = await page.evaluate(() => [...document.querySelectorAll('.state-strip.will-reveal, .matrix.will-reveal')]
-      .map(el => el.className));
+      .map(el => `${el.className} at y=${Math.round(el.getBoundingClientRect().top + window.scrollY)}`));
     expect(stuck).toEqual([]);
   });
 });

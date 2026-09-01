@@ -804,14 +804,16 @@
         rescue.unobserve(record.target);
         setTimeout(() => {
           if (!host.classList.contains('is-in')) host.classList.remove('will-reveal');
-        }, 700);
+        }, 1500);
       });
     }, { threshold: 0 });
     targets.forEach(el => rescue.observe(el));
 
-    // Long-stop for anything never scrolled to at all. Four seconds, not ten:
-    // nothing is worth showing a reader an empty chart for ten seconds.
-    setTimeout(() => targets.forEach(el => el.classList.remove('will-reveal')), 4000);
+    // No long-stop on a page-load timer. One used to clear every element after
+    // four seconds whether or not the reader had reached it, which truncated
+    // whatever was animating and stopped everything further down animating at
+    // all. An element nobody has scrolled to needs no rescue; the observer
+    // above deals with it the moment somebody does.
   }
 
   if (datasetDate) $('#dataset-date').textContent = datasetDate;

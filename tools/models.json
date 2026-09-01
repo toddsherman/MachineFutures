@@ -1,16 +1,27 @@
 {
   "_comment": "Roster for tools/run-elicitation.mjs. A model whose keyEnv is absent from the environment is skipped, so the keys you configure decide which models run. Roster order sets both display order and colour shade within a lab (first = the lab's base hue, later entries darkened). status: omit or 'active' to elicit it; 'paused' to stop asking while keeping its published forecast; 'retired' for a model the provider has withdrawn. Paused and retired entries are never called but are still used to label and order their historical runs, so keep them here rather than deleting them. Run --list to see everything a provider serves, --new for just what is not yet on this roster, --check to verify keys and ids.",
-  "_verified": "Model ids listed live from each provider's models endpoint on 2026-08-24. New pairings (claude-opus-5, gpt-5.4, gemini-2.5-pro, grok-4.5, muse-spark-1.1) are confirmed present but not yet preflighted for inference. Always pin an explicit version, never an alias like gemini-pro-latest: aliases drift to new models and break longitudinal comparability.",
+  "_verified": "Model ids listed live from each provider's models endpoint on 2026-08-24; Claude Fable 5.1 (claude-fable-5-1) was confirmed in Anthropic's platform docs on 2026-09-01. New pairings (claude-opus-5, gpt-5.4, gemini-2.5-pro, grok-4.5, muse-spark-1.1) are confirmed present but not yet preflighted for inference. Always pin an explicit version, never an alias like gemini-pro-latest: aliases drift to new models and break longitudinal comparability.",
   "models": [
     {
       "key": "anthropic",
+      "provider": "Anthropic",
+      "label": "Claude Fable 5.1",
+      "shortLabel": "F51",
+      "tier": "frontier",
+      "api": "anthropic",
+      "model": "claude-fable-5-1",
+      "keyEnv": "ANTHROPIC_API_KEY"
+    },
+    {
+      "key": "anthropic-fable-5",
       "provider": "Anthropic",
       "label": "Claude Fable 5",
       "shortLabel": "FAB",
       "tier": "frontier",
       "api": "anthropic",
       "model": "claude-fable-5",
-      "keyEnv": "ANTHROPIC_API_KEY"
+      "keyEnv": "ANTHROPIC_API_KEY",
+      "status": "paused"
     },
     {
       "key": "anthropic-prev",

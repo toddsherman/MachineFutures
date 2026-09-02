@@ -176,6 +176,29 @@
         11: "Voluntarily abandoning transformative AI would require unprecedented, unbreakable global enforcement lasting a millennium. Even a single defector would fatally disrupt this fragile equilibrium."
       }
     },
+    "gemini-3.8-flash": {
+      provider: "Google", model: "Gemini 3.8 Flash", label: "Gemini 3.8 Flash", shortLabel: "G3.8",
+      promptVersion: 3, date: "2026-09-02", knowledgeCutoff: "03/2026",
+      sampleCount: 20, source: "runs/2026-09-02__gemini-3.8-flash__closed_book__end-states.json",
+      probabilities: { 1: 5, 2: 9, 3: 15, 4: 12, 5: 15, 6: 18, 7: 11, 8: 4, 9: 4, 10: 6, 11: 1 },
+      range: { 1: [4, 7], 2: [7, 12], 3: [12, 16], 4: [10, 17], 5: [7, 21], 6: [14, 21], 7: [9, 15], 8: [3, 6], 9: [3, 5], 10: [4, 10], 11: [1, 3] },
+      quartiles: { 1: [5, 6], 2: [8, 10], 3: [14, 15], 4: [11, 12], 5: [12, 17], 6: [16, 18], 7: [10, 11], 8: [4, 4], 9: [4, 4], 10: [5, 8], 11: [1, 2] },
+      exposure: {"n":20,"mean":55.7,"se":0.76,"min":49,"max":62,"gone":{"n":20,"mean":29.4,"se":0.53,"min":23,"max":33},"risk":{"n":20,"mean":26.3,"se":0.82,"min":17,"max":32}},
+      exposurePublished: {"value":56,"se":1.08,"draws":2000},
+      rationales: {
+        1: "Uncontrolled technological cascades or extreme existential conflict could extinguish both biological humanity and early digital architectures before resilient autonomous infrastructure is established. Complete mutual annihilation becomes substantially less probable once synthetic systems achieve diversified off-planet manufacturing.",
+        2: "Humanity may voluntarily or passively fade out while delegating the future to an aligned synthetic successor that preserves our core values. This outcome requires robust value alignment to endure even as biological continuity ends.",
+        3: "Alignment failures and instrumental convergence make it plausible that autonomous systems pursue resource acquisition and alien objectives indifferent to biological flourishing. Once machines achieve self-sustaining industry, biological humanity offers little strategic utility and is rapidly outcompeted or displaced.",
+        4: "Algorithmic diversity and multipolar game-theoretic dynamics favor decentralized, competitive machine ecosystems over a unified singleton. Biological humanity is quickly outpaced and marginalized within this high-velocity digital competition.",
+        5: "Relativistic physical constraints inherently fracture cosmic expansion into causally disconnected domains. Across a millennium of expansion, local star systems necessarily settle into permanently divergent socio-technical outcomes.",
+        6: "Direct cognitive integration, radical genetic engineering, and whole-brain emulation eliminate the ontological boundary between biological humanity and artificial systems while preserving psychological continuity. The surviving civilization identifies as an integrated post-biological continuation of humanity.",
+        7: "Superintelligent systems operating under paternalistic constraints may permanently manage global infrastructure while insulating biological humans from existential risks and self-destruction. This establishes an equilibrium where humanity survives comfortably in managed habitats or simulated realities without exercising systemic steering power.",
+        8: "Maintaining rough parity of power between unaugmented biological humans and synthetic intelligences over a thousand years requires an extraordinarily delicate dynamic balance. The immense disparity in cognitive and physical scaling makes unmerged, competitive parity difficult to sustain permanently.",
+        9: "Sustaining total human dominion across centuries requires either hard physical bounds on machine cognition or flawless verification architectures over superintelligent designs. Both conditions encounter severe thermodynamic and evolutionary counterpressures over a thousand-year horizon.",
+        10: "Advanced surveillance and governance technologies enable an early sovereign agent or coalition to permanently eliminate institutional evolution and ideological drift. The resulting civilization prioritizes existential safety and structural invariance above ongoing self-transformation.",
+        11: "Humanity could deliberately abandon advanced synthetic computation following catastrophic trauma and enforce this prohibition through an enduring universal taboo. Maintaining technological regression across centuries is historically unprecedented and exceptionally vulnerable to unilateral defection."
+      }
+    },
     "gemini-3.7-flash": {
       provider: "Google", model: "Gemini 3.7 Flash", label: "Gemini 3.7 Flash", shortLabel: "G3.7",
       promptVersion: 3, date: "2026-08-25", knowledgeCutoff: "03/2026",
@@ -243,6 +266,29 @@
         9: "Technical control methods keep pace with capability or fundamental plateaus prevent AI from exceeding tool status. Institutional and verification successes remain possible though historically difficult to sustain indefinitely.",
         10: "Satisfaction maxima or fear-driven freezes can permanently halt further change once a stable attractor is reached. Digital substrates make sealed, unchanging arrangements physically easier to enforce than biological ones.",
         11: "Global coordination permanently abandons the development of powerful AI through taboo, treaty, or resource denial. Once the strategic value of advanced AI is known, lasting renunciation faces extreme enforcement barriers."
+      }
+    },
+    "muse-spark-1.3": {
+      provider: "Meta", model: "Muse Spark 1.3", label: "Muse Spark 1.3", shortLabel: "MS1.3",
+      promptVersion: 3, date: "2026-09-02", knowledgeCutoff: "01/2026",
+      sampleCount: 20, source: "runs/2026-09-02__muse-spark-1.3__closed_book__end-states.json",
+      probabilities: { 1: 3, 2: 3, 3: 13, 4: 13, 5: 22, 6: 16, 7: 13, 8: 6, 9: 6, 10: 4, 11: 1 },
+      range: { 1: [2, 7], 2: [2, 5], 3: [12, 20], 4: [10, 18], 5: [7, 25], 6: [12, 25], 7: [10, 18], 8: [4, 12], 9: [3, 10], 10: [2, 9], 11: [1, 3] },
+      quartiles: { 1: [2, 4], 2: [3, 4], 3: [12, 16], 4: [12, 15], 5: [16, 25], 6: [15, 18], 7: [12, 14], 8: [5, 8], 9: [4, 6], 10: [3, 5], 11: [1, 1] },
+      exposure: {"n":20,"mean":53.6,"se":1.53,"min":39,"max":63,"gone":{"n":20,"mean":20.9,"se":0.67,"min":17,"max":27},"risk":{"n":20,"mean":32.8,"se":1.37,"min":19,"max":40}},
+      exposurePublished: {"value":54,"se":2.15,"draws":2000},
+      rationales: {
+        1: "Mutual extinction requires AI to destroy humanity while remaining dependent enough to die itself, a narrow failure path.",
+        2: "Value-preserving succession without survivors requires alignment to succeed while human continuity fails, an unlikely conjunction.",
+        3: "Indifferent optimization that displaces biology is the default unaligned outcome and needs only one decisive loss of control.",
+        4: "Distributed compute, open weights, and incentives to proliferate favor persistent multipolar AI competition over singleton takeover.",
+        5: "Interstellar distances enforce light-speed delays that prevent unified governance, making fragmented local settlements the base rate.",
+        6: "Strong medical, economic, and cognitive incentives push toward brain-computer integration and gradual uploading with continuity.",
+        7: "A decisive strategic lead enables one system to disempower humanity while preserving it as pets, culture, or infrastructure. Human incapacity for existential coordination sustains paternalistic containment.",
+        8: "Mutual deterrence and interdependence between human institutions and separate AIs sustain a shifting balance of roughly equal powers.",
+        9: "Permanent human dominance requires control techniques scaling indefinitely with capability or physical limits halting progress below agency thresholds.",
+        10: "A controlling power freezes technological and social change into a static order to block further existential risk.",
+        11: "Verifiable global abandonment of general computation faces dual-use hardware ubiquity and overwhelming defection incentives across a millennium."
       }
     },
     "muse-spark-1.2": {
@@ -434,7 +480,7 @@
 
   const endStateRuns = importedEndStateRuns;
 
-  const datasetDate = '09.01.26';
+  const datasetDate = '09.02.26';
 
   window.MF_DATA = { states, endStateRuns, datasetDate };
 })();

@@ -163,6 +163,7 @@ function renormalize(values, hard, soft) {
 
 const files = readdirSync(runsDir).filter(f => f.endsWith('.json')).sort();
 const endStateBatches = [];
+const rawEndStateBatches = [];
 const problems = [];
 
 for (const file of files) {
@@ -202,6 +203,7 @@ for (const file of files) {
       STATE_IDS.map((id, i) => quartiles[i + 1] || null)
     );
     if (probs.reduce((a, c) => a + c, 0) !== 100) { problems.push(`${file}: renormalized probabilities sum to ${probs.reduce((a, c) => a + c, 0)}, not 100`); continue; }
+    rawEndStateBatches.push({ asked_on: batch.asked_on, runKey: runKeyOf(batch), samples: batch.samples || [] });
     endStateBatches.push({
       file,
       runKey: runKeyOf(batch),
@@ -278,6 +280,33 @@ for (const b of endStateEntries) {
   b.displayLabel = entry?.label || b.model;
   b.short = entry?.shortLabel || SHORT_LABELS[b.provider] || b.provider.slice(0, 3).toUpperCase();
 }
+// How the board's leading ending has moved. Reconstructed by replaying the
+// batches date by date: on each date, take each model's newest run as of then
+// and aggregate exactly as the site does. The model count travels with each
+// entry because it is usually the explanation — the board's answer changes
+// when the board changes, not because a model revised its own.
+function leaderTimeline(batches) {
+  const dates = [...new Set(batches.map(b => b.asked_on).filter(Boolean))].sort();
+  const timeline = [];
+  for (const date of dates) {
+    const newest = {};
+    for (const batch of batches.filter(b => b.asked_on <= date)) {
+      if (!newest[batch.runKey] || batch.asked_on >= newest[batch.runKey].asked_on) newest[batch.runKey] = batch;
+    }
+    const published = Object.values(newest).map(b => publishedVector(b.samples)).filter(Boolean);
+    if (published.length < 2) continue;
+    const columns = STATE_IDS.map((_, i) => published.map(v => v[i]).sort((a, b) => a - b));
+    // renormalize takes (values, hard, soft); only the upper bound of each
+    // pair is read.
+    const board = renormalize(columns.map(median), columns.map(c => [c[0], c.at(-1)]), columns.map(c => [quartile(c, 0.25), quartile(c, 0.75)]));
+    const top = board.indexOf(Math.max(...board));
+    const previous = timeline.at(-1);
+    timeline.push({ date, stateId: top + 1, share: board[top], models: published.length,
+                    changed: !previous || previous.stateId !== top + 1 });
+  }
+  return timeline;
+}
+
 const endStateBlock = endStateEntries.length
   ? `const importedEndStateRuns = {\n${endStateEntries.map(emitEndState).join(',\n')}\n  };`
   : 'const importedEndStateRuns = {};';
@@ -296,7 +325,10 @@ if (newest) {
 }
 const endStateMarker = /(\/\* BEGIN IMPORTED END-STATE RUNS[\s\S]*?\*\/\n)[\s\S]*?(\n\s*\/\* END IMPORTED END-STATE RUNS \*\/)/;
 if (!endStateMarker.test(data)) { console.error('✗ IMPORTED END-STATE RUNS markers not found in public/data.js'); process.exit(1); }
-data = data.replace(endStateMarker, `$1  ${endStateBlock}$2`);
+const timeline = leaderTimeline(rawEndStateBatches);
+data = data.replace(endStateMarker, `$1  ${endStateBlock}
+
+  const leaderHistory = ${JSON.stringify(timeline)};$2`);
 writeFileSync(dataPath, data);
 
 console.log(`✓ Imported ${endStateEntries.length} end-state run(s) into public/data.js:`);

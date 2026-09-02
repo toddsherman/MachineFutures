@@ -476,11 +476,13 @@
       }
     }
   };
+
+  const leaderHistory = [{"date":"2026-08-24","stateId":3,"share":16,"models":5,"changed":true},{"date":"2026-08-25","stateId":3,"share":18,"models":11,"changed":false},{"date":"2026-08-27","stateId":3,"share":17,"models":17,"changed":false},{"date":"2026-09-01","stateId":3,"share":17,"models":18,"changed":false},{"date":"2026-09-02","stateId":6,"share":17,"models":20,"changed":true}];
   /* END IMPORTED END-STATE RUNS */
 
   const endStateRuns = importedEndStateRuns;
 
   const datasetDate = '09.02.26';
 
-  window.MF_DATA = { states, endStateRuns, datasetDate };
+  window.MF_DATA = { states, endStateRuns, datasetDate, leaderHistory };
 })();

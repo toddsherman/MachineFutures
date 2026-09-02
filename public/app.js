@@ -1,5 +1,5 @@
 (function () {
-  const { states, endStateRuns = {}, datasetDate } = window.MF_DATA;
+  const { states, endStateRuns = {}, datasetDate, leaderHistory = [] } = window.MF_DATA;
 
   // Guard against taxonomy/data drift: every end-state run must cover exactly
   // the published state ids and allocate exactly 100 points.
@@ -172,6 +172,39 @@
     io.observe(panel);
     // If it is never scrolled to, nothing needs to happen: the answer is
     // already the text on screen.
+  }
+
+  // The board's leader over time, replayed from the runs. Dates are when a
+  // model was asked, not when it shipped: nothing here can say what a model
+  // would have answered before it was put the question.
+  const SHORT_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const shortDate = iso => {
+    const [y, m, d] = iso.split('-').map(Number);
+    return `${d} ${SHORT_MONTHS[m - 1]}`;
+  };
+
+  function leaderTimelineMarkup() {
+    if (leaderHistory.length < 2) return '';
+    const nameOf = id => states.find(state => state.id === id)?.name ?? '';
+    const rows = leaderHistory.map(entry => `<li${entry.changed ? ' class="is-change"' : ''}>
+        <span class="tl-date">${esc(shortDate(entry.date))}</span>
+        <span class="tl-name" style="--state:${states.find(s => s.id === entry.stateId)?.color}">${esc(nameOf(entry.stateId))}</span>
+        <span class="tl-share">${entry.share}%</span>
+        <span class="tl-models">${entry.models} models</span>
+      </li>`).join('');
+    const changes = leaderHistory.filter(e => e.changed);
+    const last = changes.at(-1);
+    // Say what moved it. A leader changes when the board gains models far more
+    // often than because a model revised its own answer, and the two read
+    // identically unless the count is on the page.
+    const note = changes.length > 1 && last
+      ? `It changed on ${esc(shortDate(last.date))}, when the board went from ${leaderHistory[leaderHistory.indexOf(last) - 1].models} models to ${last.models}.`
+      : 'It has led on every date the board has been asked.';
+    return `<div class="leader-timeline">
+      <h3>How this has moved</h3>
+      <ol>${rows}</ol>
+      <p>${note}</p>
+    </div>`;
   }
 
   // How many models put this ending at the top of their own allocation, and
@@ -542,7 +575,7 @@
     const paint = () => {
       const support = supportFor(leader.id);
       const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
-      leaderEl.innerHTML = `<h2 class="leader-title" id="leader-title">Most likely <em>ending</em></h2><p class="leader-name">${esc(leader.name)}</p><strong>${leader.probability}%</strong><span class="leader-unit">Median across ${Object.keys(endStateRuns).length} models &middot; of 100 points</span><p class="leader-description">${esc(leader.description)}</p><p class="leader-method">${plural(support.first, 'model')} picked this as their highest-weighted prediction, and ${support.second} more had it as their second. ${esc(support.top.label)} from ${esc(support.top.provider)} put the most weight on it, at ${support.top.value}%; ${esc(support.bottom.label)} from ${esc(support.bottom.provider)} the least, at ${support.bottom.value}%.</p>`;
+      leaderEl.innerHTML = `<h2 class="leader-title" id="leader-title">Most likely <em>ending</em></h2><p class="leader-name">${esc(leader.name)}</p><strong>${leader.probability}%</strong><span class="leader-unit">Median across ${Object.keys(endStateRuns).length} models &middot; of 100 points</span><p class="leader-description">${esc(leader.description)}</p>${leaderTimelineMarkup()}<p class="leader-method">${plural(support.first, 'model')} picked this as their highest-weighted prediction, and ${support.second} more had it as their second. ${esc(support.top.label)} from ${esc(support.top.provider)} put the most weight on it, at ${support.top.value}%; ${esc(support.bottom.label)} from ${esc(support.bottom.provider)} the least, at ${support.bottom.value}%.</p>`;
     };
     // Selecting a model no longer moves this panel, so there is nothing to
     // animate: without this it would re-tween the same figure on every click.

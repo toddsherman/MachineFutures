@@ -257,6 +257,49 @@ test.describe('the charts are actually painted', () => {
   });
 });
 
+test.describe('the leader timeline', () => {
+  test('it lists every date and marks the changes', async ({ page }) => {
+    await settle(page);
+    const tl = await page.evaluate(() => {
+      const el = document.querySelector('.leader-timeline');
+      if (!el) return null;
+      const rows = [...el.querySelectorAll('li')].map(li => ({
+        text: li.innerText.replace(/\s+/g, ' ').trim(),
+        change: li.classList.contains('is-change')
+      }));
+      return { rows, note: el.querySelector('p').textContent,
+               history: window.MF_DATA.leaderHistory,
+               insidePanel: !!el.closest('.end-leader') };
+    });
+    expect(tl, 'no timeline rendered').not.toBeNull();
+    expect(tl.insidePanel, 'the timeline should live in the leader panel').toBe(true);
+    expect(tl.rows.length, 'a row per date in the data').toBe(tl.history.length);
+    // Dates run forward, and the model count never goes backwards.
+    const dates = tl.history.map(h => h.date);
+    expect([...dates].sort()).toEqual(dates);
+    const counts = tl.history.map(h => h.models);
+    expect(counts.every((n, i) => i === 0 || n >= counts[i - 1]), 'model count went backwards').toBe(true);
+    // A row flagged as a change must actually differ from the row before it.
+    tl.history.forEach((h, i) => {
+      const differs = i === 0 || tl.history[i - 1].stateId !== h.stateId;
+      expect(h.changed, `row ${i} (${h.date}) is flagged ${h.changed} but differs=${differs}`).toBe(differs);
+    });
+    expect(tl.rows.filter(r => r.change).length).toBe(tl.history.filter(h => h.changed).length);
+  });
+
+  test('the last row agrees with the ending the panel names', async ({ page }) => {
+    await settle(page);
+    const same = await page.evaluate(() => {
+      const history = window.MF_DATA.leaderHistory;
+      const latest = history.at(-1);
+      const named = window.MF_TEST.stateMedians().slice().sort((a, b) => b.probability - a.probability)[0];
+      return { timelineSays: latest.stateId, panelSays: named.id, share: latest.share, panelShare: named.probability };
+    });
+    expect(same.timelineSays, 'the timeline ends on a different ending than the panel names').toBe(same.panelSays);
+    expect(same.share).toBe(same.panelShare);
+  });
+});
+
 test.describe('the selector governs one chart only', () => {
   test('choosing a model leaves the ending cards alone', async ({ page }) => {
     await settle(page);

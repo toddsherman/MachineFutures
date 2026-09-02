@@ -77,6 +77,16 @@
       "keyEnv": "GEMINI_API_KEY"
     },
     {
+      "key": "google-flash",
+      "provider": "Google",
+      "label": "Gemini 3.8 Flash",
+      "shortLabel": "G3.8",
+      "tier": "frontier",
+      "api": "google",
+      "model": "gemini-3.8-flash",
+      "keyEnv": "GEMINI_API_KEY"
+    },
+    {
       "key": "google-prev",
       "provider": "Google",
       "label": "Gemini 3.7 Flash",
@@ -110,6 +120,17 @@
     },
     {
       "key": "meta",
+      "provider": "Meta",
+      "label": "Muse Spark 1.3",
+      "shortLabel": "MS1.3",
+      "tier": "frontier",
+      "api": "openai-compatible",
+      "model": "muse-spark-1.3",
+      "keyEnv": "META_API_KEY",
+      "baseUrl": "https://api.meta.ai/v1"
+    },
+    {
+      "key": "meta-spark-1.2",
       "provider": "Meta",
       "label": "Muse Spark 1.2",
       "shortLabel": "MS1.2",

@@ -16,7 +16,12 @@ import { createHash } from 'node:crypto';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const harness = join(root, 'tools', 'run-elicitation.mjs');
 const DATE = '2026-01-01';
-const RUN_ID = `${DATE}__claude-fable-5__closed_book__end-states`;
+const MODEL_KEY = 'anthropic';
+const rosterEntry = JSON.parse(readFileSync(join(root, 'tools', 'models.json'), 'utf8'))
+  .models.find(m => m.key === MODEL_KEY);
+if (!rosterEntry) throw new Error(`tools/models.json has no "${MODEL_KEY}" entry for these tests to drive`);
+const slug = value => (value || 'model').toLowerCase().replace(/[^a-z0-9.]+/g, '-').replace(/^-+|-+$/g, '');
+const RUN_ID = `${DATE}__${slug(rosterEntry.model)}__closed_book__end-states`;
 
 const run = (args, { expectFail = false } = {}) => {
   try {
@@ -28,7 +33,7 @@ const run = (args, { expectFail = false } = {}) => {
 };
 const scratch = () => mkdtempSync(join(tmpdir(), 'mf-test-'));
 const batchAt = dir => JSON.parse(readFileSync(join(dir, `${RUN_ID}.json`), 'utf8'));
-const elicit = (dir, samples) => run(['--mock', '--date', DATE, '--models', 'anthropic', '--samples', String(samples), '--out', dir]);
+const elicit = (dir, samples) => run(['--mock', '--date', DATE, '--models', MODEL_KEY, '--samples', String(samples), '--out', dir]);
 
 test('a dry run never touches a real batch', () => {
   // --mock defaulted to runs/ once and overwrote a paid twenty-sample batch
@@ -37,7 +42,7 @@ test('a dry run never touches a real batch', () => {
     .filter(f => f.endsWith('.json'))
     .map(f => [f, readFileSync(join(root, 'runs', f), 'utf8').length]));
   const before = snapshot();
-  run(['--mock', '--date', DATE, '--models', 'anthropic', '--samples', '2']);
+  run(['--mock', '--date', DATE, '--models', MODEL_KEY, '--samples', '2']);
   assert.deepEqual(snapshot(), before, '--mock added or replaced a batch in runs/');
   assert.ok(existsSync(join(root, 'runs', '.mock', `${RUN_ID}.json`)), 'mock output should land in runs/.mock');
   rmSync(join(root, 'runs', '.mock'), { recursive: true, force: true });
@@ -114,7 +119,7 @@ test('the integrity digest covers the samples', () => {
 
 test('--samples refuses values that would waste or skip a run', () => {
   for (const bad of ['abc', '-5', '0', '2.5', '100000']) {
-    const r = run(['--mock', '--models', 'anthropic', '--samples', bad], { expectFail: true });
+    const r = run(['--mock', '--models', MODEL_KEY, '--samples', bad], { expectFail: true });
     assert.equal(r.ok, false, `--samples ${bad} should have been rejected`);
     assert.match(r.out, /whole number from 1 to 200/);
   }

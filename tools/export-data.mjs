@@ -85,6 +85,34 @@ write('samples.csv', csv(
   sampleRows
 ));
 
+/* ---------- answers the harness refused ---------- */
+// Every batch records the attempts that were thrown away. Published nowhere
+// until now, which meant a model quietly failing the schema on a fifth of its
+// attempts looked identical to one that never missed.
+const qualityRows = [];
+for (const file of readdirSync(join(root, 'runs')).filter(f => f.endsWith('.json')).sort()) {
+  const batch = JSON.parse(readFileSync(join(root, 'runs', file), 'utf8'));
+  if (batch.prompt_family !== 'end_states') continue;
+  const failures = batch.harness?.failures ?? [];
+  // Batches written before failures carried a kind hold validation rejections
+  // only, which is what an absent kind means.
+  const byKind = kind => failures.filter(f => (f.kind ?? 'permanent') === kind).length;
+  const kept = (batch.samples || []).length;
+  const rejected = byKind('permanent');
+  const attempts = kept + rejected;
+  qualityRows.push([
+    batch.model?.name, batch.model?.api_string, batch.asked_on, kept, rejected,
+    byKind('transient'), byKind('quota'),
+    attempts ? (rejected / attempts * 100).toFixed(1) : '0.0',
+    [...new Set(failures.filter(f => (f.kind ?? 'permanent') === 'permanent').map(f => f.reason))].join(' | ')
+  ]);
+}
+write('quality.csv', csv(
+  ['model', 'api_model_id', 'asked_on', 'samples_kept', 'answers_rejected',
+   'transient_errors', 'quota_errors', 'reject_rate_pct', 'rejection_reasons'],
+  qualityRows
+));
+
 /* ---------- the taxonomy ---------- */
 write('endings.csv', csv(
   ['ending_id', 'ending', 'family', 'extinction_tier', 'description'],

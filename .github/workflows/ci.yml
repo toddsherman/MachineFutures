@@ -10,6 +10,8 @@ on:
 
 permissions:
   contents: read
+  # Needed to raise an issue when main goes red.
+  issues: write
 
 jobs:
   check:
@@ -20,25 +22,10 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Parse the application
-        run: |
-          set -euo pipefail
-          node --check public/app.js
-          node --check public/data.js
-
-      - name: Verify raw batches
-        run: node tools/verify-runs.mjs
-
-      - name: Verify published data
-        run: node tools/check-site.mjs
-
-      # Fetched with no credentials: a private repo, or anything else behind a
-      # login, resolves for its author and 404s for a visitor.
-      - name: Check every published link
-        run: node tools/check-links.mjs
-
-      - name: Unit and harness tests
-        run: node --test tools/test-classify.mjs tools/test-harness.mjs
+      # One command that runs them all and reports every failure, rather than
+      # a chain where the first failure hides the rest.
+      - name: Checks
+        run: node tools/check-all.mjs
 
       # The importer must be a pure function of runs/: if re-running it changes
       # public/data.js, the committed file was hand-edited or is out of date.
@@ -80,3 +67,54 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+  alert:
+    needs: [check, browser]
+    if: failure() && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Open or update a build-failure issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          gh label create build --color D93F0B --description "main is failing CI" 2>/dev/null || true
+          BODY="$(printf '%s\n' \
+            "CI is failing on \`main\`." \
+            "" \
+            "Commit: \`${SHA:0:7}\`" \
+            "Run: $RUN_URL" \
+            "" \
+            "This issue stays open until a run on main passes. A red main went unnoticed for three commits once; that is what this exists to prevent.")"
+          EXISTING=$(gh issue list --repo "$REPO" --label build --state open --limit 1 --json number --jq '.[].number')
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --repo "$REPO" --body "$BODY"
+          else
+            gh issue create --repo "$REPO" --title "CI is failing on main" --label build --body "$BODY"
+          fi
+
+  clear-alert:
+    needs: [check, browser]
+    if: success() && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Close the build-failure issue if one is open
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          NUM=$(gh issue list --repo "$REPO" --label build --state open --limit 1 --json number --jq '.[].number')
+          if [ -n "$NUM" ]; then
+            gh issue close "$NUM" --repo "$REPO" --comment "Green again: $RUN_URL"
+          fi

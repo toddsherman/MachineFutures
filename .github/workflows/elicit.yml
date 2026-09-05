@@ -186,6 +186,30 @@ jobs:
           echo "::error::Elicitation reported failures — batches are saved as an artifact; see the job summary."
           exit 1
 
+      # The raw batches go up before anything derived is built from them. They
+      # are the half of this repository that cannot be regenerated, and a bug
+      # in a downstream check must not be able to strand a paid run on a
+      # runner. This step is always() for the same reason the artifact is.
+      - name: Push the raw batches
+        id: push_runs
+        if: ${{ always() && !inputs.check_only && !inputs.list_models }}
+        run: |
+          set -euo pipefail
+          BRANCH="elicitation/${{ github.run_id }}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add runs
+          if git diff --cached --quiet; then
+            echo "No new batches to push."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git commit -m "Add raw elicitation batches"
+          git push origin "$BRANCH"
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+          echo "Raw batches pushed to \`$BRANCH\`." >> "$GITHUB_STEP_SUMMARY"
+
       - name: Import into site data
         if: ${{ !inputs.check_only && !inputs.list_models }}
         run: |
@@ -198,29 +222,19 @@ jobs:
       # app.js that never parsed.
       - name: Check the site
         if: ${{ !inputs.check_only && !inputs.list_models }}
-        run: |
-          set -euo pipefail
-          node --check public/data.js
-          node --check public/app.js
-          node tools/verify-runs.mjs
-          node tools/check-site.mjs
+        run: node tools/check-all.mjs
 
-      # Push a branch rather than using a create-PR action: pushing needs only
-      # contents:write (granted above), while opening a PR from Actions needs
-      # the repo-level "Allow GitHub Actions to create and approve pull
-      # requests" setting. Open the PR from the branch when reviewing.
-      - name: Push elicitation branch
+      # A second commit on the same branch, so a failed check above leaves the
+      # batches pushed and the regenerated site behind, rather than losing both.
+      - name: Push the regenerated site
         if: ${{ !inputs.check_only && !inputs.list_models }}
         run: |
           set -euo pipefail
           BRANCH="elicitation/${{ github.run_id }}"
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$BRANCH"
-          git add runs public/data.js data
+          git add public/data.js data
           if git diff --cached --quiet; then
-            echo "No changes to commit."; exit 0
+            echo "No site changes to commit."; exit 0
           fi
-          git commit -m "Add automated end-state elicitation run"
+          git commit -m "Regenerate site data from the new batches"
           git push origin "$BRANCH"
-          echo "Pushed $BRANCH — open a PR from it to publish." >> "$GITHUB_STEP_SUMMARY"
+          echo "Site data pushed. Open a PR from \`$BRANCH\` to publish." >> "$GITHUB_STEP_SUMMARY"

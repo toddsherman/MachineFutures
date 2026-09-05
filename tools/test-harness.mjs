@@ -126,7 +126,7 @@ test('--samples refuses values that would waste or skip a run', () => {
 });
 
 test('an unknown model key fails the run instead of eliciting nothing', () => {
-  const r = run(['--mock', '--models', 'gpt-5.6'], { expectFail: true });
+  const r = run(['--mock', '--models', 'definitely-not-a-roster-key'], { expectFail: true });
   assert.equal(r.ok, false);
   assert.match(r.out, /unknown model key/);
 });

@@ -497,10 +497,11 @@ test.describe('behaviour', () => {
       dialog.close();
       const mark = document.querySelector('.state-mark');
       return { name, markColour: getComputedStyle(mark).color, bodyColour: getComputedStyle(document.body).color,
-               rowheaders: document.querySelectorAll('.matrix-rowheader[role="rowheader"] button').length };
+               rowheaders: document.querySelectorAll('.matrix-rowheader[role="rowheader"] button').length,
+               endings: window.MF_DATA.states.length };
     });
     expect(a11y.name, 'the dialog has no accessible name').toBeTruthy();
     expect(a11y.markColour, 'the marks should take the surrounding ink').toBe(a11y.bodyColour);
-    expect(a11y.rowheaders, 'row headers should wrap a real button').toBe(11);
+    expect(a11y.rowheaders, 'row headers should wrap a real button').toBe(a11y.endings);
   });
 });

@@ -631,17 +631,31 @@ if (process.env.GITHUB_STEP_SUMMARY) {
   const countBy = (r, kind) => r.failures.filter(f => f.kind === kind).length;
   const rows = results.map(r => {
     const status = r.quota ? '💳 quota/credit' : !r.ok ? '❌ failed' : r.samples < r.target ? '⚠️ short' : '✅ complete';
-    return `| ${r.label} (\`${r.key}\`) | ${status} | ${r.samples}/${r.target} | ${countBy(r, 'transient')} | ${countBy(r, 'quota')} | ${countBy(r, 'permanent')} |`;
+    const rejected = countBy(r, 'permanent');
+    const attempts = r.samples + rejected;
+    const rate = attempts ? `${(rejected / attempts * 100).toFixed(0)}%` : '—';
+    return `| ${r.label} (\`${r.key}\`) | ${status} | ${r.samples}/${r.target} | ${countBy(r, 'transient')} | ${countBy(r, 'quota')} | ${rejected} | ${rate} |`;
   });
   const lines = [
     `## Elicitation ${RUN_DATE}`,
     '',
     `${wrote} batch(es) written · ${hardFailures} model(s) failed · target ${SAMPLES} samples each`,
     '',
-    '| Model | Status | Samples | Transient | Quota | Permanent |',
-    '| --- | --- | ---: | ---: | ---: | ---: |',
+    '| Model | Status | Samples | Transient | Quota | Rejected | Reject rate |',
+    '| --- | --- | ---: | ---: | ---: | ---: | ---: |',
     ...rows
   ];
+  // A rejected answer is the validation working, so this is a note rather
+  // than a failure — but a model whose rate climbs is one to look at before
+  // its numbers are published.
+  const rejecting = results.filter(r => r.failures.some(f => f.kind === 'permanent'));
+  if (rejecting.length) {
+    lines.push('', '### Answers rejected as invalid', '',
+      'These were re-asked until the model returned a well-formed answer, so no batch is short because of them. A high rate means the model struggles with the schema.', '',
+      ...rejecting.flatMap(r => [`- **${r.label}** (\`${r.key}\`)`,
+        ...[...new Set(r.failures.filter(f => f.kind === 'permanent').map(f => f.reason))].map(reason => `  - ${reason}`)]));
+  }
+
   if (quotaHit.length) {
     lines.push('', '### Out of quota or credit', '',
       'These providers rejected calls for billing reasons. Top up or raise the limit, then re-run — samples already collected are resumed from the checkpoint rather than paid for twice.', '',

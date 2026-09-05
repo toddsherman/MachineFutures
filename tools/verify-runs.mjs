@@ -70,6 +70,12 @@ for (const file of files) {
     notes.push(`${file}: no integrity digest (written before harness v2)`);
   }
 
+  const rejected = (batch.harness?.failures ?? []).filter(f => (f.kind ?? 'permanent') === 'permanent').length;
+  if (rejected) {
+    const rate = (rejected / (samples.length + rejected) * 100).toFixed(0);
+    notes.push(`${file}: ${rejected} answer(s) rejected as invalid, ${rate}% of attempts`);
+  }
+
   if (batch.harness && batch.harness.complete === false) {
     notes.push(`${file}: short run — ${samples.length}/${batch.harness.target_samples} samples${batch.harness.quota_exhausted ? ', quota exhausted' : ''}`);
   }

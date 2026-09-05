@@ -7,7 +7,8 @@ Everything Machine Futures publishes, in formats that open in a spreadsheet with
 | `forecasts.csv` | model × ending | The published figure for every model on every ending, with the sample range and middle half behind it. |
 | `exposure.csv` | model | Extinction-risk exposure: the "humanity is gone" and "might perish" subtotals, their sum, and its bootstrap standard error. |
 | `rationales.csv` | model × ending | The reasoning each model gave, taken from the sample nearest its median. |
-| `samples.csv` | run × sample × ending | Every raw sample from every run, unaggregated — 245 samples across 16 runs. |
+| `samples.csv` | run × sample × ending | Every raw sample from every run, unaggregated. |
+| `quality.csv` | run | How each run went: samples kept, answers rejected as malformed, transient and quota errors, and the reject rate. |
 | `endings.csv` | ending | The taxonomy: the eleven end states, their families, and which carry extinction risk. |
 | `forecasts.json` | — | All of the above as one structured document. |
 
@@ -18,6 +19,10 @@ Each model allocates exactly 100 whole percentage points across eleven mutually 
 `probability_pct` is that published figure. `samples_min_pct` and `samples_max_pct` are the full spread across the model's samples; `middle_half_low_pct` and `middle_half_high_pct` are its quartiles. A gap between two models means little unless it clears the sampling error — see `bootstrap_standard_error` in `exposure.csv`.
 
 These questions never resolve. There is no right answer and no leaderboard: the numbers record what a model expresses and how that shifts as new models arrive.
+
+## Answers that were thrown away
+
+A model that returns a malformed allocation is re-asked until it returns a valid one, so no run is short because of a rejection. `quality.csv` records how often that happened. The rate is a property of the model, not of its forecast: one model rejected on a sixth of its attempts by consistently allocating 110 points, and nothing about its published figures is affected, but it is worth knowing.
 
 ## The full raw batches
 

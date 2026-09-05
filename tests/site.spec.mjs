@@ -390,10 +390,11 @@ test.describe('the forecast plays itself', () => {
       const active = () => document.querySelector('.end-toggle-button.active')?.dataset.endForecast;
       let last = active();
       const t0 = performance.now();
+      const budget = Object.keys(window.MF_DATA.endStateRuns).length * 500 + 6000;
       const watch = setInterval(() => {
         const now = active();
         if (now !== last) { seen.push({ at: Math.round(performance.now() - t0), key: now }); last = now; }
-        if (performance.now() - t0 > 12000) {
+        if (performance.now() - t0 > budget) {
           clearInterval(watch);
           const gaps = seen.slice(1).map((s, i) => s.at - seen[i].at).sort((a, b) => a - b);
           resolve({ visited: seen.map(s => s.key), models: Object.keys(window.MF_DATA.endStateRuns).length,

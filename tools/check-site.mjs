@@ -12,12 +12,10 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const source = readFileSync(join(root, 'public', 'data.js'), 'utf8');
-const start = source.indexOf('const importedEndStateRuns = ');
-const end = source.indexOf('/* END IMPORTED END-STATE RUNS */');
-if (start === -1 || end === -1) { console.error('✗ IMPORTED END-STATE RUNS block not found'); process.exit(1); }
-
-const runs = (0, eval)('(' + source.slice(start, end).replace('const importedEndStateRuns = ', '').trim().replace(/;$/, '') + ')');
+const shim = {};
+new Function('window', readFileSync(join(root, 'public', 'data.js'), 'utf8'))(shim);
+if (!shim.MF_DATA) { console.error('✗ public/data.js did not publish window.MF_DATA'); process.exit(1); }
+const { endStateRuns: runs, states, leaderHistory = [] } = shim.MF_DATA;
 const STATE_IDS = Array.from({ length: 11 }, (_, i) => i + 1);
 const EXPOSURE_IDS = [1, 2, 3, 4, 5];
 const problems = [];
@@ -75,6 +73,23 @@ for (const [i, id] of STATE_IDS.entries()) {
   }
 }
 
+// The leader timeline is published data, so it is checked like the rest.
+if (leaderHistory.length) {
+  const dates = leaderHistory.map(h => h.date);
+  if (dates.some((d, i) => i && d <= dates[i - 1])) problems.push('leaderHistory dates are not in ascending order');
+  const counts = leaderHistory.map(h => h.models);
+  if (counts.some((n, i) => i && n < counts[i - 1])) problems.push('leaderHistory model count goes backwards');
+  leaderHistory.forEach((entry, i) => {
+    if (!states.some(s => s.id === entry.stateId)) problems.push(`leaderHistory ${entry.date} names ending ${entry.stateId}, which is not in the taxonomy`);
+    const differs = i === 0 || leaderHistory[i - 1].stateId !== entry.stateId;
+    if (entry.changed !== differs) problems.push(`leaderHistory ${entry.date} is flagged changed=${entry.changed} but differs=${differs}`);
+  });
+  const latest = leaderHistory.at(-1);
+  if (latest && latest.stateId !== out.indexOf(Math.max(...out)) + 1) {
+    problems.push(`leaderHistory ends on ending ${latest.stateId} but the aggregate leads with ${out.indexOf(Math.max(...out)) + 1}`);
+  }
+}
+
 if (problems.length) { problems.forEach(p => console.error('✗ ' + p)); process.exit(1); }
-console.log(`✓ ${entries.length} runs valid — each sums to 100, sits inside its sample range, and carries an exposure error for the figure drawn`);
+console.log(`✓ ${entries.length} runs valid, ${leaderHistory.length} timeline entries — each sums to 100, sits inside its sample range, and carries an exposure error for the figure drawn`);
 console.log(`  headline aggregate: raw medians sum to ${total}, published as ${out.join(', ')}`);

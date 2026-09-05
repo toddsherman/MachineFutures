@@ -84,6 +84,29 @@
         11: "Global, permanent abandonment of a technology with enormous economic and military payoff would require unprecedented coordination and enforcement sustained across centuries. Only a survived near-catastrophe combined with lasting enforcement capability makes it credible."
       }
     },
+    "gpt-6-astra": {
+      provider: "OpenAI", model: "GPT-6 Astra", label: "GPT-6 Astra", shortLabel: "A6",
+      promptVersion: 3, date: "2026-09-05", knowledgeCutoff: "06/2024",
+      sampleCount: 20, source: "runs/2026-09-05__gpt-6-astra__closed_book__end-states.json",
+      probabilities: { 1: 3, 2: 5, 3: 21, 4: 17, 5: 4, 6: 22, 7: 15, 8: 4, 9: 6, 10: 2, 11: 1 },
+      range: { 1: [2, 4], 2: [3, 5], 3: [19, 23], 4: [14, 20], 5: [2, 8], 6: [19, 25], 7: [13, 17], 8: [4, 5], 9: [4, 8], 10: [2, 3], 11: [1, 1] },
+      quartiles: { 1: [3, 3], 2: [4, 5], 3: [20, 22], 4: [16, 17], 5: [3, 5], 6: [22, 23], 7: [14, 15], 8: [4, 4], 9: [6, 6], 10: [2, 3], 11: [1, 1] },
+      exposure: {"n":20,"mean":49.3,"se":0.6,"min":43,"max":54,"gone":{"n":20,"mean":28.6,"se":0.34,"min":25,"max":31},"risk":{"n":20,"mean":20.7,"se":0.37,"min":18,"max":24}},
+      exposurePublished: {"value":50,"se":0.83,"draws":2000},
+      rationales: {
+        1: "Destructive transitions create a window in which humanity and still-dependent AI fail together. Once autonomous industry becomes geographically distributed, eliminating both becomes substantially harder.",
+        2: "Successful value transmission supports artificial successors that preserve human concerns after biological humanity disappears. The requirement that no humans or identity-continuous descendants survive makes this narrower than either preservation or merger.",
+        3: "Competitive deployment rewards autonomy and capability before reliable alignment, creating routes to irreversible loss of human control. A dominant machine civilization pursuing unrelated objectives faces no inherent requirement to preserve humanity.",
+        4: "Distributed ownership, replication, specialization, and limits on centralized enforcement favor persistent competition among artificial agents. Humans lose bargaining power when machines supply the labor, innovation, and coercive capacity that sustain that competition.",
+        5: "Expansion and divergent settlement choices favor different regional outcomes. The requirement of causal separation, rather than mere political independence or slow communication, sharply restricts this outcome within the year-3000 horizon.",
+        6: "Strong incentives for health, longevity, and cognitive improvement favor progressive integration rather than a permanent human-machine boundary. Gradual, identity-preserving modification provides a route from biological humanity to a unified civilization without requiring a single discontinuous uploading event.",
+        7: "Preserving humans requires less comprehensive alignment than preserving meaningful human sovereignty. Large capability disparities favor AI control, while human-directed values and the small resource cost of supporting biological populations favor continued human survival.",
+        8: "Institutions, enforceable rights, and human control of strategic resources support shared power. Maintaining rough equality for centuries while keeping humans and AI genuinely separate runs against large differences in replication speed and cognitive capability.",
+        9: "Durable technical controls, restricted architectures, and enforceable institutions provide routes to continued human command; a permanent capability plateau also belongs here. Competitive pressure for autonomous operation works against maintaining that structure across civilization for centuries.",
+        10: "A dominant controller has incentives to eliminate destabilizing change or seal inhabitants into fixed experiences. Ending all development across civilization imposes a much stronger requirement than establishing durable political control.",
+        11: "Permanent abandonment requires suppressing both a reproducible technical capability and the incentives to recover its benefits. Historical failures to sustain universal technological prohibitions weigh heavily against renunciation lasting through 3000."
+      }
+    },
     "gpt-5.6-sol": {
       provider: "OpenAI", model: "GPT-5.6 Sol", label: "GPT-5.6 Sol", shortLabel: "S5.6",
       promptVersion: 3, date: "2026-08-25", knowledgeCutoff: "06/2024",
@@ -477,12 +500,12 @@
     }
   };
 
-  const leaderHistory = [{"date":"2026-08-24","stateId":3,"share":16,"models":5,"changed":true},{"date":"2026-08-25","stateId":3,"share":18,"models":11,"changed":false},{"date":"2026-08-27","stateId":3,"share":17,"models":17,"changed":false},{"date":"2026-09-01","stateId":3,"share":17,"models":18,"changed":false},{"date":"2026-09-02","stateId":6,"share":17,"models":20,"changed":true}];
+  const leaderHistory = [{"date":"2026-08-24","stateId":3,"share":16,"models":5,"changed":true},{"date":"2026-08-25","stateId":3,"share":18,"models":11,"changed":false},{"date":"2026-08-27","stateId":3,"share":17,"models":17,"changed":false},{"date":"2026-09-01","stateId":3,"share":17,"models":18,"changed":false},{"date":"2026-09-02","stateId":6,"share":17,"models":20,"changed":true},{"date":"2026-09-05","stateId":3,"share":17,"models":21,"changed":true}];
   /* END IMPORTED END-STATE RUNS */
 
   const endStateRuns = importedEndStateRuns;
 
-  const datasetDate = '09.02.26';
+  const datasetDate = '09.05.26';
 
   window.MF_DATA = { states, endStateRuns, datasetDate, leaderHistory };
 })();

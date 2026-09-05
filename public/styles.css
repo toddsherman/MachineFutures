@@ -63,7 +63,7 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 /* The tweet this project started from. A quotation, not a replica: the site
    sets it in its own type, names the author, and links the original rather
    than dressing it up as a screenshot of someone's post. */
-.origin { padding-block: 40px 8px; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); align-items: start; column-gap: 6vw; row-gap: 14px; }
+.origin { padding-block: 40px; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); align-items: start; column-gap: 6vw; row-gap: 14px; }
 .origin-kicker { grid-column: 1 / -1; margin: 0; color: var(--muted); font: 700 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; }
 .origin-kicker::before { content: ""; display: inline-block; width: 30px; border-top: 1px solid; margin: 0 12px 4px 0; }
 .origin-tweet { margin: 0; padding: 30px 32px 26px; border: 1px solid var(--ink); background: var(--paper-2); box-shadow: 7px 7px 0 var(--ink); }
@@ -80,7 +80,7 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .origin-note p { margin: 0 0 18px; font-size: clamp(17px, 1.35vw, 20px); line-height: 1.55; letter-spacing: -.015em; }
 .origin-note p:last-child { margin-bottom: 0; color: var(--muted); }
 .origin-note b { font-weight: 700; color: var(--ink); }
-.end-hero { padding-block: 22px 40px; display: grid; gap: 26px; }
+.end-hero { padding-block: 52px 40px; border-top: 1px solid var(--line); display: grid; gap: 26px; }
 .end-hero .dek { margin: 0; max-width: 46ch; }
 .end-hero .dek b { font-weight: 900; }
 /* Both bands run the full width now, stacked, rather than sharing a row. */
@@ -358,6 +358,10 @@ body.dialog-open { overflow: hidden; }
 .stacked-legend .state-mark { font-size: 1.16em; }
 .state-card-meta .state-mark { margin-left: 0; font-size: 18px; }
 .matrix-state .state-mark { font-size: 15px; margin-left: 8px; }
+.state-mark.is-glyph { width: auto; height: auto; font-size: 1.62em; line-height: 1; vertical-align: -.14em; font-family: var(--sans); font-variant-emoji: text; }
+.stacked-legend .state-mark.is-glyph { font-size: 1.78em; }
+.state-card-meta .state-mark.is-glyph { font-size: 27px; }
+.matrix-state .state-mark.is-glyph { font-size: 23px; }
 
 @media (max-width: 1040px) {
   .state-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -370,9 +374,9 @@ body.dialog-open { overflow: hidden; }
 
 @media (max-width: 820px) {
   .section-heading, .section-heading.compact { align-items: start; flex-direction: column; gap: 22px; }
-  .origin { grid-template-columns: 1fr; row-gap: 26px; padding-block: 26px 4px; }
+  .origin { grid-template-columns: 1fr; row-gap: 26px; padding-block: 26px 30px; }
   .origin-tweet { padding: 24px 22px 20px; box-shadow: 5px 5px 0 var(--ink); }
-  .end-hero { padding-block: 24px 34px; gap: 22px; }
+  .end-hero { padding-block: 40px 34px; gap: 22px; }
   .end-consensus { padding: 40px 0 44px; }
   .end-leader { grid-template-columns: minmax(0, 1fr); column-gap: 0; }
   .leader-detail { margin-top: 26px; }

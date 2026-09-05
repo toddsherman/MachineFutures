@@ -504,4 +504,22 @@ test.describe('behaviour', () => {
     expect(a11y.markColour, 'the marks should take the surrounding ink').toBe(a11y.bodyColour);
     expect(a11y.rowheaders, 'row headers should wrap a real button').toBe(a11y.endings);
   });
+
+  test('the extinction mark is a text glyph, never a colour emoji', async ({ page }) => {
+    await page.goto('/');
+    const mark = await page.evaluate(() => {
+      const m = document.querySelector('.state-mark.is-glyph');
+      if (!m) return null;
+      const size = parseFloat(getComputedStyle(m).fontSize);
+      // Emoji presentation comes from a colour font whose advance is about one
+      // em or wider; the text glyph is around .6em. Computed colour cannot tell
+      // them apart — a colour emoji reports the inherited ink and paints its
+      // own — so measure the advance the engine actually chose.
+      return { points: [...m.textContent].map(c => c.codePointAt(0).toString(16)),
+               ratio: m.getBoundingClientRect().width / size };
+    });
+    expect(mark, 'no extinction glyph rendered').not.toBeNull();
+    expect(mark.points, 'the glyph must carry U+FE0E, the text-presentation selector').toEqual(['2620', 'fe0e']);
+    expect(mark.ratio, 'the glyph rendered at emoji width — the engine substituted a colour emoji').toBeLessThan(0.9);
+  });
 });

@@ -46,15 +46,22 @@
     risk: 'Endings 4–5. Humanity survives in some versions of the ending and perishes in others.'
   };
   const MARK_SHAPES = {
-    gone: '<circle cx="11" cy="11" r="9.1"/><path d="M7.3 6.7h7.4M7.3 15.3h7.4M7.7 7l6.6 8M14.3 7l-6.6 8"/>',
     risk: '<path d="M11 3.2 20.1 18.5H1.9Z"/><path d="M11 9.1v3.9M11 15.8h.01"/>'
   };
+  // U+2620 carries U+FE0E, the text-presentation selector. Without it iOS and
+  // Android both substitute a colour emoji, which would put back on the page
+  // the one thing these marks deliberately do not use: hue.
+  const MARK_GLYPHS = { gone: '\u2620\uFE0E' };
   const extinctionMark = state => {
     const tier = state.extinction;
     if (!tier) return '';
     const label = extinctionLabels[tier];
     // No title attribute: it would double up with the tooltip below.
-    return `<span class="state-mark is-${tier}" role="img" data-mark="${tier}" aria-label="${label}. ${extinctionTips[tier]}"><svg viewBox="0 0 22 22" aria-hidden="true">${MARK_SHAPES[tier]}</svg></span>`;
+    const body = MARK_GLYPHS[tier]
+      ? MARK_GLYPHS[tier]
+      : `<svg viewBox="0 0 22 22" aria-hidden="true">${MARK_SHAPES[tier]}</svg>`;
+    const glyph = MARK_GLYPHS[tier] ? ' is-glyph' : '';
+    return `<span class="state-mark is-${tier}${glyph}" role="img" data-mark="${tier}" aria-label="${label}. ${extinctionTips[tier]}">${body}</span>`;
   };
 
   // Rationales are model-authored: they arrive from a provider API, pass

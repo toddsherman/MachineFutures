@@ -37,6 +37,11 @@ const run = (args, { expectFail = false } = {}) => {
     return { ok: false, status: error.status, out: `${error.stdout}${error.stderr}` };
   }
 };
+const git = (cwd, ...args) => execFileSync('git', args, {
+  cwd,
+  encoding: 'utf8',
+  stdio: ['ignore', 'pipe', 'pipe']
+}).trim();
 const scratch = () => mkdtempSync(join(tmpdir(), 'mf-test-'));
 const batchAt = dir => JSON.parse(readFileSync(join(dir, `${RUN_ID}.json`), 'utf8'));
 const horizonBatchAt = (dir, horizon, date = DATE) => JSON.parse(readFileSync(join(dir, `${runIdFor(horizon, date)}.json`), 'utf8'));
@@ -200,4 +205,93 @@ test('the workflow restores and passes the original elicitation date on resume',
     'a captured quota exit must stop later horizons');
   assert.match(workflow, /echo "quota_exhausted=\$quota" >> "\$GITHUB_OUTPUT"[\s\S]*?exit "\$result"/,
     'failure outputs must be written before the elicitation step exits nonzero');
+});
+
+test('the workflow preserves complete prior data when resuming a model subset', () => {
+  const workflow = readFileSync(join(root, '.github', 'workflows', 'elicit.yml'), 'utf8');
+  const aggregate = workflow.slice(workflow.indexOf('\n  aggregate:'));
+  const restore = aggregate.indexOf('name: Restore the previous combined run');
+  const current = aggregate.indexOf('name: Download every model artifact');
+  assert.ok(restore >= 0 && current > restore, 'aggregate must restore the prior combined artifact before current model artifacts');
+  assert.match(aggregate, /name: runs-\$\{\{ inputs\.resume_from_run_id \}\}[\s\S]*?path: restored\/[\s\S]*?run-id: \$\{\{ inputs\.resume_from_run_id \}\}/);
+  assert.match(aggregate, /if \[ -d restored \]; then\s+cp -R restored\/\. runs\/\s+fi\s+# Current artifacts win[\s\S]*?cp -R collected\/\. runs\//,
+    'current model artifacts must overlay, not replace, the prior combined run');
+});
+
+test('the workflow publishes a workflow-free squash based on the latest default branch', () => {
+  const workflow = readFileSync(join(root, '.github', 'workflows', 'elicit.yml'), 'utf8');
+  const pushStart = workflow.indexOf('name: Push the raw batches');
+  const importStart = workflow.indexOf('name: Import every horizon into site data');
+  const push = workflow.slice(pushStart, importStart);
+  assert.ok(pushStart >= 0 && importStart > pushStart);
+  assert.match(push, /DEFAULT_BRANCH: \$\{\{ github\.event\.repository\.default_branch \}\}/);
+  assert.match(push, /git fetch --no-tags --prune --unshallow origin/);
+  assert.match(push, /merge_base=\$\(git merge-base "\$SOURCE_SHA" "\$default_ref"\)/);
+  assert.match(push, /git restore --source="\$merge_base" --staged --worktree -- \.github\/workflows[\s\S]*?git commit --amend --no-edit/,
+    'the ephemeral source tree must neutralize feature-branch workflow changes');
+  assert.match(push, /git checkout -b "\$branch" "\$default_ref"[\s\S]*?git merge --squash --no-commit "\$publish_source_sha"/,
+    'the publish branch must start at the latest default branch and squash all safe feature changes');
+  assert.match(push, /git restore --source="\$default_ref" --staged --worktree -- \.github\/workflows/);
+  assert.match(push, /git diff --quiet "\$default_ref" HEAD -- \.github\/workflows/,
+    'the workflow tree must be checked before pushing');
+});
+
+test('a workflow-free squash preserves newer default content and non-workflow feature data', () => {
+  const dir = scratch();
+  try {
+    git(dir, 'init', '-q', '-b', 'main');
+    git(dir, 'config', 'user.name', 'Harness Test');
+    git(dir, 'config', 'user.email', 'harness@example.invalid');
+    mkdirSync(join(dir, '.github', 'workflows'), { recursive: true });
+    mkdirSync(join(dir, 'runs'), { recursive: true });
+    writeFileSync(join(dir, '.github', 'workflows', 'elicit.yml'), 'base workflow\n');
+    writeFileSync(join(dir, 'shared.txt'), 'base content\n');
+    git(dir, 'add', '.');
+    git(dir, 'commit', '-q', '-m', 'base');
+    git(dir, 'branch', 'feature');
+
+    writeFileSync(join(dir, '.github', 'workflows', 'elicit.yml'), 'new default workflow\n');
+    writeFileSync(join(dir, 'shared.txt'), 'new default content\n');
+    git(dir, 'add', '.');
+    git(dir, 'commit', '-q', '-m', 'advance default');
+    const defaultHead = git(dir, 'rev-parse', 'HEAD');
+
+    git(dir, 'switch', '-q', 'feature');
+    writeFileSync(join(dir, '.github', 'workflows', 'elicit.yml'), 'feature workflow\n');
+    writeFileSync(join(dir, 'feature.txt'), 'keep this feature\n');
+    git(dir, 'add', '.');
+    git(dir, 'commit', '-q', '-m', 'feature changes');
+    const sourceSha = git(dir, 'rev-parse', 'HEAD');
+    writeFileSync(join(dir, 'runs', 'new-batch.json'), '{"samples":[]}\n');
+    git(dir, 'add', 'runs');
+    git(dir, 'commit', '-q', '--allow-empty', '-m', 'stage batches');
+
+    const mergeBase = git(dir, 'merge-base', sourceSha, 'main');
+    git(dir, 'restore', `--source=${mergeBase}`, '--staged', '--worktree', '--', '.github/workflows');
+    git(dir, 'commit', '-q', '--amend', '--no-edit');
+    const publishSource = git(dir, 'rev-parse', 'HEAD');
+
+    git(dir, 'checkout', '-q', '-b', 'publish', 'main');
+    git(dir, 'merge', '--squash', '--no-commit', publishSource);
+    git(dir, 'restore', '--source=main', '--staged', '--worktree', '--', '.github/workflows');
+    git(dir, 'commit', '-q', '-m', 'publish safe changes');
+
+    assert.equal(git(dir, 'rev-parse', 'HEAD^'), defaultHead, 'the publish commit must be based on the latest default commit');
+    assert.equal(readFileSync(join(dir, '.github', 'workflows', 'elicit.yml'), 'utf8'), 'new default workflow\n');
+    assert.equal(readFileSync(join(dir, 'shared.txt'), 'utf8'), 'new default content\n');
+    assert.equal(readFileSync(join(dir, 'feature.txt'), 'utf8'), 'keep this feature\n');
+    assert.equal(readFileSync(join(dir, 'runs', 'new-batch.json'), 'utf8'), '{"samples":[]}\n');
+    git(dir, 'diff', '--quiet', 'main', 'HEAD', '--', '.github/workflows');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('the workflow default budget fits all three horizons inside the model-job window', () => {
+  const workflow = readFileSync(join(root, '.github', 'workflows', 'elicit.yml'), 'utf8');
+  assert.match(workflow, /budget_minutes:[\s\S]*?default: '100'/);
+  assert.equal((workflow.match(/inputs\.budget_minutes \|\| '100'/g) || []).length, 2,
+    'plan and model jobs must use the same 100-minute default');
+  assert.match(workflow, /if \(\(budget \+ 5\) \* count > 315\)/);
+  assert.match(workflow, /\n    timeout-minutes: 330\n/);
 });

@@ -39,7 +39,7 @@ on:
       budget_minutes:
         description: 'Per-model, per-horizon wall-clock budget in minutes'
         required: false
-        default: '90'
+        default: '100'
       resume_from_run_id:
         description: 'Restore the combined runs artifact from a previous workflow run id and buy only what is missing'
         required: false
@@ -90,7 +90,7 @@ jobs:
           CHECK_ONLY: ${{ inputs.check_only }}
           LIST_MODELS: ${{ inputs.list_models }}
           RESUME_RUN_ID: ${{ inputs.resume_from_run_id }}
-          BUDGET_MINUTES: ${{ inputs.budget_minutes || '90' }}
+          BUDGET_MINUTES: ${{ inputs.budget_minutes || '100' }}
         run: |
           set -euo pipefail
 
@@ -275,7 +275,7 @@ jobs:
           HORIZONS_JSON: ${{ needs.plan.outputs.horizons }}
           RUN_DATE: ${{ needs.plan.outputs.run_date }}
           SAMPLES: ${{ inputs.samples || '20' }}
-          BUDGET_MINUTES: ${{ inputs.budget_minutes || '90' }}
+          BUDGET_MINUTES: ${{ inputs.budget_minutes || '100' }}
         run: |
           set -uo pipefail
           result=0
@@ -348,6 +348,17 @@ jobs:
         with:
           node-version: 22
 
+      # A subset resume must start from the previous combined artifact. The
+      # selected model artifacts below then replace only the models rerun now.
+      - name: Restore the previous combined run
+        if: ${{ inputs.resume_from_run_id != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: runs-${{ inputs.resume_from_run_id }}
+          path: restored/
+          run-id: ${{ inputs.resume_from_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Download every model artifact
         uses: actions/download-artifact@v4
         with:
@@ -360,6 +371,10 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p runs/.partial
+          if [ -d restored ]; then
+            cp -R restored/. runs/
+          fi
+          # Current artifacts win over the restored combined snapshot.
           cp -R collected/. runs/
 
           failed=false
@@ -413,19 +428,55 @@ jobs:
       # is regenerated only after every selected model and horizon completed.
       - name: Push the raw batches
         id: push_runs
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          SOURCE_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
           branch="elicitation/${{ github.run_id }}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$branch"
+
+          # Record the generated runs in an ephemeral local commit so a
+          # three-way squash can carry both them and every non-workflow feature
+          # change onto the latest default branch.
           git add runs
+          git commit --allow-empty -m "Stage collected elicitation batches"
+
+          if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+            git fetch --no-tags --prune --unshallow origin
+          else
+            git fetch --no-tags --prune origin
+          fi
+          default_ref="refs/remotes/origin/$DEFAULT_BRANCH"
+          git rev-parse --verify "$default_ref^{commit}" >/dev/null
+          if ! merge_base=$(git merge-base "$SOURCE_SHA" "$default_ref"); then
+            echo "::error::Cannot find a merge base between the workflow source and $default_ref."
+            exit 1
+          fi
+
+          # GitHub's Actions token cannot create a branch containing workflow
+          # changes. Rewrite only the ephemeral source tree so workflows match
+          # the merge base; the squash will therefore retain the latest default
+          # branch versions without publishing feature-branch workflow edits.
+          git restore --source="$merge_base" --staged --worktree -- .github/workflows
+          git commit --amend --no-edit
+          publish_source_sha=$(git rev-parse HEAD)
+
+          git checkout -b "$branch" "$default_ref"
+          git merge --squash --no-commit "$publish_source_sha"
+          git restore --source="$default_ref" --staged --worktree -- .github/workflows
+
           if git diff --cached --quiet; then
             echo "No new batches to push."
             echo 'pushed=false' >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git commit -m "Add raw horizon elicitation batches"
+          if ! git diff --quiet "$default_ref" HEAD -- .github/workflows; then
+            echo "::error::Refusing to publish a commit that changes .github/workflows."
+            exit 1
+          fi
           git push origin "$branch"
           echo 'pushed=true' >> "$GITHUB_OUTPUT"
           echo "Raw batches pushed to \`$branch\`." >> "$GITHUB_STEP_SUMMARY"

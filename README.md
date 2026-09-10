@@ -60,7 +60,7 @@ Errors are sorted into three kinds, because the right response differs:
 - **quota** — the provider says the account is out of money. Recognised across providers by body text as well as status, since OpenAI returns 429 for both "slow down" and "you're broke". The model stops immediately rather than spending eighteen minutes of backoff on a call that cannot succeed.
 - **permanent** — a bad model id, a refusal, an unparseable answer. The attempt fails and the next sample is tried.
 
-The attempt budget is `ceil(samples × 1.5) + 5`, and each model has a 90-minute wall-clock budget per horizon by default. Each model runs in its own job, so a slow provider cannot starve the rest of the roster.
+The attempt budget is `ceil(samples × 1.5) + 5`, and each model has a 100-minute wall-clock budget per horizon by default. Each model runs in its own job, so a slow provider cannot starve the rest of the roster.
 
 ### Knowing you have run out of credit
 

@@ -194,4 +194,10 @@ test('the workflow restores and passes the original elicitation date on resume',
   assert.match(workflow, /-name '\.elicitation-date'/);
   assert.match(workflow, /--date "\$RUN_DATE"/);
   assert.match(workflow, /timeout --foreground/);
+  assert.match(workflow, /if GITHUB_OUTPUT='' timeout[\s\S]*?then\s+status=0\s+else\s+status=\$\?\s+fi/,
+    'the workflow must capture nonzero harness exits despite GitHub invoking bash with -e');
+  assert.match(workflow, /if \[ "\$status" -eq 4 \]; then[\s\S]*?quota=true[\s\S]*?break/,
+    'a captured quota exit must stop later horizons');
+  assert.match(workflow, /echo "quota_exhausted=\$quota" >> "\$GITHUB_OUTPUT"[\s\S]*?exit "\$result"/,
+    'failure outputs must be written before the elicitation step exits nonzero');
 });

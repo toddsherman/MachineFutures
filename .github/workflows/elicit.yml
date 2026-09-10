@@ -284,14 +284,20 @@ jobs:
           while IFS= read -r horizon; do
             echo "Asking $MODEL_KEY for horizon $horizon"
             timeout_seconds=$(BUDGET_MINUTES="$BUDGET_MINUTES" node -e 'process.stdout.write(String(Math.ceil(Number(process.env.BUDGET_MINUTES) * 60) + 300))')
-            GITHUB_OUTPUT='' timeout --foreground --signal=TERM --kill-after=30s "${timeout_seconds}s" node tools/run-elicitation.mjs \
-              --models "$MODEL_KEY" \
-              --horizon "$horizon" \
-              --date "$RUN_DATE" \
-              --samples "$SAMPLES" \
-              --budget-minutes "$BUDGET_MINUTES" \
-              --out work/runs
-            status=$?
+            # GitHub launches run blocks with bash -e. A command used as an if
+            # condition is exempt from errexit, so we can capture a short-run
+            # exit and continue without hiding a quota exit or final failure.
+            if GITHUB_OUTPUT='' timeout --foreground --signal=TERM --kill-after=30s "${timeout_seconds}s" node tools/run-elicitation.mjs \
+                --models "$MODEL_KEY" \
+                --horizon "$horizon" \
+                --date "$RUN_DATE" \
+                --samples "$SAMPLES" \
+                --budget-minutes "$BUDGET_MINUTES" \
+                --out work/runs; then
+              status=0
+            else
+              status=$?
+            fi
             if [ "$status" -eq 4 ]; then
               quota=true
               result=4

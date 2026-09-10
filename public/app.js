@@ -361,10 +361,19 @@
     const active = horizonMeta();
     const toggle = $('#horizon-toggle');
     if (toggle) {
-      toggle.innerHTML = horizonOptions.map(option => {
-        const on = option.id === activeHorizon;
-        return `<button type="button" class="horizon-button${on ? ' active' : ''}" data-horizon="${esc(option.id)}" aria-pressed="${on}">${esc(option.label)}</button>`;
-      }).join('');
+      // These controls are the one part of the changing view that should stay
+      // physically put. Build them once so a click does not discard the
+      // focused element, then only update their selected state.
+      if (!toggle.children.length) {
+        toggle.innerHTML = horizonOptions.map(option =>
+          `<button type="button" class="horizon-button" data-horizon="${esc(option.id)}" aria-pressed="false">${esc(option.label)}</button>`
+        ).join('');
+      }
+      [...toggle.querySelectorAll('.horizon-button[data-horizon]')].forEach(button => {
+        const on = button.dataset.horizon === activeHorizon;
+        button.classList.toggle('active', on);
+        button.setAttribute('aria-pressed', String(on));
+      });
     }
 
     const note = $('#horizon-note');
@@ -427,7 +436,7 @@
       </div>`;
 
     const rows = orderedStates.map((state, row) => `
-      <div class="matrix-row" role="row">
+      <div class="matrix-row" role="row" data-state="${state.id}">
         <div class="matrix-rowheader" role="rowheader">
           <button class="matrix-state" type="button" data-state="${state.id}" style="--state:${state.color}" aria-label="${esc(state.name)} — see each model's reasoning">
             <i></i><span class="matrix-state-name">${state.id}. ${esc(state.name)}</span>${extinctionMark(state)}
@@ -603,7 +612,7 @@
           // go in the interactive row's name for non-visual readers.
           const spoken = parts.map(({ state, value }) => `${esc(state.name)} ${value}%`).join(', ');
           const readoutId = `doomer-readout-${index}`;
-          return `<div class="doomer-row" style="--r:${index}" role="button" tabindex="0" aria-expanded="false" aria-controls="${readoutId}" aria-label="${esc(entry.label)}: ${entry.sums.gone}% humanity is gone, ${entry.sums.risk}% might perish. ${spoken}. Activate to show or hide the five ${outcomeTerm(false)} values.">
+          return `<div class="doomer-row" data-run-key="${esc(entry.runKey)}" style="--r:${index}" role="button" tabindex="0" aria-expanded="false" aria-controls="${readoutId}" aria-label="${esc(entry.label)}: ${entry.sums.gone}% humanity is gone, ${entry.sums.risk}% might perish. ${spoken}. Activate to show or hide the five ${outcomeTerm(false)} values.">
           <div class="doomer-label">${labLogo(entry.provider, 'in-row')}<b>${esc(entry.label)}</b><small>${esc(entry.provider)}</small></div>
           <div class="doomer-meter">
             <div class="doomer-bar" role="img" aria-label="${esc(entry.label)}: ${entry.sums.gone}% humanity is gone, ${entry.sums.risk}% might perish. ${spoken}">
@@ -894,6 +903,135 @@
     applyForecast({ animate: true });
   }
 
+  // A horizon can change the height of every dynamic section above the
+  // reader. Holding scrollY would therefore move the thing they were reading.
+  // Instead, remember a semantic block near the reader's visual focus and
+  // compensate for its new document position before the next paint.
+  let viewportRestoreToken = 0;
+  let viewportStyleSnapshot = null;
+  let viewportRestorePosition = null;
+
+  function captureViewportPosition() {
+    const root = document.documentElement;
+    const maxScroll = Math.max(0, root.scrollHeight - innerHeight);
+    if (scrollY <= 1.5) return { edge: 'top' };
+    if (maxScroll - scrollY <= 1.5) return { edge: 'bottom' };
+
+    const dock = $('.horizon-toggle-dock');
+    const contentTop = dock?.getBoundingClientRect().bottom || 0;
+    // The middle of the unobscured viewport best represents what the reader
+    // is looking at. Anchoring only the first line below the sticky controls
+    // can still move a card that occupies the rest of the screen.
+    const readingLine = Math.min(innerHeight - 1, contentTop + (innerHeight - contentTop) / 2);
+    const anchors = [];
+    const add = (element, resolve, priority = 0) => {
+      if (!element) return;
+      const rect = element.getBoundingClientRect();
+      if (!rect.width || !rect.height || rect.bottom <= 0 || rect.top >= innerHeight) return;
+      anchors.push({
+        top: rect.top,
+        bottom: rect.bottom,
+        priority,
+        // Rectangles are half-open here, so a line exactly between two cards
+        // belongs to the one beginning there, not the row that just ended.
+        distance: readingLine < rect.top ? rect.top - readingLine : readingLine >= rect.bottom ? readingLine - rect.bottom : 0,
+        resolve
+      });
+    };
+
+    $$('.state-card[data-state]').forEach(card => {
+      const id = card.dataset.state;
+      add(card, () => $$('.state-card[data-state]').find(candidate => candidate.dataset.state === id));
+    });
+    $$('.matrix-row[data-state]').forEach(row => {
+      const id = row.dataset.state;
+      add(row, () => $$('.matrix-row[data-state]').find(candidate => candidate.dataset.state === id));
+    });
+    $$('.doomer-row[data-run-key]').forEach((row, index) => {
+      const key = row.dataset.runKey;
+      add(row, () => $$('.doomer-row[data-run-key]').find(candidate => candidate.dataset.runKey === key) || $$('.doomer-row')[index]);
+    });
+    $$('.method-list > li').forEach((item, index) => add(item, () => $$('.method-list > li')[index]));
+    $$('.section-heading').forEach((heading, index) => add(heading, () => $$('.section-heading')[index], 1));
+
+    [
+      '.horizon-picker-copy', '.horizon-picker-rule', '.origin-tweet', '.origin-note',
+      '.end-hero h1', '#forecast-summary', '.leader-title', '.leader-name',
+      '.leader-unit', '.leader-timeline', '.leader-description', '.leader-method',
+      '#end-forecast-title', '#forecast-note', '#end-forecast-toggle',
+      '#consensus-bar', '#consensus-legend', '.method-hero', '.footer-mark', '.footer-note'
+    ].forEach(selector => add($(selector), () => $(selector)));
+
+    // Broad sections are fallbacks for whitespace between the smaller blocks.
+    [
+      '.origin', '.end-hero', '.end-leader-section', '.end-intro',
+      '.states-section', '.matrix-section', '.model-mix', '#method', '.site-footer'
+    ].forEach(selector => add($(selector), () => $(selector), 2));
+
+    anchors.sort((a, b) => {
+      const aCrosses = a.distance === 0;
+      const bCrosses = b.distance === 0;
+      // Prefer real readable blocks even when the focus line lands in nearby
+      // whitespace. A section-sized fallback would otherwise win merely
+      // because it surrounds everything, while the visible row still moved.
+      if (a.priority !== b.priority) return a.priority - b.priority;
+      if (aCrosses !== bCrosses) return aCrosses ? -1 : 1;
+      if (a.distance !== b.distance) return a.distance - b.distance;
+      return Math.abs(a.top - readingLine) - Math.abs(b.top - readingLine);
+    });
+    return { anchors };
+  }
+
+  function holdViewport(position) {
+    const root = document.documentElement;
+    if (!viewportStyleSnapshot) {
+      viewportStyleSnapshot = {
+        scrollBehavior: root.style.scrollBehavior,
+        overflowAnchor: root.style.overflowAnchor
+      };
+      // Treat consecutive selections before the next settled paint as one
+      // interaction. Keeping their first anchor avoids accumulating WebKit's
+      // per-scroll device-pixel rounding when a reader taps rapidly.
+      viewportRestorePosition = position;
+    }
+    root.style.scrollBehavior = 'auto';
+    root.style.overflowAnchor = 'none';
+    viewportRestoreToken += 1;
+    return { token: viewportRestoreToken, position: viewportRestorePosition };
+  }
+
+  function restoreViewportPosition(position) {
+    if (position.edge === 'top') {
+      scrollTo(0, 0);
+      return;
+    }
+    if (position.edge === 'bottom') {
+      scrollTo(0, Math.max(0, document.documentElement.scrollHeight - innerHeight));
+      return;
+    }
+    let anchor;
+    let replacement;
+    position.anchors.some(candidate => {
+      const resolved = candidate.resolve();
+      if (!resolved) return false;
+      anchor = candidate;
+      replacement = resolved;
+      return true;
+    });
+    if (!anchor || !replacement) return;
+    const delta = replacement.getBoundingClientRect().top - anchor.top;
+    if (Math.abs(delta) > 0.01) scrollTo(0, scrollY + delta);
+  }
+
+  function releaseViewport(token) {
+    if (token !== viewportRestoreToken || !viewportStyleSnapshot) return;
+    const root = document.documentElement;
+    root.style.scrollBehavior = viewportStyleSnapshot.scrollBehavior;
+    root.style.overflowAnchor = viewportStyleSnapshot.overflowAnchor;
+    viewportStyleSnapshot = null;
+    viewportRestorePosition = null;
+  }
+
   function selectHorizon(key) {
     if (!datasets[key] || key === activeHorizon) return;
     stopSweep();
@@ -904,17 +1042,29 @@
     clearTimeout(leaderEl._swap);
     leaderEl.classList.remove('is-swapping');
 
+    const viewportHold = holdViewport(captureViewportPosition());
+    const viewportToken = viewportHold.token;
+    const viewportPosition = viewportHold.position;
+
     useDataset(key);
     if (activeEndForecast !== 'Median' && !endStateRuns[activeEndForecast]) activeEndForecast = 'Median';
     leaderSettled = false;
     settleCancelled = false;
     renderEndStates();
+    restoreViewportPosition(viewportPosition);
     updateUrl();
     revealOnView('.state-strip', { watch: '.strip-axis', threshold: 1 });
     revealOnView('.matrix', { threshold: 0.12 });
     revealOnView('.doomer-list', { threshold: 0.15, delay: 500 });
     requestAnimationFrame(() => {
+      if (viewportToken !== viewportRestoreToken) return;
       $$('.horizon-button[data-horizon]').find(button => button.dataset.horizon === activeHorizon)?.focus({ preventScroll: true });
+      restoreViewportPosition(viewportPosition);
+      requestAnimationFrame(() => {
+        if (viewportToken !== viewportRestoreToken) return;
+        restoreViewportPosition(viewportPosition);
+        releaseViewport(viewportToken);
+      });
     });
   }
 

@@ -11,12 +11,14 @@ import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
+import { DEFAULT_HORIZON, horizonOfBatch } from './horizons.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const runsDir = join(root, 'runs');
 const STATE_IDS = Array.from({ length: 11 }, (_, i) => 'S' + (i + 1));
 const problems = [];
 const notes = [];
+const horizonsSeen = new Set();
 // One-time migration for batches written before harness v2. The digest attests
 // to what the file holds now, not to its origin — it makes later corruption
 // detectable, it does not certify the past.
@@ -33,6 +35,20 @@ for (const file of files) {
   try { batch = JSON.parse(readFileSync(join(runsDir, file), 'utf8')); }
   catch (error) { fail(`unreadable JSON — ${error.message}`); continue; }
 
+  if (batch.prompt_family !== 'end_states') { fail(`unsupported prompt_family ${JSON.stringify(batch.prompt_family)}`); continue; }
+  let horizon;
+  try { horizon = horizonOfBatch(batch); }
+  catch (error) { fail(error.message); continue; }
+  horizonsSeen.add(horizon);
+  // Legacy year-3000 batches have no horizon in their historical run id and are
+  // intentionally grandfathered as long-term. Every new dated-horizon batch
+  // must carry the horizon in its immutable identity so the two paid runs for a
+  // model on one date cannot masquerade as revisions of each other.
+  if (horizon !== DEFAULT_HORIZON && !String(batch.run_id || '').includes(horizon)) {
+    fail(`run_id must include horizon ${horizon}`);
+  }
+
+  if (!batch.run_id) fail('no run_id');
   if (!batch.model?.api_string) fail('no model.api_string, so the batch has no identity');
   if (!batch.asked_on) fail('no asked_on date');
   const samples = batch.samples || [];
@@ -88,7 +104,10 @@ const byIdentity = new Map();
 for (const file of files) {
   try {
     const batch = JSON.parse(readFileSync(join(runsDir, file), 'utf8'));
-    const identity = `${batch.model?.api_string}@${batch.asked_on}`;
+    let horizon;
+    try { horizon = horizonOfBatch(batch); }
+    catch { continue; }
+    const identity = `${horizon}:${batch.model?.api_string}@${batch.asked_on}`;
     if (!byIdentity.has(identity)) byIdentity.set(identity, []);
     byIdentity.get(identity).push({ file, n: (batch.samples || []).length });
   } catch { /* already reported above */ }
@@ -99,4 +118,4 @@ for (const [identity, entries] of byIdentity) {
 
 notes.forEach(n => console.log('· ' + n));
 if (problems.length) { problems.forEach(p => console.error('✗ ' + p)); process.exit(1); }
-console.log(`✓ ${files.length} batches, ${samplesSeen} samples — every sample is a valid allocation and every digest matches`);
+console.log(`✓ ${files.length} batches, ${samplesSeen} samples across ${horizonsSeen.size} horizon(s) — every sample is a valid allocation and every digest matches`);

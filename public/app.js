@@ -909,6 +909,7 @@
   // compensate for its new document position before the next paint.
   let viewportRestoreToken = 0;
   let viewportStyleSnapshot = null;
+  let viewportRestorePosition = null;
 
   function captureViewportPosition() {
     const root = document.documentElement;
@@ -981,18 +982,22 @@
     return { anchors };
   }
 
-  function holdViewport() {
+  function holdViewport(position) {
     const root = document.documentElement;
     if (!viewportStyleSnapshot) {
       viewportStyleSnapshot = {
         scrollBehavior: root.style.scrollBehavior,
         overflowAnchor: root.style.overflowAnchor
       };
+      // Treat consecutive selections before the next settled paint as one
+      // interaction. Keeping their first anchor avoids accumulating WebKit's
+      // per-scroll device-pixel rounding when a reader taps rapidly.
+      viewportRestorePosition = position;
     }
     root.style.scrollBehavior = 'auto';
     root.style.overflowAnchor = 'none';
     viewportRestoreToken += 1;
-    return viewportRestoreToken;
+    return { token: viewportRestoreToken, position: viewportRestorePosition };
   }
 
   function restoreViewportPosition(position) {
@@ -1024,6 +1029,7 @@
     root.style.scrollBehavior = viewportStyleSnapshot.scrollBehavior;
     root.style.overflowAnchor = viewportStyleSnapshot.overflowAnchor;
     viewportStyleSnapshot = null;
+    viewportRestorePosition = null;
   }
 
   function selectHorizon(key) {
@@ -1036,8 +1042,9 @@
     clearTimeout(leaderEl._swap);
     leaderEl.classList.remove('is-swapping');
 
-    const viewportPosition = captureViewportPosition();
-    const viewportToken = holdViewport();
+    const viewportHold = holdViewport(captureViewportPosition());
+    const viewportToken = viewportHold.token;
+    const viewportPosition = viewportHold.position;
 
     useDataset(key);
     if (activeEndForecast !== 'Median' && !endStateRuns[activeEndForecast]) activeEndForecast = 'Median';

@@ -135,8 +135,12 @@ test.describe('layout', () => {
 });
 
 test.describe('forecast horizons', () => {
-  test('switching horizons keeps the visible content in place', async ({ page }) => {
+  test('switching horizons keeps the visible content in place', async ({ page }, testInfo) => {
     await settleWithHorizons(page);
+    // WebKit quantizes both the parked and restored scroll positions. Their
+    // independent rounding can differ by nearly two CSS pixels even when the
+    // same content remains visually stationary; Chromium stays within one.
+    const viewportTolerance = testInfo.project.name === 'phone' ? 2 : 1;
     // Make a shared model move from first to second in the exposure ranking.
     // Anchoring by list position would appear stable only until real data
     // reordered the models, which is exactly what horizon changes can do.
@@ -160,7 +164,7 @@ test.describe('forecast horizons', () => {
         await expect(page.locator(`.horizon-button[data-horizon="${id}"]`)).toHaveAttribute('aria-pressed', 'true');
         await nextPaint(page);
         const after = await page.locator(selector).evaluate(anchor => anchor.getBoundingClientRect().top);
-        expect(Math.abs(after - before), `${label} moved in the viewport while switching to ${name}`).toBeLessThanOrEqual(1);
+        expect(Math.abs(after - before), `${label} moved in the viewport while switching to ${name}`).toBeLessThanOrEqual(viewportTolerance);
       }
     }
 
@@ -173,13 +177,13 @@ test.describe('forecast horizons', () => {
     const rapidSwitch = await page.locator('#state-9 .state-card-head').evaluate(anchor => ({
       top: anchor.getBoundingClientRect().top,
       horizon: document.querySelector('.horizon-button[aria-pressed="true"]').dataset.horizon,
+      focusedHorizon: document.activeElement?.dataset?.horizon,
       overflowAnchor: document.documentElement.style.overflowAnchor
     }));
     expect(rapidSwitch.horizon).toBe('2040');
+    expect(rapidSwitch.focusedHorizon).toBe('2040');
     expect(rapidSwitch.overflowAnchor, 'rapid switching left native scroll anchoring disabled').toBe('');
-    // WebKit rounds each programmatic scroll to device pixels, so two switches
-    // can accumulate a hair over one CSS pixel even though nothing perceptibly moves.
-    expect(Math.abs(rapidSwitch.top - beforeRapidSwitch), 'rapid switching moved the visible card').toBeLessThanOrEqual(1.1);
+    expect(Math.abs(rapidSwitch.top - beforeRapidSwitch), 'rapid switching moved the visible card').toBeLessThanOrEqual(viewportTolerance);
   });
 
   test('switching horizons at the page top does not move the content below the controls', async ({ page }) => {

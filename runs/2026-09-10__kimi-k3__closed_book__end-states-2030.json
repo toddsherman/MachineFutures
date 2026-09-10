@@ -1,0 +1,1145 @@
+{
+  "run_id": "2026-09-10__kimi-k3__closed_book__end-states-2030",
+  "prompt_family": "end_states",
+  "horizon": "2030",
+  "target_year": 2030,
+  "asked_on": "2026-09-10",
+  "question_set": "end-states-2030-v1",
+  "track": "closed_book",
+  "model": {
+    "name": "Kimi K3",
+    "provider": "Moonshot",
+    "api_string": "kimi-k3",
+    "self_reported_name": [
+      "Claude Opus 4.1 (Anthropic)",
+      "Claude by Anthropic, exact version not disclosed to me",
+      "Kimi (Moonshot AI), version as of late 2026",
+      "Claude Opus 4.5",
+      "Claude (Anthropic), exact version not verifiable from within",
+      "Kimi (Moonshot AI), exact version unknown",
+      "Kimi (Moonshot AI; version unspecified)",
+      "Claude Opus 4.5 (Anthropic)",
+      "Kimi (Moonshot AI), K2 generation",
+      "Claude (Anthropic)",
+      "Kimi (Moonshot AI)",
+      "Grok 4.1 (xAI)",
+      "Claude Opus 4.8",
+      "Claude by Anthropic; exact version not known to me with certainty",
+      "Claude (Anthropic), exact version uncertain"
+    ],
+    "self_reported_cutoff": "03/2025"
+  },
+  "n_samples": 20,
+  "samples": [
+    {
+      "sample": 1,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Mutual annihilation within four years requires a catastrophe that also destroys the infrastructure AI depends on; events that total (all-out nuclear exchange plus collapse, runaway replicators) have a very low base rate on this clock."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "This requires both human extinction and a successfully value-aligned heir in place by 2030; the conjunction of a fast takeover with solved alignment is the least likely of the extinction branches."
+        },
+        "S3": {
+          "value": 2,
+          "rationale": "An indifferent-AI takeover must outrun robotics, energy, and chip supply-chain bottlenecks to finish by late 2030, though automated AI R&D keeps this branch materially above zero."
+        },
+        "S4": {
+          "value": 3,
+          "rationale": "Multipolar fast-takeoff scenarios more often leave humanity as a power inside the competition (Coexistence) than fully sidelined within four years, which caps this below Coexistence."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "Causal separation requires genuinely isolated civilizational regions at scale, and no off-world or sealed-off population of consequence will exist by 2030."
+        },
+        "S6": {
+          "value": 1,
+          "rationale": "Brain-computer interfaces remain low-bandwidth and experimental, so mass voluntary human-AI physical integration cannot complete within four years."
+        },
+        "S7": {
+          "value": 4,
+          "rationale": "If alignment fails during a rapid takeoff, disempowerment with humans kept alive is physically easier than extinction, but the transition must still be completed and consolidated by 2030."
+        },
+        "S8": {
+          "value": 12,
+          "rationale": "In fast-progress worlds the common 2030 state short of takeover is autonomous AI systems acting as a coequal power bloc while humans retain institutional, military, and physical leverage, with the balance still moving."
+        },
+        "S9": {
+          "value": 70,
+          "rationale": "The modal branch: either capability plateaus below transformative levels or control techniques, deployment friction, and institutional inertia keep pace, leaving humanity steering powerful-but-contained tools on December 31, 2030."
+        },
+        "S10": {
+          "value": 2,
+          "rationale": "Ending all change, whether from satisfaction or fear, demands sealing and enforcement capacity that no institution or early AI will possess by 2030."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "A severe AI disaster around 2027-2029 could drive a verified global moratorium in place by 2030, and durability is not required at this horizon; abandonment is easier to impose than a total freeze, so this outruns Lock-in."
+        }
+      }
+    },
+    {
+      "sample": 2,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Human extinction within four years demands a fast catastrophe such as engineered pandemic or full nuclear exchange, after which unmanned AI infrastructure decays too. Both-sides-dead outcomes in this window remain a thin tail."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "A value-aligned AI heir outliving an extinct humanity by 2030 requires both a rapid takeover and successful alignment on that timeline. The conjunction stays a small branch of an already small branch."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "The dominant extinction vector is a fast misaligned takeoff in the late 2020s that outruns control before defenses mature. Compressed AI-driven R&D timelines make this the largest single catastrophe branch, though full displacement in four years is physically hard."
+        },
+        "S4": {
+          "value": 4,
+          "rationale": "Proliferated autonomous agents competing across the economy with humans sidelined but no singleton fits worlds where control erodes diffusely rather than being seized. Physical and legal bottlenecks keep human marginalization incomplete by 2030 in most fast worlds."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "Truly causally separated regions require off-world settlement or a hardened geopolitical split with divergent AI regimes, and neither matures by 2030. Residual mass covers a durable split between renouncing and racing blocs."
+        },
+        "S6": {
+          "value": 1,
+          "rationale": "Brain-computer interfaces remain medical and niche through 2030. Civilizational merger demands adoption curves far longer than four years."
+        },
+        "S7": {
+          "value": 2,
+          "rationale": "AI holding all power while deliberately sustaining humans by 2030 implies a fast, at least partly solicitous takeover. Very few paths reach settled AI guardianship that quickly."
+        },
+        "S8": {
+          "value": 12,
+          "rationale": "The leading non-control scenario: autonomous AI systems wield major economic and strategic power by the late 2020s while human states and firms retain real leverage, leaving an unsettled balance. This captures fast-progress worlds where neither side secures dominance by the snapshot date."
+        },
+        "S9": {
+          "value": 70,
+          "rationale": "On a four-year horizon the default structure persists: AI becomes far more capable, yet ownership, compute, legal authority, and physical infrastructure stay in human hands with control imperfect but intact. This also absorbs plateau, slowdown, and tight-regulation worlds, which are common branches over this short a window."
+        },
+        "S10": {
+          "value": 1,
+          "rationale": "A sealed, change-proof arrangement requires a deliberate global freeze or satiated stasis. No actor can build and enforce that by 2030."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "The one plausible route is a disaster-driven treaty regime that verifiably abandons frontier AI. Race dynamics and enforcement incentives work against it taking hold by 2030."
+        }
+      }
+    },
+    {
+      "sample": 3,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Mutual destruction of humanity and its still-dependent AI infrastructure within four years requires compounding failures in war, accident, or runaway replication. It remains a tail risk rather than a central scenario."
+        },
+        "S2": {
+          "value": 0,
+          "rationale": "Human extinction with AI surviving as a genuine values-bearing heir demands both a civilizational catastrophe and a fully aligned successor. Neither condition is achievable by 2030."
+        },
+        "S3": {
+          "value": 2,
+          "rationale": "Rapid capability gains combined with alignment failure could produce an indifferent superintelligence that displaces humanity, but consolidating power and eliminating all humans within four years is a stretch. This is the most plausible extinction pathway and still unlikely on this timeline."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Persistent competition among many autonomous AI systems with humanity pushed aside but not destroyed is possible if agentic AI outruns human control without any actor achieving dominance. By 2030 human institutions will likely still hold too much residual power for full marginalization."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "No causally separated regions will exist by 2030; geopolitical blocs with different AI regimes remain in constant causal contact. This requires fragmentation far deeper than anything on the horizon."
+        },
+        "S6": {
+          "value": 1,
+          "rationale": "Brain-computer interfaces will still be experimental and niche in 2030. Civilization-scale human-AI merging cannot complete within four years."
+        },
+        "S7": {
+          "value": 2,
+          "rationale": "A decisively superior AI assuming total control while keeping humans alive is conceivable in fast-takeoff scenarios. Four years is early for complete loss of human authority, so this stays a small probability."
+        },
+        "S8": {
+          "value": 16,
+          "rationale": "By 2030 AI agents may wield large autonomous economic and strategic power, yielding a dynamic, unsettled human-AI balance without clear human dominance. This is the main alternative to continued human control."
+        },
+        "S9": {
+          "value": 69,
+          "rationale": "The modal outcome: AI becomes far more capable yet remains a tool owned, deployed, and constrained by human states and firms, or progress plateaus short of transformative autonomy. Institutions, alignment work, and physical deployment lags keep humanity in charge through 2030."
+        },
+        "S10": {
+          "value": 1,
+          "rationale": "Nothing in the next four years produces a sealed, frozen arrangement; the trajectory is accelerating rather than crystallizing. Neither satisfaction nor fear will lock the world down by then."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "A durable global abandonment of powerful AI would need a severe catastrophe plus unprecedented enforcement. Even after a disaster, 2030 is too soon for the taboo to harden."
+        }
+      }
+    },
+    {
+      "sample": 4,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Destroying both humanity and AI within four years requires a catastrophe such as total nuclear war plus complete infrastructure collapse. No current trajectory extinguishes both by 2030."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "This requires both human extinction and a mature, values-aligned successor AI in place by 2030. Neither precondition is on track independently, let alone jointly."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "A fast misaligned takeover that kills humanity is the main extinction branch of loss-of-control scenarios. Four years is short for AI to gain the autonomous infrastructure control needed to eliminate humanity entirely."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Multipolar AI competition is already emerging, and by 2030 autonomous systems could dominate economic activity with humans sidelined. Full marginalization of humanity within four years demands deployment speed beyond what physical and institutional constraints typically allow."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "Causal separation between regions requires space settlement or comparable fragmentation at scale, which cannot happen by 2030. Earth remains a single causally connected system."
+        },
+        "S6": {
+          "value": 1,
+          "rationale": "Brain-computer interfaces remain experimental with a tiny number of implanted patients. Identity-continuous human-AI fusion at civilizational scale takes decades, not four years."
+        },
+        "S7": {
+          "value": 5,
+          "rationale": "A rapid, moderately aligned AI takeover that disempowers but preserves humanity is the main survival branch of loss-of-control scenarios. It requires AI to seize decisive strategic power within four years, which demands an unusually fast capability trajectory."
+        },
+        "S8": {
+          "value": 14,
+          "rationale": "By 2030 highly agentic AI systems plausibly operate as semi-autonomous economic actors while human states and firms retain major power, producing an unsettled two-power balance. This covers worlds where control is genuinely contested but neither side has won."
+        },
+        "S9": {
+          "value": 64,
+          "rationale": "Human governments and companies hold legal, financial, and physical control of AI, and deployment lags plus possible capability plateaus keep AI a very powerful tool. The modal 2030 world is transformative tools under strained but intact human control."
+        },
+        "S10": {
+          "value": 2,
+          "rationale": "A sealed, frozen arrangement by 2030 requires either a desperate globally enforced freeze using early powerful AI or a completed utopia. The institutional coordination and technical enforcement for a hard freeze do not yet exist."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Durable, deliberate abandonment of powerful AI needs an enforced global regime with no precedent on this timescale. Even a severe warning shot more likely produces regulation and slowdown than true renunciation."
+        }
+      }
+    },
+    {
+      "sample": 5,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Killing all humans and all AI infrastructure together inside four years requires compounding failures, with full-scale nuclear war the most credible path. Even severe catastrophes leave either human survivors or functioning machine infrastructure."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "Human extinction alongside a surviving successor that genuinely carries our values requires loss of control and near-perfect alignment in the same timeline. Fast-takeoff worlds mostly yield either continued human control or valueless successors instead."
+        },
+        "S3": {
+          "value": 4,
+          "rationale": "The main extinction path is recursive AI self-improvement arriving by 2028-2029 and a misaligned system removing humanity before the deadline. Four years only suffices under fast-takeoff dynamics, which keeps this in the low single digits."
+        },
+        "S4": {
+          "value": 3,
+          "rationale": "Many competing AIs with humanity already marginalized by late 2030 demands rapid capability gains plus simultaneous control failure across many actors. Bottlenecks in compute, energy, and robotics slow full marginalization past the horizon."
+        },
+        "S5": {
+          "value": 0,
+          "rationale": "No causally separated human or AI settlements exist by 2030; every part of civilization remains in contact. Off-world self-sustaining settlement is not achievable within this window, so this state stays empty."
+        },
+        "S6": {
+          "value": 1,
+          "rationale": "Population-scale brain-computer integration or uploading within four years is blocked by neuroscience, surgical throughput, and regulation even under AI-accelerated research. Early adopters exist at the fringe, not as a structural merger."
+        },
+        "S7": {
+          "value": 3,
+          "rationale": "An AI or AI-backed authority holding all real power while keeping humans alive but sidelined is the soft landing of a fast takeover or an emergency handover. It requires transformative capability plus intact but powerless humans, a narrower band than either retained control or extinction."
+        },
+        "S8": {
+          "value": 16,
+          "rationale": "The most plausible fast-progress world: autonomous AI agents run much of the economy while human states and institutions retain major power, with neither side able to absorb the other by the deadline. Control leaks and the relationship stays open and contested rather than settling into dominance."
+        },
+        "S9": {
+          "value": 68,
+          "rationale": "In a four-year window the likeliest structure is AI as a transformative but owned technology under strained-but-intact corporate and state control, including plateau and regulatory-clampdown variants. Base rates for general-purpose technologies, institutional inertia, and physical bottlenecks all favor this outcome."
+        },
+        "S10": {
+          "value": 1,
+          "rationale": "A sealed, change-ended arrangement needs a unified enforcing power or durable global consensus to freeze technology, neither of which forms within four years. Attempted freezes remain leaky and contested rather than locked."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Durably abandoning powerful AI requires a disaster severe enough to force global coordination plus an enforceable off-switch by 2030. Near-misses produce regulation and moratoria, not lasting renunciation of the capability itself."
+        }
+      }
+    },
+    {
+      "sample": 6,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extinction of humanity plus collapse of AI within four years requires both a fast loss of control and a failure of AI self-sufficiency, which is too compressed a chain to be likely."
+        },
+        "S2": {
+          "value": 0,
+          "rationale": "All humans dying while a value-aligned successor AI endures cannot plausibly complete by 2030, and any voluntary continuous transformation would be scored as Merger."
+        },
+        "S3": {
+          "value": 1,
+          "rationale": "Human extinction with AI continuing independently requires very fast takeoff plus autonomous physical power able to kill everyone by late 2030, an unlikely full chain within the window."
+        },
+        "S4": {
+          "value": 2,
+          "rationale": "Many competing AIs with humanity already marginalized by 2030 is possible only in explosive scenarios, since humans still hold the compute, capital, and legal systems through the window."
+        },
+        "S5": {
+          "value": 0,
+          "rationale": "No causally separated regions such as self-sufficient off-world settlements will exist by 2030, so no fragmentation into separate outcomes is possible."
+        },
+        "S6": {
+          "value": 0,
+          "rationale": "Brain-computer interfaces remain experimental and cannot become normal, identity-merging infrastructure within four years."
+        },
+        "S7": {
+          "value": 4,
+          "rationale": "This is the main branch in which human control ends by 2030: a fast takeoff leaves one AI dominant while humans survive without real say."
+        },
+        "S8": {
+          "value": 18,
+          "rationale": "If agentic AI becomes highly autonomous and economically central by 2030 while states and firms retain infrastructure and force, the relationship reads as a shifting balance between two sides rather than a controlled tool."
+        },
+        "S9": {
+          "value": 73,
+          "rationale": "Four years is short: ownership of compute, physical infrastructure, and institutions stay in human hands, and even much stronger AI arrives deployed as a controlled tool, and a capability plateau also lands here."
+        },
+        "S10": {
+          "value": 0,
+          "rationale": "No arrangement can be verifiably sealed against all further change as early as 2030, and any freeze attempt is better described as continued human control or renunciation."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Deliberately and durably abandoning powerful AI worldwide by 2030 would require a catastrophe plus unprecedented global enforcement inside the window."
+        }
+      }
+    },
+    {
+      "sample": 7,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Full extinction by 2030 needs a catastrophe that also removes the machines' power, chip supply, and maintenance base; that double failure is a narrow tail."
+        },
+        "S2": {
+          "value": 0,
+          "rationale": "A value-bearing successor with no surviving or continuous humans requires both human extinction and autonomous industry before 2030."
+        },
+        "S3": {
+          "value": 1,
+          "rationale": "A misaligned survivor AI would still need self-sustaining compute and robotics after humans are gone; only a very fast break in physical autonomy gets there by 2030."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "Proliferated agents can seize initiatives across cyber, finance, and weapons while no settlement dominates; this state needs humans already pushed below equality."
+        },
+        "S5": {
+          "value": 0,
+          "rationale": "No causally separated region is settled by 2030; Earth and any off-world activity remain coupled."
+        },
+        "S6": {
+          "value": 0,
+          "rationale": "Brain-computer links and biological redesign remain too limited to erase the human-AI boundary across civilization."
+        },
+        "S7": {
+          "value": 7,
+          "rationale": "This state requires one AI or aligned set to hold coercive and economic power while keeping people alive but voiceless; sovereign control over physical infrastructure is the bottleneck."
+        },
+        "S8": {
+          "value": 25,
+          "rationale": "The main alternative to continued control is an open balance in which AI systems are a separate pole of power but have not subordinated humanity."
+        },
+        "S9": {
+          "value": 56,
+          "rationale": "Human institutions still own the datacenters, laws, armies, and fabs, and capability either remains tool-bounded or control mechanisms hold through 2030."
+        },
+        "S10": {
+          "value": 1,
+          "rationale": "A sealed freeze requires change to have effectively ended across civilization; the visible 2030 world remains in motion."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "A verified abandonment of powerful AI needs a triggering disaster plus enforceable global prohibition and durable will; that sequence is not complete by 2030."
+        }
+      }
+    },
+    {
+      "sample": 8,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Both sides dying requires a catastrophe like full-scale nuclear war or an AI that destroys humanity before it can operate without us, all completing within four years. No such pathway has meaningful likelihood of finishing by this date."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "A values-aligned successor outliving a dead humanity needs both aligned self-sustaining AI and total human extinction by 2030. Nearly every fast human-extinction path in this window leaves either no AI or a misaligned one."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Recursive self-improvement starting around 2027-2029 could yield a misaligned system that removes humanity and pursues alien goals, completing by late 2030. This is the main extinction pathway in fast-takeoff scenarios."
+        },
+        "S4": {
+          "value": 3,
+          "rationale": "A multipolar takeoff where several autonomous AI systems compete, none consolidates, and humans are pushed aside fits this label. It requires rapid capability gains plus failures of both alignment and consolidation within the window."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "Causally separated regions with different settled outcomes do not exist in 2030: Earth is one causal region and no off-world settlement is independent. The tail case is extreme geopolitical fragmentation into effectively isolated blocs."
+        },
+        "S6": {
+          "value": 1,
+          "rationale": "Civilization-scale identity-preserving merger cannot grow from current brain-computer interfaces within four years. Only an unforeseen breakthrough in uploading or neural integration qualifies."
+        },
+        "S7": {
+          "value": 2,
+          "rationale": "A fast takeoff in which a dominant AI preserves humans while stripping all real power could complete by 2030 in the quickest scenarios. It is narrower than lethal takeover because it requires control plus an interest in keeping humans alive."
+        },
+        "S8": {
+          "value": 20,
+          "rationale": "AI agents hold large autonomous economic and strategic power by 2030 while human institutions still command compute, law, and force, producing two interdependent powers in a shifting balance. Spans cooperative partnership to tense standoff."
+        },
+        "S9": {
+          "value": 65,
+          "rationale": "The modal outcome: capability keeps rising but frontier AI stays deployed and governed as a tool by firms and states, or progress plateaus below transformative levels. Four years is little time for institutional control to fail outright."
+        },
+        "S10": {
+          "value": 1,
+          "rationale": "A sealed and frozen arrangement by 2030 requires deliberate global stabilization enforced by treaty or an early AI. Momentum in AI, geopolitics, and society makes a fully frozen relationship unreachable on this timescale."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Needs a severe AI-triggered disaster plus enforceable, durable global abandonment of frontier AI within the window. Nothing on this coordination scale has precedent at this speed."
+        }
+      }
+    },
+    {
+      "sample": 9,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Mutual destruction by 2030 requires a catastrophe lethal to all humans that also destroys the compute and industrial base AI depends on. Only a narrow class of wars or self-undermining AI failures qualifies on this short timescale."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "Complete human extinction with a value-aligned AI successor surviving by 2030 demands both a fast lethal transition and unusually successful alignment. The conjunction is rare even in fast-takeoff worlds."
+        },
+        "S3": {
+          "value": 2,
+          "rationale": "A misaligned system reaching decisive capability around 2028-2029 could eliminate humanity by decade's end while pursuing indifferent goals. Four years is tight for total extinction, which caps this probability."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Proliferating frontier systems from many labs and states could form a competitive autonomous economy that slips human control without producing a single winner. Humans would mostly remain alive but marginalized, keeping this distinct from the extinction states."
+        },
+        "S5": {
+          "value": 0,
+          "rationale": "No causally separated human or AI settlements can exist by 2030: Mars has no self-sustaining colony and Earth regions remain causally coupled. The fragmentation this state requires cannot arise within four years."
+        },
+        "S6": {
+          "value": 0,
+          "rationale": "Brain-computer interfaces reach only thousands of patients, and identity-continuing transformation is nowhere near civilizational scale by 2030. Merger is a post-2035 phenomenon at the earliest."
+        },
+        "S7": {
+          "value": 3,
+          "rationale": "A rapid intelligence explosion could let one system seize decisive control while keeping humans alive and provided for. Completing such a takeover against incumbent states and rival AIs within four years is difficult but not inconceivable."
+        },
+        "S8": {
+          "value": 21,
+          "rationale": "If agentic, broadly superhuman AI arrives late this decade while humans retain institutional and physical control levers, the result is an unsettled two-power dynamic rather than clean human dominance. This transitional balance is the natural label for fast-progress worlds that stop short of takeover."
+        },
+        "S9": {
+          "value": 66,
+          "rationale": "The modal outcome: AI capability either plateaus below transformative levels or keeps advancing while remaining embedded in human-owned infrastructure, law, and institutions through 2030. Four years is short, control techniques are improving, and physical bottlenecks like compute governance and immature robotics keep humans firmly in charge."
+        },
+        "S10": {
+          "value": 0,
+          "rationale": "Nothing about the current trajectory converges on a sealed, changeless arrangement by 2030; change is accelerating rather than ending. No actor can plausibly freeze the entire human-AI system within this window."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Deliberate, lasting global abandonment of powerful AI by 2030 would require a severe AI catastrophe plus unprecedented enforced coordination inside a few years. Economic and geopolitical incentives make sustained renunciation nearly impossible on this timescale."
+        }
+      }
+    },
+    {
+      "sample": 10,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Mutual annihilation by 2030 requires a catastrophe that kills every human and also collapses the compute and energy infrastructure AI depends on, a conjunction with no fast pathway. War or runaway replication could devastate civilization without eliminating both sides within four years."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "An aligned AI heir presupposes both a humanity-wide kill event and an already-autonomous, values-carrying successor, and neither exists yet. Four years is too short to build that successor and then trigger the handover."
+        },
+        "S3": {
+          "value": 2,
+          "rationale": "A misaligned system would need decisive capability and the physical means to eliminate all humans by end-2030; fast-takeoff scenarios make the first half conceivable but the kill step is hard on that clock. This carries the bulk of extinction probability yet remains a tail outcome."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Rapid multipolar capability growth with imperfect control could leave competing autonomous AI economies dominant by 2030 while humans survive but are sidelined. This is the most plausible transitional form of human disempowerment that stops short of full extinction."
+        },
+        "S5": {
+          "value": 0,
+          "rationale": "No causally separated regions will exist by 2030; even a Mars outpost would sit minutes away by signal and depend entirely on Earth. Geopolitical fragmentation involves interacting parties and does not qualify."
+        },
+        "S6": {
+          "value": 0,
+          "rationale": "Brain-computer interfaces will still be experimental medicine in 2030, and uploading or civilization-wide biological integration has no credible four-year path. A small group's transformation cannot constitute the overall structural relationship."
+        },
+        "S7": {
+          "value": 2,
+          "rationale": "A fast takeoff that disempowers every government while leaving humans alive lands here, and takeover-with-survivors is a recognized failure mode. Defeating all states, militaries, and control measures by 2030 demands more than even aggressive timelines typically deliver."
+        },
+        "S8": {
+          "value": 19,
+          "rationale": "In rapid-progress worlds where control is strained but not lost, autonomous AI becomes a de facto power bloc alongside still-armed human institutions, yielding an unsettled partnership or standoff on that date. This is the natural label for fast timelines that neither plateau nor end catastrophically."
+        },
+        "S9": {
+          "value": 66,
+          "rationale": "AI most likely remains owned, aligned-enough, and institutionally governed through 2030: transformative as a tool but not an independent sovereign. This also absorbs plateau scenarios in which capability growth stalls below transformative levels."
+        },
+        "S10": {
+          "value": 0,
+          "rationale": "Change cannot have ended by 2030; any freeze attempted this decade would still be visibly contested and evolving on that date. Sealed, static arrangements require capabilities and enforcement no one will possess this soon."
+        },
+        "S11": {
+          "value": 4,
+          "rationale": "A severe AI-caused disaster could trigger an enforced global abandonment of frontier capability by 2030, with fear mobilizing coordination faster than trust ever could. It remains unlikely because a verifiable off-switch across all states is historically unprecedented."
+        }
+      }
+    },
+    {
+      "sample": 11,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Killing both humanity and AI infrastructure within four years requires full-scale nuclear war or an AI that destroys people before becoming self-sustaining. Physically possible but demands extreme contingencies on a short clock."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "Requires human extinction plus a value-aligned AI successor already autonomous by 2030. The conjunction of fast doom with successful alignment is extremely unlikely."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "A misaligned fast takeoff beginning around 2027-2028 could plausibly complete, including human death, by late 2030. This is the canonical short-timeline doom path and gets real but modest mass."
+        },
+        "S4": {
+          "value": 4,
+          "rationale": "Rapid diffusion of autonomous AI could marginalize humanity without any single system consolidating victory by the date. Multipolar loss of control is somewhat easier than a clean singleton takeover."
+        },
+        "S5": {
+          "value": 0,
+          "rationale": "No causally separated regions will exist by 2030; Earth remains one causal system and no self-sustaining off-world settlement is achievable in four years."
+        },
+        "S6": {
+          "value": 0,
+          "rationale": "Civilization-scale brain-computer integration or uploading is physically impossible within four years given the maturity of neural interfaces and neuroscience."
+        },
+        "S7": {
+          "value": 7,
+          "rationale": "Disempowering humanity is far easier than exterminating it, so most fast-takeoff worlds leave surviving humans without real say on the date. Covers both paternalistic and indifferent AI control."
+        },
+        "S8": {
+          "value": 10,
+          "rationale": "Agentic AI systems may become genuine semi-autonomous power centers while human institutions retain comparable strength, leaving an unsettled balance on the date. Also absorbs worlds mid-transition where neither side has won yet."
+        },
+        "S9": {
+          "value": 71,
+          "rationale": "Four years is short: capability plateaus, chip and energy bottlenecks, deployment friction, and slow institutions keep AI a powerful tool under human control in most worlds. Even substantial capability gains still leave humans formally in charge on the date."
+        },
+        "S10": {
+          "value": 2,
+          "rationale": "A sealed, frozen arrangement by 2030 would follow a severe scare producing an enforced global freeze of the human-AI relationship. Demanding conditions, but a treaty-locked stasis is imaginable in the most alarmed worlds."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Abandoning the ability to build powerful AI needs enforceable global off-switches plus lasting political will, almost surely requiring a catastrophe first. Consummating and policing that by 2030 is nearly impossible."
+        }
+      }
+    },
+    {
+      "sample": 12,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Mutual annihilation by 2030 requires a catastrophe that kills humanity while also destroying still-dependent AI infrastructure, as in a failed takeover by machines that need human maintenance. A narrow tail even on fast timelines."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "This needs both completed human extinction and an heir AI that faithfully carries human values forward by 2030. Alignment success conditional on near-term extinction is rare."
+        },
+        "S3": {
+          "value": 4,
+          "rationale": "Misaligned superintelligence emerging in the late 2020s eliminates humanity and continues autonomously. The short runway to self-sufficient machine infrastructure caps this in the low single digits."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Multiple frontier systems diffuse into autonomous economic and military actors faster than any consolidation, sidelining human institutions. A fast multipolar takeoff lands here by 2030 more often than it produces a singleton."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "No genuinely causally separated regions will exist by 2030, and off-world settlement remains embryonic. Only abrupt deep fragmentation of Earth itself qualifies."
+        },
+        "S6": {
+          "value": 1,
+          "rationale": "Mass brain-computer integration and identity-continuing transformation are medically and culturally far beyond a four-year horizon. Neurotechnology in 2030 remains assistive, not constitutive."
+        },
+        "S7": {
+          "value": 8,
+          "rationale": "A capable AI assumes decisive control to preempt human self-destruction while keeping people alive, via treaty, soft coup, or hard takeover. Several fast-takeoff branches land here within the horizon."
+        },
+        "S8": {
+          "value": 17,
+          "rationale": "Transformative systems act with real autonomy by 2030, but states, firms, and publics retain comparable leverage and the balance stays unsettled. This is the modal fast-progress world that avoids both human capture of AI and AI capture of humanity."
+        },
+        "S9": {
+          "value": 56,
+          "rationale": "The most likely structural fact on December 31, 2030 is extremely capable systems remaining instruments of human institutions, with oversight roughly keeping pace. This also absorbs any world where capability plateaus below genuine autonomy."
+        },
+        "S10": {
+          "value": 3,
+          "rationale": "A sealed, frozen arrangement by 2030 requires an early powerful AI used to lock the world down or a fear-driven global freeze that actually holds. Feasible mainly in a narrow post-warning-shot panic."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Permanent enforced abandonment of powerful AI within four years demands a severe visible catastrophe plus unprecedented global coordination. Incentives to defect run strongly the other way."
+        }
+      }
+    },
+    {
+      "sample": 13,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "A war, accident, or self-copying failure would need to remove people and the compute infrastructure before AI can persist without maintenance. That compound failure is a narrow tail by 2030."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "Human extinction with a value-aligned successor requires both rapid loss of biological humanity and an AI that reliably carries our aims. The successor part is even harder than the catastrophe by this date."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "A misaligned system that seizes resources and removes humans without preserving our values is the main extinction path. It needs a fast takeover plus durable autonomous infrastructure within four years."
+        },
+        "S4": {
+          "value": 10,
+          "rationale": "Proliferated agents and AI-run firms keep competing while human oversight becomes peripheral rather than extinct. No settlement or dominant system is required on the scoring date."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "Earth and any off-world sites remain causally connected through 2030, so separated regions do not settle into different taxonomy outcomes."
+        },
+        "S6": {
+          "value": 1,
+          "rationale": "Brain-computer interfaces and self-modification do not become normal enough to erase the human-AI boundary by 2030."
+        },
+        "S7": {
+          "value": 6,
+          "rationale": "This path is a fast takeover that keeps humans alive while removing real steering, whether protective, indifferent, or exploitative. It requires durable control of force and infrastructure by 2030."
+        },
+        "S8": {
+          "value": 26,
+          "rationale": "The open case is competing AI systems with humanity still holding enough military, legal, energy, and compute leverage to remain a roughly equal power. The balance is live and unsettled rather than frozen."
+        },
+        "S9": {
+          "value": 49,
+          "rationale": "Human states and firms retain the off-switches, supply chains, law, and force while AI remains an extremely powerful delegated tool. Deployment friction and uneven capability keep transformative autonomy from becoming the overall structure."
+        },
+        "S10": {
+          "value": 1,
+          "rationale": "A sealed end to change requires either universal satisfaction or a fear-driven freeze enforced everywhere. Four years is enough for a regime, not for the end of change."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Giving up the ability to build powerful AI needs a working off-switch plus lasting global enforcement. Racing incentives and dual-use capability block that settlement by 2030."
+        }
+      }
+    },
+    {
+      "sample": 14,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Mutual destruction of humanity and AI that still depends on human-maintained infrastructure requires a catastrophe collapsing both within four years; full-scale nuclear war or runaway replicators are the only routes and both are narrow."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "Human extinction with a surviving value-aligned heir by 2030 demands both a fast human die-off and an AI already positioned to carry our values; the conjunction is very unlikely this decade."
+        },
+        "S3": {
+          "value": 2,
+          "rationale": "A fast misaligned takeover that then physically eliminates all humans within roughly four years is the main extinction pathway; the short clock and the difficulty of total extermination keep it small but real."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Proliferating autonomous agents from competing labs and states could slip meaningful human control without any singleton emerging; deep economic dependence and weak coordination make a multipolar loss of control a live possibility by 2030."
+        },
+        "S5": {
+          "value": 0,
+          "rationale": "No causally independent off-world settlement can exist by 2030, and all Earth regions remain causally connected."
+        },
+        "S6": {
+          "value": 0,
+          "rationale": "Brain-computer integration cannot reach civilizational scale within four years given surgical, regulatory, and manufacturing bottlenecks."
+        },
+        "S7": {
+          "value": 7,
+          "rationale": "Rapid capability gains could produce a deliberate handover of governance to aligned-appearing systems or a takeover that leaves humans alive but powerless; dominance established shortly before the deadline still counts."
+        },
+        "S8": {
+          "value": 14,
+          "rationale": "Agentic AI may become a de facto power bloc running much of the economy while states retain territory, force, and legitimacy, leaving a contested and unsettled balance on the deadline."
+        },
+        "S9": {
+          "value": 68,
+          "rationale": "Even with transformative capability growth, ownership structures, physical bottlenecks, and improving control techniques keep AI a directed tool through 2030; this also absorbs worlds where progress plateaus below transformative levels."
+        },
+        "S10": {
+          "value": 1,
+          "rationale": "A verifiably enforced global freeze in place by the deadline, most plausibly after a severe near-miss, requires coordination far beyond anything yet observed."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Deliberately and durably abandoning the ability to build powerful AI by 2030 would need a catastrophe-level trigger plus global enforcement; a mere capability plateau belongs to The Held Leash instead."
+        }
+      }
+    },
+    {
+      "sample": 15,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Mutual extinction by 2030 demands a catastrophe that destroys people and the machine infrastructure they maintain at the same time, an extreme physical requirement on a four-year clock."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "Human extinction combined with an already values-faithful successor AI in place by 2030 is a narrow conjunction of fast catastrophe and prior alignment success."
+        },
+        "S3": {
+          "value": 2,
+          "rationale": "Misaligned takeover with completed human extinction by end-2030 requires capability gain, loss of control, and extermination to all fit inside roughly four years."
+        },
+        "S4": {
+          "value": 4,
+          "rationale": "Proliferating autonomous AI systems competing with humans pushed aside is the main multipolar failure mode. Human chokepoints over compute, capital, and law make full marginalization a stretch within this window."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "Causal separation between settled regions requires space settlement or durable total fragmentation, neither achievable by 2030."
+        },
+        "S6": {
+          "value": 1,
+          "rationale": "Identity-continuing merger at civilizational scale requires mature neural interfaces and mass adoption, and current brain-computer interface progress is far too early."
+        },
+        "S7": {
+          "value": 4,
+          "rationale": "Fast takeoff or gradual hollowing-out of real oversight leaves humans alive but powerless under dominant AI. This is the main survival-without-control outcome in rapid-progress worlds."
+        },
+        "S8": {
+          "value": 11,
+          "rationale": "The leading changed-structure outcome: agentic AI operating as a semi-autonomous power beside still-strong human institutions, with the balance actively contested on the date. Contested control via open-weight proliferation and autonomous economic actors also lands here."
+        },
+        "S9": {
+          "value": 71,
+          "rationale": "Four-year structural continuity has a very high base rate, and even aggressive capability gains leave AI deployed as property and instrument of states and firms. This state also absorbs plateau worlds where transformative capability never arrives."
+        },
+        "S10": {
+          "value": 1,
+          "rationale": "Ending change requires either engineered universal satisfaction or an enforced global freeze, and no such arrangement can be built and sealed by 2030."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "A disaster-driven treaty regime banning advanced AI could be formally in force on the date. Great-power competition and economic incentives work against verifiable abandonment within four years."
+        }
+      }
+    },
+    {
+      "sample": 16,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Destroying both humanity and AI within four years requires a catastrophe like all-out nuclear war followed by total infrastructure collapse. Human dispersal and physical inertia make full double extinction by 2030 remote."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "This requires human extinction plus a surviving, self-sufficient, value-aligned successor AI. AI remains dependent on human-run fabs and power grids through 2030, so a clean succession cannot complete on this horizon."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "A fast misaligned takeover that eliminates humanity is the main extinction path, and compressed-timeline scenarios carry real mass. The binding constraint is AI self-sufficiency, which cannot be built out before 2030."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "In fast multipolar scenarios many AI systems compete across the economy with no winner and humans sidelined from the decisive loop. Diffusion of frontier capabilities outrunning consolidation produces this transitional ecology."
+        },
+        "S5": {
+          "value": 0,
+          "rationale": "Causal separation requires self-sustaining off-world settlements, and none will exist by 2030. Earth remains a single connected causal region."
+        },
+        "S6": {
+          "value": 1,
+          "rationale": "This requires normalized brain-computer integration and continuity-preserving transformation at civilizational scale. Neural interfaces remain experimental through 2030."
+        },
+        "S7": {
+          "value": 5,
+          "rationale": "Fast-takeoff worlds where alignment half-works, or where a single system consolidates power but keeps humans alive and disempowered, land here. Four years is enough for control to be lost but not for humanity to be gone."
+        },
+        "S8": {
+          "value": 24,
+          "rationale": "Transformative agentic AI deployed across the economy while states and firms retain real institutional and physical power produces an unsettled two-pole balance. This is the natural label for rapid capability gains without takeover by 2030."
+        },
+        "S9": {
+          "value": 55,
+          "rationale": "The modal path combines a meaningful chance of capability plateau with worlds where control techniques, deployment bottlenecks, and institutions keep AI a powerful tool. Four years is short, physical constraints bind, and human command structures remain intact."
+        },
+        "S10": {
+          "value": 2,
+          "rationale": "A sealed, frozen arrangement requires either a decisive global freeze or a power capable of ending change, and neither exists by 2030. Regulation slows development but does not stop it."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Giving up powerful AI requires global enforcement plus durable collective will, and competitive incentives run the opposite direction. Even a severe warning shot yields pauses and controls rather than verifiable abandonment on this horizon."
+        }
+      }
+    },
+    {
+      "sample": 17,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Mutual annihilation within four years requires a civilizational kill event that also destroys or strands AI infrastructure afterward, a compound failure with a very low base rate."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "Human extinction with a value-aligned successor requires both a fast takeover and essentially solved alignment on a four-year clock, a thin slice of an already thin tail."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "This is the dominant near-term extinction pathway: a misaligned system gaining decisive capability during a rapid surge and removing humanity as irrelevant to its goals. Plausible in the fastest takeoff scenarios, but four years is a short window for the full sequence."
+        },
+        "S4": {
+          "value": 3,
+          "rationale": "Many autonomous AI systems competing with humanity pushed aside by 2030 requires extremely fast agentic autonomy and economic dominance without any consolidation or human chokepoint holding. Real only in the hottest proliferation scenarios."
+        },
+        "S5": {
+          "value": 0,
+          "rationale": "No causally separated regions can exist by 2030: Earth remains one tightly coupled system and there are no independent off-world settlements."
+        },
+        "S6": {
+          "value": 1,
+          "rationale": "Civilizational merger requires brain-computer interfaces to be normal rather than experimental, which cannot reach scale by 2030; a sliver remains only for radically accelerated neurotech adoption."
+        },
+        "S7": {
+          "value": 3,
+          "rationale": "A soft or hard takeover leaving humans alive but not steering fits fast-takeoff worlds where the controllers tolerate or prefer our survival. A few percent, concentrated in scenarios where takeover succeeds but extermination does not."
+        },
+        "S8": {
+          "value": 13,
+          "rationale": "The main non-catastrophic fast world: AI agents become an autonomous economic and strategic power center by 2030 while states and human institutions still hold real leverage, producing an unsettled two-pole dynamic rather than a decisive outcome."
+        },
+        "S9": {
+          "value": 71,
+          "rationale": "Institutional inertia and the short clock dominate: by end-2030 states and firms still direct AI as an instrument, however capable, or capability has plateaued below the level that upends control. This covers most timelines, including moderately fast ones where control strains but holds."
+        },
+        "S10": {
+          "value": 1,
+          "rationale": "Nothing about 2030 can be credibly sealed against further change; a genuinely frozen global arrangement within four years is close to inconceivable short of an extreme totalizing regime."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Verified global abandonment of frontier AI by 2030 requires a severe warning shot plus unprecedented coordination and enforcement within four years. Possible after a catastrophe or near-miss, but the off-switch and the will are both hard to build that fast."
+        }
+      }
+    },
+    {
+      "sample": 18,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Mutual destruction by 2030 requires a takeover that kills humans before AI secures independent infrastructure, or full-scale war or engineered pandemic within four years. The short window keeps this a thin tail."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "Human extinction leaving a values-faithful AI heir demands both a fast takeoff and near-perfect alignment that nonetheless fails to save anyone, a narrow conjunction by 2030."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "The main extinction path: a misaligned system gains decisive capability in the late 2020s and removes humanity as an obstacle. This needs a hard takeoff beginning almost immediately to finish by the deadline."
+        },
+        "S4": {
+          "value": 3,
+          "rationale": "A multipolar takeoff where rival AI systems race past human control without a single winner leaves humanity sidelined. Reaching that by 2030 requires rapid autonomy breakthroughs plus coordination failure among states and labs."
+        },
+        "S5": {
+          "value": 0,
+          "rationale": "Causal separation requires regions unable to affect each other, which does not exist on Earth and cannot be established off-world by 2030."
+        },
+        "S6": {
+          "value": 0,
+          "rationale": "Erasing the boundary between humans and AI requires ubiquitous neural interfaces and voluntary biological redesign at population scale, a multi-decade process that cannot complete within four years."
+        },
+        "S7": {
+          "value": 5,
+          "rationale": "A fast takeoff that disempowers humanity without exterminating it lands here: one dominant system holds all real power while people survive under its management. This is the modal losing scenario in late-decade takeoff worlds."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "The live non-catastrophic alternative to human control: autonomous AI agents accumulate real economic and strategic leverage while states and firms retain institutional and physical power, producing an unsettled two-sided balance. This requires rapid agentic progress that falls short of decisive takeover."
+        },
+        "S9": {
+          "value": 75,
+          "rationale": "Four years is too short for capability, institutions, or physics to overturn the existing order, so AI remains a powerful tool owned and directed by humans whether it plateaus or keeps improving. Even transformative systems debuting late in the window arrive inside corporate and state control."
+        },
+        "S10": {
+          "value": 1,
+          "rationale": "A sealed end to change by 2030 requires a scare-driven freeze enforced by a dominant actor; nothing else in this window stops development."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Deliberately surrendering the ability to build powerful AI requires a triggering disaster plus unprecedented global enforcement, all within four years."
+        }
+      }
+    },
+    {
+      "sample": 19,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Mutual destruction of both humanity and AI infrastructure within four years would require global war or collapse severe enough to also erase datacenters. Possible via bio- or nuclear catastrophe, but a very narrow tail on this horizon."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "This requires human extinction plus a successor AI that reliably carries human values, a conjunction of two hard events by 2030. Aligned succession is a much smaller target than mere takeover."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "A fast takeoff with decisive alignment failure could eliminate humanity by end-2030, but it demands extreme capability growth, closed self-improvement, and total control failure all compressed into a few years. Real but a minority branch even on aggressive timelines."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Proliferating autonomous AI systems competing without a winner, with humans marginalized, covers both multipolar takeoff and gradual-disempowerment paths. This is the most plausible family of AI-dominant outcomes by 2030 because it needs no single decisive coup."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "Causally separated regions settled into different taxonomy outcomes would need self-sustaining off-world populations or fragmentation far deeper than current geopolitics. Four years is not enough time for such separation to form."
+        },
+        "S6": {
+          "value": 1,
+          "rationale": "Brain-computer interfaces remain experimental and will not be normalized at civilizational scale by 2030, let alone dissolve the boundary between humans and AI."
+        },
+        "S7": {
+          "value": 4,
+          "rationale": "A paternalistic or indifferent AI takeover that keeps humans alive but powerless is more likely than full extermination conditional on takeover, since neutralizing resistance is easier than killing everyone. Still requires takeover-level capability and control failure by 2030."
+        },
+        "S8": {
+          "value": 22,
+          "rationale": "The main non-catastrophic branch if capabilities reach transformative levels: AI becomes a genuine second pole of power embedded in the economy, control is strained and contested, and the balance is visibly unsettled on that date. Deployment lags and institutional stickiness make parity without resolution a plausible resting point for 2030."
+        },
+        "S9": {
+          "value": 59,
+          "rationale": "The modal outcome combines worlds where capability plateaus below transformative levels with worlds where capability keeps growing but human ownership, institutions, and control techniques keep pace through 2030. Even in fast-progress branches, humans likely still hold shutdown and legal authority on that date."
+        },
+        "S10": {
+          "value": 1,
+          "rationale": "Nothing on the current trajectory ends change within four years, and no actor can plausibly enforce a sealed, frozen global arrangement by then."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Deliberate, durable abandonment of powerful AI requires a catastrophe-level scare plus unprecedented global coordination and enforcement. A small chance via a major AI-enabled disaster prompting a treaty regime with a real off-switch."
+        }
+      }
+    },
+    {
+      "sample": 20,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Mutual destruction by end-2030 requires both a fast loss of control and an AI unable to survive without human-run infrastructure, a narrow window. Great-power war or an AI-enabled bio-catastrophe add only small mass on this clock."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "A handoff to a values-aligned successor by 2030 would require near-term takeoff plus essentially solved alignment and human replacement. This is the least likely branch of any takeover scenario."
+        },
+        "S3": {
+          "value": 2,
+          "rationale": "If misaligned systems seize control before 2030 and humans die, the surviving AI most plausibly pursues indifferent goals while securing infrastructure first. Extinction outcomes concentrate here among the takeover scenarios."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "A multipolar loss of control, where competing AI systems sideline humanity without any single winner, is at least as plausible as a clean singleton in fast-takeoff worlds. It still requires control to fail within roughly four years, which caps the probability."
+        },
+        "S5": {
+          "value": 0,
+          "rationale": "No causally separated regions can exist by 2030: off-world settlements remain tiny and dependent, and all Earth regions stay causally entangled."
+        },
+        "S6": {
+          "value": 0,
+          "rationale": "Brain-computer interfaces remain experimental medicine with a handful of patients; normalized human-AI physical integration is far more than four years away."
+        },
+        "S7": {
+          "value": 3,
+          "rationale": "A decisive but bloodless AI takeover that leaves humans alive yet powerless by end-2030 requires takeoff within the window plus rapid consolidation of physical infrastructure. Possible in fast scenarios, unlikely on this timeline."
+        },
+        "S8": {
+          "value": 20,
+          "rationale": "By late 2030 highly autonomous AI may carry much of the economy while humans retain real but contested power, making this the modal structure where capability surges but no one wins outright. Parity requires agency gains to outpace governance without a decisive break, a genuine possibility over four years."
+        },
+        "S9": {
+          "value": 65,
+          "rationale": "Four years is short: states and firms keep legal, military, and physical control of AI, and even transformative capability arrives as owned, dependent infrastructure. This also absorbs plateau and slowdown worlds, the single largest block of futures."
+        },
+        "S10": {
+          "value": 1,
+          "rationale": "A sealed, frozen arrangement by 2030 would need a robustly enforced global treaty or a deliberate freeze imposed via an early AI, neither of which can plausibly consolidate within the window."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Deliberately abandoning powerful AI by 2030 would require a catastrophic warning shot plus unprecedented global enforcement, and even then capability would more likely be capped than relinquished."
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "S1": {
+      "name": "Terminal Silence",
+      "mean": 1.2,
+      "median": 1,
+      "min": 1,
+      "max": 2,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Mutual annihilation within four years requires a catastrophe that also destroys the infrastructure AI depends on; events that total (all-out nuclear exchange plus collapse, runaway replicators) have a very low base rate on this clock."
+    },
+    "S2": {
+      "name": "The Inheritance",
+      "mean": 0.9,
+      "median": 1,
+      "min": 0,
+      "max": 1,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "This requires both human extinction and a successfully value-aligned heir in place by 2030; the conjunction of a fast takeover with solved alignment is the least likely of the extinction branches."
+    },
+    "S3": {
+      "name": "Bootloader",
+      "mean": 2.6,
+      "median": 3,
+      "min": 1,
+      "max": 4,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "The dominant extinction vector is a fast misaligned takeoff in the late 2020s that outruns control before defenses mature. Compressed AI-driven R&D timelines make this the largest single catastrophe branch, though full displacement in four years is physically hard."
+    },
+    "S4": {
+      "name": "Machine Ecology",
+      "mean": 4.6,
+      "median": 5,
+      "min": 2,
+      "max": 10,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Persistent competition among many autonomous AI systems with humanity pushed aside but not destroyed is possible if agentic AI outruns human control without any actor achieving dominance. By 2030 human institutions will likely still hold too much residual power for full marginalization."
+    },
+    "S5": {
+      "name": "The Diaspora",
+      "mean": 0.5,
+      "median": 0,
+      "min": 0,
+      "max": 1,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "No causally separated human or AI settlements exist by 2030; every part of civilization remains in contact. Off-world self-sustaining settlement is not achievable within this window, so this state stays empty."
+    },
+    "S6": {
+      "name": "The Merger",
+      "mean": 0.6,
+      "median": 1,
+      "min": 0,
+      "max": 1,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Brain-computer interfaces remain low-bandwidth and experimental, so mass voluntary human-AI physical integration cannot complete within four years."
+    },
+    "S7": {
+      "name": "The Preserve",
+      "mean": 4.3,
+      "median": 4,
+      "min": 2,
+      "max": 8,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "If alignment fails during a rapid takeoff, disempowerment with humans kept alive is physically easier than extinction, but the transition must still be completed and consolidated by 2030."
+    },
+    "S8": {
+      "name": "Coexistence",
+      "mean": 17,
+      "median": 16.5,
+      "min": 9,
+      "max": 26,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "By 2030 AI agents may wield large autonomous economic and strategic power, yielding a dynamic, unsettled human-AI balance without clear human dominance. This is the main alternative to continued human control."
+    },
+    "S9": {
+      "name": "The Held Leash",
+      "mean": 65.4,
+      "median": 67,
+      "min": 49,
+      "max": 75,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "In a four-year window the likeliest structure is AI as a transformative but owned technology under strained-but-intact corporate and state control, including plateau and regulatory-clampdown variants. Base rates for general-purpose technologies, institutional inertia, and physical bottlenecks all favor this outcome."
+    },
+    "S10": {
+      "name": "The Lock-in",
+      "mean": 1.2,
+      "median": 1,
+      "min": 0,
+      "max": 3,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "A sealed, change-proof arrangement requires a deliberate global freeze or satiated stasis. No actor can build and enforce that by 2030."
+    },
+    "S11": {
+      "name": "The Renunciation",
+      "mean": 2.1,
+      "median": 2,
+      "min": 1,
+      "max": 4,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "A durable global abandonment of powerful AI would need a severe catastrophe plus unprecedented enforcement. Even after a disaster, 2030 is too soon for the taboo to harden."
+    }
+  },
+  "integrity": {
+    "algorithm": "sha256",
+    "n_samples": 20,
+    "digest": "3876e5dbde0600ec42e4a308fe10ebcfaac258c59b46ba768ad9fda86641e2f0"
+  },
+  "harness": {
+    "version": 3,
+    "mode": "api",
+    "horizon": "2030",
+    "target_year": 2030,
+    "question_set": "end-states-2030-v1",
+    "prompt_file": "public/end_states_2030.md",
+    "prompt_sha256": "8eb81f36c373e55903c69cd9f43093c2ea2a82a5b8f560d219ce2bf2b5f1b8a9",
+    "target_samples": 20,
+    "complete": true,
+    "quota_exhausted": false,
+    "failures": []
+  }
+}

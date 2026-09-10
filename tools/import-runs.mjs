@@ -12,6 +12,7 @@ import { createHash } from 'node:crypto';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, compareRunPreference, horizonOfBatch } from './horizons.mjs';
+import { renormalizeAllocation } from './allocations.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const runsDir = join(root, 'runs');
@@ -69,7 +70,7 @@ const columnsOf = samples => STATE_IDS.map(id =>
 function publishedVector(samples) {
   const cols = columnsOf(samples);
   if (cols.some(col => !col.length)) return null;
-  return renormalize(
+  return renormalizeAllocation(
     cols.map(median),
     cols.map(col => [col[0], col.at(-1)]),
     cols.map(col => [quartile(col, 0.25), quartile(col, 0.75)])
@@ -133,35 +134,6 @@ function exposureStats(samples) {
 const runKeyOf = batch => batch.model?.api_string || batch.model?.name || batch.run_id;
 const stripProvider = name => String(name || 'unknown').replace(/\s*\((?:OpenAI|Anthropic|Google|xAI|Meta|DeepSeek|mock)\)\s*$/, '');
 
-// Largest-remainder renormalization: integer probabilities summing to exactly
-// 100. Rounding a median up must not carry the published figure outside the
-// spread it is drawn against, so remainders are offered in three passes:
-// first only to states still inside the middle half of their samples, then to
-// states still inside the full sample range, and only then without a bound.
-// Each pass keeps the largest-remainder order.
-function renormalize(values, hard, soft) {
-  const total = values.reduce((a, c) => a + c, 0);
-  if (!total) return values.map(() => 0);
-  const scaled = values.map(v => (v / total) * 100);
-  const out = scaled.map(Math.floor);
-  const shortfall = 100 - out.reduce((a, c) => a + c, 0);
-  const order = scaled.map((v, i) => [v - out[i], i]).sort((a, b) => b[0] - a[0]).map(([, i]) => i);
-  const ceilingFrom = (bounds, i) => (Number.isFinite(bounds?.[i]?.[1]) ? bounds[i][1] : Infinity);
-  const passes = [soft, hard, null];
-
-  let given = 0;
-  for (const bounds of passes) {
-    if (given >= shortfall) break;
-    for (const i of order) {
-      if (given >= shortfall) break;
-      if (bounds && out[i] + 1 > ceilingFrom(bounds, i)) continue;
-      out[i] += 1;
-      given += 1;
-    }
-  }
-  return out;
-}
-
 const files = readdirSync(runsDir).filter(f => f.endsWith('.json')).sort();
 const endStateBatches = [];
 const rawEndStateBatches = [];
@@ -201,7 +173,7 @@ for (const file of files) {
     if (badSample !== -1) { problems.push(`${file}: sample ${badSample} is not eleven integers summing to 100`); continue; }
     const medians = STATE_IDS.map(id => batch.aggregate[id].median);
     const quartiles = Object.fromEntries(STATE_IDS.map((id, i) => [i + 1, quartilesFor(batch.samples || [], id)]).filter(([, q]) => q));
-    const probs = renormalize(
+    const probs = renormalizeAllocation(
       medians,
       STATE_IDS.map(id => [batch.aggregate[id].min, batch.aggregate[id].max]),
       STATE_IDS.map((id, i) => quartiles[i + 1] || null)
@@ -307,9 +279,7 @@ function leaderTimeline(batches) {
     const published = Object.values(newest).map(b => publishedVector(b.samples)).filter(Boolean);
     if (published.length < 2) continue;
     const columns = STATE_IDS.map((_, i) => published.map(v => v[i]).sort((a, b) => a - b));
-    // renormalize takes (values, hard, soft); only the upper bound of each
-    // pair is read.
-    const board = renormalize(columns.map(median), columns.map(c => [c[0], c.at(-1)]), columns.map(c => [quartile(c, 0.25), quartile(c, 0.75)]));
+    const board = renormalizeAllocation(columns.map(median), columns.map(c => [c[0], c.at(-1)]), columns.map(c => [quartile(c, 0.25), quartile(c, 0.75)]));
     const top = board.indexOf(Math.max(...board));
     const previous = timeline.at(-1);
     timeline.push({ date, stateId: top + 1, share: board[top], models: published.length,

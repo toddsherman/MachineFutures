@@ -18,7 +18,7 @@ const checks = [
   ['published links', ['tools/check-links.mjs']],
   ['application parses', ['--check', 'public/app.js']],
   ['data parses', ['--check', 'public/data.js']],
-  ['unit and harness tests', ['--test', 'tools/test-analytics.mjs', 'tools/test-classify.mjs', 'tools/test-harness.mjs', 'tools/test-horizons.mjs', 'tools/test-sweep.mjs']]
+  ['unit and harness tests', ['--test', 'tools/test-allocations.mjs', 'tools/test-analytics.mjs', 'tools/test-classify.mjs', 'tools/test-harness.mjs', 'tools/test-horizons.mjs', 'tools/test-sweep.mjs']]
 ];
 
 const results = [];

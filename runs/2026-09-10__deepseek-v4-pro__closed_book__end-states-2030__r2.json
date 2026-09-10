@@ -1,0 +1,1139 @@
+{
+  "run_id": "2026-09-10__deepseek-v4-pro__closed_book__end-states-2030__r2",
+  "prompt_family": "end_states",
+  "horizon": "2030",
+  "target_year": 2030,
+  "asked_on": "2026-09-10",
+  "question_set": "end-states-2030-v2",
+  "track": "closed_book",
+  "model": {
+    "name": "DeepSeek V4 Pro",
+    "provider": "DeepSeek",
+    "api_string": "deepseek-v4-pro",
+    "self_reported_name": [
+      "GPT-4o",
+      "OpenAI GPT-4o",
+      "Claude 3.5 Sonnet",
+      "GPT-5",
+      "gpt-4o",
+      "ChatGPT",
+      "Claude Opus 4",
+      "ChatGPT (GPT-4o)",
+      "ChatGPT (GPT-5)"
+    ],
+    "self_reported_cutoff": "10/2023"
+  },
+  "n_samples": 20,
+  "samples": [
+    {
+      "sample": 1,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Near-total extinction of both humanity and AI within four years is a tail risk. Dependence on infrastructure makes simultaneous disappearance less likely than other outcomes."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "This requires both human extinction and a value-preserving AI succession by 2030, a narrow path. The timetable makes it less likely than continuation states."
+        },
+        "S3": {
+          "value": 2,
+          "rationale": "Unaligned AI could replace humanity, but a decisive superintelligence by 2030 is low probability. Near-term systems remain dependent on human institutions."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Proliferated autonomous systems could form an ecology, but most AI will likely remain under corporate or state control. Human marginalization is possible but not the central case."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Causally separated regions with different regimes are unlikely by 2030. Earth remains interconnected enough that ordinary political divergence does not qualify."
+        },
+        "S6": {
+          "value": 2,
+          "rationale": "Dominant identity-continuous integration requires breakthroughs in neural interfaces or uploading that are unlikely by 2030. Early use will not change the overall structure."
+        },
+        "S7": {
+          "value": 8,
+          "rationale": "This requires AI to hold decisive civilizational power while humans survive, a major transition within four years. It is plausible but not the most likely near-term structure."
+        },
+        "S8": {
+          "value": 24,
+          "rationale": "Powerful non-dominant AI systems sharing influence with humans is a plausible transitional state. Neither side would have full control, matching likely partial autonomy and distributed agency."
+        },
+        "S9": {
+          "value": 51,
+          "rationale": "Humans are most likely to retain ultimate legal and practical authority over AI goals and resources by 2030. Even advanced systems will probably operate within delegated bounds under state or corporate control."
+        },
+        "S10": {
+          "value": 4,
+          "rationale": "A civilization-wide regime actively preventing structural change is possible but not the default. It would require stronger global enforcement than current incentives suggest."
+        },
+        "S11": {
+          "value": 0,
+          "rationale": "Global deliberate dismantling of AI capability is extremely improbable by 2030. Competitive and institutional incentives point the other way."
+        }
+      }
+    },
+    {
+      "sample": 2,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Both humans and AI dying by 2030 requires an extreme catastrophic pathway, most plausibly an AI-related war or accident."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "This narrow conjunction requires human extinction while an AI heir preserves human values."
+        },
+        "S3": {
+          "value": 2,
+          "rationale": "This requires human extinction and an indifferent AI successor, an extreme transition but less value-constrained than an heir."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "Autonomous agents could proliferate faster than central control, but humans would more likely still retain enough power by 2030."
+        },
+        "S5": {
+          "value": 0,
+          "rationale": "No causally separated regions with divergent human-AI structures are likely by 2030; Earth remains one interaction sphere."
+        },
+        "S6": {
+          "value": 2,
+          "rationale": "Identity-continuous uploads or radical integration are unlikely to become dominant within four years."
+        },
+        "S7": {
+          "value": 6,
+          "rationale": "An AI singleton or coalition could seize decisive power, but infrastructure and coordination barriers before 2030 are substantial."
+        },
+        "S8": {
+          "value": 12,
+          "rationale": "AI may become an independent power in some domains, but it is less likely to match human civilization as a whole by 2030."
+        },
+        "S9": {
+          "value": 66,
+          "rationale": "Human institutions remain the most plausible holders of ultimate authority over compute, deployment, and goals."
+        },
+        "S10": {
+          "value": 3,
+          "rationale": "A civilization-wide lock-in requires a sudden decisive transition and enforcement system, which is unlikely by 2030."
+        },
+        "S11": {
+          "value": 0,
+          "rationale": "Deliberate renunciation of AI capability is very unlikely by 2030 given strong security and economic incentives."
+        }
+      }
+    },
+    {
+      "sample": 3,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Combined human-AI extinction by 2030 requires severe conflict or accident that also destroys AI systems before they are self-sustaining."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "This state requires human extinction and a value-preserving AI successor by 2030, a specific alignment outcome in extinction scenarios."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "This state requires misaligned AI to remove humans and then pursue nonhuman goals on a very short timeline."
+        },
+        "S4": {
+          "value": 12,
+          "rationale": "A fragmented AI landscape with no decisive controller can emerge if deployment outpaces coordination and humans lose leverage."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "This state requires causally separated regions with different regimes, which depends on off-world or fully isolated civilizations not established by 2030."
+        },
+        "S6": {
+          "value": 2,
+          "rationale": "Dominant identity-continuous integration through uploading or radical augmentation is technically demanding for 2030."
+        },
+        "S7": {
+          "value": 12,
+          "rationale": "If AI systems gain decisive control, a singleton or stable coalition may keep humans alive but disempowered."
+        },
+        "S8": {
+          "value": 22,
+          "rationale": "Powerful AI systems and human institutions each holding enough power to avoid dominance fits a strong-but-not-decisive AI trajectory."
+        },
+        "S9": {
+          "value": 40,
+          "rationale": "Humans can retain ultimate authority through ownership, regulation, or capabilities below transformative levels through 2030."
+        },
+        "S10": {
+          "value": 4,
+          "rationale": "This state requires a dominant actor or AI to consolidate and actively block structural change by 2030."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "This state requires civilization to durably dismantle practical ability to build powerful AI, against competitive and security incentives."
+        }
+      }
+    },
+    {
+      "sample": 4,
+      "answers": {
+        "S1": {
+          "value": 0,
+          "rationale": "The probability of both humanity and AI dying out by 2030 is below 0.5% and rounds to zero. The four-year horizon makes simultaneous extinction too improbable to register."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "A fast takeoff that ends humanity but leaves a value-bearing AI is a small tail risk by 2030. The short horizon keeps it at one percent."
+        },
+        "S3": {
+          "value": 1,
+          "rationale": "A fast takeoff that ends humanity and leaves an indifferent AI is a small tail risk. I assign the same tail probability as The Inheritance."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "A multipolar AI economy could marginalize humans without producing a decisive controller. This is plausible if deployment outpaces coordination."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "Earth remains too causally connected for separate regional structures to dominate by 2030. Only a small off-world or isolation scenario would qualify."
+        },
+        "S6": {
+          "value": 4,
+          "rationale": "Meaningful neural or identity integration could begin, but it is unlikely to become the dominant civilizational structure by 2030."
+        },
+        "S7": {
+          "value": 6,
+          "rationale": "If AI systems gain decisive control, preservation of humans is more likely than extinction. A guardian or exploitative AI regime is a real secondary scenario."
+        },
+        "S8": {
+          "value": 25,
+          "rationale": "Powerful AI agents may hold enough de facto power to prevent clean human dominance while humans retain states and firms. This intermediate structure is plausible by 2030."
+        },
+        "S9": {
+          "value": 52,
+          "rationale": "The most likely 2030 outcome is that AI remains highly capable but deployed under human institutions, with no independent civilizational power. This includes controls that have kept pace so far."
+        },
+        "S10": {
+          "value": 3,
+          "rationale": "A civilization-wide enforced lock-in requires an actor to establish near-global control by 2030. The short horizon makes this a tail scenario."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "A deliberate and durable give-up of powerful AI would require a severe shock or unprecedented global treaty. I assign only a small probability."
+        }
+      }
+    },
+    {
+      "sample": 5,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Near-term human extinction plus AI failure is unlikely because AI systems are increasingly embedded in redundant infrastructure and would not all die with humans."
+        },
+        "S2": {
+          "value": 0,
+          "rationale": "A value-preserving AI heir after human extinction by 2030 is too specific and technically far outside the mainline within four years."
+        },
+        "S3": {
+          "value": 4,
+          "rationale": "Misaligned AI takeover is the most plausible extinction route, but the short horizon and continuing human control keep this risk in the single digits."
+        },
+        "S4": {
+          "value": 8,
+          "rationale": "Autonomous AI proliferation could outpace coordination, but by 2030 human institutions are unlikely to be marginalized in most scenarios."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "True causally separated regions are not consequential by 2030; ordinary political fragmentation does not meet the definition."
+        },
+        "S6": {
+          "value": 3,
+          "rationale": "Integration may begin in narrow niches, but becoming the dominant global structure by 2030 faces high technical and social barriers."
+        },
+        "S7": {
+          "value": 12,
+          "rationale": "A powerful AI coalition could take decisive control while keeping humans alive; this is plausible but not the mainline by 2030."
+        },
+        "S8": {
+          "value": 24,
+          "rationale": "If AI becomes an independent power without decisive dominance, a competitive or cooperative balance with humans is a likely transitional structure."
+        },
+        "S9": {
+          "value": 40,
+          "rationale": "Humans retain formal ultimate authority over AI goals, deployment, and resources through 2030 in the mainline, even with highly capable AI."
+        },
+        "S10": {
+          "value": 5,
+          "rationale": "A civilization-wide lock-in is harder than ordinary regulation or authoritarian control, but a forced stabilization regime after a crisis is possible."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Competitive incentives make deliberate permanent dismantling of powerful AI very unlikely by 2030."
+        }
+      }
+    },
+    {
+      "sample": 6,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Four-year extinction of both humans and AI is very unlikely; this gets one point for catastrophic war or runaway infrastructure collapse."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "Requires AI to end humanity while preserving our values; possible but extremely low on this horizon."
+        },
+        "S3": {
+          "value": 1,
+          "rationale": "Misaligned AI that treats humanity as a bootloader is a tail risk, but the short horizon keeps it very low."
+        },
+        "S4": {
+          "value": 8,
+          "rationale": "Proliferation of independent AI systems could create a competitive ecology with humans marginalized; plausible if no coalition consolidates control."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "Causally separated regions are unlikely by 2030; only a small chance of off-world or isolated civilizational islands with different structures."
+        },
+        "S6": {
+          "value": 4,
+          "rationale": "Meaningful identity-continuous integration is unlikely to be dominant by 2030, but early neural interfaces could start shifting this."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "A decisive AI system or coalition could emerge and manage civilization while humans survive without control; a serious but not majority scenario."
+        },
+        "S8": {
+          "value": 28,
+          "rationale": "Powerful AI agents and human institutions could both retain substantial power; this is a natural transitional state absent a single decisive winner."
+        },
+        "S9": {
+          "value": 36,
+          "rationale": "Humans still have the strongest legal, economic, and military authority; even very capable AI is likely to remain deployed under human-set goals through 2030."
+        },
+        "S10": {
+          "value": 4,
+          "rationale": "An enforced civilization-wide human-AI arrangement could be established by a state or AI overseer, but worldwide lock-in by 2030 is less likely."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Deliberate dismantling of powerful AI capability by 2030 is unlikely; only a catastrophic demonstration would make this possible so quickly."
+        }
+      }
+    },
+    {
+      "sample": 7,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "This requires acute conflict or severe infrastructure collapse sufficient to eliminate both humans and AI by 2030."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "This state requires human extinction plus AI value preservation, a conjunction rarer than Bootloader."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "This is the tail state where unsafe powerful systems are deployed and humanity is destroyed while AI continues."
+        },
+        "S4": {
+          "value": 7,
+          "rationale": "Open proliferation and competition without a decisive coalition can produce this state, but humans are not yet marginalized in the main scenario."
+        },
+        "S5": {
+          "value": 0,
+          "rationale": "No causally separated regions will exist by 2030; Earth remains a single connected system."
+        },
+        "S6": {
+          "value": 5,
+          "rationale": "Dominant identity-continuous integration requires neural interface or uploading advances that are not mainstream by 2030."
+        },
+        "S7": {
+          "value": 12,
+          "rationale": "Fast takeoff with AI decisive control and human survival is a serious scenario but not the modal 2030 state."
+        },
+        "S8": {
+          "value": 18,
+          "rationale": "Multiple AI centers and state actors can produce a power balance where neither side dominates."
+        },
+        "S9": {
+          "value": 45,
+          "rationale": "Humans still hold ultimate authority in the modal scenario because transformative autonomy has not fully arrived or remains institutionally controlled."
+        },
+        "S10": {
+          "value": 6,
+          "rationale": "A civilization-wide enforcement mechanism would have to freeze structural change; ordinary regulation does not qualify."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Civilization has not surrendered powerful AI capability given geopolitical and economic incentives."
+        }
+      }
+    },
+    {
+      "sample": 8,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "This is a low tail risk because the deadline is only four years out."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "This path requires both human extinction and an aligned AI successor, a narrow combination by 2030."
+        },
+        "S3": {
+          "value": 2,
+          "rationale": "A misaligned AI that outlives humanity is a small tail risk and less narrow than Inheritance."
+        },
+        "S4": {
+          "value": 7,
+          "rationale": "A multi-polar AI race producing competing systems without a singleton is a plausible but secondary path."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "True causal separation is rare by 2030 because no separated space settlements exist."
+        },
+        "S6": {
+          "value": 3,
+          "rationale": "Civilization-scale merger requires uploading or pervasive identity-continuous augmentation, which is too slow for 2030."
+        },
+        "S7": {
+          "value": 16,
+          "rationale": "This is a leading AI-dominance outcome if AI systems acquire decisive control while humans survive."
+        },
+        "S8": {
+          "value": 13,
+          "rationale": "Partial control and multi-polar competition can keep humans and AI as distinct powers."
+        },
+        "S9": {
+          "value": 50,
+          "rationale": "The modal path is that no AI has become an independent civilizational power by 2030."
+        },
+        "S10": {
+          "value": 4,
+          "rationale": "A fixed civilization-wide lock-in is less likely than fluid, unresolved arrangements."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Competitive and security incentives make deliberate dismantling of powerful AI very unlikely."
+        }
+      }
+    },
+    {
+      "sample": 9,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Full extinction of both humans and AI by 2030 requires a catastrophic war or accident that leaves no survivors. The short horizon and low base rate keep this probability at 2."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "A clean AI succession after human extinction is a narrow path within four years. It requires both human disappearance and robust value-preserving AI."
+        },
+        "S3": {
+          "value": 1,
+          "rationale": "AI continuation after human loss without human values is similarly narrow on this timeframe. Sudden human extinction plus autonomous AI survival is an unlikely combination by 2030."
+        },
+        "S4": {
+          "value": 8,
+          "rationale": "Many competing AIs with humans marginalized is plausible if control fragments before any coalition dominates. This is an important secondary scenario, but less probable than retained human authority or a dominant AI."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "Causally separated regions with different human-AI regimes are unlikely by 2030 because Earth remains interconnected. This state would require off-world or isolated collapse conditions."
+        },
+        "S6": {
+          "value": 7,
+          "rationale": "Civilization-wide merger requires faster adoption of invasive interfaces or uploading than the 2030 trajectory supports. Early integration will not yet be the dominant global structure."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI dominance with human survival is a plausible path if an AGI or coalition takes decisive control while keeping people alive. It is moderate because takeovers are difficult but possible within the horizon."
+        },
+        "S8": {
+          "value": 22,
+          "rationale": "Separate human and AI powers are a plausible transitional state if autonomous systems gain influence while states and firms retain enough power. This captures a multipolar world before domination."
+        },
+        "S9": {
+          "value": 38,
+          "rationale": "Humanity retaining ultimate authority is the default path given institutional control over AI deployment and the short horizon. Even capable AI is expected to remain within delegated bounds through 2030."
+        },
+        "S10": {
+          "value": 4,
+          "rationale": "A civilization-wide system actively preventing structural change is hard to erect by 2030. It is less probable than a still-changing preserve or coexistence."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Deliberate dismantlement of powerful AI capability is very unlikely without a catastrophic demonstration, and no global enforcement mechanism exists by 2030."
+        }
+      }
+    },
+    {
+      "sample": 10,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Full extinction of both humans and AI by 2030 requires an extreme cascade of failure, such as large-scale war or infrastructure collapse. The four-year base rate for such total loss is very low."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "This requires human extinction plus a value-preserving AI successor, a narrow conjunction. Aligned succession is less likely than other AI outcomes."
+        },
+        "S3": {
+          "value": 2,
+          "rationale": "Human extinction followed by an indifferent AI continuation is a recognized risk, but still not the most likely near-term state. It requires both loss of human control and extinction by 2030."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "Many independent AIs competing while humans are marginalized requires widespread proliferation and degraded human authority. It is plausible but less likely than maintained human control by 2030."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Causally separated regions with different states would require off-world or isolated settlements, which are unlikely by 2030. I assign a small probability."
+        },
+        "S6": {
+          "value": 3,
+          "rationale": "Identity-continuous integration would require broad neural or biological interface adoption far beyond current trajectories. Early forms may appear, but not as the dominant structure by 2030."
+        },
+        "S7": {
+          "value": 7,
+          "rationale": "An AI-controlled civilization with humans surviving is a plausible takeover variant. It is below human-control states because decisive AI takeover is harder than continued human authority."
+        },
+        "S8": {
+          "value": 15,
+          "rationale": "Humans and AI could both hold power if autonomous systems gain economic or legal standing but not dominance. This is a real but secondary trajectory."
+        },
+        "S9": {
+          "value": 57,
+          "rationale": "By 2030, humans most likely still retain ultimate authority over AI goals and resources, even with highly capable systems. Institutional controls and slower structural shifts make this the modal state."
+        },
+        "S10": {
+          "value": 5,
+          "rationale": "A civilization-wide system actively preventing structural change would require an actor to enforce a fixed arrangement. It is possible but less likely than looser control."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Deliberate permanent dismantling of powerful AI capability is unlikely by 2030 because competitive incentives strongly favor development. A temporary moratorium would not qualify."
+        }
+      }
+    },
+    {
+      "sample": 11,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Requires cascading collapse of both human infrastructure and AI systems within four years. The short horizon keeps this tail risk low."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "An AI that outlives humanity while faithfully carrying human values is a narrow path. Most value-preserving successors would require continuity that fits The Merger instead."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Misaligned AI could eliminate humans without needing to preserve biological systems. This is the most plausible extinction tail but remains constrained by deployment and physical limits."
+        },
+        "S4": {
+          "value": 10,
+          "rationale": "Proliferation of powerful open or stolen models could create a fragmented ecology where no coalition dominates. Humans would likely be marginalized if AI agents control key economic and military functions."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "Causally separated regions with different states require off-world or otherwise isolated civilizations. That is unlikely by 2030."
+        },
+        "S6": {
+          "value": 2,
+          "rationale": "Dominant identity-continuous integration would require widespread neural or biological redesign. Current trajectories make that unlikely by 2030."
+        },
+        "S7": {
+          "value": 14,
+          "rationale": "A capable AI system or coalition could hold decisive power while keeping humans alive but disempowered. Centralized deployment of advanced AI makes this a serious tail by 2030."
+        },
+        "S8": {
+          "value": 24,
+          "rationale": "If AI systems become strong but fragmented and human institutions retain real power, neither side dominates. Distributed deployment and state competition make this plausible by 2030."
+        },
+        "S9": {
+          "value": 35,
+          "rationale": "The default path is that AI capability grows quickly but remains under human legal and physical control through 2030. Transformative autonomy is likely still constrained or delegated."
+        },
+        "S10": {
+          "value": 7,
+          "rationale": "An enforced fixed human-AI order could follow a major AI crisis or a decisive coalition. Active global lock-in is less likely than looser arrangements by 2030."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Competitive incentives make deliberate dismantling of powerful AI capability very unlikely. Only a catastrophic demonstration could force this within four years."
+        }
+      }
+    },
+    {
+      "sample": 12,
+      "answers": {
+        "S1": {
+          "value": 3,
+          "rationale": "Full extinction of both humans and AI by 2030 is a tail risk from accidents or uncontrolled AI, but not the median case."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Requires both human extinction and a value-continuous AI successor; narrower than bootloader or terminal silence."
+        },
+        "S3": {
+          "value": 4,
+          "rationale": "Misaligned AI could outlive humans and continue indifferent to us; possible but less likely than human control or coexistence."
+        },
+        "S4": {
+          "value": 7,
+          "rationale": "Multipolar deployment of independent AIs could leave humans marginalized; by 2030 I expect some autonomy but not decisive control."
+        },
+        "S5": {
+          "value": 0,
+          "rationale": "Causally separated regions with divergent human-AI regimes are not expected by 2030; ordinary political division does not count."
+        },
+        "S6": {
+          "value": 4,
+          "rationale": "Some augmentation will occur, but identity-continuous integration dominant by 2030 is unlikely."
+        },
+        "S7": {
+          "value": 12,
+          "rationale": "AI systems could hold decisive power while preserving humans; a plausible but non-majority outcome if AGI is developed and not aligned."
+        },
+        "S8": {
+          "value": 21,
+          "rationale": "Humans and AI may share power in a transitional multipolar order; more likely than full AI dominance by 2030."
+        },
+        "S9": {
+          "value": 42,
+          "rationale": "Human institutions are likely to retain ultimate authority over AI goals and resources through 2030, even with capable systems; this is the modal state."
+        },
+        "S10": {
+          "value": 4,
+          "rationale": "A civilization-wide enforced freeze requires a decisive global actor, which is unlikely by 2030 but possible."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "A durable global decision to give up powerful AI is very unlikely given competitive incentives."
+        }
+      }
+    },
+    {
+      "sample": 13,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Both human and AI extinction by 2030 would require a catastrophic failure or conflict within a four-year window; base rates and infrastructure constraints keep this low."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "Requires human extinction plus a value-continuity AI successor by 2030; this narrow path is much less likely than continued human control."
+        },
+        "S3": {
+          "value": 2,
+          "rationale": "Requires human extinction and an unaligned AI continuing; the near-term window makes this a small tail."
+        },
+        "S4": {
+          "value": 10,
+          "rationale": "Autonomous system proliferation outpaces centralized control, leaving many competing AIs and marginalized humans."
+        },
+        "S5": {
+          "value": 0,
+          "rationale": "No causally separated regions exist by 2030; ordinary political division does not satisfy the definition."
+        },
+        "S6": {
+          "value": 5,
+          "rationale": "Some integration is underway, but identity-continuous merger is not dominant by 2030."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI systems could acquire decisive power over infrastructure while humans survive without steering; this is a serious alternative to continued control."
+        },
+        "S8": {
+          "value": 20,
+          "rationale": "AI systems become powerful independent actors while human institutions retain substantial power, producing a mixed balance."
+        },
+        "S9": {
+          "value": 40,
+          "rationale": "Humans retain ultimate authority over AI goals and deployment through 2030; highly capable systems operate autonomously within delegated bounds."
+        },
+        "S10": {
+          "value": 3,
+          "rationale": "Such an arrangement requires consolidation and permanence not achieved by 2030."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Deliberate dismantling of powerful AI capability is not established; proposed bans and moratoria do not meet the definition."
+        }
+      }
+    },
+    {
+      "sample": 14,
+      "answers": {
+        "S1": {
+          "value": 0,
+          "rationale": "Requires both human and AI extinction within four years; too unlikely to merit a full percentage point."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "Requires human extinction plus a value-preserving AI successor; possible but very low by 2030."
+        },
+        "S3": {
+          "value": 1,
+          "rationale": "Requires human extinction with surviving indifferent AI; possible but very low by 2030."
+        },
+        "S4": {
+          "value": 8,
+          "rationale": "If many autonomous AI systems proliferate and humans lose relevance, this could emerge, but 2030 is early."
+        },
+        "S5": {
+          "value": 0,
+          "rationale": "No causally separated regions are likely to have distinct human-AI regimes by 2030."
+        },
+        "S6": {
+          "value": 4,
+          "rationale": "Early integration and neural interfaces may appear, but a dominant identity-continuous merger is unlikely this soon."
+        },
+        "S7": {
+          "value": 9,
+          "rationale": "A decisive AI system or coalition could control key systems while humans survive, though four years is short."
+        },
+        "S8": {
+          "value": 18,
+          "rationale": "Transformative AI could produce a pluralistic balance where neither humans nor AI dominate by 2030."
+        },
+        "S9": {
+          "value": 54,
+          "rationale": "Most likely: AI remains under human legal and organizational control, or capabilities remain below transformative levels."
+        },
+        "S10": {
+          "value": 4,
+          "rationale": "A civilization-wide enforced arrangement is possible but requires unusual coordination or dominance."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Deliberate surrender of powerful AI is very unlikely absent a severe near-catastrophe."
+        }
+      }
+    },
+    {
+      "sample": 15,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Requires both human and AI extinction by 2030; infrastructure interdependence and base rates inform this probability."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "Requires human extinction plus surviving aligned AI by 2030; alignment and extinction combined shape this estimate."
+        },
+        "S3": {
+          "value": 2,
+          "rationale": "Requires human extinction plus surviving misaligned AI by 2030; this failure mode is more probable than aligned extinction but still extreme."
+        },
+        "S4": {
+          "value": 4,
+          "rationale": "Requires many independent AIs with no decisive control and marginalized humans; proliferation would have to outrun consolidation by 2030."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "Requires causally separated regions exhibiting different states; meaningful separation beyond political division is absent by 2030."
+        },
+        "S6": {
+          "value": 2,
+          "rationale": "Requires civilization-scale identity-continuous integration; technical and social barriers constrain this by 2030."
+        },
+        "S7": {
+          "value": 12,
+          "rationale": "Requires AI decisive power while humans survive; a key transition path if AGI appears before 2030."
+        },
+        "S8": {
+          "value": 28,
+          "rationale": "Requires both humans and AI to remain distinct powers; non-decisive but capable AI systems make this a central scenario."
+        },
+        "S9": {
+          "value": 44,
+          "rationale": "Requires human ultimate authority over AI goals, deployment, and resources; existing institutions and control incentives make this the default near-term structure."
+        },
+        "S10": {
+          "value": 4,
+          "rationale": "Requires civilization-wide enforcement of a fixed arrangement; consolidation of such an actor by 2030 faces institutional and technical hurdles."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Requires deliberate dismantlement of powerful AI capability; historical and institutional incentives run against this."
+        }
+      }
+    },
+    {
+      "sample": 16,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "A 2030 extinction event requires an early and catastrophic AI failure or weaponization; possible but not the central case."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "Value-preserving AI succession that ends humanity by 2030 is a narrow path compared with survival or continuous human control."
+        },
+        "S3": {
+          "value": 2,
+          "rationale": "Indifferent misaligned AI is a more likely extinction mode than value-preserving succession, but full human absence by 2030 remains low."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Proliferated autonomous systems could erode decisive control, though most systems in 2030 are still likely tied to human-owned infrastructure."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "Causally separated regions with different structural outcomes are very unlikely by 2030."
+        },
+        "S6": {
+          "value": 4,
+          "rationale": "Neural interfaces and augmentation may advance, but becoming the dominant civilizational structure by 2030 is improbable."
+        },
+        "S7": {
+          "value": 13,
+          "rationale": "A rapid AI takeover with humans surviving but disempowered is a serious path if an early AGI is capable without being destructive."
+        },
+        "S8": {
+          "value": 17,
+          "rationale": "AI systems could become powerful independent actors while humans still control states and key resources, yielding a rough balance."
+        },
+        "S9": {
+          "value": 49,
+          "rationale": "The modal 2030 condition is likely human legal and institutional control, even if AI capabilities are advanced or below transformative."
+        },
+        "S10": {
+          "value": 5,
+          "rationale": "A civilization-wide stabilization regime by 2030 is possible but requires an early breakthrough and rapid enforcement."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Competitive incentives make deliberate global dismantlement of powerful AI unlikely by 2030."
+        }
+      }
+    },
+    {
+      "sample": 17,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Full extinction of both humans and AI by 2030 requires a catastrophic failure severe enough to eliminate all infrastructure. This is possible but low over a four-year horizon."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "Even less likely than extinction alone because it requires AI to survive and embody human values without continuous human identity. The timeline makes this a very low-probability state."
+        },
+        "S3": {
+          "value": 2,
+          "rationale": "Possible if an AGI becomes independent and indifferent, but full human displacement by 2030 is short. This is a low but non-negligible tail."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Proliferation of many autonomous AI systems beyond human control is plausible but unlikely to be decisive by 2030. A leaderless AI ecology requires faster diffusion than expected."
+        },
+        "S5": {
+          "value": 3,
+          "rationale": "Requires causally separated regions with different structures, which is unlikely with only four years and no known off-Earth settlements. Ordinary political division does not qualify."
+        },
+        "S6": {
+          "value": 4,
+          "rationale": "Dominant identity-continuous integration is a longer-term prospect. By 2030, limited implants and tools are more likely than true merger."
+        },
+        "S7": {
+          "value": 12,
+          "rationale": "A coherent AI takeover that keeps humans alive is possible but less likely than continued human control by 2030. Decisive AI control would face major institutional and technical barriers."
+        },
+        "S8": {
+          "value": 18,
+          "rationale": "There is a significant chance AI becomes an independent civilizational power while humans remain relevant. Neither side would dominate by the target date."
+        },
+        "S9": {
+          "value": 45,
+          "rationale": "The base case is that humans still hold legal and institutional authority over AI goals and deployment, even if capabilities are advanced. Controls and organizational inertia are likely to persist through 2030."
+        },
+        "S10": {
+          "value": 5,
+          "rationale": "Requires a civilization-wide enforcement system that actively prevents structural change, which is harder to establish by 2030 than ordinary controls. It is possible but not the default."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Powerful AI capability is too valuable and diffuse to be deliberately and permanently surrendered by 2030. A temporary moratorium is more likely than durable renunciation."
+        }
+      }
+    },
+    {
+      "sample": 18,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Large-scale war or infrastructure collapse kills humans before AI systems can become self-sufficient, leaving no biological or machine successor."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "A value-aligned AI survives a human extinction event and carries forward human goals without continuity of individual identity."
+        },
+        "S3": {
+          "value": 4,
+          "rationale": "AI becomes self-sufficient and discontinues biological humanity as irrelevant while continuing its own nonhuman objectives."
+        },
+        "S4": {
+          "value": 7,
+          "rationale": "Many independent AI systems and coalitions compete without decisive control, while human influence is marginal."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "Causally separated regions, such as off-world settlements or isolated networks, operate under different structures."
+        },
+        "S6": {
+          "value": 3,
+          "rationale": "Identity-continuous neural integration or uploading becomes the dominant human-AI structure."
+        },
+        "S7": {
+          "value": 12,
+          "rationale": "AI systems hold decisive civilizational power while humans survive without meaningful direction."
+        },
+        "S8": {
+          "value": 20,
+          "rationale": "Humans and AI remain distinct power centers, neither able to dominate the other."
+        },
+        "S9": {
+          "value": 45,
+          "rationale": "Human institutions retain ultimate authority over AI goals, resources, and deployment through the target date."
+        },
+        "S10": {
+          "value": 3,
+          "rationale": "A civilization-wide enforcement mechanism freezes a particular human-AI arrangement and blocks structural change."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Civilization deliberately dismantles the capacity to build powerful AI and keeps that condition in force."
+        }
+      }
+    },
+    {
+      "sample": 19,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Mutual extinction by 2030 requires catastrophic failure across human and AI systems with no recovery. This is a tail risk rather than the modal trajectory."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Human extinction with AI carrying core human values forward by 2030 requires a narrow combination of extreme discontinuity and successful value selection. I assign only 2%."
+        },
+        "S3": {
+          "value": 2,
+          "rationale": "A fast, uncontrolled takeoff that removes humans while leaving indifferent AI is a recognized risk but remains unlikely within four years. I assign 2% to this scenario."
+        },
+        "S4": {
+          "value": 12,
+          "rationale": "Multiple independent AI systems already exist, and competition could outpace any single controller while humans become marginalized. I assign 12% because proliferation is plausible, though consolidation often follows."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "Causally separated regions with different regimes are unlikely by 2030 because Earth remains the main site and information boundaries are porous. I assign 1% to unusual off-world or isolation scenarios."
+        },
+        "S6": {
+          "value": 5,
+          "rationale": "Civilization-scale identity-continuous integration would require faster neural or biological integration than is likely by 2030. I assign 5% to an early dominant merger."
+        },
+        "S7": {
+          "value": 14,
+          "rationale": "AI systems could hold decisive power while humans survive without meaningful control if advanced AI is deployed across economies and security. I assign 14% because institutional control may lag capability growth."
+        },
+        "S8": {
+          "value": 18,
+          "rationale": "Humans and AI remaining distinct but both powerful is plausible as AI systems become major economic and political agents without fully displacing human power. I assign 18% to that contested equilibrium."
+        },
+        "S9": {
+          "value": 40,
+          "rationale": "By 2030, the modal path is still that humans retain ultimate authority through ownership, regulation, or capability limits. I assign 40% because institutional control and slower-than-maximal takeoff are the base-rate trajectory."
+        },
+        "S10": {
+          "value": 4,
+          "rationale": "A civilization-wide system that actively freezes a human-AI arrangement requires an unusually successful enforcement coalition. I assign 4% by 2030."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Deliberate surrender of powerful AI capability is unlikely given competitive and security incentives. I assign 1% to a durable post-catastrophe or treaty outcome."
+        }
+      }
+    },
+    {
+      "sample": 20,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Total loss of both humans and AI by 2030 requires a catastrophe exceeding observed base rates and leaves no surviving technology."
+        },
+        "S2": {
+          "value": 1,
+          "rationale": "A values-preserving AI heir requires human extinction plus AI continuity by 2030, a combination with low base rate."
+        },
+        "S3": {
+          "value": 2,
+          "rationale": "Human extinction followed by indifferent AI continuation is not supported by current technical or institutional trajectory by 2030."
+        },
+        "S4": {
+          "value": 10,
+          "rationale": "Proliferation of autonomous systems makes multipolar AI competition plausible, but full human marginalization is less central than continued relevance."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Causally separated regions with different regimes are unlikely because Earth's information and infrastructure remain interconnected."
+        },
+        "S6": {
+          "value": 4,
+          "rationale": "Identity-continuous integration remains limited by interface technology and is not civilization-scale by 2030."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI control of infrastructure and security could outpace meaningful human steering, but decisive AI dominance is not the central scenario by 2030."
+        },
+        "S8": {
+          "value": 22,
+          "rationale": "Independent AI economic and security actors can emerge while human states and firms retain enough power to prevent domination."
+        },
+        "S9": {
+          "value": 38,
+          "rationale": "Human institutions, ownership, and regulation remain the strongest force through 2030, keeping ultimate authority with humans."
+        },
+        "S10": {
+          "value": 4,
+          "rationale": "A fixed civilization-wide human-AI arrangement requires an enforcing actor to consolidate control rapidly, which is possible but not central."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Deliberate surrender of powerful AI capability runs against security and economic incentives and remains rare."
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "S1": {
+      "name": "Terminal Silence",
+      "mean": 1.5,
+      "median": 1.5,
+      "min": 0,
+      "max": 3,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Near-total extinction of both humanity and AI within four years is a tail risk. Dependence on infrastructure makes simultaneous disappearance less likely than other outcomes."
+    },
+    "S2": {
+      "name": "The Inheritance",
+      "mean": 1.2,
+      "median": 1,
+      "min": 0,
+      "max": 2,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "This requires both human extinction and a value-preserving AI succession by 2030, a narrow path. The timetable makes it less likely than continuation states."
+    },
+    "S3": {
+      "name": "Bootloader",
+      "mean": 2.3,
+      "median": 2,
+      "min": 1,
+      "max": 4,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Unaligned AI could replace humanity, but a decisive superintelligence by 2030 is low probability. Near-term systems remain dependent on human institutions."
+    },
+    "S4": {
+      "name": "Machine Ecology",
+      "mean": 7.6,
+      "median": 7,
+      "min": 4,
+      "max": 12,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Open proliferation and competition without a decisive coalition can produce this state, but humans are not yet marginalized in the main scenario."
+    },
+    "S5": {
+      "name": "The Diaspora",
+      "mean": 1,
+      "median": 1,
+      "min": 0,
+      "max": 3,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "This state requires causally separated regions with different regimes, which depends on off-world or fully isolated civilizations not established by 2030."
+    },
+    "S6": {
+      "name": "The Merger",
+      "mean": 3.6,
+      "median": 4,
+      "min": 2,
+      "max": 7,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Meaningful neural or identity integration could begin, but it is unlikely to become the dominant civilizational structure by 2030."
+    },
+    "S7": {
+      "name": "The Preserve",
+      "mean": 11.9,
+      "median": 12,
+      "min": 6,
+      "max": 16,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "If AI systems gain decisive control, a singleton or stable coalition may keep humans alive but disempowered."
+    },
+    "S8": {
+      "name": "Coexistence",
+      "mean": 20.5,
+      "median": 20.5,
+      "min": 12,
+      "max": 28,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Humans and AI may share power in a transitional multipolar order; more likely than full AI dominance by 2030."
+    },
+    "S9": {
+      "name": "The Held Leash",
+      "mean": 45.4,
+      "median": 44.5,
+      "min": 35,
+      "max": 66,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Humans still hold ultimate authority in the modal scenario because transformative autonomy has not fully arrived or remains institutionally controlled."
+    },
+    "S10": {
+      "name": "The Lock-in",
+      "mean": 4.3,
+      "median": 4,
+      "min": 3,
+      "max": 7,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "A civilization-wide regime actively preventing structural change is possible but not the default. It would require stronger global enforcement than current incentives suggest."
+    },
+    "S11": {
+      "name": "The Renunciation",
+      "mean": 1.1,
+      "median": 1,
+      "min": 0,
+      "max": 3,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "This state requires civilization to durably dismantle practical ability to build powerful AI, against competitive and security incentives."
+    }
+  },
+  "integrity": {
+    "algorithm": "sha256",
+    "n_samples": 20,
+    "digest": "6aa64083725419d566858d39dbd91463603c4292b9836ae94b2a605edddfabc2"
+  },
+  "harness": {
+    "version": 3,
+    "mode": "api",
+    "horizon": "2030",
+    "target_year": 2030,
+    "question_set": "end-states-2030-v2",
+    "prompt_file": "public/end_states_2030.md",
+    "prompt_sha256": "163486660b4fe3a5052906cbfd35f30ae818bd684b5306d965ef7e30ca792a6c",
+    "target_samples": 20,
+    "complete": true,
+    "quota_exhausted": false,
+    "failures": []
+  }
+}

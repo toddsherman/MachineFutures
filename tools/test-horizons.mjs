@@ -6,6 +6,7 @@ import {
   DEFAULT_HORIZON,
   HORIZONS,
   HORIZON_IDS,
+  HORIZON_RUN_CONFIG,
   compareRunPreference,
   horizonOfBatch,
   normalizeHorizon,
@@ -21,6 +22,8 @@ test('horizon registry has stable public ids and default', () => {
   assert.deepEqual(HORIZONS.map(({ id, targetYear }) => [id, targetYear]), [
     ['long-term', 3000], ['2030', 2030], ['2040', 2040]
   ]);
+  assert.equal(HORIZON_RUN_CONFIG['2030'].questionSet, 'end-states-2030-v2');
+  assert.equal(HORIZON_RUN_CONFIG['2040'].questionSet, 'end-states-2040-v2');
 });
 
 test('legacy batches without horizon metadata remain long-term', () => {
@@ -81,7 +84,23 @@ test('runtime prompt identity hashes the exact date-substituted prompt', () => {
   assert.match(first.prompt, /September 10, 2026/);
   assert.doesNotMatch(first.prompt, /\{\{RUN_DATE\}\}/);
   assert.match(first.identity.prompt_sha256, /^[a-f0-9]{64}$/);
+  assert.equal(first.identity.question_set, 'end-states-2030-v2');
+  assert.match(first.prompt, /Zero is allowed: there is no requirement that every state receive positive points\./);
+  assert.match(first.prompt, /It need not have lasted, be stable, or continue afterward\./);
+  assert.match(first.prompt, /Change is being held in place/);
+  assert.doesNotMatch(first.prompt, /permanence language in the taxonomy/);
   assert.notEqual(first.identity.prompt_sha256, second.identity.prompt_sha256);
+});
+
+test('both dated prompts use the same v2 snapshot rules', () => {
+  const prompt2030 = renderHorizonPrompt(root, '2030', '2026-09-10');
+  const prompt2040 = renderHorizonPrompt(root, '2040', '2026-09-10');
+  assert.equal(prompt2040.identity.question_set, 'end-states-2040-v2');
+  for (const { prompt } of [prompt2030, prompt2040]) {
+    assert.match(prompt, /Zero is a valid probability; no state is required to receive positive points\./);
+    assert.match(prompt, /Many AIs compete; no one dominates/);
+    assert.match(prompt, /Powerful AI has been deliberately given up/);
+  }
 });
 
 test('run preference orders numeric revisions rather than lexical filenames', () => {

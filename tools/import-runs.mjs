@@ -3,14 +3,15 @@
 //
 // Reads every end-state batch in runs/ — written by tools/run-elicitation.mjs
 // or exported by forecast-ingest_1.html — and rewrites the IMPORTED END-STATE
-// RUNS block in public/data.js with each provider's newest run: median
-// allocation per state, renormalized to integers summing to 100.
+// RUNS block in public/data.js with each model's newest run in each horizon:
+// median allocation per state, renormalized to integers summing to 100.
 //
 // Usage: node tools/import-runs.mjs
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, horizonOfBatch } from './horizons.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const runsDir = join(root, 'runs');
@@ -169,6 +170,9 @@ const problems = [];
 for (const file of files) {
   const batch = JSON.parse(readFileSync(join(runsDir, file), 'utf8'));
   if (batch.prompt_family === 'end_states') {
+    let horizon;
+    try { horizon = horizonOfBatch(batch); }
+    catch (error) { problems.push(`${file}: ${error.message}`); continue; }
     const provider = batch.model?.provider;
     if (!provider) { problems.push(`${file}: batch has no model.provider`); continue; }
     const missing = STATE_IDS.filter(id => { const a = batch.aggregate?.[id]; return !a || !a.n || typeof a.median !== 'number'; });
@@ -203,14 +207,15 @@ for (const file of files) {
       STATE_IDS.map((id, i) => quartiles[i + 1] || null)
     );
     if (probs.reduce((a, c) => a + c, 0) !== 100) { problems.push(`${file}: renormalized probabilities sum to ${probs.reduce((a, c) => a + c, 0)}, not 100`); continue; }
-    rawEndStateBatches.push({ asked_on: batch.asked_on, runKey: runKeyOf(batch), samples: batch.samples || [] });
+    rawEndStateBatches.push({ asked_on: batch.asked_on, runKey: runKeyOf(batch), horizon, samples: batch.samples || [] });
     endStateBatches.push({
       file,
       runKey: runKeyOf(batch),
+      horizon,
       provider,
       model: stripProvider(batch.model?.name),
       date: batch.asked_on,
-      promptVersion: Number((batch.question_set || '').match(/end-states-v(\d+)/)?.[1]) || null,
+      promptVersion: Number((batch.question_set || '').match(/end-states(?:-(?:2030|2040))?-v(\d+)/)?.[1]) || null,
       knowledgeCutoff: batch.model?.self_reported_cutoff || null,
       sampleCount: batch.n_samples ?? (batch.samples || []).length,
       probabilities: Object.fromEntries(probs.map((p, i) => [i + 1, p])),
@@ -220,7 +225,9 @@ for (const file of files) {
       quartiles,
       exposure: exposureStats(batch.samples || []),
       // Keyed on the run so the bootstrap is reproducible per model.
-      exposurePublished: publishedExposure(batch.samples || [], runKeyOf(batch)),
+      // Preserve the historical long-term bootstrap exactly; short horizons
+      // add their id so equal model ids remain independently reproducible.
+      exposurePublished: publishedExposure(batch.samples || [], horizon === DEFAULT_HORIZON ? runKeyOf(batch) : `${horizon}:${runKeyOf(batch)}`),
       rationales: Object.fromEntries(STATE_IDS.map((id, i) => [i + 1, String(batch.aggregate[id].rationale || '')]))
     });
     continue;
@@ -232,15 +239,17 @@ if (problems.length) { problems.forEach(p => console.error('✗ ' + p)); process
 
 const indent = '    ';
 
-// One entry per model (not per provider), newest asked_on wins. Keying by the
-// api model id is what lets two models from the same lab sit side by side.
-const endStateByModel = {};
+// One entry per model and horizon (not per provider), newest asked_on wins.
+// Horizon is part of the identity: without it a same-day 2030 batch can replace
+// the long-term forecast for the same API model id.
+const endStateByHorizon = Object.fromEntries(HORIZON_IDS.map(horizon => [horizon, {}]));
 const byModel = new Map();
 for (const b of endStateBatches) {
-  if (!byModel.has(b.runKey)) byModel.set(b.runKey, []);
-  byModel.get(b.runKey).push(b);
+  const identity = `${b.horizon}\0${b.runKey}`;
+  if (!byModel.has(identity)) byModel.set(identity, []);
+  byModel.get(identity).push(b);
 }
-for (const [runKey, batches] of byModel) {
+for (const [, batches] of byModel) {
   // Newest date wins, but a tie goes to the batch with more samples: a rerun
   // on the same day used to replace a twenty-sample run with a three-sample
   // one purely because it was read second.
@@ -248,34 +257,35 @@ for (const [runKey, batches] of byModel) {
   const chosen = ranked[0];
   const richest = [...batches].sort((a, b) => b.sampleCount - a.sampleCount)[0];
   if (chosen.sampleCount < richest.sampleCount && !FORCE) {
-    problems.push(`${chosen.file}: publishing it would drop ${runKey} from ${richest.sampleCount} samples (${richest.file}) to ${chosen.sampleCount}. Re-run the model, or pass --force to publish the smaller batch anyway.`);
+    problems.push(`${chosen.file}: publishing it would drop ${chosen.horizon}/${chosen.runKey} from ${richest.sampleCount} samples (${richest.file}) to ${chosen.sampleCount}. Re-run the model, or pass --force to publish the smaller batch anyway.`);
     continue;
   }
   if (chosen.sampleCount < richest.sampleCount) {
-    console.warn(`! ${runKey}: forced downgrade ${richest.sampleCount} → ${chosen.sampleCount} samples`);
+    console.warn(`! ${chosen.horizon}/${chosen.runKey}: forced downgrade ${richest.sampleCount} → ${chosen.sampleCount} samples`);
   }
-  endStateByModel[runKey] = chosen;
+  endStateByHorizon[chosen.horizon][chosen.runKey] = chosen;
 }
 if (problems.length) { problems.forEach(p => console.error('✗ ' + p)); process.exit(1); }
-const emitEndState = b => `${indent}${JSON.stringify(b.runKey)}: {
-${indent}  provider: ${JSON.stringify(b.provider)}, model: ${JSON.stringify(b.displayLabel)}, label: ${JSON.stringify(b.displayLabel)}, shortLabel: ${JSON.stringify(b.short)},
-${indent}  promptVersion: ${JSON.stringify(b.promptVersion)}, date: ${JSON.stringify(b.date)}, knowledgeCutoff: ${JSON.stringify(b.knowledgeCutoff)},
-${indent}  sampleCount: ${b.sampleCount}, source: ${JSON.stringify('runs/' + b.file)},
-${indent}  probabilities: { ${Object.entries(b.probabilities).map(([id, p]) => `${id}: ${p}`).join(', ')} },
-${indent}  range: { ${Object.entries(b.range).map(([id, r]) => `${id}: [${r[0]}, ${r[1]}]`).join(', ')} },
-${indent}  quartiles: { ${Object.entries(b.quartiles).map(([id, q]) => `${id}: [${q[0]}, ${q[1]}]`).join(', ')} },
-${indent}  exposure: ${JSON.stringify(b.exposure)},
-${indent}  exposurePublished: ${JSON.stringify(b.exposurePublished)},
-${indent}  rationales: {
-${Object.entries(b.rationales).map(([id, r]) => `${indent}    ${id}: ${JSON.stringify(r)}`).join(',\n')}
-${indent}  }
-${indent}}`;
-const endStateEntries = Object.values(endStateByModel).sort((a, b) => {
+const emitEndState = (b, pad = indent) => `${pad}${JSON.stringify(b.runKey)}: {
+${pad}  provider: ${JSON.stringify(b.provider)}, model: ${JSON.stringify(b.displayLabel)}, label: ${JSON.stringify(b.displayLabel)}, shortLabel: ${JSON.stringify(b.short)},
+${pad}  horizon: ${JSON.stringify(b.horizon)}, promptVersion: ${JSON.stringify(b.promptVersion)}, date: ${JSON.stringify(b.date)}, knowledgeCutoff: ${JSON.stringify(b.knowledgeCutoff)},
+${pad}  sampleCount: ${b.sampleCount}, source: ${JSON.stringify('runs/' + b.file)},
+${pad}  probabilities: { ${Object.entries(b.probabilities).map(([id, p]) => `${id}: ${p}`).join(', ')} },
+${pad}  range: { ${Object.entries(b.range).map(([id, r]) => `${id}: [${r[0]}, ${r[1]}]`).join(', ')} },
+${pad}  quartiles: { ${Object.entries(b.quartiles).map(([id, q]) => `${id}: [${q[0]}, ${q[1]}]`).join(', ')} },
+${pad}  exposure: ${JSON.stringify(b.exposure)},
+${pad}  exposurePublished: ${JSON.stringify(b.exposurePublished)},
+${pad}  rationales: {
+${Object.entries(b.rationales).map(([id, r]) => `${pad}    ${id}: ${JSON.stringify(r)}`).join(',\n')}
+${pad}  }
+${pad}}`;
+const sortEntries = entries => entries.sort((a, b) => {
   const ra = rosterByModel.get(a.runKey)?.order ?? Infinity;
   const rb = rosterByModel.get(b.runKey)?.order ?? Infinity;
   return ra - rb || a.runKey.localeCompare(b.runKey);
 });
-for (const b of endStateEntries) {
+const entriesByHorizon = Object.fromEntries(HORIZON_IDS.map(horizon => [horizon, sortEntries(Object.values(endStateByHorizon[horizon]))]));
+for (const b of Object.values(entriesByHorizon).flat()) {
   const entry = rosterByModel.get(b.runKey);
   b.displayLabel = entry?.label || b.model;
   b.short = entry?.shortLabel || SHORT_LABELS[b.provider] || b.provider.slice(0, 3).toUpperCase();
@@ -291,7 +301,10 @@ function leaderTimeline(batches) {
   for (const date of dates) {
     const newest = {};
     for (const batch of batches.filter(b => b.asked_on <= date)) {
-      if (!newest[batch.runKey] || batch.asked_on >= newest[batch.runKey].asked_on) newest[batch.runKey] = batch;
+      const prior = newest[batch.runKey];
+      const newer = !prior || batch.asked_on > prior.asked_on;
+      const richerSameDay = prior && batch.asked_on === prior.asked_on && batch.samples.length > prior.samples.length;
+      if (newer || richerSameDay) newest[batch.runKey] = batch;
     }
     const published = Object.values(newest).map(b => publishedVector(b.samples)).filter(Boolean);
     if (published.length < 2) continue;
@@ -307,32 +320,49 @@ function leaderTimeline(batches) {
   return timeline;
 }
 
-const endStateBlock = endStateEntries.length
-  ? `const importedEndStateRuns = {\n${endStateEntries.map(emitEndState).join(',\n')}\n  };`
-  : 'const importedEndStateRuns = {};';
+const datasets = Object.fromEntries(HORIZON_IDS.map(horizon => {
+  const entries = entriesByHorizon[horizon];
+  const dates = entries.map(entry => entry.date).filter(Boolean).sort();
+  return [horizon, {
+    entries,
+    datasetDate: dates.length ? dates.at(-1) : null,
+    leaderHistory: leaderTimeline(rawEndStateBatches.filter(batch => batch.horizon === horizon))
+  }];
+}));
 
-// Keep the header badge in step with the newest run rather than hand-editing it.
-const allDates = endStateEntries.map(b => b.date).filter(Boolean).sort();
-const newest = allDates.at(-1);
+const badgeOf = iso => {
+  if (!iso) return null;
+  const [y, m, d] = iso.split('-');
+  return `${m}.${d}.${y.slice(2)}`;
+};
+const emitDataset = (horizon, dataset) => `${indent}${JSON.stringify(horizon)}: {
+${indent}  endStateRuns: {${dataset.entries.length ? `\n${dataset.entries.map(entry => emitEndState(entry, `${indent}    `)).join(',\n')}\n${indent}  ` : ''}},
+${indent}  datasetDate: ${JSON.stringify(badgeOf(dataset.datasetDate))},
+${indent}  leaderHistory: ${JSON.stringify(dataset.leaderHistory)}
+${indent}}`;
+const generatedBlock = `const defaultHorizon = ${JSON.stringify(DEFAULT_HORIZON)};
+  const horizons = ${JSON.stringify(HORIZONS)};
+  const datasets = {
+${HORIZON_IDS.map(horizon => emitDataset(horizon, datasets[horizon])).join(',\n')}
+  };`;
 
 let data = readFileSync(dataPath, 'utf8');
-if (newest) {
-  const [y, m, d] = newest.split('-');
-  const badge = `${m}.${d}.${y.slice(2)}`;
-  const datePattern = /const datasetDate = '[^']*';/;
-  if (!datePattern.test(data)) console.warn('! datasetDate not found in public/data.js');
-  else data = data.replace(datePattern, `const datasetDate = '${badge}';`);
-}
 const endStateMarker = /(\/\* BEGIN IMPORTED END-STATE RUNS[\s\S]*?\*\/\n)[\s\S]*?(\n\s*\/\* END IMPORTED END-STATE RUNS \*\/)/;
 if (!endStateMarker.test(data)) { console.error('✗ IMPORTED END-STATE RUNS markers not found in public/data.js'); process.exit(1); }
-const timeline = leaderTimeline(rawEndStateBatches);
-data = data.replace(endStateMarker, `$1  ${endStateBlock}
+data = data.replace(endStateMarker, `$1  ${generatedBlock}$2`);
 
-  const leaderHistory = ${JSON.stringify(timeline)};$2`);
+// Migrate the old generated footer once. Subsequent imports only need to
+// refresh the declaration above, but accepting both shapes keeps generation
+// reproducible across the schema transition.
+data = data.replace(/\n\s*const endStateRuns = importedEndStateRuns;\s*\n\s*const datasetDate = '[^']*';\s*\n/, '\n');
+const assignment = /window\.MF_DATA\s*=\s*\{[^;]*\};/;
+if (!assignment.test(data)) { console.error('✗ window.MF_DATA assignment not found in public/data.js'); process.exit(1); }
+data = data.replace(assignment, 'window.MF_DATA = { states, defaultHorizon, horizons, datasets };');
 writeFileSync(dataPath, data);
 
-console.log(`✓ Imported ${endStateEntries.length} end-state run(s) into public/data.js:`);
+const endStateEntries = Object.values(entriesByHorizon).flat();
+console.log(`✓ Imported ${endStateEntries.length} end-state run(s) across ${HORIZON_IDS.length} horizon(s) into public/data.js:`);
 endStateEntries.forEach(b => {
   const sum = Object.values(b.probabilities).reduce((a, c) => a + c, 0);
-  console.log(`  ${b.provider} / ${b.displayLabel} [${b.runKey}] — ${b.date}, ${b.sampleCount} samples, prompt v${b.promptVersion}, sum ${sum}`);
+  console.log(`  ${b.horizon}: ${b.provider} / ${b.displayLabel} [${b.runKey}] — ${b.date}, ${b.sampleCount} samples, prompt v${b.promptVersion}, sum ${sum}`);
 });

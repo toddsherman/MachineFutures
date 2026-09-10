@@ -10,86 +10,163 @@
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS } from './horizons.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const roster = JSON.parse(readFileSync(join(root, 'tools', 'models.json'), 'utf8')).models;
+const activeModelIds = roster.filter(model => (model.status || 'active') === 'active').map(model => model.model);
 const shim = {};
 new Function('window', readFileSync(join(root, 'public', 'data.js'), 'utf8'))(shim);
 if (!shim.MF_DATA) { console.error('✗ public/data.js did not publish window.MF_DATA'); process.exit(1); }
-const { endStateRuns: runs, states, leaderHistory = [] } = shim.MF_DATA;
+const { defaultHorizon, horizons, datasets, states } = shim.MF_DATA;
 const STATE_IDS = Array.from({ length: 11 }, (_, i) => i + 1);
 const EXPOSURE_IDS = [1, 2, 3, 4, 5];
 const problems = [];
+const median = list => { const s = [...list].sort((a, b) => a - b); const n = s.length; return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2; };
+const quantile = (column, f) => { const k = (column.length - 1) * f, lo = Math.floor(k), hi = Math.ceil(k); return column[lo] + (column[hi] - column[lo]) * (k - lo); };
+const badgeOf = iso => {
+  const [year, month, day] = iso.split('-');
+  return `${month}.${day}.${year.slice(2)}`;
+};
 
-const entries = Object.entries(runs);
-if (!entries.length) problems.push('no runs published');
+if (defaultHorizon !== DEFAULT_HORIZON) problems.push(`defaultHorizon must be ${DEFAULT_HORIZON}, received ${JSON.stringify(defaultHorizon)}`);
+if (!Array.isArray(horizons)) problems.push('horizons metadata must be an array');
+if (!datasets || typeof datasets !== 'object' || Array.isArray(datasets)) problems.push('datasets must be an object');
 
-for (const [key, run] of entries) {
-  const values = STATE_IDS.map(id => run.probabilities?.[id]);
-  if (values.some(v => !Number.isInteger(v) || v < 0 || v > 100)) problems.push(`${key}: probabilities must be integers 0-100`);
-  const sum = values.reduce((a, c) => a + (c || 0), 0);
-  if (sum !== 100) problems.push(`${key}: probabilities sum to ${sum}, not 100`);
+const metadataIds = Array.isArray(horizons) ? horizons.map(horizon => horizon?.id) : [];
+if (new Set(metadataIds).size !== metadataIds.length) problems.push('horizons metadata contains duplicate ids');
+if (JSON.stringify(metadataIds) !== JSON.stringify(HORIZON_IDS)) {
+  problems.push(`horizons metadata ids must be ${HORIZON_IDS.join(', ')} in display order`);
+}
+for (const expected of HORIZONS) {
+  const actual = Array.isArray(horizons) ? horizons.find(horizon => horizon?.id === expected.id) : null;
+  if (!actual) continue;
+  if (actual.label !== expected.label) problems.push(`${expected.id}: horizon label must be ${JSON.stringify(expected.label)}`);
+  if (actual.targetYear !== expected.targetYear) problems.push(`${expected.id}: targetYear must be ${expected.targetYear}`);
+}
+const datasetIds = datasets && typeof datasets === 'object' ? Object.keys(datasets) : [];
+for (const id of HORIZON_IDS) if (!datasetIds.includes(id)) problems.push(`datasets is missing horizon ${id}`);
+for (const id of datasetIds) if (!HORIZON_IDS.includes(id)) problems.push(`datasets contains unsupported horizon ${id}`);
 
-  for (const id of STATE_IDS) {
-    const band = run.range?.[id];
-    if (band && (run.probabilities[id] < band[0] || run.probabilities[id] > band[1])) {
-      problems.push(`${key}: S${id} published ${run.probabilities[id]}% outside its sample range ${band[0]}-${band[1]}%`);
+const stateIds = Array.isArray(states) ? states.map(state => state?.id) : [];
+if (JSON.stringify(stateIds) !== JSON.stringify(STATE_IDS)) problems.push('states must contain canonical ids 1 through 11 in order');
+
+// Coordinate-wise medians need not sum to 100, which is why the site
+// renormalizes them. Run the same assertion independently for each horizon.
+function validateDataset(horizon, dataset) {
+  const prefix = `[${horizon}]`;
+  if (!dataset || typeof dataset !== 'object' || Array.isArray(dataset)) {
+    problems.push(`${prefix} dataset must be an object`);
+    return { runs: 0, timeline: 0, total: null, aggregate: null };
+  }
+
+  const runs = dataset.endStateRuns;
+  const leaderHistory = dataset.leaderHistory;
+  if (!runs || typeof runs !== 'object' || Array.isArray(runs)) problems.push(`${prefix} endStateRuns must be an object`);
+  if (!Array.isArray(leaderHistory)) problems.push(`${prefix} leaderHistory must be an array`);
+  const entries = runs && typeof runs === 'object' && !Array.isArray(runs) ? Object.entries(runs) : [];
+  const timeline = Array.isArray(leaderHistory) ? leaderHistory : [];
+
+  // Empty future horizons are valid before their first paid collection. Once a
+  // run lands, the ordinary dataset-date and aggregate invariants become strict.
+  if (!entries.length) {
+    if (horizon === defaultHorizon) problems.push(`${prefix} default dataset has no runs`);
+    if (dataset.datasetDate !== null) problems.push(`${prefix} empty datasetDate must be null`);
+    if (timeline.length) problems.push(`${prefix} empty dataset must not have leader history`);
+    return { runs: 0, timeline: timeline.length, total: null, aggregate: null };
+  }
+
+  // A partially collected horizon must never look like a complete board. Empty
+  // future placeholders are allowed above; once the first batch is published,
+  // every currently active roster model is required. Historical paused or
+  // retired extras remain valid provenance and are not removed from old views.
+  const publishedModelIds = new Set(entries.map(([key]) => key));
+  const missingActive = activeModelIds.filter(id => !publishedModelIds.has(id));
+  if (missingActive.length) problems.push(`${prefix} populated dataset is missing ${missingActive.length} active model(s): ${missingActive.join(', ')}`);
+
+  const newestDate = entries.map(([, run]) => run.date).filter(Boolean).sort().at(-1);
+  if (!newestDate) problems.push(`${prefix} published runs have no dates`);
+  else if (dataset.datasetDate !== badgeOf(newestDate)) problems.push(`${prefix} datasetDate ${JSON.stringify(dataset.datasetDate)} does not match newest run ${newestDate}`);
+
+  for (const [key, run] of entries) {
+    const runPrefix = `${prefix} ${key}`;
+    if (run.horizon !== horizon) problems.push(`${runPrefix}: horizon is ${JSON.stringify(run.horizon)}`);
+    const values = STATE_IDS.map(id => run.probabilities?.[id]);
+    if (values.some(value => !Number.isInteger(value) || value < 0 || value > 100)) problems.push(`${runPrefix}: probabilities must be integers 0-100`);
+    const sum = values.reduce((acc, value) => acc + (value || 0), 0);
+    if (sum !== 100) problems.push(`${runPrefix}: probabilities sum to ${sum}, not 100`);
+
+    for (const id of STATE_IDS) {
+      const band = run.range?.[id];
+      if (band && (run.probabilities[id] < band[0] || run.probabilities[id] > band[1])) {
+        problems.push(`${runPrefix}: S${id} published ${run.probabilities[id]}% outside its sample range ${band[0]}-${band[1]}%`);
+      }
+    }
+
+    // The exposure chart draws the five extinction-risk segments and labels the
+    // sum; the uncertainty beside it has to belong to that same number.
+    const drawn = EXPOSURE_IDS.reduce((acc, id) => acc + run.probabilities[id], 0);
+    const published = run.exposurePublished;
+    if (!published || !Number.isFinite(published.se)) problems.push(`${runPrefix}: exposurePublished.se missing`);
+    else if (published.value !== drawn) problems.push(`${runPrefix}: exposurePublished.value ${published.value} != drawn total ${drawn}`);
+  }
+
+  const medians = STATE_IDS.map(id => median(entries.map(([, run]) => run.probabilities[id])));
+  const total = medians.reduce((acc, value) => acc + value, 0);
+  const columns = STATE_IDS.map(id => entries.map(([, run]) => run.probabilities[id]).sort((a, b) => a - b));
+  const scaled = medians.map(value => (value / total) * 100);
+  const out = scaled.map(Math.floor);
+  const order = scaled.map((value, index) => [value - out[index], index]).sort((a, b) => b[0] - a[0]).map(([, index]) => index);
+  let given = 0;
+  const shortfall = 100 - out.reduce((acc, value) => acc + value, 0);
+  for (const bounds of [columns.map(column => quantile(column, 0.75)), columns.map(column => column.at(-1)), null]) {
+    if (given >= shortfall) break;
+    for (const index of order) {
+      if (given >= shortfall) break;
+      if (bounds && out[index] + 1 > bounds[index]) continue;
+      out[index] += 1; given += 1;
+    }
+  }
+  const aggregateSum = out.reduce((acc, value) => acc + value, 0);
+  if (aggregateSum !== 100) problems.push(`${prefix} headline aggregate normalises to ${aggregateSum}, not 100`);
+  for (const [index, id] of STATE_IDS.entries()) {
+    const column = columns[index];
+    const low = quantile(column, 0.25), high = quantile(column, 0.75);
+    if (out[index] < low || out[index] > high) {
+      problems.push(`${prefix} headline S${id} published ${out[index]}% outside the models' middle half ${low}-${high}%`);
     }
   }
 
-  // The exposure chart draws the five extinction-risk segments and labels the
-  // sum; the uncertainty beside it has to belong to that same number.
-  const drawn = EXPOSURE_IDS.reduce((a, id) => a + run.probabilities[id], 0);
-  const published = run.exposurePublished;
-  if (!published || !Number.isFinite(published.se)) problems.push(`${key}: exposurePublished.se missing`);
-  else if (published.value !== drawn) problems.push(`${key}: exposurePublished.value ${published.value} != drawn total ${drawn}`);
+  if (entries.length >= 2 && !timeline.length) problems.push(`${prefix} leaderHistory is empty despite ${entries.length} published models`);
+  if (timeline.length) {
+    const dates = timeline.map(entry => entry.date);
+    if (dates.some((date, index) => index && date <= dates[index - 1])) problems.push(`${prefix} leaderHistory dates are not in ascending order`);
+    const counts = timeline.map(entry => entry.models);
+    if (counts.some((count, index) => index && count < counts[index - 1])) problems.push(`${prefix} leaderHistory model count goes backwards`);
+    timeline.forEach((entry, index) => {
+      if (!STATE_IDS.includes(entry.stateId)) problems.push(`${prefix} leaderHistory ${entry.date} names ending ${entry.stateId}, which is not in the taxonomy`);
+      if (!Number.isInteger(entry.share) || entry.share < 0 || entry.share > 100) problems.push(`${prefix} leaderHistory ${entry.date} has invalid share ${entry.share}`);
+      if (!Number.isInteger(entry.models) || entry.models < 2 || entry.models > entries.length) problems.push(`${prefix} leaderHistory ${entry.date} has invalid model count ${entry.models}`);
+      const differs = index === 0 || timeline[index - 1].stateId !== entry.stateId;
+      if (entry.changed !== differs) problems.push(`${prefix} leaderHistory ${entry.date} is flagged changed=${entry.changed} but differs=${differs}`);
+    });
+    const latest = timeline.at(-1);
+    const leaderIndex = out.indexOf(Math.max(...out));
+    if (latest.stateId !== leaderIndex + 1) problems.push(`${prefix} leaderHistory ends on ending ${latest.stateId} but the aggregate leads with ${leaderIndex + 1}`);
+    if (latest.share !== out[leaderIndex]) problems.push(`${prefix} leaderHistory ends at ${latest.share}% but the aggregate leader is ${out[leaderIndex]}%`);
+    if (latest.models !== entries.length) problems.push(`${prefix} leaderHistory ends with ${latest.models} models but ${entries.length} are published`);
+    if (newestDate && latest.date !== newestDate) problems.push(`${prefix} leaderHistory ends on ${latest.date}, not newest run date ${newestDate}`);
+  }
+
+  return { runs: entries.length, timeline: timeline.length, total, aggregate: out };
 }
 
-// Coordinate-wise medians need not sum to 100, which is why the site
-// renormalizes them; this asserts the renormalization is still applied.
-const median = list => { const s = [...list].sort((a, b) => a - b); const n = s.length; return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2; };
-const medians = STATE_IDS.map(id => median(entries.map(([, run]) => run.probabilities[id])));
-const total = medians.reduce((a, c) => a + c, 0);
-const columns = STATE_IDS.map(id => entries.map(([, run]) => run.probabilities[id]).sort((a, b) => a - b));
-const quantile = (column, f) => { const k = (column.length - 1) * f, lo = Math.floor(k), hi = Math.ceil(k); return column[lo] + (column[hi] - column[lo]) * (k - lo); };
-const scaled = medians.map(v => (v / total) * 100);
-const out = scaled.map(Math.floor);
-const order = scaled.map((v, i) => [v - out[i], i]).sort((a, b) => b[0] - a[0]).map(([, i]) => i);
-let given = 0;
-const shortfall = 100 - out.reduce((a, c) => a + c, 0);
-for (const bounds of [columns.map(c => quantile(c, 0.75)), columns.map(c => c.at(-1)), null]) {
-  if (given >= shortfall) break;
-  for (const i of order) {
-    if (given >= shortfall) break;
-    if (bounds && out[i] + 1 > bounds[i]) continue;
-    out[i] += 1; given += 1;
-  }
-}
-if (out.reduce((a, c) => a + c, 0) !== 100) problems.push(`headline aggregate normalises to ${out.reduce((a, c) => a + c, 0)}, not 100`);
-for (const [i, id] of STATE_IDS.entries()) {
-  const column = entries.map(([, run]) => run.probabilities[id]).sort((a, b) => a - b);
-  const at = f => { const k = (column.length - 1) * f, lo = Math.floor(k), hi = Math.ceil(k); return column[lo] + (column[hi] - column[lo]) * (k - lo); };
-  if (out[i] < at(0.25) || out[i] > at(0.75)) {
-    problems.push(`headline S${id} published ${out[i]}% outside the models' middle half ${at(0.25)}-${at(0.75)}%`);
-  }
-}
-
-// The leader timeline is published data, so it is checked like the rest.
-if (leaderHistory.length) {
-  const dates = leaderHistory.map(h => h.date);
-  if (dates.some((d, i) => i && d <= dates[i - 1])) problems.push('leaderHistory dates are not in ascending order');
-  const counts = leaderHistory.map(h => h.models);
-  if (counts.some((n, i) => i && n < counts[i - 1])) problems.push('leaderHistory model count goes backwards');
-  leaderHistory.forEach((entry, i) => {
-    if (!states.some(s => s.id === entry.stateId)) problems.push(`leaderHistory ${entry.date} names ending ${entry.stateId}, which is not in the taxonomy`);
-    const differs = i === 0 || leaderHistory[i - 1].stateId !== entry.stateId;
-    if (entry.changed !== differs) problems.push(`leaderHistory ${entry.date} is flagged changed=${entry.changed} but differs=${differs}`);
-  });
-  const latest = leaderHistory.at(-1);
-  if (latest && latest.stateId !== out.indexOf(Math.max(...out)) + 1) {
-    problems.push(`leaderHistory ends on ending ${latest.stateId} but the aggregate leads with ${out.indexOf(Math.max(...out)) + 1}`);
-  }
-}
-
+const summaries = HORIZON_IDS.map(horizon => [horizon, validateDataset(horizon, datasets?.[horizon])]);
 if (problems.length) { problems.forEach(p => console.error('✗ ' + p)); process.exit(1); }
-console.log(`✓ ${entries.length} runs valid, ${leaderHistory.length} timeline entries — each sums to 100, sits inside its sample range, and carries an exposure error for the figure drawn`);
-console.log(`  headline aggregate: raw medians sum to ${total}, published as ${out.join(', ')}`);
+const totalRuns = summaries.reduce((sum, [, summary]) => sum + summary.runs, 0);
+const totalTimeline = summaries.reduce((sum, [, summary]) => sum + summary.timeline, 0);
+console.log(`✓ ${totalRuns} runs valid across ${HORIZON_IDS.length} horizons, ${totalTimeline} timeline entries — datasets are isolated and every published allocation sums to 100`);
+for (const [horizon, summary] of summaries) {
+  if (!summary.runs) console.log(`  ${horizon}: empty, ready for initial collection`);
+  else console.log(`  ${horizon}: ${summary.runs} runs; raw medians sum to ${summary.total}, published as ${summary.aggregate.join(', ')}`);
+}

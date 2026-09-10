@@ -4,21 +4,23 @@ Everything Machine Futures publishes, in formats that open in a spreadsheet with
 
 | File | One row per | What it holds |
 | --- | --- | --- |
-| `forecasts.csv` | model × ending | The published figure for every model on every ending, with the sample range and middle half behind it. |
-| `exposure.csv` | model | Extinction-risk exposure: the "humanity is gone" and "might perish" subtotals, their sum, and its bootstrap standard error. |
-| `rationales.csv` | model × ending | The reasoning each model gave, taken from the sample nearest its median. |
-| `samples.csv` | run × sample × ending | Every raw sample from every run, unaggregated. |
-| `quality.csv` | run | How each run went: samples kept, answers rejected as malformed, transient and quota errors, and the reject rate. |
+| `forecasts.csv` | horizon × model × ending | The published figure for every model on every ending, with the sample range and middle half behind it. |
+| `exposure.csv` | horizon × model | Extinction-risk exposure: the "humanity is gone" and "might perish" subtotals, their sum, and its bootstrap standard error. |
+| `rationales.csv` | horizon × model × ending | The reasoning each model gave, taken from the sample nearest its median. |
+| `samples.csv` | horizon × run × sample × ending | Every raw sample from every run, unaggregated. |
+| `quality.csv` | horizon × run | How each run went: samples kept, answers rejected as malformed, transient and quota errors, and the reject rate. |
 | `endings.csv` | ending | The taxonomy: the eleven end states, their families, and which carry extinction risk. |
-| `forecasts.json` | — | All of the above as one structured document. |
+| `forecasts.json` | — | All of the above as one structured document, grouped under `datasets` by horizon. |
 
 ## What the numbers mean
 
-Each model allocates exactly 100 whole percentage points across eleven mutually exclusive end states, twenty times, at its own default settings. The published figure per ending is the median across that model's samples, renormalized so the eleven still sum to 100.
+Each model allocates exactly 100 whole percentage points across eleven mutually exclusive states, twenty times per horizon, at its own default settings. The published figure per ending is the median across that model's samples, renormalized so the eleven still sum to 100.
 
-`probability_pct` is that published figure. `samples_min_pct` and `samples_max_pct` are the full spread across the model's samples; `middle_half_low_pct` and `middle_half_high_pct` are its quartiles. A gap between two models means little unless it clears the sampling error — see `bootstrap_standard_error` in `exposure.csv`.
+Every combined CSV begins with a `horizon` column. Its canonical values are `long-term`, `2030`, and `2040`; historical raw batches without a horizon belong to `long-term`. In `forecasts.json`, `default_horizon` names the default view, `horizons` carries display metadata, and each `datasets.<horizon>` object carries its own dataset date and models. Values from different horizons are never pooled.
 
-These questions never resolve. There is no right answer and no leaderboard: the numbers record what a model expresses and how that shifts as new models arrive.
+`probability_pct` is the published figure. `samples_min_pct` and `samples_max_pct` are the full spread across the model's samples; `middle_half_low_pct` and `middle_half_high_pct` are its quartiles. A gap between two models means little unless it clears the sampling error — see `bootstrap_standard_error` in `exposure.csv`.
+
+The long-term view asks about the durable year-3000 arrangement. The dated views use the same taxonomy for their named horizons. These are records of what models express, not a leaderboard, and they are separate from the retired 50-question 2030 benchmark in `archive/`.
 
 ## Answers that were thrown away
 
@@ -26,8 +28,8 @@ A model that returns a malformed allocation is re-asked until it returns a valid
 
 ## The full raw batches
 
-`runs/` in the repository root holds the complete batches: every sample, every rationale, the failures, the exact model id called, and a SHA-256 digest of the samples. Those files are the provenance; this folder is the convenient copy.
+`runs/` in the repository root holds the complete batches: every sample, every rationale, the failures, the target horizon, the exact model id called, and a SHA-256 digest of the samples. Legacy batches predate the explicit horizon field and imply `long-term`. Those files are the provenance; this folder is the convenient copy.
 
 ## Reuse
 
-The data is free to use with attribution to machinefutures.ai. The prompt that produced it is `public/end_states.md`, reproduced verbatim so anyone can run it and get their own numbers.
+The data is free to use with attribution to machinefutures.ai. The versioned prompts that produced it are `public/end_states.md`, `public/end_states_2030.md`, and `public/end_states_2040.md`, reproduced verbatim so anyone can run them and get their own numbers.

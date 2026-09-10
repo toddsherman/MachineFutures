@@ -8,22 +8,32 @@
 //   Jensen–Shannon   symmetric, bounded; √JSD is a true metric.
 //
 // The load-bearing question is not "do models differ" but "do they differ by
-// more than a single model differs from itself across samples". Five samples
-// per model give a noise floor to compare against.
+// more than a single model differs from itself across samples". Repeated
+// samples per model give a noise floor to compare against.
 //
-// Usage: node tools/analyse-agreement.mjs
+// Usage: node tools/analyse-agreement.mjs [--horizon long-term|2030|2040]
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { DEFAULT_HORIZON, HORIZON_IDS, horizonOfBatch, normalizeHorizon } from './horizons.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const IDS = Array.from({ length: 11 }, (_, i) => 'S' + (i + 1));
 const roster = JSON.parse(readFileSync(join(root, 'tools', 'models.json'), 'utf8')).models;
 const labelOf = new Map(roster.map(m => [m.model, m.label]));
+const args = process.argv.slice(2);
+const horizonIndex = args.indexOf('--horizon');
+const horizonArg = horizonIndex === -1 ? DEFAULT_HORIZON : args[horizonIndex + 1];
+const requestedHorizon = horizonIndex !== -1 && (!horizonArg || horizonArg.startsWith('--')) ? null : normalizeHorizon(horizonArg);
+if (!requestedHorizon) {
+  console.error(`✗ --horizon must be one of ${HORIZON_IDS.join(', ')}`);
+  process.exit(1);
+}
 
 const runs = readdirSync(join(root, 'runs')).filter(f => f.endsWith('.json'))
   .map(f => JSON.parse(readFileSync(join(root, 'runs', f), 'utf8')))
   .filter(b => b.prompt_family === 'end_states')
+  .filter(b => horizonOfBatch(b) === requestedHorizon)
   .map(b => ({
     id: b.model.api_string,
     label: labelOf.get(b.model.api_string) || b.model.name,
@@ -31,6 +41,11 @@ const runs = readdirSync(join(root, 'runs')).filter(f => f.endsWith('.json'))
     date: b.asked_on,
     samples: b.samples.map(s => IDS.map(id => s.answers[id].value / 100))
   }));
+if (!runs.length) {
+  console.error(`✗ no end-state batches found for horizon ${requestedHorizon}`);
+  process.exit(1);
+}
+console.log(`HORIZON — ${requestedHorizon}\n`);
 
 // runs/ accumulates history, so cross-model comparisons must use one run per
 // model — the newest — or a model gets compared against its own past self.
@@ -51,7 +66,7 @@ const entropy = p => -p.reduce((a, x) => x ? a + x * Math.log2(x) : a, 0);
 const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
 const fmt = n => n.toFixed(3);
 
-// --- 1. Self-consistency: how far apart are a model's own five samples? ---
+// --- 1. Self-consistency: how far apart are a model's own samples? ---
 const self = latest.map(r => {
   const d = [];
   for (let i = 0; i < r.samples.length; i++)
@@ -59,7 +74,7 @@ const self = latest.map(r => {
   return { ...r, centre: mean(r.samples), selfTV: avg(d), selfMax: Math.max(...d), entropy: entropy(mean(r.samples)) };
 }).sort((a, b) => a.selfTV - b.selfTV);
 
-console.log('SELF-CONSISTENCY — mean pairwise total variation between a model\'s own 5 samples');
+console.log('SELF-CONSISTENCY — mean pairwise total variation between a model\'s own samples');
 console.log('(0 = identical every time; higher = the model does not hold a stable view)\n');
 for (const r of self) console.log(`  ${fmt(r.selfTV)}  worst ${fmt(r.selfMax)}   ${r.label.padEnd(17)} ${r.provider}`);
 const noiseFloor = avg(self.map(r => r.selfTV));

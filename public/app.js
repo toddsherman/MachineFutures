@@ -923,11 +923,12 @@
     // is looking at. Anchoring only the first line below the sticky controls
     // can still move a card that occupies the rest of the screen.
     const readingLine = Math.min(innerHeight - 1, contentTop + (innerHeight - contentTop) / 2);
+
     const anchors = [];
     const add = (element, resolve, priority = 0) => {
       if (!element) return;
       const rect = element.getBoundingClientRect();
-      if (!rect.width || !rect.height || rect.bottom <= 0 || rect.top >= innerHeight) return;
+      if (!rect.width || !rect.height || rect.bottom <= contentTop || rect.top >= innerHeight) return;
       anchors.push({
         top: rect.top,
         bottom: rect.bottom,
@@ -947,19 +948,29 @@
       const id = row.dataset.state;
       add(row, () => $$('.matrix-row[data-state]').find(candidate => candidate.dataset.state === id));
     });
-    $$('.doomer-row[data-run-key]').forEach((row, index) => {
+    $$('.doomer-row').forEach((row, index) => {
       const key = row.dataset.runKey;
-      add(row, () => $$('.doomer-row[data-run-key]').find(candidate => candidate.dataset.runKey === key) || $$('.doomer-row')[index]);
+      const wasOpen = row.classList.contains('is-open');
+      add(row, () => {
+        const rows = $$('.doomer-row');
+        const positionRow = rows.length ? rows[Math.min(index, rows.length - 1)] : null;
+        // Exposure is a ranking, so a collapsed model is not a stable visual
+        // anchor: let models change rank inside a stationary chart. An open
+        // model is the exception because the reader explicitly revealed it.
+        // If a horizon has fewer models, clamp a vanished final rank to the
+        // new final rank instead of falling through to a broad section anchor.
+        return (wasOpen && rows.find(candidate => candidate.dataset.runKey === key)) || positionRow;
+      });
     });
     $$('.method-list > li').forEach((item, index) => add(item, () => $$('.method-list > li')[index]));
-    $$('.section-heading').forEach((heading, index) => add(heading, () => $$('.section-heading')[index], 1));
+    $$('.section-heading').forEach((heading, index) => add(heading, () => $$('.section-heading')[index]));
 
     [
       '.horizon-picker-copy', '.horizon-picker-rule', '.origin-tweet', '.origin-note',
       '.end-hero h1', '#forecast-summary', '.leader-title', '.leader-name',
       '.leader-unit', '.leader-timeline', '.leader-description', '.leader-method',
       '#end-forecast-title', '#forecast-note', '#end-forecast-toggle',
-      '#consensus-bar', '#consensus-legend', '.method-hero', '.footer-mark', '.footer-note'
+      '#consensus-bar', '#consensus-legend', '.doomer-key', '.method-hero', '.footer-mark', '.footer-note'
     ].forEach(selector => add($(selector), () => $(selector)));
 
     // Broad sections are fallbacks for whitespace between the smaller blocks.
@@ -1041,6 +1052,7 @@
     const leaderEl = $('#end-leader');
     clearTimeout(leaderEl._swap);
     leaderEl.classList.remove('is-swapping');
+    const openExposureKey = $('.doomer-row.is-open')?.dataset.runKey;
 
     const viewportHold = holdViewport(captureViewportPosition());
     const viewportToken = viewportHold.token;
@@ -1051,6 +1063,10 @@
     leaderSettled = false;
     settleCancelled = false;
     renderEndStates();
+    if (openExposureKey) {
+      const openExposure = $$('.doomer-row[data-run-key]').find(row => row.dataset.runKey === openExposureKey);
+      if (openExposure) setExposureOpen(openExposure, true);
+    }
     restoreViewportPosition(viewportPosition);
     updateUrl();
     revealOnView('.state-strip', { watch: '.strip-axis', threshold: 1 });

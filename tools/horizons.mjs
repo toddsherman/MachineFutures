@@ -19,8 +19,8 @@ export const HORIZON_IDS = Object.freeze(HORIZONS.map(horizon => horizon.id));
 
 export const HORIZON_RUN_CONFIG = Object.freeze({
   'long-term': Object.freeze({ promptFile: 'public/end_states.md', questionSet: 'end-states-v3', runSuffix: 'end-states' }),
-  '2030': Object.freeze({ promptFile: 'public/end_states_2030.md', questionSet: 'end-states-2030-v1', runSuffix: 'end-states-2030' }),
-  '2040': Object.freeze({ promptFile: 'public/end_states_2040.md', questionSet: 'end-states-2040-v1', runSuffix: 'end-states-2040' })
+  '2030': Object.freeze({ promptFile: 'public/end_states_2030.md', questionSet: 'end-states-2030-v2', runSuffix: 'end-states-2030' }),
+  '2040': Object.freeze({ promptFile: 'public/end_states_2040.md', questionSet: 'end-states-2040-v2', runSuffix: 'end-states-2040' })
 });
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',

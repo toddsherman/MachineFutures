@@ -34,7 +34,7 @@ import { readFileSync, writeFileSync, appendFileSync, renameSync, rmSync, mkdirS
 import { createHash, randomUUID } from 'node:crypto';
 import { join, dirname, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, HORIZON_RUN_CONFIG, normalizeHorizon, horizonOfBatch, renderHorizonPrompt } from './horizons.mjs';
+import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, HORIZON_RUN_CONFIG, normalizeHorizon, horizonOfBatch, renderHorizonPrompt, compareRunPreference } from './horizons.mjs';
 import { normalizeSweepPlan } from './check-sweep.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -172,6 +172,20 @@ function reserveBatchPath(dir, runId) {
     if (!existsSync(file)) return { file, runId: revisedId };
   }
   throw new Error(`more than 99 revisions of ${runId}`);
+}
+
+// A changed same-day instrument lands beside the old batch as __r2. Resumes
+// must inspect those immutable siblings too, or a completed revision would be
+// bought again merely because the incompatible v1 batch still owns the base
+// filename.
+function existingBatchPaths(dir, runId) {
+  const candidates = [];
+  for (let revision = 1; revision < 100; revision++) {
+    const candidateRunId = revision === 1 ? runId : `${runId}__r${revision}`;
+    const file = join(dir, `${candidateRunId}.json`);
+    if (existsSync(file)) candidates.push({ file, runId: candidateRunId });
+  }
+  return candidates;
 }
 
 // Lets the importer and tools/verify-runs.mjs detect a batch that was
@@ -353,42 +367,54 @@ async function elicit(model, prompt) {
   // model that finished short is carried forward rather than re-bought. The
   // checkpoint is deleted once a batch is written, so a short batch has no
   // checkpoint left and its own samples are the only thing to resume from.
-  const existingPath = join(OUT_DIR, `${runId}.json`);
+  let existingPath = join(OUT_DIR, `${runId}.json`);
+  let existingRunId = runId;
   let carried = [];
   let toppingUp = false;
-  if (!FORCE && existsSync(existingPath)) {
-    try {
-      const existing = JSON.parse(readFileSync(existingPath, 'utf8'));
-      const existingHorizon = horizonOfBatch(existing);
-      const sameInstrument = existingHorizon === HORIZON
-        && existing.question_set === QUESTION_SET
-        && existing.model?.api_string === model.model
-        && existing.track === 'closed_book'
-        && existing.harness?.prompt_file === HORIZON_CONFIG.promptFile
-        && existing.harness?.prompt_sha256 === promptSha256;
-      if (!sameInstrument) {
-        console.warn(`! ${model.key}: ${existingPath} belongs to a different model, horizon, or question set — writing a revision beside it`);
-      } else {
-        const have = (existing.samples || []).length;
-        if (have >= SAMPLES) {
-          console.log(`= ${model.key}: complete batch already on disk (${have} samples) — not re-asking`);
-          return { ok: true, reused: true, key: model.key, label: model.label, samples: have, target: SAMPLES, quota: null, failures: [] };
-        }
-        if (have) {
-          const reported = Array.isArray(existing.model?.self_reported_name)
-            ? existing.model.self_reported_name[0]
-            : existing.model?.self_reported_name;
-          carried = existing.samples.map((sample, index) => ({
-            ...sample,
-            sample: index + 1,
-            meta: sample.meta || { model: reported ?? null, cutoff: existing.model?.self_reported_cutoff ?? null, asOf: existing.asked_on ?? null }
-          }));
-          toppingUp = true;
-          console.log(`  ${model.key}: carrying ${have} sample(s) forward from the existing batch — buying ${SAMPLES - have} more`);
-        }
+  if (!FORCE) {
+    const existingPaths = existingBatchPaths(OUT_DIR, runId);
+    const finalized = [];
+    for (const candidate of existingPaths) {
+      try {
+        const batch = JSON.parse(readFileSync(candidate.file, 'utf8'));
+        const existingHorizon = horizonOfBatch(batch);
+        const sameInstrument = existingHorizon === HORIZON
+          && batch.run_id === candidate.runId
+          && batch.question_set === QUESTION_SET
+          && batch.model?.api_string === model.model
+          && batch.track === 'closed_book'
+          && batch.harness?.prompt_file === HORIZON_CONFIG.promptFile
+          && batch.harness?.prompt_sha256 === promptSha256;
+        if (sameInstrument) finalized.push({ ...candidate, batch });
+      } catch {
+        console.warn(`! ${model.key}: existing batch at ${candidate.file} is unreadable — leaving it untouched`);
       }
-    } catch {
-      console.warn(`! ${model.key}: existing batch at ${existingPath} is unreadable — writing a revision beside it`);
+    }
+
+    const selected = finalized.sort(compareRunPreference)[0];
+    if (selected) {
+      const existing = selected.batch;
+      existingPath = selected.file;
+      existingRunId = selected.runId;
+      const have = (existing.samples || []).length;
+      if (have >= SAMPLES) {
+        console.log(`= ${model.key}: complete batch already on disk (${have} samples) — not re-asking`);
+        return { ok: true, reused: true, key: model.key, label: model.label, samples: have, target: SAMPLES, quota: null, failures: [] };
+      }
+      if (have) {
+        const reported = Array.isArray(existing.model?.self_reported_name)
+          ? existing.model.self_reported_name[0]
+          : existing.model?.self_reported_name;
+        carried = existing.samples.map((sample, index) => ({
+          ...sample,
+          sample: index + 1,
+          meta: sample.meta || { model: reported ?? null, cutoff: existing.model?.self_reported_cutoff ?? null, asOf: existing.asked_on ?? null }
+        }));
+        toppingUp = true;
+        console.log(`  ${model.key}: carrying ${have} sample(s) forward from the existing batch — buying ${SAMPLES - have} more`);
+      }
+    } else if (existingPaths.length) {
+      console.warn(`! ${model.key}: existing same-day batch(es) belong to a different model, horizon, or question set — writing a revision beside them`);
     }
   }
 
@@ -473,7 +499,7 @@ async function elicit(model, prompt) {
   // self-report is kept alongside as data, clearly marked as a claim.
   const selfReported = [...new Set(samples.map(s => s.meta?.model).filter(Boolean))];
   const batch = {
-    run_id: runId,
+    run_id: toppingUp ? existingRunId : runId,
     prompt_family: 'end_states',
     horizon: HORIZON,
     target_year: TARGET_YEAR,
@@ -508,7 +534,7 @@ async function elicit(model, prompt) {
   mkdirSync(OUT_DIR, { recursive: true });
   // A top-up is a strict superset of the batch it grew from, so it replaces
   // that file rather than landing beside it as a revision.
-  const reserved = toppingUp ? { file: existingPath, runId: batch.run_id } : reserveBatchPath(OUT_DIR, batch.run_id);
+  const reserved = toppingUp ? { file: existingPath, runId: existingRunId } : reserveBatchPath(OUT_DIR, batch.run_id);
   if (reserved.runId !== batch.run_id) {
     console.warn(`! ${model.key}: ${batch.run_id}.json exists — writing revision ${reserved.runId} rather than replacing it`);
     batch.run_id = reserved.runId;

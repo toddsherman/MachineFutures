@@ -11,7 +11,7 @@ import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, compareRunPreference, horizonOfBatch } from './horizons.mjs';
+import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, HORIZON_RUN_CONFIG, compareRunPreference, horizonOfBatch } from './horizons.mjs';
 import { renormalizeAllocation } from './allocations.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -137,6 +137,7 @@ const stripProvider = name => String(name || 'unknown').replace(/\s*\((?:OpenAI|
 const files = readdirSync(runsDir).filter(f => f.endsWith('.json')).sort();
 const endStateBatches = [];
 const rawEndStateBatches = [];
+const outdatedBatches = [];
 const problems = [];
 
 for (const file of files) {
@@ -171,6 +172,15 @@ for (const file of files) {
       return values.reduce((a, c) => a + c, 0) !== 100;
     });
     if (badSample !== -1) { problems.push(`${file}: sample ${badSample} is not eleven integers summing to 100`); continue; }
+    const questionSet = batch.question_set || null;
+    const currentQuestionSet = HORIZON_RUN_CONFIG[horizon].questionSet;
+    // Raw v1 snapshot runs remain in runs/ as provenance, but they measured a
+    // materially different instrument. Never blend them into a v2 board or
+    // replay them as if the dated taxonomy had not changed.
+    if (questionSet !== currentQuestionSet) {
+      outdatedBatches.push({ file, horizon, questionSet, currentQuestionSet });
+      continue;
+    }
     const medians = STATE_IDS.map(id => batch.aggregate[id].median);
     const quartiles = Object.fromEntries(STATE_IDS.map((id, i) => [i + 1, quartilesFor(batch.samples || [], id)]).filter(([, q]) => q));
     const probs = renormalizeAllocation(
@@ -179,7 +189,10 @@ for (const file of files) {
       STATE_IDS.map((id, i) => quartiles[i + 1] || null)
     );
     if (probs.reduce((a, c) => a + c, 0) !== 100) { problems.push(`${file}: renormalized probabilities sum to ${probs.reduce((a, c) => a + c, 0)}, not 100`); continue; }
-    rawEndStateBatches.push({ file, run_id: batch.run_id, asked_on: batch.asked_on, runKey: runKeyOf(batch), horizon, samples: batch.samples || [] });
+    rawEndStateBatches.push({
+      file, run_id: batch.run_id, asked_on: batch.asked_on, runKey: runKeyOf(batch), horizon,
+      questionSet, promptSha256: batch.harness?.prompt_sha256 || null, samples: batch.samples || []
+    });
     endStateBatches.push({
       file,
       runKey: runKeyOf(batch),
@@ -187,6 +200,8 @@ for (const file of files) {
       provider,
       model: stripProvider(batch.model?.name),
       date: batch.asked_on,
+      questionSet,
+      promptSha256: batch.harness?.prompt_sha256 || null,
       promptVersion: Number((batch.question_set || '').match(/end-states(?:-(?:2030|2040))?-v(\d+)/)?.[1]) || null,
       knowledgeCutoff: batch.model?.self_reported_cutoff || null,
       sampleCount: sampleList.length,
@@ -240,7 +255,7 @@ for (const [, batches] of byModel) {
 if (problems.length) { problems.forEach(p => console.error('✗ ' + p)); process.exit(1); }
 const emitEndState = (b, pad = indent) => `${pad}${JSON.stringify(b.runKey)}: {
 ${pad}  provider: ${JSON.stringify(b.provider)}, model: ${JSON.stringify(b.displayLabel)}, label: ${JSON.stringify(b.displayLabel)}, shortLabel: ${JSON.stringify(b.short)},
-${pad}  horizon: ${JSON.stringify(b.horizon)}, promptVersion: ${JSON.stringify(b.promptVersion)}, date: ${JSON.stringify(b.date)}, knowledgeCutoff: ${JSON.stringify(b.knowledgeCutoff)},
+${pad}  horizon: ${JSON.stringify(b.horizon)}, questionSet: ${JSON.stringify(b.questionSet)}, promptSha256: ${JSON.stringify(b.promptSha256)}, promptVersion: ${JSON.stringify(b.promptVersion)}, date: ${JSON.stringify(b.date)}, knowledgeCutoff: ${JSON.stringify(b.knowledgeCutoff)},
 ${pad}  sampleCount: ${b.sampleCount}, source: ${JSON.stringify('runs/' + b.file)},
 ${pad}  probabilities: { ${Object.entries(b.probabilities).map(([id, p]) => `${id}: ${p}`).join(', ')} },
 ${pad}  range: { ${Object.entries(b.range).map(([id, r]) => `${id}: [${r[0]}, ${r[1]}]`).join(', ')} },
@@ -325,7 +340,7 @@ data = data.replace(endStateMarker, `$1  ${generatedBlock}$2`);
 data = data.replace(/\n\s*const endStateRuns = importedEndStateRuns;\s*\n\s*const datasetDate = '[^']*';\s*\n/, '\n');
 const assignment = /window\.MF_DATA\s*=\s*\{[^;]*\};/;
 if (!assignment.test(data)) { console.error('✗ window.MF_DATA assignment not found in public/data.js'); process.exit(1); }
-data = data.replace(assignment, 'window.MF_DATA = { states, defaultHorizon, horizons, datasets };');
+data = data.replace(assignment, 'window.MF_DATA = { states, statesByHorizon, defaultHorizon, horizons, datasets };');
 writeFileSync(dataPath, data);
 
 const endStateEntries = Object.values(entriesByHorizon).flat();
@@ -334,3 +349,6 @@ endStateEntries.forEach(b => {
   const sum = Object.values(b.probabilities).reduce((a, c) => a + c, 0);
   console.log(`  ${b.horizon}: ${b.provider} / ${b.displayLabel} [${b.runKey}] — ${b.date}, ${b.sampleCount} samples, prompt v${b.promptVersion}, sum ${sum}`);
 });
+if (outdatedBatches.length) {
+  console.log(`  Preserved ${outdatedBatches.length} superseded raw batch(es) without publishing them.`);
+}

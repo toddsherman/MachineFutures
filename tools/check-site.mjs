@@ -10,7 +10,7 @@
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS } from './horizons.mjs';
+import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, HORIZON_RUN_CONFIG, renderHorizonPrompt } from './horizons.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const roster = JSON.parse(readFileSync(join(root, 'tools', 'models.json'), 'utf8')).models;
@@ -18,7 +18,7 @@ const activeModelIds = roster.filter(model => (model.status || 'active') === 'ac
 const shim = {};
 new Function('window', readFileSync(join(root, 'public', 'data.js'), 'utf8'))(shim);
 if (!shim.MF_DATA) { console.error('✗ public/data.js did not publish window.MF_DATA'); process.exit(1); }
-const { defaultHorizon, horizons, datasets, states } = shim.MF_DATA;
+const { defaultHorizon, horizons, datasets, states, statesByHorizon } = shim.MF_DATA;
 const STATE_IDS = Array.from({ length: 11 }, (_, i) => i + 1);
 const EXPOSURE_IDS = [1, 2, 3, 4, 5];
 const problems = [];
@@ -50,6 +50,46 @@ for (const id of datasetIds) if (!HORIZON_IDS.includes(id)) problems.push(`datas
 
 const stateIds = Array.isArray(states) ? states.map(state => state?.id) : [];
 if (JSON.stringify(stateIds) !== JSON.stringify(STATE_IDS)) problems.push('states must contain canonical ids 1 through 11 in order');
+
+const publicTaxonomy = list => (list || []).map(({ id, name, family, description }) => ({ id, name, family, description }));
+const promptTaxonomy = horizon => {
+  const file = HORIZON_RUN_CONFIG[horizon].promptFile;
+  const source = readFileSync(join(root, file), 'utf8');
+  const prompt = source.match(/^--- PROMPT BEGINS ---$([\s\S]*?)^--- PROMPT ENDS ---$/m)?.[1] || '';
+  return [...prompt.matchAll(/^### (\d+)\. (.+?)(?: [⧖⚠])?\n\n\*\*Family:\*\* (.+)\n\n([\s\S]*?)(?=\n\n### |\s*$)/gm)]
+    .map(match => ({ id: Number(match[1]), name: match[2], family: match[3], description: match[4].trim() }));
+};
+
+if (!statesByHorizon || typeof statesByHorizon !== 'object' || Array.isArray(statesByHorizon)) {
+  problems.push('statesByHorizon must be an object');
+} else {
+  const taxonomyIds = Object.keys(statesByHorizon);
+  for (const id of HORIZON_IDS) if (!taxonomyIds.includes(id)) problems.push(`statesByHorizon is missing horizon ${id}`);
+  for (const id of taxonomyIds) if (!HORIZON_IDS.includes(id)) problems.push(`statesByHorizon contains unsupported horizon ${id}`);
+  if (statesByHorizon[DEFAULT_HORIZON] !== states) problems.push('statesByHorizon long-term must preserve the base states array');
+  for (const horizon of HORIZON_IDS) {
+    const taxonomy = statesByHorizon[horizon];
+    if (!Array.isArray(taxonomy) || JSON.stringify(taxonomy.map(state => state?.id)) !== JSON.stringify(STATE_IDS)) {
+      problems.push(`statesByHorizon ${horizon} must contain canonical ids 1 through 11 in order`);
+      continue;
+    }
+    taxonomy.forEach((state, index) => {
+      const base = states[index];
+      for (const field of ['id', 'name', 'color', 'extinction']) {
+        if (state[field] !== base[field]) problems.push(`statesByHorizon ${horizon} changes invariant ${field} for S${index + 1}`);
+      }
+      if (!String(state.family || '').trim()) problems.push(`statesByHorizon ${horizon} S${index + 1} has no family`);
+      if (!String(state.description || '').trim()) problems.push(`statesByHorizon ${horizon} S${index + 1} has no description`);
+    });
+    const inPrompt = promptTaxonomy(horizon);
+    if (JSON.stringify(publicTaxonomy(taxonomy)) !== JSON.stringify(inPrompt)) {
+      problems.push(`statesByHorizon ${horizon} does not match the taxonomy in ${HORIZON_RUN_CONFIG[horizon].promptFile}`);
+    }
+  }
+  if (JSON.stringify(publicTaxonomy(statesByHorizon['2030'])) !== JSON.stringify(publicTaxonomy(statesByHorizon['2040']))) {
+    problems.push('2030 and 2040 snapshot taxonomies must use the same copy');
+  }
+}
 
 // Coordinate-wise medians need not sum to 100, which is why the site
 // renormalizes them. Run the same assertion independently for each horizon.
@@ -91,6 +131,20 @@ function validateDataset(horizon, dataset) {
   for (const [key, run] of entries) {
     const runPrefix = `${prefix} ${key}`;
     if (run.horizon !== horizon) problems.push(`${runPrefix}: horizon is ${JSON.stringify(run.horizon)}`);
+    if (run.questionSet !== HORIZON_RUN_CONFIG[horizon].questionSet) {
+      problems.push(`${runPrefix}: questionSet is ${JSON.stringify(run.questionSet)}, expected ${HORIZON_RUN_CONFIG[horizon].questionSet}`);
+    }
+    if (horizon !== DEFAULT_HORIZON && !/^[a-f0-9]{64}$/.test(run.promptSha256 || '')) {
+      problems.push(`${runPrefix}: current snapshot run has no promptSha256`);
+    }
+    if (run.promptSha256) {
+      try {
+        const expectedPromptHash = renderHorizonPrompt(root, horizon, run.date).identity.prompt_sha256;
+        if (run.promptSha256 !== expectedPromptHash) problems.push(`${runPrefix}: promptSha256 does not match the current dated prompt`);
+      } catch (error) {
+        problems.push(`${runPrefix}: cannot verify promptSha256 (${error.message})`);
+      }
+    }
     const values = STATE_IDS.map(id => run.probabilities?.[id]);
     if (values.some(value => !Number.isInteger(value) || value < 0 || value > 100)) problems.push(`${runPrefix}: probabilities must be integers 0-100`);
     const sum = values.reduce((acc, value) => acc + (value || 0), 0);

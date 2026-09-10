@@ -574,10 +574,11 @@
         ${doomerEntries.map((entry, index) => {
           const total = entry.sums.total;
           const parts = exposureStates.map(state => ({ state, value: stateValue(entry, state) }));
-          // The readout only exists on hover, so the same breakdown goes in the
-          // bar's label — a screen reader never has a pointer to hover with.
+          // The visual breakdown is collapsed by default, so the same values
+          // go in the interactive row's name for non-visual readers.
           const spoken = parts.map(({ state, value }) => `${esc(state.name)} ${value}%`).join(', ');
-          return `<div class="doomer-row" style="--r:${index}">
+          const readoutId = `doomer-readout-${index}`;
+          return `<div class="doomer-row" style="--r:${index}" role="button" tabindex="0" aria-expanded="false" aria-controls="${readoutId}" aria-label="${esc(entry.label)}: ${entry.sums.gone}% humanity is gone, ${entry.sums.risk}% might perish. ${spoken}. Activate to show or hide the five ending values.">
           <div class="doomer-label">${labLogo(entry.provider, 'in-row')}<b>${esc(entry.label)}</b><small>${esc(entry.provider)}</small></div>
           <div class="doomer-meter">
             <div class="doomer-bar" role="img" aria-label="${esc(entry.label)}: ${entry.sums.gone}% humanity is gone, ${entry.sums.risk}% might perish. ${spoken}">
@@ -591,7 +592,7 @@
                   .map(([tier, value]) => `<i class="${tier}" style="width:${value}%"><span>${value}%</span></i>`).join('')
               }</div>
             </div>
-            <div class="doomer-readout">${
+            <div class="doomer-readout" id="${readoutId}">${
               parts.map(({ state, value }) => `<span><i style="background:${state.color}"></i>${state.id}. ${esc(state.name)} <b>${value}%</b></span>`).join('')
             }</div>
           </div>
@@ -600,6 +601,30 @@
         }).join('')}
       </div>
 `;
+    requestAnimationFrame(fitDoomerTierLabels);
+  }
+
+  // A percentage belongs inside a tier only when its complete text fits.
+  // Recheck after every horizon render and viewport change because the same
+  // value has very different room on a phone and a desktop.
+  function fitDoomerTierLabels() {
+    $$('.doomer-tiers > i').forEach(tier => {
+      const label = tier.querySelector('span');
+      if (!label) return;
+      const needed = label.getBoundingClientRect().width + 2;
+      tier.classList.toggle('is-label-hidden', needed > tier.clientWidth);
+    });
+  }
+
+  function setExposureOpen(row, open) {
+    row.classList.toggle('is-open', open);
+    row.setAttribute('aria-expanded', String(open));
+  }
+
+  function toggleExposureRow(row) {
+    const open = row.getAttribute('aria-expanded') !== 'true';
+    $$('.doomer-row.is-open').forEach(other => setExposureOpen(other, false));
+    setExposureOpen(row, open);
   }
 
   function applyForecast({ animate }) {
@@ -924,14 +949,11 @@
       return;
     }
 
-    // Touch has no hover, so a tap holds the composition open instead. Only
-    // one at a time: the readouts overhang the rows beneath them, and several
-    // open at once would stack on top of each other.
+    // Touch has no hover, so a tap holds the composition open instead. Keep
+    // only one disclosure open at a time so the long ranking stays scannable.
     const exposureRow = event.target.closest('.doomer-row');
     if (exposureRow) {
-      const wasOpen = exposureRow.classList.contains('is-open');
-      $$('.doomer-row.is-open').forEach(row => row.classList.remove('is-open'));
-      exposureRow.classList.toggle('is-open', !wasOpen);
+      toggleExposureRow(exposureRow);
       return;
     }
 
@@ -945,6 +967,12 @@
     stopSweep();
     if (event.key === 'Escape') hideMarkTip();
     if (event.key !== 'Enter' && event.key !== ' ') return;
+    const exposureRow = event.target.closest?.('.doomer-row');
+    if (exposureRow) {
+      event.preventDefault();
+      toggleExposureRow(exposureRow);
+      return;
+    }
     const card = event.target.closest?.('.state-card[data-state]');
     if (!card) return;
     event.preventDefault();
@@ -1033,4 +1061,10 @@
   revealOnView('.state-strip', { watch: '.strip-axis', threshold: 1 });
   revealOnView('.matrix', { threshold: 0.12 });
   revealOnView('.doomer-list', { threshold: 0.15, delay: 500 });
+
+  let doomerLabelFrame;
+  window.addEventListener('resize', () => {
+    cancelAnimationFrame(doomerLabelFrame);
+    doomerLabelFrame = requestAnimationFrame(fitDoomerTierLabels);
+  });
 })();

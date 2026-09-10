@@ -15,7 +15,7 @@ export default defineConfig({
   use: { baseURL: 'http://127.0.0.1:4173', trace: 'retain-on-failure' },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
-    { name: 'phone', use: { ...devices['iPhone 13'] } },
+    { name: 'phone', use: { ...devices['iPhone 13'], browserName: 'webkit' } },
     { name: 'narrow', use: { ...devices['Desktop Chrome'], viewport: { width: 320, height: 700 } } }
   ],
   webServer: {

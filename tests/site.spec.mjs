@@ -213,6 +213,150 @@ test.describe('forecast horizons', () => {
   });
 });
 
+test.describe('the 2030 exposure chart on a phone', () => {
+  test.beforeEach(async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name === 'desktop', 'mobile regression coverage');
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await settle(page, '/?horizon=2030');
+  });
+
+  test('the state colours end exactly where their aggregate tiers end', async ({ page }) => {
+    // Padding on each state once made the five-colour layer longer than the
+    // two-tier layer. Checking the painted endpoints catches any box-model
+    // inflation without coupling the test to a particular CSS implementation.
+    const mismatches = await page.evaluate(() => [...document.querySelectorAll('.doomer-row')]
+      .map(row => {
+        const endpoint = selector => {
+          const layer = row.querySelector(selector);
+          const painted = [...layer.children].filter(segment => segment.getBoundingClientRect().width > 0.01);
+          return painted.at(-1)?.getBoundingClientRect().right ?? layer.getBoundingClientRect().left;
+        };
+        const stateEnd = endpoint('.doomer-stack');
+        const tierEnd = endpoint('.doomer-tiers');
+        return {
+          model: row.querySelector('.doomer-label b').textContent.trim(),
+          delta: Math.abs(stateEnd - tierEnd)
+        };
+      })
+      .filter(({ delta }) => delta > 1)
+      .map(({ model, delta }) => `${model}: endpoints differ by ${delta.toFixed(2)}px`));
+    expect(mismatches).toEqual([]);
+    const exposedWhileCollapsed = await page.locator('.doomer-stack').evaluateAll(layers =>
+      layers.filter(layer => parseFloat(getComputedStyle(layer).opacity) > 0).length);
+    expect(exposedWhileCollapsed, 'a collapsed row can leak state colour past a tier boundary').toBe(0);
+  });
+
+  test('a tier percentage is either wholly visible or intentionally hidden', async ({ page }) => {
+    // A narrow 3% or 4% tier used to clip its figure down to a stray "%".
+    // Omitted, hidden, and visually-hidden labels are valid; a painted label
+    // must fit completely inside the segment that owns it.
+    const clipped = await page.evaluate(() => [...document.querySelectorAll('.doomer-tiers > i')]
+      .flatMap(segment => {
+        const label = segment.querySelector('span');
+        if (!label) return [];
+        const style = getComputedStyle(label);
+        const intentionallyHidden = label.hidden
+          || label.getAttribute('aria-hidden') === 'true'
+          || label.classList.contains('sr-only')
+          || style.display === 'none'
+          || style.visibility === 'hidden'
+          || parseFloat(style.opacity) === 0
+          || label.getClientRects().length === 0;
+        if (intentionallyHidden) return [];
+        const outer = segment.getBoundingClientRect();
+        const inner = label.getBoundingClientRect();
+        const fits = inner.left >= outer.left - 0.5
+          && inner.right <= outer.right + 0.5
+          && inner.top >= outer.top - 0.5
+          && inner.bottom <= outer.bottom + 0.5;
+        if (fits) return [];
+        const model = segment.closest('.doomer-row').querySelector('.doomer-label b').textContent.trim();
+        return [`${model}: ${label.textContent.trim()} is only partly inside its tier`];
+      }));
+    expect(clipped).toEqual([]);
+  });
+
+  test('opening a breakdown makes room before the next model', async ({ page }) => {
+    const first = page.locator('.doomer-row').first();
+    const next = page.locator('.doomer-row').nth(1);
+    await first.click();
+    const readout = first.locator('.doomer-readout');
+    await expect(readout).toBeVisible();
+    const geometry = await page.evaluate(() => {
+      const rows = document.querySelectorAll('.doomer-row');
+      const detail = rows[0].querySelector('.doomer-readout').getBoundingClientRect();
+      const following = rows[1].getBoundingClientRect();
+      return { detailBottom: detail.bottom, nextTop: following.top };
+    });
+    expect(geometry.detailBottom, 'the open breakdown overlaps the following model').toBeLessThanOrEqual(geometry.nextTop + 0.5);
+    await expect(next).toBeVisible();
+  });
+
+  test('the legend preserves its swatches and gives the hint a separate row', async ({ page }) => {
+    const layout = await page.evaluate(() => {
+      const key = document.querySelector('.doomer-key');
+      const gone = key.querySelector('.key-gone').getBoundingClientRect();
+      const risk = key.querySelector('.key-risk').getBoundingClientRect();
+      const hint = key.querySelector('.key-hint').getBoundingClientRect();
+      const swatches = [...key.querySelectorAll(':scope > span > i')].map(i => i.getBoundingClientRect().width);
+      return {
+        display: getComputedStyle(key).display,
+        hintTop: hint.top,
+        keyBottom: Math.max(gone.bottom, risk.bottom),
+        swatches
+      };
+    });
+    expect(layout.display).toBe('grid');
+    expect(layout.hintTop, 'the interaction hint is squeezed beside the two keys').toBeGreaterThanOrEqual(layout.keyBottom - 0.5);
+    expect(Math.min(...layout.swatches), 'a legend swatch shrank below its intended size').toBeGreaterThanOrEqual(9.5);
+  });
+
+  test('the global horizon picker precedes the origin and fits above the fold', async ({ page }) => {
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const placement = await page.evaluate(() => {
+      const picker = document.querySelector('.horizon-picker');
+      const origin = document.querySelector('.origin');
+      const p = picker.getBoundingClientRect();
+      const o = origin.getBoundingClientRect();
+      return {
+        domBeforeOrigin: Boolean(picker.compareDocumentPosition(origin) & Node.DOCUMENT_POSITION_FOLLOWING),
+        visuallyBeforeOrigin: p.bottom <= o.top + 1,
+        top: p.top,
+        bottom: p.bottom,
+        viewportHeight: innerHeight,
+        viewportWidth: innerWidth
+      };
+    });
+    expect(placement.viewportWidth).toBeGreaterThanOrEqual(320);
+    expect(placement.viewportWidth).toBeLessThanOrEqual(390);
+    expect(placement.domBeforeOrigin, 'the picker follows the origin in reading order').toBe(true);
+    expect(placement.visuallyBeforeOrigin, 'the picker is painted below the origin').toBe(true);
+    expect(placement.top, 'the picker starts above the viewport').toBeGreaterThanOrEqual(-0.5);
+    expect(placement.bottom, 'the picker falls below the initial viewport').toBeLessThanOrEqual(placement.viewportHeight + 0.5);
+  });
+
+  test('an exposure row works from the keyboard and reflects its state', async ({ page }) => {
+    const row = page.locator('.doomer-row').first();
+    const semantics = await row.evaluate(el => ({
+      button: el.matches('button') || el.getAttribute('role') === 'button',
+      tabIndex: el.tabIndex
+    }));
+    expect(semantics.button, 'the interactive row has no button semantics').toBe(true);
+    expect(semantics.tabIndex, 'the interactive row is not in the tab order').toBeGreaterThanOrEqual(0);
+    await expect(row).toHaveAttribute('aria-expanded', 'false');
+
+    await row.focus();
+    await expect(row).toBeFocused();
+    await row.press('Enter');
+    await expect(row).toHaveAttribute('aria-expanded', 'true');
+    await expect(row).toHaveClass(/\bis-open\b/);
+
+    await row.press('Space');
+    await expect(row).toHaveAttribute('aria-expanded', 'false');
+    await expect(row).not.toHaveClass(/\bis-open\b/);
+  });
+});
+
 test.describe('every model view', () => {
   test('each strip agrees with its own numbers', async ({ page }) => {
     await settle(page);

@@ -1050,9 +1050,11 @@
     revealOnView('.matrix', { threshold: 0.12 });
     revealOnView('.doomer-list', { threshold: 0.15, delay: 500 });
     requestAnimationFrame(() => {
+      if (viewportToken !== viewportRestoreToken) return;
       $$('.horizon-button[data-horizon]').find(button => button.dataset.horizon === activeHorizon)?.focus({ preventScroll: true });
       restoreViewportPosition(viewportPosition);
       requestAnimationFrame(() => {
+        if (viewportToken !== viewportRestoreToken) return;
         restoreViewportPosition(viewportPosition);
         releaseViewport(viewportToken);
       });

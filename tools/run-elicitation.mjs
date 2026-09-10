@@ -2,9 +2,9 @@
 // Automated end-state elicitation harness.
 //
 // For each model in tools/models.json whose API key is present in the
-// environment: sends the end-state prompt (extracted verbatim from
-// public/end_states.md between the PROMPT BEGINS/ENDS delimiters, with
-// {{RUN_DATE}} substituted), collects 5 samples at provider-default
+// environment: sends the selected horizon's end-state prompt (extracted
+// verbatim between the PROMPT BEGINS/ENDS delimiters, with
+// {{RUN_DATE}} substituted), collects 20 samples at provider-default
 // sampling settings with no tools, validates each against the taxonomy
 // rules, and writes one batch JSON per model into runs/ — the same
 // format forecast-ingest_1.html exports, so tools/import-runs.mjs and
@@ -12,8 +12,8 @@
 //
 // Usage:
 //   node tools/run-elicitation.mjs [--models anthropic,google] [--tier frontier]
-//                                  [--samples 5] [--out runs] [--date YYYY-MM-DD]
-//                                  [--mock]
+//                                  [--samples 20] [--out runs] [--date YYYY-MM-DD]
+//                                  [--horizon long-term|2030|2040] [--mock]
 //   node tools/run-elicitation.mjs --check    # verify keys + model ids, ~1 cheap
 //                                             # call per model, writes nothing
 //   node tools/run-elicitation.mjs --list     # list every model each provider
@@ -34,6 +34,8 @@ import { readFileSync, writeFileSync, appendFileSync, renameSync, rmSync, mkdirS
 import { createHash, randomUUID } from 'node:crypto';
 import { join, dirname, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, HORIZON_RUN_CONFIG, normalizeHorizon, horizonOfBatch, renderHorizonPrompt } from './horizons.mjs';
+import { normalizeSweepPlan } from './check-sweep.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -64,20 +66,54 @@ const SAMPLES = (() => {
 // real batch with fabricated samples, and the importer would publish them.
 const outArg = argValue('--out') || (MOCK ? join('runs', '.mock') : 'runs');
 const OUT_DIR = isAbsolute(outArg) ? outArg : join(root, outArg);
-const RUN_DATE = argValue('--date') || new Date().toISOString().slice(0, 10);
+const dateArg = argValue('--date');
+if (args.includes('--date') && !dateArg) {
+  console.error('✗ --date needs an ISO date in YYYY-MM-DD form');
+  process.exit(1);
+}
+const RUN_DATE = dateArg || new Date().toISOString().slice(0, 10);
+const parsedRunDate = new Date(`${RUN_DATE}T00:00:00Z`);
+if (!/^\d{4}-\d{2}-\d{2}$/.test(RUN_DATE)
+  || Number.isNaN(parsedRunDate.valueOf())
+  || parsedRunDate.toISOString().slice(0, 10) !== RUN_DATE) {
+  console.error(`✗ --date must be a real ISO date in YYYY-MM-DD form, received ${JSON.stringify(dateArg)}`);
+  process.exit(1);
+}
 const ONLY = argValue('--models')?.split(',').map(s => s.trim()).filter(Boolean) || null;
 const TIER = argValue('--tier');
 const FORCE = args.includes('--force');
-const QUESTION_SET = 'end-states-v3';
+const horizonArg = argValue('--horizon');
+if (args.includes('--horizon') && !horizonArg) {
+  console.error(`✗ --horizon needs one of: ${HORIZON_IDS.join(', ')}`);
+  process.exit(1);
+}
+const HORIZON = normalizeHorizon(horizonArg || DEFAULT_HORIZON);
+if (!HORIZON) {
+  console.error(`✗ --horizon must be one of ${HORIZON_IDS.join(', ')}; received ${JSON.stringify(horizonArg)}`);
+  process.exit(1);
+}
+const HORIZON_CONFIG = HORIZON_RUN_CONFIG[HORIZON];
+const TARGET_YEAR = HORIZONS.find(candidate => candidate.id === HORIZON).targetYear;
+const QUESTION_SET = HORIZON_CONFIG.questionSet;
 // A reasoning model can legitimately take minutes; a stalled connection can
 // take forever. Timed out requests are retried like any other failure.
 const REQUEST_TIMEOUT_MS = 5 * 60 * 1000;
 const HTTP_TRIES = 4;
-// One provider having a bad hour must not consume the job's whole budget and
-// take the models after it down with it. Raise it with --budget-minutes for
-// the slow reasoning models: DeepSeek and Kimi both need well over an hour
-// for twenty samples.
-const MODEL_BUDGET_MS = Number(argValue('--budget-minutes') || 45) * 60 * 1000;
+// One provider having a bad hour must not consume the job's whole budget. The
+// workflow runs one model per job and several horizons in sequence, so this is
+// a per-model, per-horizon limit. DeepSeek and Kimi have both needed well over
+// an hour for twenty samples.
+const budgetArg = argValue('--budget-minutes');
+if (args.includes('--budget-minutes') && (budgetArg === undefined || budgetArg === null || budgetArg === '')) {
+  console.error('✗ --budget-minutes needs a number from 1 to 240');
+  process.exit(1);
+}
+const MODEL_BUDGET_MINUTES = Number(budgetArg || 90);
+if (!Number.isFinite(MODEL_BUDGET_MINUTES) || MODEL_BUDGET_MINUTES < 1 || MODEL_BUDGET_MINUTES > 240) {
+  console.error(`✗ --budget-minutes must be a number from 1 to 240, received ${JSON.stringify(budgetArg)}`);
+  process.exit(1);
+}
+const MODEL_BUDGET_MS = MODEL_BUDGET_MINUTES * 60 * 1000;
 // Samples resume from here if a run dies partway, so a re-dispatch pays for
 // the shortfall instead of the whole model again.
 const PARTIAL_DIR = join(OUT_DIR, '.partial');
@@ -165,14 +201,7 @@ const isCandidate = id => !NOISE.test(id) && !SUBTIER.test(id) && !SNAPSHOT.test
 
 /* ---------- prompt ---------- */
 function buildPrompt() {
-  const doc = readFileSync(join(root, 'public', 'end_states.md'), 'utf8');
-  const match = doc.match(/^--- PROMPT BEGINS ---$([\s\S]*?)^--- PROMPT ENDS ---$/m);
-  if (!match) throw new Error('PROMPT BEGINS/ENDS delimiters not found in public/end_states.md');
-  const [y, m, d] = RUN_DATE.split('-').map(Number);
-  const longDate = new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'long', day: 'numeric' });
-  const prompt = match[1].trim().replaceAll('{{RUN_DATE}}', longDate);
-  if (prompt.includes('{{')) throw new Error('Unsubstituted placeholder left in prompt');
-  return prompt;
+  return renderHorizonPrompt(root, HORIZON, RUN_DATE).prompt;
 }
 
 /* ---------- provider adapters (raw HTTP, zero dependencies) ---------- */
@@ -282,7 +311,7 @@ function appendSample(path, sample) {
   appendFileSync(path, JSON.stringify(sample) + '\n');
 }
 
-function resumeSamples(path, model) {
+function resumeSamples(path, model, promptSha256) {
   if (!existsSync(path)) return [];
   const kept = [];
   const lines = readFileSync(path, 'utf8').split('\n').filter(Boolean);
@@ -291,6 +320,13 @@ function resumeSamples(path, model) {
       const sample = JSON.parse(line);
       // A checkpoint is only worth resuming if it still validates: a half
       // written final line, or a file from an older prompt version, is not.
+      const checkpointHorizon = horizonOfBatch(sample);
+      if (checkpointHorizon !== HORIZON || (sample.question_set && sample.question_set !== QUESTION_SET)) {
+        throw new Error('belongs to a different horizon or question set');
+      }
+      if (sample.prompt_file !== HORIZON_CONFIG.promptFile || sample.prompt_sha256 !== promptSha256) {
+        throw new Error('belongs to a different prompt identity');
+      }
       const values = STATE_NAMES.map((_, i) => sample.answers?.['S' + (i + 1)]?.value);
       if (values.some(v => !Number.isInteger(v)) || values.reduce((a, c) => a + c, 0) !== 100) throw new Error('not a valid allocation');
       kept.push({ ...sample, sample: kept.length + 1 });
@@ -308,8 +344,9 @@ async function elicit(model, prompt) {
   const key = MOCK ? 'mock' : process.env[model.keyEnv];
   if (!key) { console.log(`~ ${model.key}: ${model.keyEnv} not set — skipped`); return null; }
 
-  const runId = `${RUN_DATE}__${slug(model.model)}__closed_book__end-states`;
+  const runId = `${RUN_DATE}__${slug(model.model)}__closed_book__${HORIZON_CONFIG.runSuffix}`;
   const partialPath = join(PARTIAL_DIR, `${runId}.jsonl`);
+  const promptSha256 = createHash('sha256').update(prompt).digest('hex');
 
   // A re-dispatch after a partial failure restores the previous run's batches,
   // so a model that already finished must not be bought a second time — and a
@@ -322,22 +359,33 @@ async function elicit(model, prompt) {
   if (!FORCE && existsSync(existingPath)) {
     try {
       const existing = JSON.parse(readFileSync(existingPath, 'utf8'));
-      const have = (existing.samples || []).length;
-      if (have >= SAMPLES) {
-        console.log(`= ${model.key}: complete batch already on disk (${have} samples) — not re-asking`);
-        return { ok: true, reused: true, key: model.key, label: model.label, samples: have, target: SAMPLES, quota: null, failures: [] };
-      }
-      if (have) {
-        const reported = Array.isArray(existing.model?.self_reported_name)
-          ? existing.model.self_reported_name[0]
-          : existing.model?.self_reported_name;
-        carried = existing.samples.map((sample, index) => ({
-          ...sample,
-          sample: index + 1,
-          meta: sample.meta || { model: reported ?? null, cutoff: existing.model?.self_reported_cutoff ?? null, asOf: existing.asked_on ?? null }
-        }));
-        toppingUp = true;
-        console.log(`  ${model.key}: carrying ${have} sample(s) forward from the existing batch — buying ${SAMPLES - have} more`);
+      const existingHorizon = horizonOfBatch(existing);
+      const sameInstrument = existingHorizon === HORIZON
+        && existing.question_set === QUESTION_SET
+        && existing.model?.api_string === model.model
+        && existing.track === 'closed_book'
+        && existing.harness?.prompt_file === HORIZON_CONFIG.promptFile
+        && existing.harness?.prompt_sha256 === promptSha256;
+      if (!sameInstrument) {
+        console.warn(`! ${model.key}: ${existingPath} belongs to a different model, horizon, or question set — writing a revision beside it`);
+      } else {
+        const have = (existing.samples || []).length;
+        if (have >= SAMPLES) {
+          console.log(`= ${model.key}: complete batch already on disk (${have} samples) — not re-asking`);
+          return { ok: true, reused: true, key: model.key, label: model.label, samples: have, target: SAMPLES, quota: null, failures: [] };
+        }
+        if (have) {
+          const reported = Array.isArray(existing.model?.self_reported_name)
+            ? existing.model.self_reported_name[0]
+            : existing.model?.self_reported_name;
+          carried = existing.samples.map((sample, index) => ({
+            ...sample,
+            sample: index + 1,
+            meta: sample.meta || { model: reported ?? null, cutoff: existing.model?.self_reported_cutoff ?? null, asOf: existing.asked_on ?? null }
+          }));
+          toppingUp = true;
+          console.log(`  ${model.key}: carrying ${have} sample(s) forward from the existing batch — buying ${SAMPLES - have} more`);
+        }
       }
     } catch {
       console.warn(`! ${model.key}: existing batch at ${existingPath} is unreadable — writing a revision beside it`);
@@ -346,7 +394,7 @@ async function elicit(model, prompt) {
 
   // Resume: samples already paid for on an earlier attempt at this run are
   // read back, and only the shortfall is asked for.
-  const samples = carried.length ? carried : resumeSamples(partialPath, model);
+  const samples = carried.length ? carried : resumeSamples(partialPath, model, promptSha256);
   const failures = [];
   const seen = new Map();
   samples.forEach(s => seen.set(signatureOf(s.answers), s.sample));
@@ -383,7 +431,16 @@ async function elicit(model, prompt) {
       const sig = signatureOf(answers);
       if (seen.has(sig)) console.warn(`! ${model.key}: sample ${samples.length + 1} is identical to sample ${seen.get(sig)} (kept — an API run, not a paste error, but worth noting)`);
       else seen.set(sig, samples.length + 1);
-      const sample = { sample: samples.length + 1, meta, answers };
+      const sample = {
+        sample: samples.length + 1,
+        horizon: HORIZON,
+        target_year: TARGET_YEAR,
+        question_set: QUESTION_SET,
+        prompt_file: HORIZON_CONFIG.promptFile,
+        prompt_sha256: promptSha256,
+        meta,
+        answers
+      };
       samples.push(sample);
       // Checkpoint before anything else can fail. Everything above this line
       // has already been paid for.
@@ -418,6 +475,8 @@ async function elicit(model, prompt) {
   const batch = {
     run_id: runId,
     prompt_family: 'end_states',
+    horizon: HORIZON,
+    target_year: TARGET_YEAR,
     asked_on: RUN_DATE,
     question_set: QUESTION_SET,
     track: 'closed_book',
@@ -432,7 +491,19 @@ async function elicit(model, prompt) {
     samples: samples.map(s => ({ sample: s.sample, answers: s.answers })),
     aggregate: aggregate(samples),
     integrity: integrityOf(samples),
-    harness: { version: 2, mode: MOCK ? 'mock' : 'api', target_samples: SAMPLES, complete: samples.length >= SAMPLES, quota_exhausted: Boolean(quotaExhausted), failures }
+    harness: {
+      version: 3,
+      mode: MOCK ? 'mock' : 'api',
+      horizon: HORIZON,
+      target_year: TARGET_YEAR,
+      question_set: QUESTION_SET,
+      prompt_file: HORIZON_CONFIG.promptFile,
+      prompt_sha256: promptSha256,
+      target_samples: SAMPLES,
+      complete: samples.length >= SAMPLES,
+      quota_exhausted: Boolean(quotaExhausted),
+      failures
+    }
   };
   mkdirSync(OUT_DIR, { recursive: true });
   // A top-up is a strict superset of the batch it grew from, so it replaces
@@ -607,7 +678,37 @@ if (CHECK) {
 }
 
 const prompt = buildPrompt();
-console.log(`Eliciting ${SAMPLES} samples for ${roster.length} model(s), run date ${RUN_DATE}${MOCK ? ' [MOCK]' : ''}`);
+if (process.env.SWEEP_PLAN_JSON) {
+  let plan;
+  try { plan = normalizeSweepPlan(JSON.parse(process.env.SWEEP_PLAN_JSON)); }
+  catch (error) {
+    console.error(`✗ invalid SWEEP_PLAN_JSON: ${error.message}`);
+    process.exit(1);
+  }
+  const horizonPlan = plan.horizons.find(candidate => candidate.id === HORIZON);
+  if (!horizonPlan) {
+    console.error(`✗ horizon ${HORIZON} is outside the frozen sweep plan`);
+    process.exit(1);
+  }
+  const promptSha256 = createHash('sha256').update(prompt).digest('hex');
+  const mismatches = [];
+  if (plan.run_date !== RUN_DATE) mismatches.push(`date ${RUN_DATE} != ${plan.run_date}`);
+  if (plan.target_samples !== SAMPLES) mismatches.push(`samples ${SAMPLES} != ${plan.target_samples}`);
+  if (horizonPlan.target_year !== TARGET_YEAR) mismatches.push(`target_year ${TARGET_YEAR} != ${horizonPlan.target_year}`);
+  if (horizonPlan.question_set !== QUESTION_SET) mismatches.push(`question_set ${QUESTION_SET} != ${horizonPlan.question_set}`);
+  if (horizonPlan.prompt_file !== HORIZON_CONFIG.promptFile) mismatches.push(`prompt_file ${HORIZON_CONFIG.promptFile} != ${horizonPlan.prompt_file}`);
+  if (horizonPlan.prompt_sha256 !== promptSha256) mismatches.push(`prompt_sha256 ${promptSha256} != ${horizonPlan.prompt_sha256}`);
+  const plannedByKey = new Map(plan.cohort.map(candidate => [candidate.key, candidate.model]));
+  for (const model of roster.filter(candidate => (candidate.status || 'active') === 'active')) {
+    if (!plannedByKey.has(model.key)) mismatches.push(`model key ${model.key} is outside the frozen cohort`);
+    else if (plannedByKey.get(model.key) !== model.model) mismatches.push(`model ${model.key} maps to ${model.model}, not frozen id ${plannedByKey.get(model.key)}`);
+  }
+  if (mismatches.length) {
+    console.error(`✗ run does not match the immutable sweep plan: ${mismatches.join('; ')}`);
+    process.exit(1);
+  }
+}
+console.log(`Eliciting ${SAMPLES} samples for ${roster.length} model(s), horizon ${HORIZON} (${TARGET_YEAR}), run date ${RUN_DATE}${MOCK ? ' [MOCK]' : ''}`);
 
 const results = [];
 for (const model of roster) {
@@ -637,7 +738,7 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     return `| ${r.label} (\`${r.key}\`) | ${status} | ${r.samples}/${r.target} | ${countBy(r, 'transient')} | ${countBy(r, 'quota')} | ${rejected} | ${rate} |`;
   });
   const lines = [
-    `## Elicitation ${RUN_DATE}`,
+    `## Elicitation ${RUN_DATE} · ${HORIZON}`,
     '',
     `${wrote} batch(es) written · ${hardFailures} model(s) failed · target ${SAMPLES} samples each`,
     '',
@@ -670,6 +771,7 @@ if (process.env.GITHUB_OUTPUT) {
   appendFileSync(process.env.GITHUB_OUTPUT, [
     `quota_exhausted=${quotaHit.length ? 'true' : 'false'}`,
     `quota_models=${quotaHit.map(r => r.label).join(', ')}`,
+    `horizon=${HORIZON}`,
     `batches_written=${wrote}`,
     `models_failed=${hardFailures}`,
     `short_runs=${short.length}`
@@ -685,4 +787,4 @@ if (!wrote && !reused) {
 // Exit 4 is distinct so the workflow can raise a billing alert specifically,
 // rather than reporting "a model failed" for something only money fixes.
 if (quotaHit.length) process.exit(4);
-if (hardFailures) process.exit(2);
+if (hardFailures || short.length) process.exit(2);

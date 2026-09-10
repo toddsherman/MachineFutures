@@ -33,7 +33,14 @@
 
       <div class="end-hero shell">
         <h1>What are AI&rsquo;s<br>predictions <em>about AI?</em></h1>
-        <p class="dek">We asked <b id="dek-models">—</b> of the leading AI models from <b id="dek-labs">—</b> labs to assign 100 percentage points across 11 mutually exclusive end states for humanity&rsquo;s relationship with AI.</p>
+        <p class="dek" id="forecast-summary">We asked <b id="dek-models">—</b> of the leading AI models from <b id="dek-labs">—</b> labs to assign 100 percentage points across 11 mutually exclusive end states for humanity&rsquo;s relationship with AI.</p>
+        <div class="horizon-picker">
+          <div class="horizon-picker-copy">
+            <span id="horizon-toggle-label">Forecast horizon</span>
+            <p id="horizon-note" aria-live="polite">Durable arrangement in 3000.</p>
+          </div>
+          <div class="horizon-toggle" id="horizon-toggle" role="group" aria-labelledby="horizon-toggle-label"></div>
+        </div>
       </div>
 
       <section class="end-leader-section shell" aria-labelledby="leader-title">
@@ -81,14 +88,14 @@
     <section class="method-view" id="method" aria-labelledby="method-title">
       <div class="method-hero shell">
         <h1 id="method-title">The <em>approach.</em></h1>
-        <p class="dek">The question stays fixed. The models change. Every answer is published as it was given.</p>
+        <p class="dek">The taxonomy stays fixed across three horizons. The models change. Every answer is published as it was given.</p>
       </div>
 
       <ul class="method-list shell">
         <li>
-          <h2>One fixed question</h2>
-          <p>Every model receives the same taxonomy of eleven mutually exclusive end states and allocates exactly 100 whole percentage points across them.</p>
-          <a class="method-link" href="end_states.md">Read the prompt <span aria-hidden="true">↗</span></a>
+          <h2>One fixed taxonomy</h2>
+          <p>Every model receives the same eleven mutually exclusive states and allocates exactly 100 whole percentage points across them. Long term asks for the durable arrangement in 3000; 2030 and 2040 are year-end snapshots and do not require the arrangement to have become permanent.</p>
+          <a class="method-link" id="method-prompt-link" href="end_states.md">Read the long-term prompt <span aria-hidden="true">↗</span></a>
         </li>
         <li>
           <h2>Closed book</h2>
@@ -125,7 +132,7 @@
   </dialog>
 
   <script src="analytics.js"></script>
-  <script src="data.js?v=20260825-rowaxis"></script>
-  <script src="app.js?v=20260825-rowaxis"></script>
+  <script src="data.js?v=20260909-horizons"></script>
+  <script src="app.js?v=20260909-horizons"></script>
 </body>
 </html>

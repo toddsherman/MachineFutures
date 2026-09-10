@@ -2,21 +2,37 @@
 // actually shipped, so a failure names the thing that broke rather than a
 // snapshot diff.
 import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
-const settle = async page => {
-  await page.goto('/');
+const horizonFixture = readFileSync(fileURLToPath(new URL('./fixtures/horizon-data.js', import.meta.url)), 'utf8');
+
+const settle = async (page, url = '/') => {
+  await page.goto(url);
   await page.waitForFunction(() => document.querySelectorAll('.state-card').length === 11);
   // The leader riffles through the endings on load; wait for it to land, or a
   // test reads a passing frame and believes it.
   await page.waitForFunction(() => {
     const top = window.MF_TEST?.stateMedians().slice().sort((a, b) => b.probability - a.probability)[0];
-    return top && document.querySelector('.leader-name')?.textContent === top.name;
+    const name = document.querySelector('.leader-name');
+    const figure = document.querySelector('.end-leader strong');
+    return top && name?.textContent === top.name && figure?.textContent === `${top.probability}%`
+      && !name.classList.contains('is-settling');
   });
   await page.evaluate(() => {
     document.documentElement.style.scrollBehavior = 'auto';
     window.MF_TEST?.stopSweep();
     window.MF_TEST?.disableLeaderSettle();
   });
+};
+
+const settleWithHorizons = async (page, url = '/') => {
+  await page.route('**/data.js*', route => route.fulfill({
+    status: 200,
+    contentType: 'application/javascript',
+    body: horizonFixture
+  }));
+  await settle(page, url);
 };
 
 test.describe('layout', () => {
@@ -85,6 +101,115 @@ test.describe('layout', () => {
       return { fits: m.scrollWidth <= document.querySelector('.matrix-scroll').clientWidth + 1, clipped };
     });
     expect(matrix.clipped, 'figures clipped inside their cell').toBe(0);
+  });
+});
+
+test.describe('forecast horizons', () => {
+  test('the global selector switches every data view together', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await settleWithHorizons(page);
+    const group = page.getByRole('group', { name: 'Forecast horizon' });
+    await expect(group.getByRole('button')).toHaveText(['Long term', '2030', '2040']);
+    await expect(group.getByRole('button', { name: 'Long term' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('#horizon-note')).toHaveText('Durable arrangement in 3000.');
+
+    await group.getByRole('button', { name: '2030', exact: true }).click();
+    await page.waitForFunction(() => document.querySelector('.leader-name')?.textContent === 'The Held Leash');
+    const snapshot = await page.evaluate(() => {
+      const row = document.querySelector('.matrix-state[data-state="9"]')?.closest('.matrix-row');
+      return {
+        activeHorizon: window.MF_TEST.activeHorizon(),
+        models: document.querySelector('#dek-models').textContent,
+        labs: document.querySelector('#dek-labs').textContent,
+        date: document.querySelector('#dataset-date').textContent,
+        title: document.querySelector('#end-forecast-title').innerText.replace(/\s+/g, ' ').trim(),
+        note: document.querySelector('#horizon-note').textContent,
+        leader: document.querySelector('.leader-name').textContent,
+        leaderValue: document.querySelector('.end-leader strong').textContent,
+        leaderUnit: document.querySelector('.leader-unit').textContent,
+        timelineLast: document.querySelector('.leader-timeline li:last-child .tl-name').textContent.trim(),
+        card: document.querySelector('.state-card[data-state="9"] .state-card-meta strong').textContent,
+        matrix: [...row.querySelectorAll('.matrix-cell span')].map(cell => cell.textContent),
+        exposure: [...document.querySelectorAll('.doomer-total b')].map(cell => cell.textContent),
+        matrixLabel: document.querySelector('#matrix').getAttribute('aria-label'),
+        prompt: new URL(document.querySelector('#method-prompt-link').href).pathname,
+        pressed: document.querySelector('.horizon-button[aria-pressed="true"]').dataset.horizon
+      };
+    });
+    expect(snapshot).toEqual({
+      activeHorizon: '2030', models: '2', labs: '2', date: '02.03.26',
+      title: '2030 MEDIAN MACHINE FORECAST',
+      note: 'Snapshot at the end of 2030; it need not yet be durable.',
+      leader: 'The Held Leash', leaderValue: '45%',
+      leaderUnit: 'Median across 2 models · 2030 · of 100 points',
+      timelineLast: 'The Held Leash', card: '45%', matrix: ['45', '45'],
+      exposure: ['15%', '15%'], matrixLabel: '2030 probability by end state and model',
+      prompt: '/end_states_2030.md', pressed: '2030'
+    });
+
+    await page.locator('.state-card[data-state="9"]').click();
+    await expect(page.locator('#dialog-content .dialog-kicker')).toContainText('2030');
+    await expect(page.locator('#dialog-content .model-answer p').first()).toContainText('2030');
+    await page.locator('#dialog-close').click();
+
+    await group.getByRole('button', { name: '2040', exact: true }).click();
+    await page.waitForFunction(() => document.querySelector('.leader-name')?.textContent === 'Coexistence');
+    const next = await page.evaluate(() => ({
+      horizon: window.MF_TEST.activeHorizon(),
+      models: document.querySelector('#dek-models').textContent,
+      labs: document.querySelector('#dek-labs').textContent,
+      date: document.querySelector('#dataset-date').textContent,
+      leader: document.querySelector('.leader-name').textContent,
+      card: document.querySelector('.state-card[data-state="8"] .state-card-meta strong').textContent,
+      exposure: [...document.querySelectorAll('.doomer-total b')].map(cell => cell.textContent),
+      prompt: new URL(document.querySelector('#method-prompt-link').href).pathname
+    }));
+    expect(next).toEqual({ horizon: '2040', models: '3', labs: '3', date: '03.04.26',
+      leader: 'Coexistence', card: '28%', exposure: ['27%', '27%', '27%'], prompt: '/end_states_2040.md' });
+  });
+
+  test('the URL shares both selectors and an unavailable model resets to Median', async ({ page }) => {
+    await settleWithHorizons(page, '/?utm_source=fixture&model=beta');
+    await expect(page.locator('.end-toggle-button.active')).toHaveAttribute('data-end-forecast', 'beta');
+
+    const horizon = page.getByRole('group', { name: 'Forecast horizon' });
+    await horizon.getByRole('button', { name: '2030', exact: true }).click();
+    await expect(page.locator('.end-toggle-button.active')).toHaveAttribute('data-end-forecast', 'Median');
+    const afterReset = new URL(page.url());
+    expect(afterReset.searchParams.get('horizon')).toBe('2030');
+    expect(afterReset.searchParams.get('model')).toBeNull();
+    expect(afterReset.searchParams.get('utm_source')).toBe('fixture');
+
+    await page.locator('[data-end-forecast="gamma"]').click();
+    await horizon.getByRole('button', { name: '2040', exact: true }).click();
+    await expect(page.locator('.end-toggle-button.active')).toHaveAttribute('data-end-forecast', 'gamma');
+    const preserved = new URL(page.url());
+    expect(preserved.searchParams.get('horizon')).toBe('2040');
+    expect(preserved.searchParams.get('model')).toBe('gamma');
+    expect(preserved.searchParams.get('utm_source')).toBe('fixture');
+    await expect(page.locator('.horizon-button[data-horizon="2040"]')).toBeFocused();
+
+    await page.reload();
+    await page.waitForFunction(() => window.MF_TEST?.activeHorizon() === '2040');
+    await expect(page.locator('.horizon-button[data-horizon="2040"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('.end-toggle-button.active')).toHaveAttribute('data-end-forecast', 'gamma');
+  });
+
+  test('an empty horizon is usable while its forecasts are being collected', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await settleWithHorizons(page);
+    await page.evaluate(() => {
+      window.MF_DATA.datasets['2040'] = { endStateRuns: {}, datasetDate: '', leaderHistory: [] };
+    });
+    await page.getByRole('group', { name: 'Forecast horizon' }).getByRole('button', { name: '2040', exact: true }).click();
+    await expect(page.locator('#forecast-summary')).toHaveText('2040 forecasts are being collected. They will use the same 11-state taxonomy and 100-point allocation as every other horizon.');
+    await expect(page.locator('#end-leader .data-empty')).toHaveText('2040 forecasts are being collected.');
+    await expect(page.locator('.state-card')).toHaveCount(0);
+    await expect(page.locator('#matrix')).not.toHaveAttribute('role', 'table');
+    await expect(page.locator('#dataset-date')).toHaveText('Awaiting data');
+    await expect(page.locator('#footer-roster')).toHaveText('0 models across 0 labs');
+    expect(errors).toEqual([]);
   });
 });
 
@@ -270,7 +395,7 @@ test.describe('the leader timeline', () => {
         markLabel: li.querySelector('.state-mark')?.getAttribute('aria-label') ?? null
       }));
       return { rows, note: el.querySelector('p').textContent,
-               history: window.MF_DATA.leaderHistory,
+               history: window.MF_TEST.activeDataset().leaderHistory,
                states: window.MF_DATA.states,
                insidePanel: !!el.closest('.end-leader') };
     });
@@ -296,7 +421,7 @@ test.describe('the leader timeline', () => {
   test('the last row agrees with the ending the panel names', async ({ page }) => {
     await settle(page);
     const same = await page.evaluate(() => {
-      const history = window.MF_DATA.leaderHistory;
+      const history = window.MF_TEST.activeDataset().leaderHistory;
       const latest = history.at(-1);
       const named = window.MF_TEST.stateMedians().slice().sort((a, b) => b.probability - a.probability)[0];
       return { timelineSays: latest.stateId, panelSays: named.id, share: latest.share, panelShare: named.probability };
@@ -396,14 +521,14 @@ test.describe('the forecast plays itself', () => {
       const active = () => document.querySelector('.end-toggle-button.active')?.dataset.endForecast;
       let last = active();
       const t0 = performance.now();
-      const budget = Object.keys(window.MF_DATA.endStateRuns).length * 500 + 6000;
+      const budget = Object.keys(window.MF_TEST.activeDataset().endStateRuns).length * 500 + 6000;
       const watch = setInterval(() => {
         const now = active();
         if (now !== last) { seen.push({ at: Math.round(performance.now() - t0), key: now }); last = now; }
         if (performance.now() - t0 > budget) {
           clearInterval(watch);
           const gaps = seen.slice(1).map((s, i) => s.at - seen[i].at).sort((a, b) => a - b);
-          resolve({ visited: seen.map(s => s.key), models: Object.keys(window.MF_DATA.endStateRuns).length,
+          resolve({ visited: seen.map(s => s.key), models: Object.keys(window.MF_TEST.activeDataset().endStateRuns).length,
                     medianGap: gaps[Math.floor(gaps.length / 2)], ended: active() });
         }
       }, 30);
@@ -456,8 +581,9 @@ test.describe('behaviour', () => {
   test('a model-authored rationale cannot execute', async ({ page }) => {
     await settle(page);
     const result = await page.evaluate(async () => {
-      const key = Object.keys(window.MF_DATA.endStateRuns)[0];
-      window.MF_DATA.endStateRuns[key].rationales[3] = '<img src=x onerror="window.__pwned=1"><scr' + 'ipt>window.__pwned=1</scr' + 'ipt>';
+      const runs = window.MF_TEST.activeDataset().endStateRuns;
+      const key = Object.keys(runs)[0];
+      runs[key].rationales[3] = '<img src=x onerror="window.__pwned=1"><scr' + 'ipt>window.__pwned=1</scr' + 'ipt>';
       window.__pwned = 0;
       document.querySelector('.state-card[data-state="3"]').click();
       await new Promise(r => setTimeout(r, 400));
@@ -477,7 +603,7 @@ test.describe('behaviour', () => {
     // pushed a figure outside its own band.
     const bad = await page.evaluate(() => {
       const { stateMedians } = window.MF_TEST;
-      const runs = Object.values(window.MF_DATA.endStateRuns);
+      const runs = Object.values(window.MF_TEST.activeDataset().endStateRuns);
       const out = [];
       for (const state of stateMedians()) {
         const column = runs.map(r => r.probabilities[state.id]).sort((a, b) => a - b);

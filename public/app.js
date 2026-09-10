@@ -192,13 +192,15 @@
 
   function leaderTimelineMarkup() {
     if (leaderHistory.length < 2) return '';
-    const nameOf = id => states.find(state => state.id === id)?.name ?? '';
-    const rows = leaderHistory.map(entry => `<li${entry.changed ? ' class="is-change"' : ''}>
-        <span class="tl-date">${esc(shortDate(entry.date))}</span>
-        <span class="tl-name" style="--state:${states.find(s => s.id === entry.stateId)?.color}">${esc(nameOf(entry.stateId))}</span>
-        <span class="tl-share">${entry.share}%</span>
-        <span class="tl-models">${entry.models} models</span>
-      </li>`).join('');
+    const rows = leaderHistory.map(entry => {
+      const state = states.find(candidate => candidate.id === entry.stateId);
+      return `<li${entry.changed ? ' class="is-change"' : ''}>
+          <span class="tl-date">${esc(shortDate(entry.date))}</span>
+          <span class="tl-name" style="--state:${state?.color}">${esc(state?.name)}${state ? extinctionMark(state) : ''}</span>
+          <span class="tl-share">${entry.share}%</span>
+          <span class="tl-models">${entry.models} models</span>
+        </li>`;
+    }).join('');
     const changes = leaderHistory.filter(e => e.changed);
     const last = changes.at(-1);
     // Say what moved it. A leader changes when the board gains models far more

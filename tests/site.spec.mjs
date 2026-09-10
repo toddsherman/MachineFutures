@@ -265,10 +265,13 @@ test.describe('the leader timeline', () => {
       if (!el) return null;
       const rows = [...el.querySelectorAll('li')].map(li => ({
         text: li.innerText.replace(/\s+/g, ' ').trim(),
-        change: li.classList.contains('is-change')
+        change: li.classList.contains('is-change'),
+        mark: li.querySelector('.state-mark')?.dataset.mark ?? null,
+        markLabel: li.querySelector('.state-mark')?.getAttribute('aria-label') ?? null
       }));
       return { rows, note: el.querySelector('p').textContent,
                history: window.MF_DATA.leaderHistory,
+               states: window.MF_DATA.states,
                insidePanel: !!el.closest('.end-leader') };
     });
     expect(tl, 'no timeline rendered').not.toBeNull();
@@ -283,6 +286,9 @@ test.describe('the leader timeline', () => {
     tl.history.forEach((h, i) => {
       const differs = i === 0 || tl.history[i - 1].stateId !== h.stateId;
       expect(h.changed, `row ${i} (${h.date}) is flagged ${h.changed} but differs=${differs}`).toBe(differs);
+      const state = tl.states.find(candidate => candidate.id === h.stateId);
+      expect(tl.rows[i].mark, `row ${i} (${h.date}) has the wrong hazard mark`).toBe(state.extinction ?? null);
+      expect(Boolean(tl.rows[i].markLabel), `row ${i} (${h.date}) has an unlabelled hazard mark`).toBe(Boolean(state.extinction));
     });
     expect(tl.rows.filter(r => r.change).length).toBe(tl.history.filter(h => h.changed).length);
   });

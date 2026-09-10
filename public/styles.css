@@ -358,10 +358,12 @@ body.dialog-open { overflow: hidden; }
 .stacked-legend .state-mark { font-size: 1.16em; }
 .state-card-meta .state-mark { margin-left: 0; font-size: 18px; }
 .matrix-state .state-mark { font-size: 15px; margin-left: 8px; }
+.leader-timeline .state-mark { margin-left: 1px; font-size: 12px; }
 .state-mark.is-glyph { width: auto; height: auto; font-size: 1.62em; line-height: 1; vertical-align: -.14em; font-family: var(--sans); font-variant-emoji: text; }
 .stacked-legend .state-mark.is-glyph { font-size: 1.78em; }
 .state-card-meta .state-mark.is-glyph { font-size: 27px; }
 .matrix-state .state-mark.is-glyph { font-size: 23px; }
+.leader-timeline .state-mark.is-glyph { font-size: 18px; }
 
 @media (max-width: 1040px) {
   .state-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }

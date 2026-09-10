@@ -1,6 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, horizonOfBatch, normalizeHorizon } from './horizons.mjs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import {
+  DEFAULT_HORIZON,
+  HORIZONS,
+  HORIZON_IDS,
+  compareRunPreference,
+  horizonOfBatch,
+  normalizeHorizon,
+  renderHorizonPrompt,
+  runRevision
+} from './horizons.mjs';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 test('horizon registry has stable public ids and default', () => {
   assert.equal(DEFAULT_HORIZON, 'long-term');
@@ -60,4 +73,23 @@ test('persisted horizon metadata is exact and complete', () => {
 test('unknown horizons are rejected', () => {
   assert.equal(normalizeHorizon('2050'), null);
   assert.throws(() => horizonOfBatch({ horizon: '2050', target_year: 2050 }), /unsupported horizon/);
+});
+
+test('runtime prompt identity hashes the exact date-substituted prompt', () => {
+  const first = renderHorizonPrompt(root, '2030', '2026-09-10');
+  const second = renderHorizonPrompt(root, '2030', '2026-09-11');
+  assert.match(first.prompt, /September 10, 2026/);
+  assert.doesNotMatch(first.prompt, /\{\{RUN_DATE\}\}/);
+  assert.match(first.identity.prompt_sha256, /^[a-f0-9]{64}$/);
+  assert.notEqual(first.identity.prompt_sha256, second.identity.prompt_sha256);
+});
+
+test('run preference orders numeric revisions rather than lexical filenames', () => {
+  assert.equal(runRevision('batch__r9.json'), 9);
+  assert.equal(runRevision('batch__r10.json'), 10);
+  const ranked = [
+    { file: 'batch__r9.json', date: '2026-09-10', sampleCount: 20 },
+    { file: 'batch__r10.json', date: '2026-09-10', sampleCount: 20 }
+  ].sort(compareRunPreference);
+  assert.equal(ranked[0].file, 'batch__r10.json');
 });

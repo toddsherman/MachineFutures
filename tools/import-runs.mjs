@@ -11,7 +11,7 @@ import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, horizonOfBatch } from './horizons.mjs';
+import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, compareRunPreference, horizonOfBatch } from './horizons.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const runsDir = join(root, 'runs');
@@ -207,7 +207,7 @@ for (const file of files) {
       STATE_IDS.map((id, i) => quartiles[i + 1] || null)
     );
     if (probs.reduce((a, c) => a + c, 0) !== 100) { problems.push(`${file}: renormalized probabilities sum to ${probs.reduce((a, c) => a + c, 0)}, not 100`); continue; }
-    rawEndStateBatches.push({ asked_on: batch.asked_on, runKey: runKeyOf(batch), horizon, samples: batch.samples || [] });
+    rawEndStateBatches.push({ file, run_id: batch.run_id, asked_on: batch.asked_on, runKey: runKeyOf(batch), horizon, samples: batch.samples || [] });
     endStateBatches.push({
       file,
       runKey: runKeyOf(batch),
@@ -217,7 +217,7 @@ for (const file of files) {
       date: batch.asked_on,
       promptVersion: Number((batch.question_set || '').match(/end-states(?:-(?:2030|2040))?-v(\d+)/)?.[1]) || null,
       knowledgeCutoff: batch.model?.self_reported_cutoff || null,
-      sampleCount: batch.n_samples ?? (batch.samples || []).length,
+      sampleCount: sampleList.length,
       probabilities: Object.fromEntries(probs.map((p, i) => [i + 1, p])),
       // Spread is what tells a reader whether a gap between two models means
       // anything, so carry it through rather than publishing bare medians.
@@ -253,7 +253,7 @@ for (const [, batches] of byModel) {
   // Newest date wins, but a tie goes to the batch with more samples: a rerun
   // on the same day used to replace a twenty-sample run with a three-sample
   // one purely because it was read second.
-  const ranked = [...batches].sort((a, b) => b.date.localeCompare(a.date) || b.sampleCount - a.sampleCount);
+  const ranked = [...batches].sort(compareRunPreference);
   const chosen = ranked[0];
   const richest = [...batches].sort((a, b) => b.sampleCount - a.sampleCount)[0];
   if (chosen.sampleCount < richest.sampleCount && !FORCE) {
@@ -302,9 +302,7 @@ function leaderTimeline(batches) {
     const newest = {};
     for (const batch of batches.filter(b => b.asked_on <= date)) {
       const prior = newest[batch.runKey];
-      const newer = !prior || batch.asked_on > prior.asked_on;
-      const richerSameDay = prior && batch.asked_on === prior.asked_on && batch.samples.length > prior.samples.length;
-      if (newer || richerSameDay) newest[batch.runKey] = batch;
+      if (!prior || compareRunPreference(batch, prior) < 0) newest[batch.runKey] = batch;
     }
     const published = Object.values(newest).map(b => publishedVector(b.samples)).filter(Boolean);
     if (published.length < 2) continue;

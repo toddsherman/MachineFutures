@@ -12,6 +12,7 @@ import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
+import { renderHorizonPrompt } from './horizons.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const harness = join(root, 'tools', 'run-elicitation.mjs');
@@ -29,9 +30,14 @@ const HORIZON_META = {
 };
 const runIdFor = (horizon, date = DATE) => `${date}__${slug(rosterEntry.model)}__closed_book__${HORIZON_META[horizon].suffix}`;
 
-const run = (args, { expectFail = false } = {}) => {
+const run = (args, { expectFail = false, env = {} } = {}) => {
   try {
-    return { ok: true, out: execFileSync('node', [harness, ...args], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }) };
+    return { ok: true, out: execFileSync('node', [harness, ...args], {
+      cwd: root,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env: { ...process.env, ...env }
+    }) };
   } catch (error) {
     if (!expectFail) throw new Error(`harness failed unexpectedly:\n${error.stdout}\n${error.stderr}`);
     return { ok: false, status: error.status, out: `${error.stdout}${error.stderr}` };
@@ -165,6 +171,36 @@ test('each horizon has a collision-safe run id and trusted instrument metadata',
   rmSync(dir, { recursive: true, force: true });
 });
 
+test('the harness itself rejects work that differs from the frozen plan', () => {
+  const dir = scratch();
+  try {
+    const identity = renderHorizonPrompt(root, '2030', DATE).identity;
+    const plan = {
+      schema_version: 2,
+      run_date: DATE,
+      target_samples: 1,
+      cohort: [{ key: MODEL_KEY, model: rosterEntry.model }],
+      horizons: [{ ...identity }]
+    };
+    const good = run(['--mock', '--date', DATE, '--models', MODEL_KEY, '--samples', '1', '--horizon', '2030', '--out', dir], {
+      env: { SWEEP_PLAN_JSON: JSON.stringify(plan) }
+    });
+    assert.equal(good.ok, true);
+    rmSync(join(dir, `${runIdFor('2030')}.json`), { force: true });
+
+    plan.horizons[0].prompt_sha256 = 'f'.repeat(64);
+    const bad = run(['--mock', '--date', DATE, '--models', MODEL_KEY, '--samples', '1', '--horizon', '2030', '--out', dir], {
+      expectFail: true,
+      env: { SWEEP_PLAN_JSON: JSON.stringify(plan) }
+    });
+    assert.match(bad.out, /run does not match the immutable sweep plan.*prompt_sha256/);
+    assert.equal(readdirSync(dir).filter(file => file.endsWith('.json')).length, 0,
+      'a plan mismatch must fail before writing or calling a model');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('topping up one horizon never reuses or changes another horizon', () => {
   const dir = scratch();
   elicitHorizon(dir, '2030', 2);
@@ -197,6 +233,8 @@ test('the workflow restores and passes the original elicitation date on resume',
   const workflow = readFileSync(join(root, '.github', 'workflows', 'elicit.yml'), 'utf8');
   assert.match(workflow, /name: Restore the original elicitation date/);
   assert.match(workflow, /-name '\.elicitation-date'/);
+  assert.match(workflow, /mapfile -t restored_dates[\s\S]*?sort -u[\s\S]*?restored_dates\[@\]/,
+    'resume must reject conflicting date manifests instead of trusting the first file');
   assert.match(workflow, /--date "\$RUN_DATE"/);
   assert.match(workflow, /timeout --foreground/);
   assert.match(workflow, /if GITHUB_OUTPUT='' timeout[\s\S]*?then\s+status=0\s+else\s+status=\$\?\s+fi/,
@@ -218,6 +256,58 @@ test('the workflow preserves complete prior data when resuming a model subset', 
     'current model artifacts must overlay, not replace, the prior combined run');
 });
 
+test('the workflow preserves raw results but gates every site step on same-date sweep completeness', () => {
+  const workflow = readFileSync(join(root, '.github', 'workflows', 'elicit.yml'), 'utf8');
+  const aggregate = workflow.slice(workflow.indexOf('\n  aggregate:'));
+  const verify = aggregate.indexOf('name: Verify raw batches');
+  const sweep = aggregate.indexOf('name: Check complete requested sweep');
+  const pushRaw = aggregate.indexOf('name: Push the raw batches');
+  const importSite = aggregate.indexOf('name: Import every horizon into site data');
+  assert.ok(verify >= 0 && sweep > verify && pushRaw > sweep && importSite > pushRaw,
+    'the completeness gate must run after verification but before raw preservation and site import');
+  assert.match(aggregate, /name: Check complete requested sweep\s+id: sweep\s+continue-on-error: true/);
+  assert.match(aggregate, /SWEEP_PLAN_JSON: \$\{\{ needs\.plan\.outputs\.sweep_plan \}\}[\s\S]*?--plan-json "\$SWEEP_PLAN_JSON"/,
+    'the publication gate must consume the full frozen plan, not recomputed scalar inputs');
+  assert.match(aggregate, /name: Raise a billing alert[\s\S]*?continue-on-error: true/,
+    'a GitHub billing-notification failure must never block raw preservation');
+  assert.equal((aggregate.match(/steps\.sweep\.outcome == 'success'/g) || []).length, 3,
+    'import, site checks, and site push must all require the sweep gate');
+  assert.match(aggregate, /name: Fail after preserving incomplete results[\s\S]*?steps\.sweep\.outcome != 'success'/,
+    'the aggregate job must ultimately fail when the non-blocking gate fails');
+});
+
+test('the workflow persists and reuses an immutable full-sweep plan across targeted resumes', () => {
+  const workflow = readFileSync(join(root, '.github', 'workflows', 'elicit.yml'), 'utf8');
+  const plan = workflow.slice(workflow.indexOf('\n  plan:'), workflow.indexOf('\n  utility:'));
+  const elicit = workflow.slice(workflow.indexOf('\n  elicit:'), workflow.indexOf('\n  aggregate:'));
+  const aggregate = workflow.slice(workflow.indexOf('\n  aggregate:'));
+  assert.match(plan, /sweep_horizons: \$\{\{ steps\.plan\.outputs\.sweep_horizons \}\}/);
+  assert.match(plan, /target_samples: \$\{\{ steps\.plan\.outputs\.target_samples \}\}/);
+  assert.match(plan, /sweep_plan: \$\{\{ steps\.plan\.outputs\.sweep_plan \}\}/);
+  assert.match(plan, /plan_args=\([\s\S]*?--resolve-plan[\s\S]*?--horizons-json "\$horizons"[\s\S]*?--samples "\$\{REQUESTED_SAMPLES:-20\}"/);
+  assert.match(plan, /if \[ -n "\$\{RESUME_RUN_ID:-\}" \]; then plan_args\+=\(--restored plan-restored\); fi/);
+  assert.match(plan, /\.horizons\.map\(horizon => horizon\.id\)/,
+    'schema-v2 horizon identity objects must be reduced to ids for work matrices');
+  assert.match(plan, /--prepare-work[\s\S]*?--plan-json "\$sweep_plan"[\s\S]*?--requested-models "\$\{REQUESTED_MODELS:-\}"/,
+    'model matrix selection must come from the frozen cohort and validate prompt hashes');
+  assert.match(plan, /name: Stage the immutable sweep plan[\s\S]*?name: Upload the immutable sweep plan[\s\S]*?name: sweep-plan-\$\{\{ github\.run_id \}\}/,
+    'the authoritative plan must be uploaded by the plan job before paid model jobs start');
+  assert.doesNotMatch(elicit.slice(0, elicit.indexOf('name: Elicit selected horizons')), /\.sweep-plan\.json/,
+    'model artifacts must not contain duplicate last-writer-wins plan manifests');
+  assert.match(elicit, /HORIZONS_JSON: \$\{\{ needs\.plan\.outputs\.horizons \}\}/,
+    'a targeted resume should work only on its selected horizon subset');
+  assert.match(elicit, /SWEEP_PLAN_JSON: \$\{\{ needs\.plan\.outputs\.sweep_plan \}\}[\s\S]*?node tools\/run-elicitation\.mjs/,
+    'the harness must receive the frozen plan for a final pre-call binding check');
+  assert.match(elicit, /SAMPLES: \$\{\{ needs\.plan\.outputs\.target_samples \}\}/,
+    'elicitation must keep the original target instead of trusting the resume input');
+  assert.match(aggregate, /name: Download the immutable sweep plan[\s\S]*?cp -R planned\/\. runs\/[\s\S]*?actual_plan=.*\.sweep-plan\.json/,
+    'aggregate must restore and compare the one authoritative plan artifact');
+  assert.doesNotMatch(aggregate, /rm -f[^\n]*\.sweep-plan/,
+    'aggregate cleanup must retain the plan in the resumable artifact');
+  assert.doesNotMatch(elicit, /echo "::error::\$\{\{ matrix\.model \}\}/,
+    'matrix values must enter shell through env rather than expression interpolation');
+});
+
 test('the workflow publishes a workflow-free squash based on the latest default branch', () => {
   const workflow = readFileSync(join(root, '.github', 'workflows', 'elicit.yml'), 'utf8');
   const pushStart = workflow.indexOf('name: Push the raw batches');
@@ -234,6 +324,10 @@ test('the workflow publishes a workflow-free squash based on the latest default 
   assert.match(push, /git restore --source="\$default_ref" --staged --worktree -- \.github\/workflows/);
   assert.match(push, /git diff --quiet "\$default_ref" HEAD -- \.github\/workflows/,
     'the workflow tree must be checked before pushing');
+  assert.match(push, /git restore --source="\$SOURCE_SHA" --worktree -- \.github\/workflows/,
+    'after raw publication, local checks must see the source-version workflow without staging it');
+  assert.match(push, /git diff --quiet "\$SOURCE_SHA" -- \.github\/workflows[\s\S]*?git diff --cached --quiet/,
+    'the source workflow restore must be verified and remain unstaged');
 });
 
 test('a workflow-free squash preserves newer default content and non-workflow feature data', () => {
@@ -282,6 +376,18 @@ test('a workflow-free squash preserves newer default content and non-workflow fe
     assert.equal(readFileSync(join(dir, 'feature.txt'), 'utf8'), 'keep this feature\n');
     assert.equal(readFileSync(join(dir, 'runs', 'new-batch.json'), 'utf8'), '{"samples":[]}\n');
     git(dir, 'diff', '--quiet', 'main', 'HEAD', '--', '.github/workflows');
+
+    // Local harness checks must inspect the source workflow that launched the
+    // job, while a later site-data commit continues to retain main's workflow.
+    git(dir, 'restore', `--source=${sourceSha}`, '--worktree', '--', '.github/workflows');
+    assert.equal(readFileSync(join(dir, '.github', 'workflows', 'elicit.yml'), 'utf8'), 'feature workflow\n');
+    git(dir, 'diff', '--cached', '--quiet');
+    mkdirSync(join(dir, 'public'), { recursive: true });
+    writeFileSync(join(dir, 'public', 'data.js'), 'regenerated site data\n');
+    git(dir, 'add', 'public/data.js');
+    git(dir, 'commit', '-q', '-m', 'publish site data only');
+    assert.equal(git(dir, 'show', 'HEAD:.github/workflows/elicit.yml'), 'new default workflow');
+    assert.equal(readFileSync(join(dir, '.github', 'workflows', 'elicit.yml'), 'utf8'), 'feature workflow\n');
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

@@ -47,10 +47,11 @@ The 50-question 2030 benchmark was retired in August 2026; its prompt and only r
 
 - **Every sample is checkpointed the moment it validates**, to `runs/.partial/<horizon-aware-run-id>.jsonl`. A run that dies partway keeps everything it had already bought.
 - **The batches are uploaded as an artifact even when the run fails.** The elicitation step is `continue-on-error` with an `always()` upload, because one model running out of credit used to fail the step and skip the upload, discarding every batch already collected.
-- **Re-dispatch with `resume_from_run_id`** to restore a previous run's combined artifact, including its original elicitation date. Models and horizons that already finished are not asked again, and half-finished batches resume from their checkpoint — a re-run pays for the shortfall, not the sweep.
+- **Re-dispatch with `resume_from_run_id`** to restore a previous run's combined artifact, including its immutable schema-v2 `.sweep-plan.json`: original elicitation date and sample target, the exact model key/API-id cohort, and—for every horizon—the prompt file, question set, target year, and SHA-256 of the exact runtime prompt after date substitution. You may select only the failed model/horizon work subset; completed work is not asked again, and half-finished batches resume from their checkpoint. Resume inputs cannot lower the original publication threshold or alter the frozen cohort.
 - **Batches are never overwritten or mixed across horizons.** A second run on the same date writes `…__r2.json` beside the original. The importer prefers the newest date within each model and horizon, breaks ties on sample count, and refuses to publish a batch that would drop a model's sample count without `--force`.
 - **Writes are atomic** (temp file plus rename), so a crash mid-write cannot leave truncated JSON.
 - **Every batch carries a SHA-256 digest** of its samples. `tools/verify-runs.mjs` and the importer both check it, so a batch altered after it was written is caught rather than published. Batches predating this carry a backfilled digest, which attests to their content from that point on — not to their origin.
+- **Publication requires a complete same-date sweep.** `tools/check-sweep.mjs` requires exactly the original plan's sample count for every frozen cohort model in every planned horizon on the original run date. It validates prompt provenance and recomputes every aggregate statistic from the samples, then judges the richest immutable revision using the same numeric revision ordering as the importer. Paused and historical extras may remain in storage; newly added roster models do not expand an existing plan. A planned key must still be active and map to its frozen API id before a resume can call it. A failed gate still preserves and pushes raw batches, but cannot regenerate or push site data; resume its artifact until the whole sweep passes. Older schema-v1 or unmanifested artifacts are upgraded once using the current cohort and rendered prompt identities; checkpoint-only artifacts retain the established 20-sample publication floor.
 
 ### When a call fails
 
@@ -80,7 +81,7 @@ Three signals, in increasing order of how hard they are to miss:
 
 1. `--list` to see what the provider now serves (Actions → Run workflow → tick **list_models**, or `node tools/run-elicitation.mjs --list`). Models already on the roster are marked, so anything new stands out. Being *listed* does not mean it is callable — `gemini-2.5-pro` appears in Google's list but rejects inference on new accounts.
 2. Add it to `tools/models.json` and preflight (**check_only**, or `--check`). One cheap call per model confirms the key is accepted and the id resolves.
-3. Elicit just the new entry: Run workflow with `horizons: all` and `models: <its key>`. Existing models keep their earlier run and date until the next monthly sweep.
+3. Run a complete all-active sweep for the horizons you want to publish. A model-only dispatch is useful for collecting or testing the new entry, but its raw batch remains unpublished until the same-date artifact contains every active model; resume that artifact with the remaining model keys to complete it.
 
 A model whose `keyEnv` is missing is skipped, so an unkeyed provider never breaks a run. That silence is the one hazard: a secret stored under the wrong name looks identical to a lab you chose not to key. The workflows therefore accept two aliases created by hand — `MINSTRAL_API_KEY` for Mistral and `KIMI_API_KEY` for Moonshot — alongside the canonical names. Rename the secrets and the aliases become dead weight worth deleting.
 
@@ -128,6 +129,7 @@ The suite is checked by reintroducing each fixed bug and confirming it fails; a 
 - `tools/export-data.mjs` — rebuilds `data/` from `public/data.js` and `runs/`
 - `tools/check-site.mjs` — invariant check on `public/data.js`, run in CI after import
 - `tools/verify-runs.mjs` — integrity check on the raw batches in `runs/` (`--backfill-integrity` to add digests to older files)
+- `tools/check-sweep.mjs` — immutable same-date, frozen-cohort completeness gate used before generated site data may publish
 - `tools/check-links.mjs` — fetches every published link signed-out, so a page that only works for its author fails CI
 - `tools/test-classify.mjs` — asserts the harness sorts provider errors into transient / quota / permanent correctly
 - `tools/test-harness.mjs` — behaviour tests for the elicitation harness, run against `--mock` so they cost nothing

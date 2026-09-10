@@ -63,6 +63,9 @@ jobs:
     outputs:
       should_elicit: ${{ steps.plan.outputs.should_elicit }}
       horizons: ${{ steps.plan.outputs.horizons }}
+      sweep_horizons: ${{ steps.plan.outputs.sweep_horizons }}
+      target_samples: ${{ steps.plan.outputs.target_samples }}
+      sweep_plan: ${{ steps.plan.outputs.sweep_plan }}
       models: ${{ steps.plan.outputs.models }}
       run_date: ${{ steps.plan.outputs.run_date }}
     steps:
@@ -90,6 +93,7 @@ jobs:
           CHECK_ONLY: ${{ inputs.check_only }}
           LIST_MODELS: ${{ inputs.list_models }}
           RESUME_RUN_ID: ${{ inputs.resume_from_run_id }}
+          REQUESTED_SAMPLES: ${{ inputs.samples || '20' }}
           BUDGET_MINUTES: ${{ inputs.budget_minutes || '100' }}
         run: |
           set -euo pipefail
@@ -97,18 +101,25 @@ jobs:
           if [ "${CHECK_ONLY:-false}" = "true" ] || [ "${LIST_MODELS:-false}" = "true" ]; then
             echo 'should_elicit=false' >> "$GITHUB_OUTPUT"
             echo 'horizons=[]' >> "$GITHUB_OUTPUT"
+            echo 'sweep_horizons=[]' >> "$GITHUB_OUTPUT"
+            echo 'target_samples=' >> "$GITHUB_OUTPUT"
+            echo 'sweep_plan={}' >> "$GITHUB_OUTPUT"
             echo 'models=[]' >> "$GITHUB_OUTPUT"
             echo 'run_date=' >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           if [ -n "${RESUME_RUN_ID:-}" ]; then
-            manifest=$(find plan-restored -type f -name '.elicitation-date' -print -quit)
-            if [ -z "$manifest" ]; then
+            mapfile -t restored_dates < <(find plan-restored -type f -name '.elicitation-date' -exec sh -c 'tr -d "[:space:]" < "$1"; printf "\n"' _ '{}' \; | sort -u)
+            if [ "${#restored_dates[@]}" -eq 0 ]; then
               echo "::error::The runs-$RESUME_RUN_ID artifact has no elicitation-date manifest; refusing to resume under a new date."
               exit 1
             fi
-            run_date=$(tr -d '[:space:]' < "$manifest")
+            if [ "${#restored_dates[@]}" -ne 1 ]; then
+              echo "::error::The runs-$RESUME_RUN_ID artifact contains conflicting elicitation dates: ${restored_dates[*]}"
+              exit 1
+            fi
+            run_date="${restored_dates[0]}"
           else
             run_date=$(date -u +%F)
           fi
@@ -125,6 +136,21 @@ jobs:
             *) echo "::error::Unsupported horizon selection: $selection"; exit 1 ;;
           esac
 
+          # Work may be resumed for only the failed model/horizon subset, but
+          # publication continues to use the original immutable sweep plan.
+          # Artifacts from before the plan existed are upgraded conservatively
+          # from every finalized batch/checkpoint on the restored run date.
+          plan_args=(
+            --resolve-plan
+            --horizons-json "$horizons"
+            --date "$run_date"
+            --samples "${REQUESTED_SAMPLES:-20}"
+          )
+          if [ -n "${RESUME_RUN_ID:-}" ]; then plan_args+=(--restored plan-restored); fi
+          sweep_plan=$(node tools/check-sweep.mjs "${plan_args[@]}")
+          sweep_horizons=$(SWEEP_PLAN_JSON="$sweep_plan" node -e 'process.stdout.write(JSON.stringify(JSON.parse(process.env.SWEEP_PLAN_JSON).horizons.map(horizon => horizon.id)))')
+          target_samples=$(SWEEP_PLAN_JSON="$sweep_plan" node -e 'process.stdout.write(String(JSON.parse(process.env.SWEEP_PLAN_JSON).target_samples))')
+
           # Each runner gets five minutes beyond its own budget to flush a
           # final batch. Refuse combinations that could reach the job timeout
           # before the always-run artifact upload steps get a chance to run.
@@ -135,26 +161,45 @@ jobs:
             if ((budget + 5) * count > 315) throw new Error(`${count} horizons at ${budget} minutes each could outrun the resumable-artifact window; reduce the budget or split the dispatch`);
           '
 
-          models=$(node --input-type=module <<'NODE'
-          import { readFileSync } from 'node:fs';
-          const roster = JSON.parse(readFileSync('tools/models.json', 'utf8')).models;
-          const active = roster.filter(model => (model.status || 'active') === 'active');
-          const requested = (process.env.REQUESTED_MODELS || '').split(',').map(value => value.trim()).filter(Boolean);
-          const byKey = new Map(roster.map(model => [model.key, model]));
-          const unknown = requested.filter(key => !byKey.has(key));
-          const inactive = requested.filter(key => byKey.has(key) && (byKey.get(key).status || 'active') !== 'active');
-          if (unknown.length) throw new Error(`unknown model key(s): ${unknown.join(', ')}`);
-          if (inactive.length) throw new Error(`inactive model key(s) cannot be elicited: ${inactive.join(', ')}`);
-          const selected = requested.length ? requested : active.map(model => model.key);
-          if (!selected.length) throw new Error('no active models selected');
-          process.stdout.write(JSON.stringify(selected));
-          NODE
-          )
+          # The matrix is selected from the frozen cohort, never rebuilt from
+          # today's active roster. This also verifies requested prompt files
+          # against their stored hashes before any paid model job can start.
+          models=$(node tools/check-sweep.mjs \
+            --prepare-work \
+            --plan-json "$sweep_plan" \
+            --horizons-json "$horizons" \
+            --requested-models "${REQUESTED_MODELS:-}")
 
           echo 'should_elicit=true' >> "$GITHUB_OUTPUT"
           echo "horizons=$horizons" >> "$GITHUB_OUTPUT"
+          echo "sweep_horizons=$sweep_horizons" >> "$GITHUB_OUTPUT"
+          echo "target_samples=$target_samples" >> "$GITHUB_OUTPUT"
+          echo "sweep_plan=$sweep_plan" >> "$GITHUB_OUTPUT"
           echo "models=$models" >> "$GITHUB_OUTPUT"
           echo "run_date=$run_date" >> "$GITHUB_OUTPUT"
+
+      # Elicitation cannot start until this job finishes, so upload the single
+      # authoritative plan before any paid call. Model artifacts intentionally
+      # omit their own copies; the aggregate job restores this one verbatim.
+      - name: Stage the immutable sweep plan
+        if: steps.plan.outputs.should_elicit == 'true'
+        env:
+          RUN_DATE: ${{ steps.plan.outputs.run_date }}
+          SWEEP_PLAN_JSON: ${{ steps.plan.outputs.sweep_plan }}
+        run: |
+          set -euo pipefail
+          mkdir -p planned/.partial
+          printf '%s\n' "$RUN_DATE" > planned/.partial/.elicitation-date
+          printf '%s\n' "$SWEEP_PLAN_JSON" > planned/.partial/.sweep-plan.json
+
+      - name: Upload the immutable sweep plan
+        if: steps.plan.outputs.should_elicit == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sweep-plan-${{ github.run_id }}
+          path: planned/
+          include-hidden-files: true
+          retention-days: 90
 
   utility:
     needs: plan
@@ -274,7 +319,8 @@ jobs:
           MODEL_KEY: ${{ matrix.model }}
           HORIZONS_JSON: ${{ needs.plan.outputs.horizons }}
           RUN_DATE: ${{ needs.plan.outputs.run_date }}
-          SAMPLES: ${{ inputs.samples || '20' }}
+          SWEEP_PLAN_JSON: ${{ needs.plan.outputs.sweep_plan }}
+          SAMPLES: ${{ needs.plan.outputs.target_samples }}
           BUDGET_MINUTES: ${{ inputs.budget_minutes || '100' }}
         run: |
           set -uo pipefail
@@ -332,8 +378,10 @@ jobs:
 
       - name: Fail this model job after preserving its data
         if: steps.elicit.outcome == 'failure'
+        env:
+          MODEL_KEY: ${{ matrix.model }}
         run: |
-          echo "::error::${{ matrix.model }} did not complete every selected horizon; its paid samples are preserved."
+          echo "::error::$MODEL_KEY did not complete every selected horizon; its paid samples are preserved."
           exit 1
 
   aggregate:
@@ -366,8 +414,17 @@ jobs:
           path: collected/
           merge-multiple: true
 
+      - name: Download the immutable sweep plan
+        uses: actions/download-artifact@v4
+        with:
+          name: sweep-plan-${{ github.run_id }}
+          path: planned/
+
       - name: Merge batches and inspect model-job status
         id: merge
+        env:
+          SWEEP_PLAN_JSON: ${{ needs.plan.outputs.sweep_plan }}
+          RUN_DATE: ${{ needs.plan.outputs.run_date }}
         run: |
           set -euo pipefail
           mkdir -p runs/.partial
@@ -376,6 +433,19 @@ jobs:
           fi
           # Current artifacts win over the restored combined snapshot.
           cp -R collected/. runs/
+          # The plan job's pre-call artifact is the only authority. Restore it
+          # after model artifacts and require exact compact JSON/date matches.
+          cp -R planned/. runs/
+          actual_plan=$(tr -d '\r\n' < runs/.partial/.sweep-plan.json)
+          actual_date=$(tr -d '[:space:]' < runs/.partial/.elicitation-date)
+          if [ "$actual_plan" != "$SWEEP_PLAN_JSON" ]; then
+            echo "::error::The combined artifact does not contain the immutable sweep plan emitted by the plan job."
+            exit 1
+          fi
+          if [ "$actual_date" != "$RUN_DATE" ]; then
+            echo "::error::The combined artifact date $actual_date does not match the sweep plan date $RUN_DATE."
+            exit 1
+          fi
 
           failed=false
           quota_models=''
@@ -406,8 +476,23 @@ jobs:
       - name: Verify raw batches
         run: node tools/verify-runs.mjs
 
+      # Integrity alone is not publication readiness. In particular, a resume
+      # aimed at one failed model can restore valid but incomplete batches for
+      # other active models. Keep the gate non-blocking here so those paid raw
+      # results still reach the branch and resumable artifact; every site step
+      # below checks the gate's original outcome explicitly.
+      - name: Check complete requested sweep
+        id: sweep
+        continue-on-error: true
+        env:
+          SWEEP_PLAN_JSON: ${{ needs.plan.outputs.sweep_plan }}
+        run: |
+          set -euo pipefail
+          node tools/check-sweep.mjs --plan-json "$SWEEP_PLAN_JSON"
+
       - name: Raise a billing alert
         if: steps.merge.outputs.quota_models != ''
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MODELS: ${{ steps.merge.outputs.quota_models }}
@@ -467,33 +552,51 @@ jobs:
           git merge --squash --no-commit "$publish_source_sha"
           git restore --source="$default_ref" --staged --worktree -- .github/workflows
 
+          publish_raw=false
           if git diff --cached --quiet; then
             echo "No new batches to push."
             echo 'pushed=false' >> "$GITHUB_OUTPUT"
-            exit 0
+          else
+            git commit -m "Add raw horizon elicitation batches"
+            publish_raw=true
           fi
-          git commit -m "Add raw horizon elicitation batches"
           if ! git diff --quiet "$default_ref" HEAD -- .github/workflows; then
             echo "::error::Refusing to publish a commit that changes .github/workflows."
             exit 1
           fi
-          git push origin "$branch"
-          echo 'pushed=true' >> "$GITHUB_OUTPUT"
-          echo "Raw batches pushed to \`$branch\`." >> "$GITHUB_STEP_SUMMARY"
+          if [ "$publish_raw" = "true" ]; then
+            git push origin "$branch"
+            echo 'pushed=true' >> "$GITHUB_OUTPUT"
+            echo "Raw batches pushed to \`$branch\`." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          # The branch must retain the default branch's trusted workflow, but
+          # the remainder of this running job must test the workflow source
+          # that launched it. Restore source into the working tree only; never
+          # stage it, so the later site-data commit cannot publish this change.
+          git restore --source="$SOURCE_SHA" --worktree -- .github/workflows
+          if ! git diff --quiet "$SOURCE_SHA" -- .github/workflows; then
+            echo "::error::Could not restore the source workflow for local checks."
+            exit 1
+          fi
+          if ! git diff --cached --quiet; then
+            echo "::error::Source workflow restore unexpectedly staged files."
+            exit 1
+          fi
 
       - name: Import every horizon into site data
-        if: needs.elicit.result == 'success' && steps.merge.outputs.failed == 'false'
+        if: needs.elicit.result == 'success' && steps.merge.outputs.failed == 'false' && steps.sweep.outcome == 'success'
         run: |
           set -euo pipefail
           node tools/import-runs.mjs
           node tools/export-data.mjs
 
       - name: Check the complete site
-        if: needs.elicit.result == 'success' && steps.merge.outputs.failed == 'false'
+        if: needs.elicit.result == 'success' && steps.merge.outputs.failed == 'false' && steps.sweep.outcome == 'success'
         run: node tools/check-all.mjs
 
       - name: Push the regenerated site
-        if: needs.elicit.result == 'success' && steps.merge.outputs.failed == 'false'
+        if: needs.elicit.result == 'success' && steps.merge.outputs.failed == 'false' && steps.sweep.outcome == 'success'
         run: |
           set -euo pipefail
           branch="elicitation/${{ github.run_id }}"
@@ -507,7 +610,7 @@ jobs:
           echo "Site data pushed. Open a PR from \`$branch\` to publish." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Fail after preserving incomplete results
-        if: ${{ always() && (needs.elicit.result != 'success' || steps.merge.outputs.failed == 'true') }}
+        if: ${{ always() && (needs.elicit.result != 'success' || steps.merge.outputs.failed == 'true' || steps.sweep.outcome != 'success') }}
         run: |
-          echo "::error::At least one model/horizon is incomplete. Raw batches and checkpoints were preserved; resume from run ${{ github.run_id }}."
+          echo "::error::At least one model/horizon is incomplete or the full same-date sweep gate did not pass. Raw batches and checkpoints were preserved; resume from run ${{ github.run_id }}."
           exit 1

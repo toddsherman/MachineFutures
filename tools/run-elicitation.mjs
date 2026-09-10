@@ -34,7 +34,8 @@ import { readFileSync, writeFileSync, appendFileSync, renameSync, rmSync, mkdirS
 import { createHash, randomUUID } from 'node:crypto';
 import { join, dirname, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, normalizeHorizon, horizonOfBatch } from './horizons.mjs';
+import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, HORIZON_RUN_CONFIG, normalizeHorizon, horizonOfBatch, renderHorizonPrompt } from './horizons.mjs';
+import { normalizeSweepPlan } from './check-sweep.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -81,23 +82,6 @@ if (!/^\d{4}-\d{2}-\d{2}$/.test(RUN_DATE)
 const ONLY = argValue('--models')?.split(',').map(s => s.trim()).filter(Boolean) || null;
 const TIER = argValue('--tier');
 const FORCE = args.includes('--force');
-const HORIZON_FILES = {
-  'long-term': {
-    promptFile: 'end_states.md',
-    questionSet: 'end-states-v3',
-    runSuffix: 'end-states'
-  },
-  '2030': {
-    promptFile: 'end_states_2030.md',
-    questionSet: 'end-states-2030-v1',
-    runSuffix: 'end-states-2030'
-  },
-  '2040': {
-    promptFile: 'end_states_2040.md',
-    questionSet: 'end-states-2040-v1',
-    runSuffix: 'end-states-2040'
-  }
-};
 const horizonArg = argValue('--horizon');
 if (args.includes('--horizon') && !horizonArg) {
   console.error(`✗ --horizon needs one of: ${HORIZON_IDS.join(', ')}`);
@@ -108,7 +92,7 @@ if (!HORIZON) {
   console.error(`✗ --horizon must be one of ${HORIZON_IDS.join(', ')}; received ${JSON.stringify(horizonArg)}`);
   process.exit(1);
 }
-const HORIZON_CONFIG = HORIZON_FILES[HORIZON];
+const HORIZON_CONFIG = HORIZON_RUN_CONFIG[HORIZON];
 const TARGET_YEAR = HORIZONS.find(candidate => candidate.id === HORIZON).targetYear;
 const QUESTION_SET = HORIZON_CONFIG.questionSet;
 // A reasoning model can legitimately take minutes; a stalled connection can
@@ -217,15 +201,7 @@ const isCandidate = id => !NOISE.test(id) && !SUBTIER.test(id) && !SNAPSHOT.test
 
 /* ---------- prompt ---------- */
 function buildPrompt() {
-  const promptPath = join(root, 'public', HORIZON_CONFIG.promptFile);
-  const doc = readFileSync(promptPath, 'utf8');
-  const match = doc.match(/^--- PROMPT BEGINS ---$([\s\S]*?)^--- PROMPT ENDS ---$/m);
-  if (!match) throw new Error(`PROMPT BEGINS/ENDS delimiters not found in public/${HORIZON_CONFIG.promptFile}`);
-  const [y, m, d] = RUN_DATE.split('-').map(Number);
-  const longDate = new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'long', day: 'numeric' });
-  const prompt = match[1].trim().replaceAll('{{RUN_DATE}}', longDate);
-  if (prompt.includes('{{')) throw new Error('Unsubstituted placeholder left in prompt');
-  return prompt;
+  return renderHorizonPrompt(root, HORIZON, RUN_DATE).prompt;
 }
 
 /* ---------- provider adapters (raw HTTP, zero dependencies) ---------- */
@@ -335,7 +311,7 @@ function appendSample(path, sample) {
   appendFileSync(path, JSON.stringify(sample) + '\n');
 }
 
-function resumeSamples(path, model) {
+function resumeSamples(path, model, promptSha256) {
   if (!existsSync(path)) return [];
   const kept = [];
   const lines = readFileSync(path, 'utf8').split('\n').filter(Boolean);
@@ -347,6 +323,9 @@ function resumeSamples(path, model) {
       const checkpointHorizon = horizonOfBatch(sample);
       if (checkpointHorizon !== HORIZON || (sample.question_set && sample.question_set !== QUESTION_SET)) {
         throw new Error('belongs to a different horizon or question set');
+      }
+      if (sample.prompt_file !== HORIZON_CONFIG.promptFile || sample.prompt_sha256 !== promptSha256) {
+        throw new Error('belongs to a different prompt identity');
       }
       const values = STATE_NAMES.map((_, i) => sample.answers?.['S' + (i + 1)]?.value);
       if (values.some(v => !Number.isInteger(v)) || values.reduce((a, c) => a + c, 0) !== 100) throw new Error('not a valid allocation');
@@ -367,6 +346,7 @@ async function elicit(model, prompt) {
 
   const runId = `${RUN_DATE}__${slug(model.model)}__closed_book__${HORIZON_CONFIG.runSuffix}`;
   const partialPath = join(PARTIAL_DIR, `${runId}.jsonl`);
+  const promptSha256 = createHash('sha256').update(prompt).digest('hex');
 
   // A re-dispatch after a partial failure restores the previous run's batches,
   // so a model that already finished must not be bought a second time — and a
@@ -382,7 +362,10 @@ async function elicit(model, prompt) {
       const existingHorizon = horizonOfBatch(existing);
       const sameInstrument = existingHorizon === HORIZON
         && existing.question_set === QUESTION_SET
-        && existing.model?.api_string === model.model;
+        && existing.model?.api_string === model.model
+        && existing.track === 'closed_book'
+        && existing.harness?.prompt_file === HORIZON_CONFIG.promptFile
+        && existing.harness?.prompt_sha256 === promptSha256;
       if (!sameInstrument) {
         console.warn(`! ${model.key}: ${existingPath} belongs to a different model, horizon, or question set — writing a revision beside it`);
       } else {
@@ -411,7 +394,7 @@ async function elicit(model, prompt) {
 
   // Resume: samples already paid for on an earlier attempt at this run are
   // read back, and only the shortfall is asked for.
-  const samples = carried.length ? carried : resumeSamples(partialPath, model);
+  const samples = carried.length ? carried : resumeSamples(partialPath, model, promptSha256);
   const failures = [];
   const seen = new Map();
   samples.forEach(s => seen.set(signatureOf(s.answers), s.sample));
@@ -448,7 +431,16 @@ async function elicit(model, prompt) {
       const sig = signatureOf(answers);
       if (seen.has(sig)) console.warn(`! ${model.key}: sample ${samples.length + 1} is identical to sample ${seen.get(sig)} (kept — an API run, not a paste error, but worth noting)`);
       else seen.set(sig, samples.length + 1);
-      const sample = { sample: samples.length + 1, horizon: HORIZON, target_year: TARGET_YEAR, question_set: QUESTION_SET, meta, answers };
+      const sample = {
+        sample: samples.length + 1,
+        horizon: HORIZON,
+        target_year: TARGET_YEAR,
+        question_set: QUESTION_SET,
+        prompt_file: HORIZON_CONFIG.promptFile,
+        prompt_sha256: promptSha256,
+        meta,
+        answers
+      };
       samples.push(sample);
       // Checkpoint before anything else can fail. Everything above this line
       // has already been paid for.
@@ -505,8 +497,8 @@ async function elicit(model, prompt) {
       horizon: HORIZON,
       target_year: TARGET_YEAR,
       question_set: QUESTION_SET,
-      prompt_file: `public/${HORIZON_CONFIG.promptFile}`,
-      prompt_sha256: createHash('sha256').update(prompt).digest('hex'),
+      prompt_file: HORIZON_CONFIG.promptFile,
+      prompt_sha256: promptSha256,
       target_samples: SAMPLES,
       complete: samples.length >= SAMPLES,
       quota_exhausted: Boolean(quotaExhausted),
@@ -686,6 +678,36 @@ if (CHECK) {
 }
 
 const prompt = buildPrompt();
+if (process.env.SWEEP_PLAN_JSON) {
+  let plan;
+  try { plan = normalizeSweepPlan(JSON.parse(process.env.SWEEP_PLAN_JSON)); }
+  catch (error) {
+    console.error(`✗ invalid SWEEP_PLAN_JSON: ${error.message}`);
+    process.exit(1);
+  }
+  const horizonPlan = plan.horizons.find(candidate => candidate.id === HORIZON);
+  if (!horizonPlan) {
+    console.error(`✗ horizon ${HORIZON} is outside the frozen sweep plan`);
+    process.exit(1);
+  }
+  const promptSha256 = createHash('sha256').update(prompt).digest('hex');
+  const mismatches = [];
+  if (plan.run_date !== RUN_DATE) mismatches.push(`date ${RUN_DATE} != ${plan.run_date}`);
+  if (plan.target_samples !== SAMPLES) mismatches.push(`samples ${SAMPLES} != ${plan.target_samples}`);
+  if (horizonPlan.target_year !== TARGET_YEAR) mismatches.push(`target_year ${TARGET_YEAR} != ${horizonPlan.target_year}`);
+  if (horizonPlan.question_set !== QUESTION_SET) mismatches.push(`question_set ${QUESTION_SET} != ${horizonPlan.question_set}`);
+  if (horizonPlan.prompt_file !== HORIZON_CONFIG.promptFile) mismatches.push(`prompt_file ${HORIZON_CONFIG.promptFile} != ${horizonPlan.prompt_file}`);
+  if (horizonPlan.prompt_sha256 !== promptSha256) mismatches.push(`prompt_sha256 ${promptSha256} != ${horizonPlan.prompt_sha256}`);
+  const plannedByKey = new Map(plan.cohort.map(candidate => [candidate.key, candidate.model]));
+  for (const model of roster.filter(candidate => (candidate.status || 'active') === 'active')) {
+    if (!plannedByKey.has(model.key)) mismatches.push(`model key ${model.key} is outside the frozen cohort`);
+    else if (plannedByKey.get(model.key) !== model.model) mismatches.push(`model ${model.key} maps to ${model.model}, not frozen id ${plannedByKey.get(model.key)}`);
+  }
+  if (mismatches.length) {
+    console.error(`✗ run does not match the immutable sweep plan: ${mismatches.join('; ')}`);
+    process.exit(1);
+  }
+}
 console.log(`Eliciting ${SAMPLES} samples for ${roster.length} model(s), horizon ${HORIZON} (${TARGET_YEAR}), run date ${RUN_DATE}${MOCK ? ' [MOCK]' : ''}`);
 
 const results = [];

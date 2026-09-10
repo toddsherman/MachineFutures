@@ -3,6 +3,10 @@
 // Historical end-state batches predate horizon-aware storage. Their prompt was
 // explicitly anchored on the year 3000, so an absent horizon is intentionally
 // interpreted as the public "long-term" view rather than rejected.
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 export const DEFAULT_HORIZON = 'long-term';
 
 export const HORIZONS = Object.freeze([
@@ -12,6 +16,62 @@ export const HORIZONS = Object.freeze([
 ]);
 
 export const HORIZON_IDS = Object.freeze(HORIZONS.map(horizon => horizon.id));
+
+export const HORIZON_RUN_CONFIG = Object.freeze({
+  'long-term': Object.freeze({ promptFile: 'public/end_states.md', questionSet: 'end-states-v3', runSuffix: 'end-states' }),
+  '2030': Object.freeze({ promptFile: 'public/end_states_2030.md', questionSet: 'end-states-2030-v1', runSuffix: 'end-states-2030' }),
+  '2040': Object.freeze({ promptFile: 'public/end_states_2040.md', questionSet: 'end-states-2040-v1', runSuffix: 'end-states-2040' })
+});
+
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'];
+
+export function renderHorizonPrompt(projectRoot, horizon, runDate) {
+  const config = HORIZON_RUN_CONFIG[horizon];
+  if (!config) throw new Error(`unsupported horizon ${JSON.stringify(horizon)}; expected ${HORIZON_IDS.join(', ')}`);
+  const matchDate = String(runDate).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const parsedDate = new Date(`${runDate}T00:00:00Z`);
+  if (!matchDate || Number.isNaN(parsedDate.valueOf()) || parsedDate.toISOString().slice(0, 10) !== runDate) {
+    throw new Error(`invalid prompt run date ${JSON.stringify(runDate)}`);
+  }
+
+  const doc = readFileSync(join(projectRoot, config.promptFile), 'utf8');
+  const delimited = doc.match(/^--- PROMPT BEGINS ---$([\s\S]*?)^--- PROMPT ENDS ---$/m);
+  if (!delimited) throw new Error(`PROMPT BEGINS/ENDS delimiters not found in ${config.promptFile}`);
+  const [, year, month, day] = matchDate;
+  const longDate = `${MONTHS[Number(month) - 1]} ${Number(day)}, ${year}`;
+  const prompt = delimited[1].trim().replaceAll('{{RUN_DATE}}', longDate);
+  if (prompt.includes('{{')) throw new Error(`unsubstituted placeholder left in ${config.promptFile}`);
+  return {
+    prompt,
+    identity: Object.freeze({
+      id: horizon,
+      target_year: HORIZONS.find(candidate => candidate.id === horizon).targetYear,
+      prompt_file: config.promptFile,
+      question_set: config.questionSet,
+      prompt_sha256: createHash('sha256').update(prompt).digest('hex')
+    })
+  };
+}
+
+export function runRevision(value) {
+  const match = String(value || '').match(/__r([1-9][0-9]*)(?:\.json)?$/);
+  return match ? Number(match[1]) : 1;
+}
+
+// Newest date, then richest sample set, then highest immutable revision. Both
+// the publication gate and importer use this ordering so they cannot validate
+// one same-day sibling and publish another.
+export function compareRunPreference(left, right) {
+  const dateOf = item => String(item?.date ?? item?.asked_on ?? item?.batch?.asked_on ?? '');
+  const samplesOf = item => Number(item?.sampleCount ?? item?.samples?.length
+    ?? item?.batch?.samples?.length ?? item?.n_samples ?? item?.batch?.n_samples ?? 0);
+  const identityOf = item => item?.file ?? item?.run_id ?? item?.batch?.run_id ?? '';
+  return dateOf(right).localeCompare(dateOf(left))
+    || samplesOf(right) - samplesOf(left)
+    || runRevision(identityOf(right)) - runRevision(identityOf(left))
+    || String(identityOf(right)).localeCompare(String(identityOf(left)));
+}
 
 export function normalizeHorizon(value) {
   if (value === undefined || value === null || value === '') return DEFAULT_HORIZON;

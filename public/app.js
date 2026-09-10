@@ -344,8 +344,7 @@
   function renderHeroStats(entries) {
     const labs = new Set(entries.map(entry => entry.provider));
     const samples = [...new Set(entries.map(entry => entry.sampleCount).filter(Boolean))];
-    for (const [id, value] of [['#dek-models', entries.length], ['#dek-labs', labs.size],
-                              ['#origin-models', entries.length], ['#origin-labs', labs.size]]) {
+    for (const [id, value] of [['#dek-models', entries.length], ['#dek-labs', labs.size]]) {
       const el = $(id);
       if (el) el.textContent = value;
     }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="theme-color" content="#11120f">
   <meta name="description" content="We asked the leading AI models to assign 100 percentage points across 11 mutually exclusive end states for humanity&rsquo;s relationship with AI. A living record, re-asked as new models arrive.">
   <title>Machine Futures — What are AI&rsquo;s predictions about AI?</title>
@@ -28,7 +28,6 @@
         <div class="origin-note">
           <p>That was 2014, far before AI had its breakout moment. Back then we couldn&rsquo;t ask AI what it thinks will happen, but we can now.</p>
           <p>This site began as a way to ask what the models themselves expect. Many people are understandably uneasy about those answers: they may reveal how these systems model the future, and they may influence how future systems behave. The risks are serious, but the future is what we make it.</p>
-          <p><b id="origin-models">&mdash;</b> frontier models from <b id="origin-labs">&mdash;</b> labs each receive the same taxonomy of eleven mutually exclusive end states and allocate exactly 100 percentage points across them, twenty times over, at their own default settings.</p>
         </div>
       </section>
 
@@ -125,6 +124,7 @@
     <div id="dialog-content"></div>
   </dialog>
 
+  <script src="analytics.js"></script>
   <script src="data.js?v=20260825-rowaxis"></script>
   <script src="app.js?v=20260825-rowaxis"></script>
 </body>

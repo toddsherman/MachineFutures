@@ -9,18 +9,18 @@ Everything Machine Futures publishes, in formats that open in a spreadsheet with
 | `rationales.csv` | horizon × model × ending | The reasoning each model gave, taken from the sample nearest its median. |
 | `samples.csv` | horizon × run × sample × ending | Every raw sample from every run, unaggregated. |
 | `quality.csv` | horizon × run | How each run went: samples kept, answers rejected as malformed, transient and quota errors, and the reject rate. |
-| `endings.csv` | ending | The taxonomy: the eleven end states, their families, and which carry extinction risk. |
-| `forecasts.json` | — | All of the above as one structured document, grouped under `datasets` by horizon. |
+| `endings.csv` | horizon × ending | The horizon-appropriate wording for all eleven states, their families, and which carry extinction risk. |
+| `forecasts.json` | — | All of the above as one structured document, including `endings_by_horizon` and datasets grouped by horizon. |
 
 ## What the numbers mean
 
 Each model allocates exactly 100 whole percentage points across eleven mutually exclusive states, twenty times per horizon, at its own default settings. The published figure per ending is the median across that model's samples, renormalized so the eleven still sum to 100.
 
-Every combined CSV begins with a `horizon` column. Its canonical values are `long-term`, `2030`, and `2040`; historical raw batches without a horizon belong to `long-term`. In `forecasts.json`, `default_horizon` names the default view, `horizons` carries display metadata, and each `datasets.<horizon>` object carries its own dataset date and models. Values from different horizons are never pooled.
+Every combined CSV begins with a `horizon` column. Its canonical values are `long-term`, `2030`, and `2040`; historical raw batches without a horizon belong to `long-term`. `question_set` and `prompt_sha256` identify the exact instrument where available. In `forecasts.json`, `default_horizon` names the default view, `horizons` carries display metadata, `endings` preserves the long-term taxonomy for compatibility, `endings_by_horizon` carries the displayed wording, and each `datasets.<horizon>` object carries its own dataset date and models. Values from different horizons or prompt versions are never pooled.
 
 `probability_pct` is the published figure. `samples_min_pct` and `samples_max_pct` are the full spread across the model's samples; `middle_half_low_pct` and `middle_half_high_pct` are its quartiles. A gap between two models means little unless it clears the sampling error — see `bootstrap_standard_error` in `exposure.csv`.
 
-The long-term view asks about the durable year-3000 arrangement. The dated views use the same taxonomy for their named horizons. These are records of what models express, not a leaderboard, and they are separate from the retired 50-question 2030 benchmark in `archive/`.
+The long-term view asks about the durable year-3000 arrangement. The dated views keep the same eleven mutually exclusive categories but describe the relationship visible at year end without requiring it to be permanent. These are records of what models express, not a leaderboard, and they are separate from the retired 50-question 2030 benchmark in `archive/`.
 
 ## Answers that were thrown away
 
@@ -28,7 +28,7 @@ A model that returns a malformed allocation is re-asked until it returns a valid
 
 ## The full raw batches
 
-`runs/` in the repository root holds the complete batches: every sample, every rationale, the failures, the target horizon, the exact model id called, and a SHA-256 digest of the samples. Legacy batches predate the explicit horizon field and imply `long-term`. Those files are the provenance; this folder is the convenient copy.
+`runs/` in the repository root holds the complete batches: every sample, every rationale, the failures, the target horizon, the exact model id called, and a SHA-256 digest of the samples. Legacy batches predate the explicit horizon field and imply `long-term`. Superseded short-horizon prompt versions remain there as provenance and in the raw `samples.csv` and `quality.csv`, identified by `question_set`; only the current version appears on the published board. Those files are the provenance; this folder is the convenient copy.
 
 ## Reuse
 

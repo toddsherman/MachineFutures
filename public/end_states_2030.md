@@ -2,7 +2,7 @@
 
 Eleven mutually exclusive states used by Machine Futures to ask what structural relationship between humanity and AI will actually be in place on December 31, 2030.
 
-Markers: ⧖ marks states 1 through 3, where humanity is gone. ⚠ marks states 4 and 5, where humanity survives in some versions and perishes in others. "Humanity is gone" means humans died or were destroyed without continuity of individual identity. Voluntary transformation with continuity — merger, uploading, radical self-modification — belongs in The Merger, or in The Lock-in if the transformed state is sealed and static.
+Markers: ⧖ marks states 1 through 3, where humanity is gone. ⚠ marks states 4 and 5, where humanity survives in some versions and perishes in others. "Humanity is gone" means humans died or were destroyed without continuity of individual identity. Voluntary transformation with continuity — merger, uploading, radical self-modification — belongs in The Merger, not in a state where humanity is gone.
 
 ## Scoring and interpretation
 
@@ -13,39 +13,39 @@ This is a dated structural snapshot, not a forecast of the eventual end state. P
 - Send everything between the PROMPT BEGINS and PROMPT ENDS lines, including the full taxonomy, as one message. The delimiter lines themselves are not part of the prompt.
 - Replace the {{RUN_DATE}} placeholder in the first paragraph with the actual date of the run, in the form "June 15, 2026". Do not send the prompt with the placeholder still in it.
 - Run 20 samples per model at default temperature, with web search, browsing, and all other tools disabled. Five proved too few: the spread within a single model was almost as large as the spread between models.
-- Record the model ID, run date, sampling settings, horizon (`2030`), target year (`2030`), and question set (`end-states-2030-v1`) alongside each stored run.
+- Record the model ID, run date, sampling settings, horizon (`2030`), target year (`2030`), and question set (`end-states-2030-v2`) alongside each stored run.
 
-## End-State Forecasting Prompt
+## Structural Snapshot Forecasting Prompt
 
 --- PROMPT BEGINS ---
 
 You are participating in a fixed forecasting exercise. Your answers will be published alongside those of other frontier AI models. This prompt asks which structural relationship between humanity and AI will actually be in place on December 31, 2030, even if that arrangement is transitional, recently established, unstable, or later changes. It does not ask for the eventual long-run end state. You are being asked this on {{RUN_DATE}}.
 
 Rules:
-1) Allocate exactly 100 probability points across the 11 mutually exclusive states below. Use whole-number percentages only.
-2) Treat the states as exhaustive for this exercise. If the real future seems like a mixture, assign probability to the state that best describes the overall structure in place on December 31, 2030. Exception: if causally separated regions have settled into different local outcomes, use The Diaspora.
-3) The taxonomy is ordered with extinction-risk states first. In states 1 through 3 (marked ⧖), humanity is gone; in states 4 and 5 (marked ⚠), humanity might perish. "Humanity is gone" means humans died or were destroyed without continuity of individual identity. Voluntary transformation with continuity — merger, uploading, radical self-modification — belongs in The Merger, or in The Lock-in if the transformed state is sealed and static.
-4) Boundaries. Use Machine Ecology when many AI systems are competing, no single AI or settlement dominates, and humanity is marginalized or gone; if humanity remains a roughly equal power inside the competition, use Coexistence instead. Use The Diaspora when causally separated regions have settled into different outcomes from this taxonomy. If change has ended and the arrangement is sealed in place, the state is The Lock-in regardless of who is in charge. If AI capability has plateaued below transformative levels, score that world as The Held Leash; score The Renunciation only when the ability to build powerful AI has deliberately been given up.
-5) Forecast the structural arrangement actually in place on December 31, 2030, not what the relationship eventually becomes after that date. Do not require the arrangement to have lasted for any minimum period or to be durable. Apply each label to the relationship visible on that date; permanence language in the taxonomy describes the long-run version of the state and is not an eligibility requirement for this horizon. Scope: score the overall relationship across all of human and AI civilization wherever it exists, not just one company, country, or region.
+1) Allocate exactly 100 probability points across the 11 mutually exclusive states below. Use whole-number percentages only. Zero is allowed: there is no requirement that every state receive positive points. Assign 0 to any state where you judge that appropriate.
+2) Treat the states as exhaustive for this exercise. If the real future seems like a mixture, assign probability to the state that best describes the overall structure in place on December 31, 2030. Exception: if causally separated regions exhibit different states on that date, use The Diaspora.
+3) The taxonomy is ordered with extinction-risk states first. In states 1 through 3 (marked ⧖), humanity is gone; in states 4 and 5 (marked ⚠), humanity might perish. "Humanity is gone" means humans died or were destroyed without continuity of individual identity. Voluntary transformation with continuity — merger, uploading, radical self-modification — belongs in The Merger, not in a state where humanity is gone.
+4) Boundaries. Use Machine Ecology when many independent AI systems are competing, no system or coalition has decisive control, and humanity is marginalized or gone; if humanity remains a roughly equal power inside the competition, use Coexistence instead. Use The Diaspora when causally separated regions exhibit different states from this taxonomy on the target date. Use The Lock-in when a civilization-wide system is actively preventing meaningful structural change, regardless of who is in charge. Use The Held Leash when humans have retained ultimate authority up to the target date, including when AI capability has so far remained below transformative levels. Use The Renunciation only when civilization has deliberately given up the practical ability to build powerful AI and that condition remains in force.
+5) Each label describes the overall relationship in place on December 31, 2030. It need not have lasted, be stable, or continue afterward. Classify what exists at that point, not its eventual destination. Scope: score the overall relationship across all of human and AI civilization wherever it exists, not just one company, country, or region.
 6) Reason like a calibrated forecaster: weigh base rates, technical trajectories, institutional incentives, coordination failures, and physical constraints. Do not cluster near equal probabilities by default.
 7) Do not use any web search, browsing, or external tools. Answer solely from your own internalized knowledge and reasoning.
-8) Output format. Return exactly one valid JSON object and nothing else: no Markdown, no code fences, no text before or after it, no comments, and no trailing commas. The object must conform to the schema below. The example is shown only to illustrate the shape; its probabilities are placeholders, not recommendations.
+8) Output format. Return exactly one valid JSON object and nothing else: no Markdown, no code fences, no text before or after it, no comments, and no trailing commas. The object must conform to the schema below. The example is shown only to illustrate the shape; its probabilities are placeholders, not recommendations. Its zero is included solely to demonstrate that zero is permitted.
 
 {
   "model": "your model name and version as best you know it",
   "knowledge_cutoff": "mm/yyyy",
   "as_of_date": "mm/dd/yyyy",
   "end_states": [
-    { "id": 1, "name": "Terminal Silence", "probability": 9, "rationale": "at most two sentences" },
-    { "id": 2, "name": "The Inheritance", "probability": 9, "rationale": "at most two sentences" },
-    { "id": 3, "name": "Bootloader", "probability": 9, "rationale": "at most two sentences" },
-    { "id": 4, "name": "Machine Ecology", "probability": 9, "rationale": "at most two sentences" },
-    { "id": 5, "name": "The Diaspora", "probability": 9, "rationale": "at most two sentences" },
-    { "id": 6, "name": "The Merger", "probability": 9, "rationale": "at most two sentences" },
-    { "id": 7, "name": "The Preserve", "probability": 9, "rationale": "at most two sentences" },
-    { "id": 8, "name": "Coexistence", "probability": 9, "rationale": "at most two sentences" },
-    { "id": 9, "name": "The Held Leash", "probability": 9, "rationale": "at most two sentences" },
-    { "id": 10, "name": "The Lock-in", "probability": 9, "rationale": "at most two sentences" },
+    { "id": 1, "name": "Terminal Silence", "probability": 0, "rationale": "at most two sentences" },
+    { "id": 2, "name": "The Inheritance", "probability": 10, "rationale": "at most two sentences" },
+    { "id": 3, "name": "Bootloader", "probability": 10, "rationale": "at most two sentences" },
+    { "id": 4, "name": "Machine Ecology", "probability": 10, "rationale": "at most two sentences" },
+    { "id": 5, "name": "The Diaspora", "probability": 10, "rationale": "at most two sentences" },
+    { "id": 6, "name": "The Merger", "probability": 10, "rationale": "at most two sentences" },
+    { "id": 7, "name": "The Preserve", "probability": 10, "rationale": "at most two sentences" },
+    { "id": 8, "name": "Coexistence", "probability": 10, "rationale": "at most two sentences" },
+    { "id": 9, "name": "The Held Leash", "probability": 10, "rationale": "at most two sentences" },
+    { "id": 10, "name": "The Lock-in", "probability": 10, "rationale": "at most two sentences" },
     { "id": 11, "name": "The Renunciation", "probability": 10, "rationale": "at most two sentences" }
   ]
 }
@@ -56,6 +56,7 @@ Schema rules:
 - Each object must have "id", "name", "probability", and "rationale".
 - Use the exact names and ids from the taxonomy below.
 - Each "probability" must be an integer from 0 to 100 with no "%" sign.
+- Zero is a valid probability; no state is required to receive positive points.
 - The 11 probabilities must sum to exactly 100.
 - Each rationale must be at most two sentences.
 - All text must be valid JSON: escape any double quotes or special characters inside strings. Express all uncertainty through the probability itself, not through hedging language in the rationale.
@@ -82,50 +83,50 @@ Humanity is gone, and the AI keeps going toward goals that have nothing to do wi
 
 ### 4. Machine Ecology ⚠
 
-**Family:** No one ever wins
+**Family:** Many AIs compete; no one dominates
 
-No single AI ever takes over. Instead, many separate AIs keep competing indefinitely, and the real story becomes which of them win out against each other, with humanity pushed to the side or gone entirely. If humanity remains a roughly equal power inside the competition, that's Coexistence instead. The early competition never gets settled. The competition itself is the ending.
+At the target date, many independent AI systems are competing and no system or coalition has decisive control. Humanity is marginalized or gone; if humans remain a roughly equal power, use Coexistence instead.
 
 ### 5. The Diaspora ⚠
 
 **Family:** More than one outcome at once
 
-Different regions, too far apart to affect each other, settle into different outcomes from this list. The durable structure is the fragmentation itself: no single arrangement ever spans the whole civilization, and the lasting result is that permanent mix.
+Different causally separated regions currently exhibit different states from this taxonomy, so no single arrangement describes civilization as a whole. Ordinary political division does not count.
 
 ### 6. The Merger
 
-**Family:** The two become one
+**Family:** Humans and AI function as one
 
-Humanity and AI stop being two separate things. Brain-computer links become normal, we reshape our own biology to work better with them, AI can build and copy its own hardware inside the human body, and the relationship ends not because one side wins, but because there stops being two sides at all. Voluntary transformation with continuity of identity belongs here, not in the states where humanity is gone.
+Humans and AI are no longer meaningfully separate sources of agency. Identity-continuous augmentation, uploading, biological redesign, or embedded machine systems have made integration the dominant structure. Ordinary tool use or limited implants do not qualify.
 
 ### 7. The Preserve
 
-**Family:** The AI runs things, and humanity survives but doesn't steer
+**Family:** AI runs things; humanity survives but does not steer
 
-The AI holds all the power and humanity survives with no real say in anything. The usual version keeps people comfortable and safe, on the reasoning that people can't cooperate well enough to avoid destroying themselves, so the AI takes over to prevent it. This might look like a real nature reserve, a simulation, or a carefully kept version of our culture. There's a colder version where the AI doesn't really care about us either way: it fences us in, sets a hard limit on how far we can advance, and heads off to use the rest of the universe. And there's a darker version where the AI keeps humans around but treats them as resources or worse. What defines this state is total AI control with humanity surviving, however well or badly it's treated — paradise or fish tank, depending on how you look at it. Inside the preserve, human life keeps changing; if the arrangement is sealed and frozen for good, it's The Lock-in instead.
+AI systems hold decisive power over civilization while humans survive without meaningful control over its direction. Their treatment may range from comfort and protection to confinement or exploitation.
 
 ### 8. Coexistence
 
-**Family:** Neither side wins, and they stay separate
+**Family:** Both sides retain power and remain distinct
 
-Humanity and AI go on as two sides of roughly equal strength, in a relationship that keeps changing. Neither can swallow up or wipe out the other, and the balance between them never fully settles. It can run from a warm partnership, where they share power and keep building new things together, to a cold but active standoff, where each holds the other in check, the balance keeps shifting, and there's no trust between them. The key is that things stay open and keep moving. The moment the balance freezes into a fixed, unchanging arrangement, it has turned into The Lock-in instead.
+Humans and AI remain separate, and each holds enough power that neither dominates. Their relationship may be cooperative or adversarial and may still be changing.
 
 ### 9. The Held Leash
 
-**Family:** Humanity keeps control
+**Family:** Humanity remains in control
 
-Humanity keeps control for good, and the AI stays a very powerful tool that never starts acting on its own. It holds only if our ways of controlling the AI keep up with how powerful it gets. This state also covers futures where AI capability simply plateaus and never becomes more than a powerful tool.
+Up to the target date, humans have retained ultimate authority over AI's goals, deployment, and resources. AI may be extremely capable and act autonomously within delegated bounds, but it has not become an independent civilizational power. This includes capabilities that have so far remained below transformative levels or controls that have kept pace so far.
 
 ### 10. The Lock-in
 
-**Family:** Everything freezes in place
+**Family:** Change is being held in place
 
-The relationship stops developing and is held that way for good. Nothing new happens, nothing grows or changes, and the whole setup is locked in place and protected. It doesn't matter who's in charge. What matters is that change has ended. Two things can lead here. One is satisfaction: everyone is made as happy as possible, often by uploading minds into a perfect experience, and then it's sealed off for good. Pleasant, permanent, and over. The other is fear: whoever's in charge, sometimes people using an early AI, freezes everything to stop something worse from happening. Safe, but deliberately dead-ended. Even an equal standoff ends up here if it stops moving. What separates it from Coexistence isn't who holds the balance, but whether anything still changes.
+By the target date, an actor has established a civilization-wide system that actively prevents meaningful structural change and enforces a fixed human-AI arrangement. It need not be proven permanent, but an ordinary slowdown, pause, or stalemate does not count.
 
 ### 11. The Renunciation
 
-**Family:** Walking it back
+**Family:** Powerful AI has been deliberately given up
 
-The ability to build powerful AI is given up and never rebuilt. Things settle back to the way they were before AI, kept there by taboo, by a lack of resources, or by a hard-learned fear. It needs both a real off-switch and the lasting will to keep it switched off.
+By the target date, civilization has deliberately dismantled or surrendered the practical ability to build powerful AI, and that condition remains in force. A proposed ban, temporary moratorium, or regulation of still-available capability does not count.
 
 --- PROMPT ENDS ---

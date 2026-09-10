@@ -42,6 +42,12 @@ const nextPaint = page => page.evaluate(() => new Promise(resolve => {
   requestAnimationFrame(() => requestAnimationFrame(resolve));
 }));
 
+const makeGammaLeadExposure = page => page.evaluate(() => {
+  const run = window.MF_DATA.datasets['2030'].endStateRuns.gamma;
+  const probabilities = [10, 10, 10, 10, 10, 10, 10, 10, 10, 5, 5];
+  run.probabilities = Object.fromEntries(probabilities.map((value, index) => [index + 1, value]));
+});
+
 const parkViewportAnchor = async (page, selector, placement = 'near-top') => {
   await page.evaluate(({ selector, placement }) => {
     const anchor = document.querySelector(selector);
@@ -135,26 +141,25 @@ test.describe('layout', () => {
 });
 
 test.describe('forecast horizons', () => {
-  test('switching horizons keeps the visible content in place', async ({ page }, testInfo) => {
+  test('switching horizons keeps the visible content in place', async ({ page, browserName }) => {
     await settleWithHorizons(page);
     // WebKit quantizes both the parked and restored scroll positions. Their
     // independent rounding can differ by nearly two CSS pixels even when the
     // same content remains visually stationary; Chromium stays within one.
-    const viewportTolerance = testInfo.project.name === 'phone' ? 2 : 1;
+    const viewportTolerance = browserName === 'webkit' ? 2 : 1;
     // Make a shared model move from first to second in the exposure ranking.
-    // Anchoring by list position would appear stable only until real data
-    // reordered the models, which is exactly what horizon changes can do.
-    await page.evaluate(() => {
-      const run = window.MF_DATA.datasets['2030'].endStateRuns.gamma;
-      const probabilities = [10, 10, 10, 10, 10, 10, 10, 10, 10, 5, 5];
-      run.probabilities = Object.fromEntries(probabilities.map((value, index) => [index + 1, value]));
-    });
+    // A ranking should update inside a stationary chart; following that model
+    // to its new rank would scroll the whole section instead.
+    await makeGammaLeadExposure(page);
     const horizon = page.getByRole('group', { name: 'Forecast horizon' });
     const anchors = [
       ['leader', '.leader-name', 'center'],
       ['late state card', '#state-9 .state-card-head', 'near-top'],
       ['matrix row', '.matrix-state[data-state="7"]', 'center'],
-      ['exposure row', '.doomer-row[data-run-key="alpha"]', 'center']
+      ['exposure heading', '.model-mix .section-heading', 'center'],
+      ['exposure legend', '.doomer-key', 'center'],
+      ['first exposure rank', '.doomer-row:nth-child(1)', 'center'],
+      ['second exposure rank', '.doomer-row:nth-child(2)', 'center']
     ];
 
     for (const [label, selector, placement] of anchors) {
@@ -184,6 +189,100 @@ test.describe('forecast horizons', () => {
     expect(rapidSwitch.focusedHorizon).toBe('2040');
     expect(rapidSwitch.overflowAnchor, 'rapid switching left native scroll anchoring disabled').toBe('');
     expect(Math.abs(rapidSwitch.top - beforeRapidSwitch), 'rapid switching moved the visible card').toBeLessThanOrEqual(viewportTolerance);
+  });
+
+  test('the full exposure ranking reorders in place', async ({ page, browserName }) => {
+    await settle(page);
+    const viewportTolerance = browserName === 'webkit' ? 2 : 1;
+    const horizon = page.getByRole('group', { name: 'Forecast horizon' });
+    const modelOrder = () => page.locator('.doomer-row').evaluateAll(rows => rows.map(row => row.dataset.runKey));
+
+    const longTermOrder = await modelOrder();
+    const forcedLeader = await page.evaluate(() => {
+      const shortRuns = window.MF_DATA.datasets['2030'].endStateRuns;
+      const currentOrder = [...document.querySelectorAll('.doomer-row')].map(row => row.dataset.runKey);
+      const key = [...currentOrder].reverse().find(runKey => shortRuns[runKey] && runKey !== currentOrder[0]);
+      const probabilities = [100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      shortRuns[key].probabilities = Object.fromEntries(probabilities.map((value, index) => [index + 1, value]));
+      return key;
+    });
+    expect(forcedLeader).not.toBe(longTermOrder[0]);
+    await horizon.getByRole('button', { name: '2030', exact: true }).click();
+    await nextPaint(page);
+    expect((await modelOrder())[0], 'the published datasets did not exercise a ranking change').toBe(forcedLeader);
+    await horizon.getByRole('button', { name: 'Long term', exact: true }).click();
+    await nextPaint(page);
+
+    const sharedRankCount = await page.evaluate(() => Math.min(
+      ...Object.values(window.MF_DATA.datasets)
+        .map(dataset => Object.keys(dataset.endStateRuns || {}).length)
+        .filter(Boolean)
+    ));
+    expect(sharedRankCount).toBeGreaterThan(1);
+    const sampledRanks = [...new Set([
+      1,
+      Math.ceil(sharedRankCount / 4),
+      Math.ceil(sharedRankCount / 2),
+      sharedRankCount
+    ])];
+    const anchors = [
+      ['exposure heading', '.model-mix .section-heading', 'near-top'],
+      ['exposure legend', '.doomer-key', 'near-top'],
+      ...sampledRanks.map(rank => [
+        `exposure rank ${rank}`,
+        `.doomer-row:nth-child(${rank})`,
+        rank === 1 ? 'near-top' : 'center'
+      ]),
+      ['exposure boundary', '.method-hero', 'near-top']
+    ];
+
+    for (const [label, selector, placement] of anchors) {
+      for (const [name, id] of [['2030', '2030'], ['2040', '2040'], ['Long term', 'long-term']]) {
+        const before = await parkViewportAnchor(page, selector, placement);
+        await horizon.getByRole('button', { name, exact: true }).click();
+        await expect(page.locator(`.horizon-button[data-horizon="${id}"]`)).toHaveAttribute('aria-pressed', 'true');
+        await nextPaint(page);
+        const after = await page.locator(selector).evaluate(anchor => anchor.getBoundingClientRect().top);
+        expect(Math.abs(after - before), `${label} moved in the viewport while switching to ${name}`).toBeLessThanOrEqual(viewportTolerance);
+      }
+    }
+
+  });
+
+  test('a disappearing final exposure rank stays in the same viewport slot', async ({ page, browserName }) => {
+    await settleWithHorizons(page);
+    const viewportTolerance = browserName === 'webkit' ? 2 : 1;
+    const horizon = page.getByRole('group', { name: 'Forecast horizon' });
+    await horizon.getByRole('button', { name: '2040', exact: true }).click();
+    await nextPaint(page);
+    await expect(page.locator('.doomer-row')).toHaveCount(3);
+    const before = await parkViewportAnchor(page, '.doomer-row:nth-child(3)', 'center');
+
+    await horizon.getByRole('button', { name: 'Long term', exact: true }).click();
+    await nextPaint(page);
+
+    await expect(page.locator('.doomer-row')).toHaveCount(2);
+    const after = await page.locator('.doomer-row:nth-child(2)').evaluate(row => row.getBoundingClientRect().top);
+    expect(Math.abs(after - before), 'a disappearing final rank moved the end of the exposure list').toBeLessThanOrEqual(viewportTolerance);
+  });
+
+  test('a reordered open exposure breakdown remains stable and open', async ({ page, browserName }) => {
+    await settleWithHorizons(page);
+    await makeGammaLeadExposure(page);
+    const viewportTolerance = browserName === 'webkit' ? 2 : 1;
+    const row = page.locator('.doomer-row[data-run-key="alpha"]');
+    await row.click();
+    await expect(row).toHaveAttribute('aria-expanded', 'true');
+    expect(await row.evaluate(element => [...element.parentElement.children].indexOf(element))).toBe(0);
+    const before = await parkViewportAnchor(page, '.doomer-row[data-run-key="alpha"]', 'center');
+
+    await page.getByRole('group', { name: 'Forecast horizon' }).getByRole('button', { name: '2030', exact: true }).click();
+    await nextPaint(page);
+
+    await expect(page.locator('.doomer-row[data-run-key="alpha"]')).toHaveAttribute('aria-expanded', 'true');
+    expect(await page.locator('.doomer-row[data-run-key="alpha"]').evaluate(element => [...element.parentElement.children].indexOf(element))).toBe(1);
+    const after = await page.locator('.doomer-row[data-run-key="alpha"]').evaluate(openRow => openRow.getBoundingClientRect().top);
+    expect(Math.abs(after - before), 'the reordered open row moved in the viewport').toBeLessThanOrEqual(viewportTolerance);
   });
 
   test('switching horizons at the page top does not move the content below the controls', async ({ page }) => {

@@ -472,6 +472,12 @@ body.dialog-open { overflow: hidden; }
   .model-answer p { margin-left: 0; }
 }
 
+/* The dated note wraps on the narrowest phones. Reserve its second line so a
+   horizon change at the top of the page cannot push everything below it. */
+@media (max-width: 360px) {
+  .horizon-picker-copy p { min-height: 2.9em; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
 }

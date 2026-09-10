@@ -38,6 +38,33 @@ const settleWithHorizons = async (page, url = '/') => {
   await settle(page, url);
 };
 
+const nextPaint = page => page.evaluate(() => new Promise(resolve => {
+  requestAnimationFrame(() => requestAnimationFrame(resolve));
+}));
+
+const parkViewportAnchor = async (page, selector, placement = 'near-top') => {
+  await page.evaluate(({ selector, placement }) => {
+    const anchor = document.querySelector(selector);
+    const dock = document.querySelector('.horizon-toggle-dock');
+    const desiredTop = placement === 'center'
+      ? dock.offsetHeight + (innerHeight - dock.offsetHeight - anchor.getBoundingClientRect().height) / 2
+      : dock.offsetHeight + 80;
+    window.scrollTo(0, window.scrollY + anchor.getBoundingClientRect().top - desiredTop);
+  }, { selector, placement });
+  await nextPaint(page);
+  await page.evaluate(({ selector, placement }) => {
+    const anchor = document.querySelector(selector);
+    const dock = document.querySelector('.horizon-toggle-dock');
+    const dockBottom = dock.getBoundingClientRect().bottom;
+    const desiredTop = placement === 'center'
+      ? dockBottom + (innerHeight - dockBottom - anchor.getBoundingClientRect().height) / 2
+      : dockBottom + 80;
+    window.scrollBy(0, anchor.getBoundingClientRect().top - desiredTop);
+  }, { selector, placement });
+  await nextPaint(page);
+  return page.locator(selector).evaluate(anchor => anchor.getBoundingClientRect().top);
+};
+
 test.describe('layout', () => {
   test('the page never scrolls sideways', async ({ page }) => {
     await settle(page);
@@ -108,6 +135,70 @@ test.describe('layout', () => {
 });
 
 test.describe('forecast horizons', () => {
+  test('switching horizons keeps the visible content in place', async ({ page }) => {
+    await settleWithHorizons(page);
+    // Make a shared model move from first to second in the exposure ranking.
+    // Anchoring by list position would appear stable only until real data
+    // reordered the models, which is exactly what horizon changes can do.
+    await page.evaluate(() => {
+      const run = window.MF_DATA.datasets['2030'].endStateRuns.gamma;
+      const probabilities = [10, 10, 10, 10, 10, 10, 10, 10, 10, 5, 5];
+      run.probabilities = Object.fromEntries(probabilities.map((value, index) => [index + 1, value]));
+    });
+    const horizon = page.getByRole('group', { name: 'Forecast horizon' });
+    const anchors = [
+      ['leader', '.leader-name', 'center'],
+      ['late state card', '#state-9 .state-card-head', 'near-top'],
+      ['matrix row', '.matrix-state[data-state="7"]', 'center'],
+      ['exposure row', '.doomer-row[data-run-key="alpha"]', 'center']
+    ];
+
+    for (const [label, selector, placement] of anchors) {
+      for (const [name, id] of [['2030', '2030'], ['2040', '2040'], ['Long term', 'long-term']]) {
+        const before = await parkViewportAnchor(page, selector, placement);
+        await horizon.getByRole('button', { name, exact: true }).click();
+        await expect(page.locator(`.horizon-button[data-horizon="${id}"]`)).toHaveAttribute('aria-pressed', 'true');
+        await nextPaint(page);
+        const after = await page.locator(selector).evaluate(anchor => anchor.getBoundingClientRect().top);
+        expect(Math.abs(after - before), `${label} moved in the viewport while switching to ${name}`).toBeLessThanOrEqual(1);
+      }
+    }
+
+    const beforeRapidSwitch = await parkViewportAnchor(page, '#state-9 .state-card-head', 'near-top');
+    await page.evaluate(() => {
+      document.querySelector('.horizon-button[data-horizon="2030"]').click();
+      document.querySelector('.horizon-button[data-horizon="2040"]').click();
+    });
+    await nextPaint(page);
+    const rapidSwitch = await page.locator('#state-9 .state-card-head').evaluate(anchor => ({
+      top: anchor.getBoundingClientRect().top,
+      horizon: document.querySelector('.horizon-button[aria-pressed="true"]').dataset.horizon,
+      overflowAnchor: document.documentElement.style.overflowAnchor
+    }));
+    expect(rapidSwitch.horizon).toBe('2040');
+    expect(rapidSwitch.overflowAnchor, 'rapid switching left native scroll anchoring disabled').toBe('');
+    // WebKit rounds each programmatic scroll to device pixels, so two switches
+    // can accumulate a hair over one CSS pixel even though nothing perceptibly moves.
+    expect(Math.abs(rapidSwitch.top - beforeRapidSwitch), 'rapid switching moved the visible card').toBeLessThanOrEqual(1.1);
+  });
+
+  test('switching horizons at the page top does not move the content below the controls', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await settleWithHorizons(page);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const before = await page.locator('.origin').evaluate(origin => origin.getBoundingClientRect().top);
+
+    await page.getByRole('group', { name: 'Forecast horizon' }).getByRole('button', { name: '2030', exact: true }).click();
+    await nextPaint(page);
+
+    const after = await page.locator('.origin').evaluate(origin => ({
+      top: origin.getBoundingClientRect().top,
+      scrollY
+    }));
+    expect(after.scrollY).toBe(0);
+    expect(Math.abs(after.top - before), 'the controls changed height at the page top').toBeLessThanOrEqual(1);
+  });
+
   test('the global selector switches every data view together', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await settleWithHorizons(page);

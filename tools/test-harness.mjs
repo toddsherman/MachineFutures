@@ -22,6 +22,12 @@ const rosterEntry = JSON.parse(readFileSync(join(root, 'tools', 'models.json'), 
 if (!rosterEntry) throw new Error(`tools/models.json has no "${MODEL_KEY}" entry for these tests to drive`);
 const slug = value => (value || 'model').toLowerCase().replace(/[^a-z0-9.]+/g, '-').replace(/^-+|-+$/g, '');
 const RUN_ID = `${DATE}__${slug(rosterEntry.model)}__closed_book__end-states`;
+const HORIZON_META = {
+  'long-term': { targetYear: 3000, questionSet: 'end-states-v3', suffix: 'end-states', promptFile: 'public/end_states.md' },
+  '2030': { targetYear: 2030, questionSet: 'end-states-2030-v1', suffix: 'end-states-2030', promptFile: 'public/end_states_2030.md' },
+  '2040': { targetYear: 2040, questionSet: 'end-states-2040-v1', suffix: 'end-states-2040', promptFile: 'public/end_states_2040.md' }
+};
+const runIdFor = (horizon, date = DATE) => `${date}__${slug(rosterEntry.model)}__closed_book__${HORIZON_META[horizon].suffix}`;
 
 const run = (args, { expectFail = false } = {}) => {
   try {
@@ -31,9 +37,18 @@ const run = (args, { expectFail = false } = {}) => {
     return { ok: false, status: error.status, out: `${error.stdout}${error.stderr}` };
   }
 };
+const git = (cwd, ...args) => execFileSync('git', args, {
+  cwd,
+  encoding: 'utf8',
+  stdio: ['ignore', 'pipe', 'pipe']
+}).trim();
 const scratch = () => mkdtempSync(join(tmpdir(), 'mf-test-'));
 const batchAt = dir => JSON.parse(readFileSync(join(dir, `${RUN_ID}.json`), 'utf8'));
+const horizonBatchAt = (dir, horizon, date = DATE) => JSON.parse(readFileSync(join(dir, `${runIdFor(horizon, date)}.json`), 'utf8'));
 const elicit = (dir, samples) => run(['--mock', '--date', DATE, '--models', MODEL_KEY, '--samples', String(samples), '--out', dir]);
+const elicitHorizon = (dir, horizon, samples, date = DATE) => run([
+  '--mock', '--date', date, '--models', MODEL_KEY, '--samples', String(samples), '--horizon', horizon, '--out', dir
+]);
 
 test('a dry run never touches a real batch', () => {
   // --mock defaulted to runs/ once and overwrote a paid twenty-sample batch
@@ -129,4 +144,154 @@ test('an unknown model key fails the run instead of eliciting nothing', () => {
   const r = run(['--mock', '--models', 'definitely-not-a-roster-key'], { expectFail: true });
   assert.equal(r.ok, false);
   assert.match(r.out, /unknown model key/);
+});
+
+test('each horizon has a collision-safe run id and trusted instrument metadata', () => {
+  const dir = scratch();
+  for (const [horizon, expected] of Object.entries(HORIZON_META)) {
+    elicitHorizon(dir, horizon, 2);
+    const batch = horizonBatchAt(dir, horizon);
+    assert.equal(batch.run_id, runIdFor(horizon));
+    assert.equal(batch.horizon, horizon);
+    assert.equal(batch.target_year, expected.targetYear);
+    assert.equal(batch.question_set, expected.questionSet);
+    assert.equal(batch.harness.horizon, horizon);
+    assert.equal(batch.harness.target_year, expected.targetYear);
+    assert.equal(batch.harness.question_set, expected.questionSet);
+    assert.equal(batch.harness.prompt_file, expected.promptFile);
+    assert.match(batch.harness.prompt_sha256, /^[a-f0-9]{64}$/);
+  }
+  assert.equal(readdirSync(dir).filter(file => file.endsWith('.json')).length, 3);
+  rmSync(dir, { recursive: true, force: true });
+});
+
+test('topping up one horizon never reuses or changes another horizon', () => {
+  const dir = scratch();
+  elicitHorizon(dir, '2030', 2);
+  elicitHorizon(dir, '2040', 3);
+  const before2040 = readFileSync(join(dir, `${runIdFor('2040')}.json`), 'utf8');
+  const toppedUp = elicitHorizon(dir, '2030', 4);
+  assert.match(toppedUp.out, /carrying 2 sample\(s\) forward/);
+  assert.equal(horizonBatchAt(dir, '2030').n_samples, 4);
+  assert.equal(readFileSync(join(dir, `${runIdFor('2040')}.json`), 'utf8'), before2040);
+  rmSync(dir, { recursive: true, force: true });
+});
+
+test('--horizon rejects unknown or missing values before a run can spend money', () => {
+  for (const args of [['--horizon', '2050'], ['--horizon']]) {
+    const r = run(['--mock', '--models', MODEL_KEY, '--samples', '1', ...args], { expectFail: true });
+    assert.equal(r.ok, false);
+    assert.match(r.out, /--horizon/);
+  }
+});
+
+test('--date rejects invalid or missing values before filenames are constructed', () => {
+  for (const args of [['--date', '2030-02-30'], ['--date', '../2030-01-01'], ['--date']]) {
+    const r = run(['--mock', '--models', MODEL_KEY, '--samples', '1', ...args], { expectFail: true });
+    assert.equal(r.ok, false);
+    assert.match(r.out, /--date/);
+  }
+});
+
+test('the workflow restores and passes the original elicitation date on resume', () => {
+  const workflow = readFileSync(join(root, '.github', 'workflows', 'elicit.yml'), 'utf8');
+  assert.match(workflow, /name: Restore the original elicitation date/);
+  assert.match(workflow, /-name '\.elicitation-date'/);
+  assert.match(workflow, /--date "\$RUN_DATE"/);
+  assert.match(workflow, /timeout --foreground/);
+  assert.match(workflow, /if GITHUB_OUTPUT='' timeout[\s\S]*?then\s+status=0\s+else\s+status=\$\?\s+fi/,
+    'the workflow must capture nonzero harness exits despite GitHub invoking bash with -e');
+  assert.match(workflow, /if \[ "\$status" -eq 4 \]; then[\s\S]*?quota=true[\s\S]*?break/,
+    'a captured quota exit must stop later horizons');
+  assert.match(workflow, /echo "quota_exhausted=\$quota" >> "\$GITHUB_OUTPUT"[\s\S]*?exit "\$result"/,
+    'failure outputs must be written before the elicitation step exits nonzero');
+});
+
+test('the workflow preserves complete prior data when resuming a model subset', () => {
+  const workflow = readFileSync(join(root, '.github', 'workflows', 'elicit.yml'), 'utf8');
+  const aggregate = workflow.slice(workflow.indexOf('\n  aggregate:'));
+  const restore = aggregate.indexOf('name: Restore the previous combined run');
+  const current = aggregate.indexOf('name: Download every model artifact');
+  assert.ok(restore >= 0 && current > restore, 'aggregate must restore the prior combined artifact before current model artifacts');
+  assert.match(aggregate, /name: runs-\$\{\{ inputs\.resume_from_run_id \}\}[\s\S]*?path: restored\/[\s\S]*?run-id: \$\{\{ inputs\.resume_from_run_id \}\}/);
+  assert.match(aggregate, /if \[ -d restored \]; then\s+cp -R restored\/\. runs\/\s+fi\s+# Current artifacts win[\s\S]*?cp -R collected\/\. runs\//,
+    'current model artifacts must overlay, not replace, the prior combined run');
+});
+
+test('the workflow publishes a workflow-free squash based on the latest default branch', () => {
+  const workflow = readFileSync(join(root, '.github', 'workflows', 'elicit.yml'), 'utf8');
+  const pushStart = workflow.indexOf('name: Push the raw batches');
+  const importStart = workflow.indexOf('name: Import every horizon into site data');
+  const push = workflow.slice(pushStart, importStart);
+  assert.ok(pushStart >= 0 && importStart > pushStart);
+  assert.match(push, /DEFAULT_BRANCH: \$\{\{ github\.event\.repository\.default_branch \}\}/);
+  assert.match(push, /git fetch --no-tags --prune --unshallow origin/);
+  assert.match(push, /merge_base=\$\(git merge-base "\$SOURCE_SHA" "\$default_ref"\)/);
+  assert.match(push, /git restore --source="\$merge_base" --staged --worktree -- \.github\/workflows[\s\S]*?git commit --amend --no-edit/,
+    'the ephemeral source tree must neutralize feature-branch workflow changes');
+  assert.match(push, /git checkout -b "\$branch" "\$default_ref"[\s\S]*?git merge --squash --no-commit "\$publish_source_sha"/,
+    'the publish branch must start at the latest default branch and squash all safe feature changes');
+  assert.match(push, /git restore --source="\$default_ref" --staged --worktree -- \.github\/workflows/);
+  assert.match(push, /git diff --quiet "\$default_ref" HEAD -- \.github\/workflows/,
+    'the workflow tree must be checked before pushing');
+});
+
+test('a workflow-free squash preserves newer default content and non-workflow feature data', () => {
+  const dir = scratch();
+  try {
+    git(dir, 'init', '-q', '-b', 'main');
+    git(dir, 'config', 'user.name', 'Harness Test');
+    git(dir, 'config', 'user.email', 'harness@example.invalid');
+    mkdirSync(join(dir, '.github', 'workflows'), { recursive: true });
+    mkdirSync(join(dir, 'runs'), { recursive: true });
+    writeFileSync(join(dir, '.github', 'workflows', 'elicit.yml'), 'base workflow\n');
+    writeFileSync(join(dir, 'shared.txt'), 'base content\n');
+    git(dir, 'add', '.');
+    git(dir, 'commit', '-q', '-m', 'base');
+    git(dir, 'branch', 'feature');
+
+    writeFileSync(join(dir, '.github', 'workflows', 'elicit.yml'), 'new default workflow\n');
+    writeFileSync(join(dir, 'shared.txt'), 'new default content\n');
+    git(dir, 'add', '.');
+    git(dir, 'commit', '-q', '-m', 'advance default');
+    const defaultHead = git(dir, 'rev-parse', 'HEAD');
+
+    git(dir, 'switch', '-q', 'feature');
+    writeFileSync(join(dir, '.github', 'workflows', 'elicit.yml'), 'feature workflow\n');
+    writeFileSync(join(dir, 'feature.txt'), 'keep this feature\n');
+    git(dir, 'add', '.');
+    git(dir, 'commit', '-q', '-m', 'feature changes');
+    const sourceSha = git(dir, 'rev-parse', 'HEAD');
+    writeFileSync(join(dir, 'runs', 'new-batch.json'), '{"samples":[]}\n');
+    git(dir, 'add', 'runs');
+    git(dir, 'commit', '-q', '--allow-empty', '-m', 'stage batches');
+
+    const mergeBase = git(dir, 'merge-base', sourceSha, 'main');
+    git(dir, 'restore', `--source=${mergeBase}`, '--staged', '--worktree', '--', '.github/workflows');
+    git(dir, 'commit', '-q', '--amend', '--no-edit');
+    const publishSource = git(dir, 'rev-parse', 'HEAD');
+
+    git(dir, 'checkout', '-q', '-b', 'publish', 'main');
+    git(dir, 'merge', '--squash', '--no-commit', publishSource);
+    git(dir, 'restore', '--source=main', '--staged', '--worktree', '--', '.github/workflows');
+    git(dir, 'commit', '-q', '-m', 'publish safe changes');
+
+    assert.equal(git(dir, 'rev-parse', 'HEAD^'), defaultHead, 'the publish commit must be based on the latest default commit');
+    assert.equal(readFileSync(join(dir, '.github', 'workflows', 'elicit.yml'), 'utf8'), 'new default workflow\n');
+    assert.equal(readFileSync(join(dir, 'shared.txt'), 'utf8'), 'new default content\n');
+    assert.equal(readFileSync(join(dir, 'feature.txt'), 'utf8'), 'keep this feature\n');
+    assert.equal(readFileSync(join(dir, 'runs', 'new-batch.json'), 'utf8'), '{"samples":[]}\n');
+    git(dir, 'diff', '--quiet', 'main', 'HEAD', '--', '.github/workflows');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('the workflow default budget fits all three horizons inside the model-job window', () => {
+  const workflow = readFileSync(join(root, '.github', 'workflows', 'elicit.yml'), 'utf8');
+  assert.match(workflow, /budget_minutes:[\s\S]*?default: '100'/);
+  assert.equal((workflow.match(/inputs\.budget_minutes \|\| '100'/g) || []).length, 2,
+    'plan and model jobs must use the same 100-minute default');
+  assert.match(workflow, /if \(\(budget \+ 5\) \* count > 315\)/);
+  assert.match(workflow, /\n    timeout-minutes: 330\n/);
 });

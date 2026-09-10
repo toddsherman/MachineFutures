@@ -52,7 +52,7 @@
         <div class="end-consensus">
           <div class="section-heading compact">
             <div><h2 id="end-forecast-title">Median machine forecast</h2></div>
-            <p class="section-note">Select a model to see its allocation. Tap any segment to jump to that ending.</p>
+            <p class="section-note" id="forecast-note">Select a model to see its allocation. Tap any segment to jump to that ending.</p>
           </div>
           <div class="end-forecast-toggle" id="end-forecast-toggle" aria-label="Select end-state forecast view"></div>
           <div class="stacked-bar" id="consensus-bar" aria-label="Median probability by end state"></div>
@@ -63,7 +63,7 @@
       <section class="states-section shell" aria-labelledby="states-title">
         <div class="section-heading compact">
           <div><h2 id="states-title">Eleven <em>endings</em></h2></div>
-          <p class="section-note">Select any ending to read every model&rsquo;s reasoning for its number.</p>
+          <p class="section-note" id="states-note">Select any ending to read every model&rsquo;s reasoning for its number.</p>
         </div>
         <div class="state-grid" id="state-grid"></div>
       </section>
@@ -71,7 +71,7 @@
       <section class="matrix-section shell" aria-labelledby="matrix-title">
         <div class="section-heading compact">
           <div><h2 id="matrix-title">Every model, <em>every prediction</em></h2></div>
-          <p class="section-note">Every model&rsquo;s number for every ending, grouped by lab. Read one column for a single model&rsquo;s theory of the future, or one row to see where the labs disagree.</p>
+          <p class="section-note" id="matrix-note">Every model&rsquo;s number for every ending, grouped by lab. Read one column for a single model&rsquo;s theory of the future, or one row to see where the labs disagree.</p>
         </div>
         <div class="matrix-scroll">
           <div class="matrix" id="matrix" role="table" aria-label="Probability by end state and model"></div>
@@ -81,7 +81,7 @@
       <section class="model-mix shell" aria-labelledby="mix-title">
         <div class="section-heading compact">
           <div><h2 id="mix-title">Extinction-risk <em>exposure</em></h2></div>
-          <p class="section-note">Each model&rsquo;s total across the endings where humanity is gone (1&ndash;3) or might perish (4&ndash;5).</p>
+          <p class="section-note" id="exposure-note">Each model&rsquo;s total across the endings where humanity is gone (1&ndash;3) or might perish (4&ndash;5).</p>
         </div>
         <div id="doomer-ratings" class="doomer-ratings"></div>
       </section>
@@ -133,7 +133,7 @@
   </dialog>
 
   <script src="analytics.js"></script>
-  <script src="data.js?v=20260909-horizons"></script>
-  <script src="app.js?v=20260910-mobile"></script>
+  <script src="data.js?v=20260910-snapshot-v2"></script>
+  <script src="app.js?v=20260910-snapshot-v2"></script>
 </body>
 </html>

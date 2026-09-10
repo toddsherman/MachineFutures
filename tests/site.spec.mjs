@@ -6,6 +6,9 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const horizonFixture = readFileSync(fileURLToPath(new URL('./fixtures/horizon-data.js', import.meta.url)), 'utf8');
+const longHeldLeashDescription = 'The Held Leash fixture description.';
+const snapshotHeldLeashDescription = "Up to the target date, humans have retained ultimate authority over AI's goals, deployment, and resources. AI may be extremely capable and act autonomously within delegated bounds, but it has not become an independent civilizational power. This includes capabilities that have so far remained below transformative levels or controls that have kept pace so far.";
+const snapshotCoexistenceDescription = 'Humans and AI remain separate, and each holds enough power that neither dominates. Their relationship may be cooperative or adversarial and may still be changing.';
 
 const settle = async (page, url = '/') => {
   await page.goto(url);
@@ -112,6 +115,16 @@ test.describe('forecast horizons', () => {
     await expect(group.getByRole('button')).toHaveText(['Long term', '2030', '2040']);
     await expect(group.getByRole('button', { name: 'Long term' })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator('#horizon-note')).toHaveText('Durable arrangement in 3000.');
+    await expect(page.locator('#forecast-summary')).toContainText('11 mutually exclusive end states');
+    await expect(page.locator('#matrix')).toHaveAttribute('aria-label', 'Long term probability by end state and model');
+    await expect(page.locator('.state-card[data-state="9"] > p')).toHaveText(longHeldLeashDescription);
+    await expect(page.locator('.leader-name')).toHaveText('The Held Leash');
+    await expect(page.locator('.leader-description')).toHaveText(longHeldLeashDescription);
+
+    await page.locator('.state-card[data-state="9"]').click();
+    await expect(page.locator('#dialog-content .dialog-kicker')).toContainText('Humanity keeps control · Long term');
+    await expect(page.locator('#dialog-content .dialog-description')).toHaveText(longHeldLeashDescription);
+    await page.locator('#dialog-close').click();
 
     await group.getByRole('button', { name: '2030', exact: true }).click();
     await page.waitForFunction(() => document.querySelector('.leader-name')?.textContent === 'The Held Leash');
@@ -129,9 +142,14 @@ test.describe('forecast horizons', () => {
         leaderUnit: document.querySelector('.leader-unit').textContent,
         timelineLast: document.querySelector('.leader-timeline li:last-child .tl-name').textContent.trim(),
         card: document.querySelector('.state-card[data-state="9"] .state-card-meta strong').textContent,
+        cardDescription: document.querySelector('.state-card[data-state="9"] > p').textContent,
+        leaderDescription: document.querySelector('.leader-description').textContent,
         matrix: [...row.querySelectorAll('.matrix-cell span')].map(cell => cell.textContent),
         exposure: [...document.querySelectorAll('.doomer-total b')].map(cell => cell.textContent),
         matrixLabel: document.querySelector('#matrix').getAttribute('aria-label'),
+        barLabel: document.querySelector('#consensus-bar').getAttribute('aria-label'),
+        summary: document.querySelector('#forecast-summary').textContent.replace(/\s+/g, ' ').trim(),
+        exposureHint: document.querySelector('.doomer-key .on-hover').textContent,
         prompt: new URL(document.querySelector('#method-prompt-link').href).pathname,
         pressed: document.querySelector('.horizon-button[aria-pressed="true"]').dataset.horizon
       };
@@ -143,12 +161,18 @@ test.describe('forecast horizons', () => {
       leader: 'The Held Leash', leaderValue: '45%',
       leaderUnit: 'Median across 2 models · 2030 · of 100 points',
       timelineLast: 'The Held Leash', card: '45%', matrix: ['45', '45'],
-      exposure: ['15%', '15%'], matrixLabel: '2030 probability by end state and model',
+      cardDescription: snapshotHeldLeashDescription,
+      leaderDescription: snapshotHeldLeashDescription,
+      exposure: ['15%', '15%'], matrixLabel: '2030 probability by structural state and model',
+      barLabel: 'Median probability by structural state for 2030',
+      summary: 'We asked 2 of the leading AI models from 2 labs to assign 100 percentage points across 11 mutually exclusive structural states for humanity’s relationship with AI.',
+      exposureHint: 'Hover a bar for the states inside it',
       prompt: '/end_states_2030.md', pressed: '2030'
     });
 
     await page.locator('.state-card[data-state="9"]').click();
-    await expect(page.locator('#dialog-content .dialog-kicker')).toContainText('2030');
+    await expect(page.locator('#dialog-content .dialog-kicker')).toContainText('Humanity remains in control · 2030');
+    await expect(page.locator('#dialog-content .dialog-description')).toHaveText(snapshotHeldLeashDescription);
     await expect(page.locator('#dialog-content .model-answer p').first()).toContainText('2030');
     await page.locator('#dialog-close').click();
 
@@ -160,12 +184,36 @@ test.describe('forecast horizons', () => {
       labs: document.querySelector('#dek-labs').textContent,
       date: document.querySelector('#dataset-date').textContent,
       leader: document.querySelector('.leader-name').textContent,
+      leaderDescription: document.querySelector('.leader-description').textContent,
       card: document.querySelector('.state-card[data-state="8"] .state-card-meta strong').textContent,
+      heldLeashDescription: document.querySelector('.state-card[data-state="9"] > p').textContent,
       exposure: [...document.querySelectorAll('.doomer-total b')].map(cell => cell.textContent),
+      matrixLabel: document.querySelector('#matrix').getAttribute('aria-label'),
+      summary: document.querySelector('#forecast-summary').textContent.replace(/\s+/g, ' ').trim(),
       prompt: new URL(document.querySelector('#method-prompt-link').href).pathname
     }));
     expect(next).toEqual({ horizon: '2040', models: '3', labs: '3', date: '03.04.26',
-      leader: 'Coexistence', card: '28%', exposure: ['27%', '27%', '27%'], prompt: '/end_states_2040.md' });
+      leader: 'Coexistence', leaderDescription: snapshotCoexistenceDescription,
+      card: '28%', heldLeashDescription: snapshotHeldLeashDescription,
+      exposure: ['27%', '27%', '27%'], matrixLabel: '2040 probability by structural state and model',
+      summary: 'We asked 3 of the leading AI models from 3 labs to assign 100 percentage points across 11 mutually exclusive structural states for humanity’s relationship with AI.',
+      prompt: '/end_states_2040.md' });
+
+    await page.locator('.state-card[data-state="9"]').click();
+    await expect(page.locator('#dialog-content .dialog-kicker')).toContainText('Humanity remains in control · 2040');
+    await expect(page.locator('#dialog-content .dialog-description')).toHaveText(snapshotHeldLeashDescription);
+    await page.locator('#dialog-close').click();
+
+    await group.getByRole('button', { name: 'Long term' }).click();
+    await page.waitForFunction(() => document.querySelector('.leader-name')?.textContent === 'The Held Leash');
+    await expect(page.locator('#forecast-summary')).toContainText('11 mutually exclusive end states');
+    await expect(page.locator('#matrix')).toHaveAttribute('aria-label', 'Long term probability by end state and model');
+    await expect(page.locator('.state-card[data-state="9"] > p')).toHaveText(longHeldLeashDescription);
+    await expect(page.locator('.leader-description')).toHaveText(longHeldLeashDescription);
+    await page.locator('.state-card[data-state="9"]').click();
+    await expect(page.locator('#dialog-content .dialog-kicker')).toContainText('Humanity keeps control · Long term');
+    await expect(page.locator('#dialog-content .dialog-description')).toHaveText(longHeldLeashDescription);
+    await page.locator('#dialog-close').click();
   });
 
   test('the URL shares both selectors and an unavailable model resets to Median', async ({ page }) => {
@@ -217,7 +265,7 @@ test.describe('the 2030 exposure chart on a phone', () => {
   test.beforeEach(async ({ page }, testInfo) => {
     test.skip(testInfo.project.name === 'desktop', 'mobile regression coverage');
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await settle(page, '/?horizon=2030');
+    await settleWithHorizons(page, '/?horizon=2030');
   });
 
   test('the state colours end exactly where their aggregate tiers end', async ({ page }) => {

@@ -25,8 +25,8 @@ const slug = value => (value || 'model').toLowerCase().replace(/[^a-z0-9.]+/g, '
 const RUN_ID = `${DATE}__${slug(rosterEntry.model)}__closed_book__end-states`;
 const HORIZON_META = {
   'long-term': { targetYear: 3000, questionSet: 'end-states-v3', suffix: 'end-states', promptFile: 'public/end_states.md' },
-  '2030': { targetYear: 2030, questionSet: 'end-states-2030-v1', suffix: 'end-states-2030', promptFile: 'public/end_states_2030.md' },
-  '2040': { targetYear: 2040, questionSet: 'end-states-2040-v1', suffix: 'end-states-2040', promptFile: 'public/end_states_2040.md' }
+  '2030': { targetYear: 2030, questionSet: 'end-states-2030-v2', suffix: 'end-states-2030', promptFile: 'public/end_states_2030.md' },
+  '2040': { targetYear: 2040, questionSet: 'end-states-2040-v2', suffix: 'end-states-2040', promptFile: 'public/end_states_2040.md' }
 };
 const runIdFor = (horizon, date = DATE) => `${date}__${slug(rosterEntry.model)}__closed_book__${HORIZON_META[horizon].suffix}`;
 
@@ -55,6 +55,26 @@ const elicit = (dir, samples) => run(['--mock', '--date', DATE, '--models', MODE
 const elicitHorizon = (dir, horizon, samples, date = DATE) => run([
   '--mock', '--date', date, '--models', MODEL_KEY, '--samples', String(samples), '--horizon', horizon, '--out', dir
 ]);
+const putCurrentInstrumentInRevision = (dir, horizon, samples) => {
+  elicitHorizon(dir, horizon, samples);
+  const baseRunId = runIdFor(horizon);
+  const basePath = join(dir, `${baseRunId}.json`);
+  const revisionRunId = `${baseRunId}__r2`;
+  const revisionPath = join(dir, `${revisionRunId}.json`);
+  const current = JSON.parse(readFileSync(basePath, 'utf8'));
+  writeFileSync(revisionPath, JSON.stringify({ ...current, run_id: revisionRunId }, null, 2) + '\n');
+  const prior = {
+    ...current,
+    question_set: `end-states-${horizon}-v999`,
+    harness: {
+      ...current.harness,
+      question_set: `end-states-${horizon}-v999`,
+      prompt_sha256: 'f'.repeat(64)
+    }
+  };
+  writeFileSync(basePath, JSON.stringify(prior, null, 2) + '\n');
+  return { basePath, revisionPath, revisionRunId };
+};
 
 test('a dry run never touches a real batch', () => {
   // --mock defaulted to runs/ once and overwrote a paid twenty-sample batch
@@ -99,6 +119,17 @@ test('a complete batch is not bought again', () => {
   rmSync(dir, { recursive: true, force: true });
 });
 
+test('a complete compatible revision is not bought again when an older instrument owns the base filename', () => {
+  const dir = scratch();
+  const { revisionPath } = putCurrentInstrumentInRevision(dir, '2030', 3);
+  const before = readFileSync(revisionPath, 'utf8');
+  const second = elicitHorizon(dir, '2030', 3);
+  assert.match(second.out, /not re-asking/, 'the compatible revision should be reused, not re-elicited');
+  assert.equal(readFileSync(revisionPath, 'utf8'), before, 'reuse should leave the completed revision untouched');
+  assert.equal(existsSync(join(dir, `${runIdFor('2030')}__r3.json`)), false, 'reuse must not create another revision');
+  rmSync(dir, { recursive: true, force: true });
+});
+
 test('a short batch is topped up, buying only the shortfall', () => {
   const dir = scratch();
   elicit(dir, 2);
@@ -108,6 +139,20 @@ test('a short batch is topped up, buying only the shortfall', () => {
   assert.equal(batch.n_samples, 5, 'the topped-up batch should hold the full target');
   assert.deepEqual(batch.samples.map(s => s.sample), [1, 2, 3, 4, 5], 'samples should be renumbered contiguously');
   assert.equal(readdirSync(dir).filter(f => f.endsWith('.json')).length, 1, 'a top-up should replace, not sit beside');
+  rmSync(dir, { recursive: true, force: true });
+});
+
+test('a short compatible revision is topped up in place when an older instrument owns the base filename', () => {
+  const dir = scratch();
+  const { basePath, revisionPath, revisionRunId } = putCurrentInstrumentInRevision(dir, '2030', 2);
+  const priorBase = readFileSync(basePath, 'utf8');
+  const out = elicitHorizon(dir, '2030', 5).out;
+  assert.match(out, /carrying 2 sample\(s\) forward/, 'the compatible revision should supply the paid samples');
+  const batch = JSON.parse(readFileSync(revisionPath, 'utf8'));
+  assert.equal(batch.run_id, revisionRunId, 'the topped-up file must retain its revision identity');
+  assert.equal(batch.n_samples, 5, 'the revision should be topped up to the target');
+  assert.equal(readFileSync(basePath, 'utf8'), priorBase, 'the older instrument must remain untouched');
+  assert.equal(existsSync(join(dir, `${runIdFor('2030')}__r3.json`)), false, 'top-up must not create another revision');
   rmSync(dir, { recursive: true, force: true });
 });
 

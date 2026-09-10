@@ -1,6 +1,6 @@
 (function () {
   const payload = window.MF_DATA || {};
-  const { states = [] } = payload;
+  const { states: baseStates = [], statesByHorizon = {} } = payload;
   // Forecasts now share one taxonomy but belong to distinct horizons. Keep the
   // legacy shape readable so a partially regenerated checkout still opens on
   // the existing long-term board rather than failing before the controls paint.
@@ -19,14 +19,25 @@
     : (datasets['long-term'] ? 'long-term' : Object.keys(datasets)[0]);
 
   let activeHorizon = fallbackHorizon || 'long-term';
+  let states = baseStates;
   let endStateRuns = {};
   let datasetDate = '';
   let leaderHistory = [];
   const activeDataset = () => datasets[activeHorizon] || { endStateRuns: {}, datasetDate: '', leaderHistory: [] };
   const horizonMeta = () => horizonOptions.find(option => option.id === activeHorizon)
     || { id: activeHorizon, label: activeHorizon, targetYear: activeHorizon };
+  const isSnapshot = () => activeHorizon !== 'long-term';
+  const stateTerm = plural => isSnapshot()
+    ? (plural ? 'structural states' : 'structural state')
+    : (plural ? 'end states' : 'end state');
+  const outcomeTerm = plural => isSnapshot()
+    ? (plural ? 'states' : 'state')
+    : (plural ? 'endings' : 'ending');
   function useDataset(horizon) {
     activeHorizon = datasets[horizon] ? horizon : (fallbackHorizon || 'long-term');
+    states = Array.isArray(statesByHorizon[activeHorizon])
+      ? statesByHorizon[activeHorizon]
+      : baseStates;
     const dataset = activeDataset();
     endStateRuns = dataset.endStateRuns || {};
     datasetDate = dataset.datasetDate || '';
@@ -40,8 +51,8 @@
     Object.entries(dataset.endStateRuns || {}).forEach(([runKey, run]) => {
       const ids = Object.keys(run.probabilities || {}).map(Number).sort((a, b) => a - b);
       const sum = ids.reduce((total, id) => total + run.probabilities[id], 0);
-      const coversAllStates = states.length > 0 && ids.length === states.length && states.every(state => ids.includes(state.id));
-      if (!coversAllStates || sum !== 100) console.error(`MF_DATA.datasets['${horizon}'].endStateRuns['${runKey}']: probabilities must cover state ids 1–${states.length} and sum to 100 (got ${ids.length} states, sum ${sum}).`);
+      const coversAllStates = baseStates.length > 0 && ids.length === baseStates.length && baseStates.every(state => ids.includes(state.id));
+      if (!coversAllStates || sum !== 100) console.error(`MF_DATA.datasets['${horizon}'].endStateRuns['${runKey}']: probabilities must cover state ids 1–${baseStates.length} and sum to 100 (got ${ids.length} states, sum ${sum}).`);
     });
   });
   const $ = selector => document.querySelector(selector);
@@ -368,6 +379,20 @@
       promptLink.href = promptForHorizon[active.id] || promptForHorizon['long-term'];
       promptLink.innerHTML = `Read the ${active.id === 'long-term' ? 'long-term' : esc(active.label)} prompt <span aria-hidden="true">↗</span>`;
     }
+
+    const ending = outcomeTerm(false);
+    const endings = outcomeTerm(true);
+    $('#end-forecast-toggle')?.setAttribute('aria-label', `Select ${stateTerm(false)} forecast view`);
+    const forecastNote = $('#forecast-note');
+    if (forecastNote) forecastNote.textContent = `Select a model to see its allocation. Tap any segment to jump to that ${ending}.`;
+    const statesTitle = $('#states-title');
+    if (statesTitle) statesTitle.innerHTML = `Eleven <em>${esc(endings)}</em>`;
+    const statesNote = $('#states-note');
+    if (statesNote) statesNote.textContent = `Select any ${ending} to read every model's reasoning for its number.`;
+    const matrixNote = $('#matrix-note');
+    if (matrixNote) matrixNote.textContent = `Every model's number for every ${ending}, grouped by lab. Read one column for a single model's theory of the future, or one row to see where the labs disagree.`;
+    const exposureNote = $('#exposure-note');
+    if (exposureNote) exposureNote.textContent = `Each model's total across the ${endings} where humanity is gone (1–3) or might perish (4–5).`;
   }
 
   function renderEndForecastToggle(entries) {
@@ -382,7 +407,7 @@
   // largest value on the board rather than 100, since nothing approaches 100.
   function renderMatrix(entries, orderedStates) {
     $('#matrix').setAttribute('role', 'table');
-    $('#matrix').setAttribute('aria-label', `${horizonMeta().label} probability by end state and model`);
+    $('#matrix').setAttribute('aria-label', `${horizonMeta().label} probability by ${stateTerm(false)} and model`);
     const peak = Math.max(...orderedStates.flatMap(state => entries.map(entry => stateValue(entry, state))), 1);
     const labs = [];
     entries.forEach(entry => {
@@ -425,7 +450,7 @@
     const summary = $('#forecast-summary');
     if (summary) {
       summary.innerHTML = entries.length
-        ? `We asked <b id="dek-models">${entries.length}</b> of the leading AI models from <b id="dek-labs">${labs.size}</b> labs to assign 100 percentage points across 11 mutually exclusive end states for humanity&rsquo;s relationship with AI.`
+        ? `We asked <b id="dek-models">${entries.length}</b> of the leading AI models from <b id="dek-labs">${labs.size}</b> labs to assign 100 percentage points across 11 mutually exclusive ${esc(stateTerm(true))} for humanity&rsquo;s relationship with AI.`
         : `${esc(horizonMeta().label)} forecasts are being collected. They will use the same 11-state taxonomy and 100-point allocation as every other horizon.`;
     }
     const methodSamples = $('#method-samples');
@@ -568,7 +593,7 @@
 
     $('#doomer-ratings').innerHTML = `
       <div class="doomer-head">
-        <p class="doomer-key"><span class="key-gone"><i></i>Humanity is gone (1–3)</span><span class="key-risk"><i></i>Might perish (4–5)</span><span class="key-hint"><span class="on-hover">Hover a bar for the endings inside it</span><span class="on-tap">Tap a bar for the endings inside it</span></span></p>
+        <p class="doomer-key"><span class="key-gone"><i></i>Humanity is gone (1–3)</span><span class="key-risk"><i></i>Might perish (4–5)</span><span class="key-hint"><span class="on-hover">Hover a bar for the ${outcomeTerm(true)} inside it</span><span class="on-tap">Tap a bar for the ${outcomeTerm(true)} inside it</span></span></p>
       </div>
       <div class="doomer-list">
         ${doomerEntries.map((entry, index) => {
@@ -578,7 +603,7 @@
           // go in the interactive row's name for non-visual readers.
           const spoken = parts.map(({ state, value }) => `${esc(state.name)} ${value}%`).join(', ');
           const readoutId = `doomer-readout-${index}`;
-          return `<div class="doomer-row" style="--r:${index}" role="button" tabindex="0" aria-expanded="false" aria-controls="${readoutId}" aria-label="${esc(entry.label)}: ${entry.sums.gone}% humanity is gone, ${entry.sums.risk}% might perish. ${spoken}. Activate to show or hide the five ending values.">
+          return `<div class="doomer-row" style="--r:${index}" role="button" tabindex="0" aria-expanded="false" aria-controls="${readoutId}" aria-label="${esc(entry.label)}: ${entry.sums.gone}% humanity is gone, ${entry.sums.risk}% might perish. ${spoken}. Activate to show or hide the five ${outcomeTerm(false)} values.">
           <div class="doomer-label">${labLogo(entry.provider, 'in-row')}<b>${esc(entry.label)}</b><small>${esc(entry.provider)}</small></div>
           <div class="doomer-meter">
             <div class="doomer-bar" role="img" aria-label="${esc(entry.label)}: ${entry.sums.gone}% humanity is gone, ${entry.sums.risk}% might perish. ${spoken}">
@@ -645,7 +670,7 @@
     const total = selectedStates.reduce((sum, state) => sum + state.probability, 0);
     const bar = $('#consensus-bar');
     const legend = $('#consensus-legend');
-    bar.setAttribute('aria-label', `${activeRun ? activeRun.label : 'Median'} probability by end state for ${horizon.label}`);
+    bar.setAttribute('aria-label', `${activeRun ? activeRun.label : 'Median'} probability by ${stateTerm(false)} for ${horizon.label}`);
     bar.classList.toggle('is-animating', Boolean(animate) && !reduceMotion());
 
     // The selector governs this one chart. The bar and its legend follow it.
@@ -654,7 +679,7 @@
       segment.style.width = `${(state.probability / total) * 100}%`;
       const spread = activeRun?.range?.[state.id];
       segment.title = `${state.name}: ${state.probability}%${spread ? ` (${spread[0]}–${spread[1]}% across samples)` : ''}${state.extinction ? ` · ${extinctionLabels[state.extinction]}` : ''}`;
-      segment.setAttribute('aria-label', `${state.name}: ${state.probability}% — jump to this ending`);
+      segment.setAttribute('aria-label', `${state.name}: ${state.probability}% — jump to this ${outcomeTerm(false)}`);
 
       const value = legend.children[index].querySelector('b');
       animate ? tweenNumber(value, state.probability) : (value.textContent = `${state.probability}%`);

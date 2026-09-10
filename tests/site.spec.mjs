@@ -114,7 +114,7 @@ test.describe('forecast horizons', () => {
     const group = page.getByRole('group', { name: 'Forecast horizon' });
     await expect(group.getByRole('button')).toHaveText(['Long term', '2030', '2040']);
     await expect(group.getByRole('button', { name: 'Long term' })).toHaveAttribute('aria-pressed', 'true');
-    await expect(page.locator('#horizon-note')).toHaveText('Durable arrangement in 3000.');
+    await expect(page.locator('#horizon-note')).toHaveText('Durable arrangement by the year 3000');
     await expect(page.locator('#forecast-summary')).toContainText('11 mutually exclusive end states');
     await expect(page.locator('#matrix')).toHaveAttribute('aria-label', 'Long term probability by end state and model');
     await expect(page.locator('.state-card[data-state="9"] > p')).toHaveText(longHeldLeashDescription);
@@ -359,28 +359,67 @@ test.describe('the 2030 exposure chart on a phone', () => {
     expect(Math.min(...layout.swatches), 'a legend swatch shrank below its intended size').toBeGreaterThanOrEqual(9.5);
   });
 
-  test('the global horizon picker precedes the origin and fits above the fold', async ({ page }) => {
+  test('the horizon controls precede the origin and only the buttons stay sticky', async ({ page }) => {
     await page.evaluate(() => window.scrollTo(0, 0));
     const placement = await page.evaluate(() => {
-      const picker = document.querySelector('.horizon-picker');
+      const copy = document.querySelector('.horizon-picker-copy');
+      const dock = document.querySelector('.horizon-toggle-dock');
+      const rule = document.querySelector('.horizon-picker-rule');
       const origin = document.querySelector('.origin');
-      const p = picker.getBoundingClientRect();
+      const c = copy.getBoundingClientRect();
+      const d = dock.getBoundingClientRect();
+      const r = rule.getBoundingClientRect();
       const o = origin.getBoundingClientRect();
       return {
-        domBeforeOrigin: Boolean(picker.compareDocumentPosition(origin) & Node.DOCUMENT_POSITION_FOLLOWING),
-        visuallyBeforeOrigin: p.bottom <= o.top + 1,
-        top: p.top,
-        bottom: p.bottom,
+        domBeforeOrigin: Boolean(rule.compareDocumentPosition(origin) & Node.DOCUMENT_POSITION_FOLLOWING),
+        visuallyOrdered: c.bottom <= d.top + 1 && d.bottom <= r.top + 1 && r.bottom <= o.top + 1,
+        top: c.top,
+        bottom: r.bottom,
         viewportHeight: innerHeight,
-        viewportWidth: innerWidth
+        viewportWidth: innerWidth,
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth
       };
     });
     expect(placement.viewportWidth).toBeGreaterThanOrEqual(320);
     expect(placement.viewportWidth).toBeLessThanOrEqual(390);
-    expect(placement.domBeforeOrigin, 'the picker follows the origin in reading order').toBe(true);
-    expect(placement.visuallyBeforeOrigin, 'the picker is painted below the origin').toBe(true);
-    expect(placement.top, 'the picker starts above the viewport').toBeGreaterThanOrEqual(-0.5);
-    expect(placement.bottom, 'the picker falls below the initial viewport').toBeLessThanOrEqual(placement.viewportHeight + 0.5);
+    expect(placement.domBeforeOrigin, 'the controls follow the origin in reading order').toBe(true);
+    expect(placement.visuallyOrdered, 'the label, buttons, divider, and origin are out of order').toBe(true);
+    expect(placement.top, 'the controls start above the viewport').toBeGreaterThanOrEqual(-0.5);
+    expect(placement.bottom, 'the controls fall below the initial viewport').toBeLessThanOrEqual(placement.viewportHeight + 0.5);
+    expect(placement.overflow, 'the sticky controls make the page scroll sideways').toBeLessThanOrEqual(0);
+
+    await page.evaluate(() => document.querySelector('.states-section').scrollIntoView({ block: 'start' }));
+    const stuck = await page.evaluate(() => {
+      const copy = document.querySelector('.horizon-picker-copy').getBoundingClientRect();
+      const dock = document.querySelector('.horizon-toggle-dock').getBoundingClientRect();
+      const buttons = document.querySelector('.horizon-toggle').getBoundingClientRect();
+      const rule = document.querySelector('.horizon-picker-rule').getBoundingClientRect();
+      return {
+        copyBottom: copy.bottom,
+        dockTop: dock.top,
+        buttonsTop: buttons.top,
+        buttonsBottom: buttons.bottom,
+        ruleBottom: rule.bottom,
+        viewportHeight: innerHeight
+      };
+    });
+    expect(stuck.copyBottom, 'the explanatory copy stayed pinned').toBeLessThan(0);
+    expect(stuck.ruleBottom, 'the divider stayed pinned').toBeLessThan(0);
+    expect(stuck.dockTop, 'the buttons did not reach the top of the viewport').toBeGreaterThanOrEqual(-0.5);
+    expect(stuck.dockTop).toBeLessThanOrEqual(0.5);
+    expect(stuck.buttonsTop, 'the buttons escaped their sticky dock').toBeGreaterThanOrEqual(stuck.dockTop);
+    expect(stuck.buttonsBottom, 'the sticky buttons fell below the viewport').toBeLessThanOrEqual(stuck.viewportHeight);
+
+    await page.getByRole('group', { name: 'Forecast horizon' }).getByRole('button', { name: '2040', exact: true }).click();
+    await expect(page.locator('.horizon-button[data-horizon="2040"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect.poll(() => page.evaluate(() => new URL(location.href).searchParams.get('horizon'))).toBe('2040');
+    const afterSwitch = await page.evaluate(() => ({
+      dockTop: document.querySelector('.horizon-toggle-dock').getBoundingClientRect().top,
+      scrollY
+    }));
+    expect(afterSwitch.scrollY, 'switching a sticky horizon returned to the page top').toBeGreaterThan(placement.bottom);
+    expect(afterSwitch.dockTop, 'the buttons stopped sticking after a horizon switch').toBeGreaterThanOrEqual(-0.5);
+    expect(afterSwitch.dockTop).toBeLessThanOrEqual(0.5);
   });
 
   test('an exposure row works from the keyboard and reflects its state', async ({ page }) => {

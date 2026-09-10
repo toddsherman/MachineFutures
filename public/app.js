@@ -370,7 +370,7 @@
     const note = $('#horizon-note');
     if (note) {
       note.textContent = active.id === 'long-term'
-        ? `Durable arrangement in ${active.targetYear || 3000}.`
+        ? `Durable arrangement by the year ${active.targetYear || 3000}`
         : `Snapshot at the end of ${active.targetYear || active.label}; it need not yet be durable.`;
     }
 

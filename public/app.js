@@ -102,9 +102,15 @@
   const extinctionLabels = { gone: 'Humanity is gone', risk: 'Humanity might perish' };
   // Straight from rule 3 of the taxonomy, so the marks explain themselves in
   // the same words the models were given.
-  const extinctionTips = {
-    gone: 'Endings 1–3. Humans died or were destroyed without continuity of individual identity.',
-    risk: 'Endings 4–5. Humanity survives in some versions of the ending and perishes in others.'
+  const extinctionTip = tier => {
+    if (isSnapshot()) {
+      return tier === 'gone'
+        ? 'States 1–3. Humans died or were destroyed without continuity of individual identity.'
+        : 'States 4–5. Humanity survives in some versions and perishes in others.';
+    }
+    return tier === 'gone'
+      ? 'Endings 1–3. Humans died or were destroyed without continuity of individual identity.'
+      : 'Endings 4–5. Humanity survives in some versions of the ending and perishes in others.';
   };
   const MARK_SHAPES = {
     risk: '<path d="M11 3.2 20.1 18.5H1.9Z"/><path d="M11 9.1v3.9M11 15.8h.01"/>'
@@ -122,7 +128,7 @@
       ? MARK_GLYPHS[tier]
       : `<svg viewBox="0 0 22 22" aria-hidden="true">${MARK_SHAPES[tier]}</svg>`;
     const glyph = MARK_GLYPHS[tier] ? ' is-glyph' : '';
-    return `<span class="state-mark is-${tier}${glyph}" role="img" data-mark="${tier}" aria-label="${label}. ${extinctionTips[tier]}">${body}</span>`;
+    return `<span class="state-mark is-${tier}${glyph}" role="img" data-mark="${tier}" aria-label="${label}. ${extinctionTip(tier)}">${body}</span>`;
   };
 
   // Rationales are model-authored: they arrive from a provider API, pass
@@ -865,7 +871,7 @@
     const tier = mark.dataset.mark;
     if (!tier || markTipFor === mark) return;
     markTipFor = mark;
-    markTip.innerHTML = `<b>${extinctionLabels[tier]}</b><span>${extinctionTips[tier]}</span>`;
+    markTip.innerHTML = `<b>${extinctionLabels[tier]}</b><span>${extinctionTip(tier)}</span>`;
     // A modal dialog paints in the top layer, above anything parented to the
     // body — so inside one, the tooltip has to live in the dialog.
     const host = mark.closest('dialog[open]') || document.body;

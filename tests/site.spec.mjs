@@ -504,6 +504,17 @@ test.describe('forecast horizons', () => {
     expect(normalized.searchParams.get('utm_source')).toBe('fixture');
     expect(errors).toEqual([]);
   });
+
+  test('extinction marks use state language for snapshots and ending language for long term', async ({ page }) => {
+    await settleWithHorizons(page, '/?horizon=2050');
+    await expect(page.locator('.state-mark[data-mark="gone"]').first()).toHaveAttribute('aria-label', /States 1–3\./);
+    await expect(page.locator('.state-mark[data-mark="risk"]').first()).toHaveAttribute('aria-label', /States 4–5\./);
+    await expect(page.locator('.state-mark').first()).not.toHaveAttribute('aria-label', /ending/i);
+
+    await page.getByRole('group', { name: 'Forecast horizon' }).getByRole('button', { name: 'Long term', exact: true }).click();
+    await expect(page.locator('.state-mark[data-mark="gone"]').first()).toHaveAttribute('aria-label', /Endings 1–3\./);
+    await expect(page.locator('.state-mark[data-mark="risk"]').first()).toHaveAttribute('aria-label', /versions of the ending/);
+  });
 });
 
 test.describe('the 2030 exposure chart on a phone', () => {

@@ -296,13 +296,13 @@ test.describe('forecast horizons', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await settleWithHorizons(page);
     await page.evaluate(() => window.scrollTo(0, 0));
-    const before = await page.locator('.origin').evaluate(origin => origin.getBoundingClientRect().top);
+    const before = await page.locator('.end-hero').evaluate(hero => hero.getBoundingClientRect().top);
 
     await page.getByRole('group', { name: 'Forecast horizon' }).getByRole('button', { name: '2060', exact: true }).click();
     await nextPaint(page);
 
-    const after = await page.locator('.origin').evaluate(origin => ({
-      top: origin.getBoundingClientRect().top,
+    const after = await page.locator('.end-hero').evaluate(hero => ({
+      top: hero.getBoundingClientRect().top,
       scrollY
     }));
     expect(after.scrollY).toBe(0);
@@ -662,21 +662,27 @@ test.describe('the 2030 exposure chart on a phone', () => {
     expect(Math.min(...layout.swatches), 'a legend swatch shrank below its intended size').toBeGreaterThanOrEqual(9.5);
   });
 
-  test('the horizon controls precede the origin and only the buttons stay sticky', async ({ page }) => {
+  test('the former origin section is absent', async ({ page }) => {
+    await expect(page.locator('.origin')).toHaveCount(0);
+    await expect(page.getByText('Where this started', { exact: true })).toHaveCount(0);
+    await expect(page.getByText(/biological boot loader/i)).toHaveCount(0);
+  });
+
+  test('the horizon controls precede the forecast and only the buttons stay sticky', async ({ page }) => {
     await page.evaluate(() => window.scrollTo(0, 0));
     const placement = await page.evaluate(() => {
       const copy = document.querySelector('.horizon-picker-copy');
       const dock = document.querySelector('.horizon-toggle-dock');
       const toggle = document.querySelector('.horizon-toggle');
       const rule = document.querySelector('.horizon-picker-rule');
-      const origin = document.querySelector('.origin');
+      const forecast = document.querySelector('.end-hero');
       const c = copy.getBoundingClientRect();
       const d = dock.getBoundingClientRect();
       const r = rule.getBoundingClientRect();
-      const o = origin.getBoundingClientRect();
+      const f = forecast.getBoundingClientRect();
       return {
-        domBeforeOrigin: Boolean(rule.compareDocumentPosition(origin) & Node.DOCUMENT_POSITION_FOLLOWING),
-        visuallyOrdered: c.bottom <= d.top + 1 && d.bottom <= r.top + 1 && r.bottom <= o.top + 1,
+        domBeforeForecast: Boolean(rule.compareDocumentPosition(forecast) & Node.DOCUMENT_POSITION_FOLLOWING),
+        visuallyOrdered: c.bottom <= d.top + 1 && d.bottom <= r.top + 1 && r.bottom <= f.top + 1,
         top: c.top,
         bottom: r.bottom,
         viewportHeight: innerHeight,
@@ -695,8 +701,8 @@ test.describe('the 2030 exposure chart on a phone', () => {
     });
     expect(placement.viewportWidth).toBeGreaterThanOrEqual(320);
     expect(placement.viewportWidth).toBeLessThanOrEqual(390);
-    expect(placement.domBeforeOrigin, 'the controls follow the origin in reading order').toBe(true);
-    expect(placement.visuallyOrdered, 'the label, buttons, divider, and origin are out of order').toBe(true);
+    expect(placement.domBeforeForecast, 'the forecast does not follow the controls in reading order').toBe(true);
+    expect(placement.visuallyOrdered, 'the label, buttons, divider, and forecast are out of order').toBe(true);
     expect(placement.top, 'the controls start above the viewport').toBeGreaterThanOrEqual(-0.5);
     expect(placement.bottom, 'the controls fall below the initial viewport').toBeLessThanOrEqual(placement.viewportHeight + 0.5);
     expect(placement.overflow, 'the sticky controls make the page scroll sideways').toBeLessThanOrEqual(0);

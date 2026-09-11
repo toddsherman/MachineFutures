@@ -980,7 +980,7 @@
     $$('.section-heading').forEach((heading, index) => add(heading, () => $$('.section-heading')[index]));
 
     [
-      '.horizon-picker-copy', '.horizon-picker-rule', '.origin-tweet', '.origin-note',
+      '.horizon-picker-copy', '.horizon-picker-rule',
       '.end-hero h1', '#forecast-summary', '.leader-title', '.leader-name',
       '.leader-unit', '.leader-timeline', '.leader-description', '.leader-method',
       '#end-forecast-title', '#forecast-note', '#end-forecast-toggle',
@@ -989,7 +989,7 @@
 
     // Broad sections are fallbacks for whitespace between the smaller blocks.
     [
-      '.origin', '.end-hero', '.end-leader-section', '.end-intro',
+      '.end-hero', '.end-leader-section', '.end-intro',
       '.states-section', '.matrix-section', '.model-mix', '#method', '.site-footer'
     ].forEach(selector => add($(selector), () => $(selector), 2));
 

@@ -367,7 +367,8 @@
     'long-term': 'end_states.md',
     '2030': 'end_states_2030.md',
     '2040': 'end_states_2040.md',
-    '2050': 'end_states_2050.md'
+    '2050': 'end_states_2050.md',
+    '2060': 'end_states_2060.md'
   };
 
   function renderHorizonContext() {

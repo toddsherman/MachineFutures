@@ -11,7 +11,7 @@
 // more than a single model differs from itself across samples". Repeated
 // samples per model give a noise floor to compare against.
 //
-// Usage: node tools/analyse-agreement.mjs [--horizon long-term|2030|2040|2050]
+// Usage: node tools/analyse-agreement.mjs [--horizon long-term|2030|2040|2050|2060]
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';

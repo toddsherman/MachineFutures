@@ -13,7 +13,7 @@
 // Usage:
 //   node tools/run-elicitation.mjs [--models anthropic,google] [--tier frontier]
 //                                  [--samples 20] [--out runs] [--date YYYY-MM-DD]
-//                                  [--horizon long-term|2030|2040|2050] [--mock]
+//                                  [--horizon long-term|2030|2040|2050|2060] [--mock]
 //   node tools/run-elicitation.mjs --check    # verify keys + model ids, ~1 cheap
 //                                             # call per model, writes nothing
 //   node tools/run-elicitation.mjs --list     # list every model each provider

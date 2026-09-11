@@ -10,6 +10,7 @@ const longHeldLeashDescription = 'The Held Leash fixture description.';
 const snapshotHeldLeashDescription = "Up to the target date, humans have retained ultimate authority over AI's goals, deployment, and resources. AI may be extremely capable and act autonomously within delegated bounds, but it has not become an independent civilizational power. This includes capabilities that have so far remained below transformative levels or controls that have kept pace so far.";
 const snapshotCoexistenceDescription = 'Humans and AI remain separate, and each holds enough power that neither dominates. Their relationship may be cooperative or adversarial and may still be changing.';
 const snapshotPreserveDescription = 'AI systems hold decisive power over civilization while humans survive without meaningful control over its direction. Their treatment may range from comfort and protection to confinement or exploitation.';
+const snapshotMergerDescription = 'Humans and AI are no longer meaningfully separate sources of agency. Identity-continuous augmentation, uploading, biological redesign, or embedded machine systems have made integration the dominant structure. Ordinary tool use or limited implants do not qualify.';
 
 const settle = async (page, url = '/') => {
   await page.goto(url);
@@ -164,7 +165,7 @@ test.describe('forecast horizons', () => {
     ];
 
     for (const [label, selector, placement] of anchors) {
-      for (const [name, id] of [['2030', '2030'], ['2040', '2040'], ['2050', '2050'], ['Long term', 'long-term']]) {
+      for (const [name, id] of [['2030', '2030'], ['2040', '2040'], ['2050', '2050'], ['2060', '2060'], ['Long term', 'long-term']]) {
         const before = await parkViewportAnchor(page, selector, placement);
         await horizon.getByRole('button', { name, exact: true }).click();
         await expect(page.locator(`.horizon-button[data-horizon="${id}"]`)).toHaveAttribute('aria-pressed', 'true');
@@ -179,6 +180,7 @@ test.describe('forecast horizons', () => {
       document.querySelector('.horizon-button[data-horizon="2030"]').click();
       document.querySelector('.horizon-button[data-horizon="2040"]').click();
       document.querySelector('.horizon-button[data-horizon="2050"]').click();
+      document.querySelector('.horizon-button[data-horizon="2060"]').click();
     });
     await nextPaint(page);
     const rapidSwitch = await page.locator('#state-9 .state-card-head').evaluate(anchor => ({
@@ -187,8 +189,8 @@ test.describe('forecast horizons', () => {
       focusedHorizon: document.activeElement?.dataset?.horizon,
       overflowAnchor: document.documentElement.style.overflowAnchor
     }));
-    expect(rapidSwitch.horizon).toBe('2050');
-    expect(rapidSwitch.focusedHorizon).toBe('2050');
+    expect(rapidSwitch.horizon).toBe('2060');
+    expect(rapidSwitch.focusedHorizon).toBe('2060');
     expect(rapidSwitch.overflowAnchor, 'rapid switching left native scroll anchoring disabled').toBe('');
     expect(Math.abs(rapidSwitch.top - beforeRapidSwitch), 'rapid switching moved the visible card').toBeLessThanOrEqual(viewportTolerance);
   });
@@ -296,7 +298,7 @@ test.describe('forecast horizons', () => {
     await page.evaluate(() => window.scrollTo(0, 0));
     const before = await page.locator('.origin').evaluate(origin => origin.getBoundingClientRect().top);
 
-    await page.getByRole('group', { name: 'Forecast horizon' }).getByRole('button', { name: '2050', exact: true }).click();
+    await page.getByRole('group', { name: 'Forecast horizon' }).getByRole('button', { name: '2060', exact: true }).click();
     await nextPaint(page);
 
     const after = await page.locator('.origin').evaluate(origin => ({
@@ -311,7 +313,7 @@ test.describe('forecast horizons', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await settleWithHorizons(page);
     const group = page.getByRole('group', { name: 'Forecast horizon' });
-    await expect(group.getByRole('button')).toHaveText(['Long term', '2030', '2040', '2050']);
+    await expect(group.getByRole('button')).toHaveText(['Long term', '2030', '2040', '2050', '2060']);
     await expect(group.getByRole('button', { name: 'Long term' })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator('#horizon-note')).toHaveText('Durable arrangement by the year 3000');
     await expect(page.locator('#forecast-summary')).toContainText('11 mutually exclusive end states');
@@ -448,6 +450,51 @@ test.describe('forecast horizons', () => {
     await expect(page.locator('#dialog-content .model-answer p').first()).toContainText('2050');
     await page.locator('#dialog-close').click();
 
+    await group.getByRole('button', { name: '2060', exact: true }).click();
+    await page.waitForFunction(() => document.querySelector('.leader-name')?.textContent === 'The Merger');
+    const laterSnapshot = await page.evaluate(() => {
+      const row = document.querySelector('.matrix-state[data-state="6"]')?.closest('.matrix-row');
+      return {
+        horizon: window.MF_TEST.activeHorizon(),
+        models: document.querySelector('#dek-models').textContent,
+        labs: document.querySelector('#dek-labs').textContent,
+        date: document.querySelector('#dataset-date').textContent,
+        title: document.querySelector('#end-forecast-title').innerText.replace(/\s+/g, ' ').trim(),
+        note: document.querySelector('#horizon-note').textContent,
+        leader: document.querySelector('.leader-name').textContent,
+        leaderValue: document.querySelector('.end-leader strong').textContent,
+        leaderUnit: document.querySelector('.leader-unit').textContent,
+        card: document.querySelector('.state-card[data-state="6"] .state-card-meta strong').textContent,
+        cardDescription: document.querySelector('.state-card[data-state="6"] > p').textContent,
+        matrix: [...row.querySelectorAll('.matrix-cell span')].map(cell => cell.textContent),
+        exposure: [...document.querySelectorAll('.doomer-total b')].map(cell => cell.textContent),
+        matrixLabel: document.querySelector('#matrix').getAttribute('aria-label'),
+        barLabel: document.querySelector('#consensus-bar').getAttribute('aria-label'),
+        summary: document.querySelector('#forecast-summary').textContent.replace(/\s+/g, ' ').trim(),
+        prompt: new URL(document.querySelector('#method-prompt-link').href).pathname,
+        pressed: document.querySelector('.horizon-button[aria-pressed="true"]').dataset.horizon
+      };
+    });
+    expect(laterSnapshot).toEqual({
+      horizon: '2060', models: '3', labs: '3', date: '05.06.26',
+      title: '2060 MEDIAN MACHINE FORECAST',
+      note: 'Snapshot at the end of 2060; it need not yet be durable.',
+      leader: 'The Merger', leaderValue: '20%',
+      leaderUnit: 'Median across 3 models · 2060 · of 100 points',
+      card: '20%', cardDescription: snapshotMergerDescription,
+      matrix: ['20', '20', '20'], exposure: ['45%', '45%', '45%'],
+      matrixLabel: '2060 probability by structural state and model',
+      barLabel: 'Median probability by structural state for 2060',
+      summary: 'We asked 3 of the leading AI models from 3 labs to assign 100 percentage points across 11 mutually exclusive structural states for humanity’s relationship with AI.',
+      prompt: '/end_states_2060.md', pressed: '2060'
+    });
+
+    await page.locator('.state-card[data-state="9"]').click();
+    await expect(page.locator('#dialog-content .dialog-kicker')).toContainText('Humanity remains in control · 2060');
+    await expect(page.locator('#dialog-content .dialog-description')).toHaveText(snapshotHeldLeashDescription);
+    await expect(page.locator('#dialog-content .model-answer p').first()).toContainText('2060');
+    await page.locator('#dialog-close').click();
+
     await group.getByRole('button', { name: 'Long term' }).click();
     await page.waitForFunction(() => document.querySelector('.leader-name')?.textContent === 'The Held Leash');
     await expect(page.locator('#forecast-summary')).toContainText('11 mutually exclusive end states');
@@ -473,28 +520,28 @@ test.describe('forecast horizons', () => {
     expect(afterReset.searchParams.get('utm_source')).toBe('fixture');
 
     await page.locator('[data-end-forecast="gamma"]').click();
-    await horizon.getByRole('button', { name: '2050', exact: true }).click();
+    await horizon.getByRole('button', { name: '2060', exact: true }).click();
     await expect(page.locator('.end-toggle-button.active')).toHaveAttribute('data-end-forecast', 'gamma');
     const preserved = new URL(page.url());
-    expect(preserved.searchParams.get('horizon')).toBe('2050');
+    expect(preserved.searchParams.get('horizon')).toBe('2060');
     expect(preserved.searchParams.get('model')).toBe('gamma');
     expect(preserved.searchParams.get('utm_source')).toBe('fixture');
-    await expect(page.locator('.horizon-button[data-horizon="2050"]')).toBeFocused();
+    await expect(page.locator('.horizon-button[data-horizon="2060"]')).toBeFocused();
 
     await page.reload();
-    await page.waitForFunction(() => window.MF_TEST?.activeHorizon() === '2050');
-    await expect(page.locator('.horizon-button[data-horizon="2050"]')).toHaveAttribute('aria-pressed', 'true');
+    await page.waitForFunction(() => window.MF_TEST?.activeHorizon() === '2060');
+    await expect(page.locator('.horizon-button[data-horizon="2060"]')).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator('.end-toggle-button.active')).toHaveAttribute('data-end-forecast', 'gamma');
   });
 
   test('an empty horizon stays out of the selector until it has forecasts', async ({ page }) => {
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
-    const empty2050 = `${horizonFixture}\nwindow.MF_DATA.datasets['2050'] = { endStateRuns: {}, datasetDate: null, leaderHistory: [] };`;
-    await settleWithHorizons(page, '/?horizon=2050&utm_source=fixture', empty2050);
+    const empty2060 = `${horizonFixture}\nwindow.MF_DATA.datasets['2060'] = { endStateRuns: {}, datasetDate: null, leaderHistory: [] };`;
+    await settleWithHorizons(page, '/?horizon=2060&utm_source=fixture', empty2060);
     const group = page.getByRole('group', { name: 'Forecast horizon' });
-    await expect(group.getByRole('button')).toHaveText(['Long term', '2030', '2040']);
-    await expect(group.getByRole('button', { name: '2050', exact: true })).toHaveCount(0);
+    await expect(group.getByRole('button')).toHaveText(['Long term', '2030', '2040', '2050']);
+    await expect(group.getByRole('button', { name: '2060', exact: true })).toHaveCount(0);
     await expect(group.getByRole('button', { name: 'Long term' })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator('.state-card')).toHaveCount(11);
     await expect(page.locator('#dataset-date')).toHaveText('01.02.26');
@@ -506,7 +553,7 @@ test.describe('forecast horizons', () => {
   });
 
   test('extinction marks use state language for snapshots and ending language for long term', async ({ page }) => {
-    await settleWithHorizons(page, '/?horizon=2050');
+    await settleWithHorizons(page, '/?horizon=2060');
     await expect(page.locator('.state-mark[data-mark="gone"]').first()).toHaveAttribute('aria-label', /States 1–3\./);
     await expect(page.locator('.state-mark[data-mark="risk"]').first()).toHaveAttribute('aria-label', /States 4–5\./);
     await expect(page.locator('.state-mark').first()).not.toHaveAttribute('aria-label', /ending/i);
@@ -638,8 +685,11 @@ test.describe('the 2030 exposure chart on a phone', () => {
         buttons: [...toggle.querySelectorAll('.horizon-button')].map(button => {
           const range = document.createRange();
           range.selectNodeContents(button);
+          const text = range.getBoundingClientRect();
+          const box = button.getBoundingClientRect();
           const lines = [...range.getClientRects()].filter(rect => rect.width > 0.1 && rect.height > 0.1).length;
-          return { label: button.textContent.trim(), lines, height: button.getBoundingClientRect().height };
+          const textFits = text.left >= box.left - 0.5 && text.right <= box.right + 0.5;
+          return { label: button.textContent.trim(), lines, height: box.height, textFits };
         })
       };
     });
@@ -650,9 +700,10 @@ test.describe('the 2030 exposure chart on a phone', () => {
     expect(placement.top, 'the controls start above the viewport').toBeGreaterThanOrEqual(-0.5);
     expect(placement.bottom, 'the controls fall below the initial viewport').toBeLessThanOrEqual(placement.viewportHeight + 0.5);
     expect(placement.overflow, 'the sticky controls make the page scroll sideways').toBeLessThanOrEqual(0);
-    expect(placement.buttons.map(button => button.label)).toEqual(['Long term', '2030', '2040', '2050']);
+    expect(placement.buttons.map(button => button.label)).toEqual(['Long term', '2030', '2040', '2050', '2060']);
     expect(placement.buttons.filter(button => button.lines !== 1), 'a horizon label wrapped onto a second line').toEqual([]);
-    expect(Math.max(...placement.buttons.map(button => button.height)), 'the four-button row grew taller than its one-line control height').toBeLessThanOrEqual(40.5);
+    expect(placement.buttons.filter(button => !button.textFits), 'a horizon label crossed its button border').toEqual([]);
+    expect(Math.max(...placement.buttons.map(button => button.height)), 'the five-button row grew taller than its one-line control height').toBeLessThanOrEqual(40.5);
 
     await page.evaluate(() => document.querySelector('.states-section').scrollIntoView({ block: 'start' }));
     const stuck = await page.evaluate(() => {
@@ -676,9 +727,9 @@ test.describe('the 2030 exposure chart on a phone', () => {
     expect(stuck.buttonsTop, 'the buttons escaped their sticky dock').toBeGreaterThanOrEqual(stuck.dockTop);
     expect(stuck.buttonsBottom, 'the sticky buttons fell below the viewport').toBeLessThanOrEqual(stuck.viewportHeight);
 
-    await page.getByRole('group', { name: 'Forecast horizon' }).getByRole('button', { name: '2050', exact: true }).click();
-    await expect(page.locator('.horizon-button[data-horizon="2050"]')).toHaveAttribute('aria-pressed', 'true');
-    await expect.poll(() => page.evaluate(() => new URL(location.href).searchParams.get('horizon'))).toBe('2050');
+    await page.getByRole('group', { name: 'Forecast horizon' }).getByRole('button', { name: '2060', exact: true }).click();
+    await expect(page.locator('.horizon-button[data-horizon="2060"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect.poll(() => page.evaluate(() => new URL(location.href).searchParams.get('horizon'))).toBe('2060');
     const afterSwitch = await page.evaluate(() => ({
       dockTop: document.querySelector('.horizon-toggle-dock').getBoundingClientRect().top,
       scrollY

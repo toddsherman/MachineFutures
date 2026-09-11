@@ -1322,6 +1322,56 @@ test.describe('mean scenario probabilities by horizon', () => {
     expect(chart.points.filter(point => !(point.radius > 0 && point.radius <= 3.5)), 'observation dots should be small, filled circles').toEqual([]);
   });
 
+  test('the hover or tap overlay carries the existing extinction symbols for states 1–5 only', async ({ page }) => {
+    await settle(page);
+    const hit = page.locator('#horizon-chart-svg .horizon-chart-hit');
+    await hit.scrollIntoViewIfNeeded();
+    const usesTouch = await page.evaluate(() => navigator.maxTouchPoints > 0);
+    if (usesTouch) await hit.tap({ position: { x: 8, y: 8 } });
+    else await hit.hover({ position: { x: 8, y: 8 } });
+
+    const tooltip = page.locator('#horizon-chart-tooltip');
+    await expect(tooltip).toBeVisible();
+    const rows = await tooltip.locator('.horizon-chart-tooltip-row').evaluateAll(elements => elements.map(row => {
+      const label = row.querySelector(':scope > span');
+      const state = Number(label?.textContent.match(/^\s*(\d+)\./)?.[1]);
+      const mark = label?.querySelector('.state-mark');
+      const matchingCardMark = document.querySelector(`.state-card[data-state="${state}"] .state-mark[data-mark]`);
+      return {
+        state,
+        mark: mark
+          ? ['gone', 'risk'].find(tier => mark.classList.contains(`is-${tier}`)) ?? null
+          : null,
+        dataMark: mark?.getAttribute('data-mark') ?? null,
+        classes: mark ? [...mark.classList].sort() : [],
+        hasHazardShape: Boolean(mark?.querySelector('svg path')),
+        glyphPoints: mark ? [...mark.textContent].map(character => character.codePointAt(0).toString(16)) : [],
+        sameBodyAsExistingMark: mark && matchingCardMark ? mark.innerHTML === matchingCardMark.innerHTML : null
+      };
+    }));
+
+    expect(rows, 'the overlay should list every scenario').toHaveLength(11);
+    expect(rows.map(row => row.state).sort((a, b) => a - b)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    for (const row of rows) {
+      if (row.state <= 3) {
+        expect(row.mark, `state ${row.state} lost its gone marker`).toBe('gone');
+        expect(row.dataMark, `state ${row.state}'s compact overlay marker should not expose tooltip behavior`).toBeNull();
+        expect(row.classes, `state ${row.state} no longer uses the existing skull glyph class`).toContain('is-glyph');
+        expect(row.glyphPoints, `state ${row.state}'s skull must include the text-presentation selector`).toEqual(['2620', 'fe0e']);
+        expect(row.hasHazardShape, `state ${row.state} should use the skull, not the hazard shape`).toBe(false);
+        expect(row.sameBodyAsExistingMark, `state ${row.state} does not reuse the site's existing gone symbol`).toBe(true);
+      } else if (row.state <= 5) {
+        expect(row.mark, `state ${row.state} lost its risk marker`).toBe('risk');
+        expect(row.dataMark, `state ${row.state}'s compact overlay marker should not expose tooltip behavior`).toBeNull();
+        expect(row.classes, `state ${row.state} no longer uses the existing risk marker class`).not.toContain('is-glyph');
+        expect(row.hasHazardShape, `state ${row.state} should use the hazard shape`).toBe(true);
+        expect(row.sameBodyAsExistingMark, `state ${row.state} does not reuse the site's existing risk symbol`).toBe(true);
+      } else {
+        expect(row.mark, `state ${row.state} should not carry an extinction marker`).toBeNull();
+      }
+    }
+  });
+
   test('curves land on every observation without inventing extrema between them', async ({ page }) => {
     await settle(page);
     const issues = await page.evaluate(() => window.MF_TEST.horizonChartData().series.flatMap(series => {

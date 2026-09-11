@@ -1018,7 +1018,13 @@ test.describe('the forecast plays itself', () => {
                     medianGap: gaps[Math.floor(gaps.length / 2)], ended: active() });
         }
       }, 30);
-      document.querySelector('.end-consensus').scrollIntoView();
+      // The site uses smooth scrolling for readers. CI WebKit can leave that
+      // programmatic scroll pending long enough that the IntersectionObserver
+      // never sees the panel during this test's fixed sweep budget. Make only
+      // the test setup scroll immediate; the real observer and timed sweep are
+      // still what drive every selection below.
+      document.documentElement.style.scrollBehavior = 'auto';
+      document.querySelector('.end-consensus').scrollIntoView({ block: 'start' });
     }));
     const models = result.visited.filter(k => k !== 'Median');
     expect(models.length, 'the sweep did not visit every model').toBe(result.models);

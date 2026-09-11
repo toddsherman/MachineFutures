@@ -4,6 +4,10 @@
   "description": "A public record of what frontier AI models forecast about humanity's relationship with AI across multiple time horizons.",
   "scripts": {
     "check": "node tools/check-all.mjs",
+    "verify:runs": "node tools/verify-runs.mjs",
+    "data:import": "node tools/import-runs.mjs",
+    "data:export": "node tools/export-data.mjs",
+    "data:rebuild": "npm run data:import && npm run data:export",
     "test:browser": "playwright test",
     "serve": "python3 -m http.server 4173 --directory public"
   },

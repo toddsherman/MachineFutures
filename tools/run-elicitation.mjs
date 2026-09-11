@@ -7,7 +7,7 @@
 // {{RUN_DATE}} substituted), collects 20 samples at provider-default
 // sampling settings with no tools, validates each against the taxonomy
 // rules, and writes one batch JSON per model into runs/ — the same
-// format forecast-ingest_1.html exports, so tools/import-runs.mjs and
+// format tools/manual-ingest.html exports, so tools/import-runs.mjs and
 // the manual path stay interchangeable.
 //
 // Usage:
@@ -160,9 +160,9 @@ function writeAtomic(file, contents) {
   renameSync(tmp, file);
 }
 
-// Batches are never overwritten. A rerun on the same date becomes a revision
-// beside the original rather than replacing it — that path already cost one
-// real 20-sample run.
+// Completed or incompatible same-date batches are never overwritten. They
+// become revisions beside the original; compatible incomplete batches are
+// selected earlier and extended in place so paid samples are not bought twice.
 function reserveBatchPath(dir, runId) {
   let file = join(dir, `${runId}.json`);
   if (!existsSync(file) || FORCE) return { file, runId };
@@ -297,7 +297,7 @@ function parseAndValidate(text) {
   return { meta: { model: obj.model || null, cutoff: obj.knowledge_cutoff || null, asOf: obj.as_of_date || null }, answers };
 }
 
-/* ---------- aggregation (mirrors forecast-ingest_1.html) ---------- */
+/* ---------- aggregation (mirrors tools/manual-ingest.html) ---------- */
 const median = a => { const s = [...a].sort((x, y) => x - y); const n = s.length; return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2; };
 const round1 = v => Math.round(v * 10) / 10;
 
@@ -778,7 +778,7 @@ if (process.env.GITHUB_STEP_SUMMARY) {
   const rejecting = results.filter(r => r.failures.some(f => f.kind === 'permanent'));
   if (rejecting.length) {
     lines.push('', '### Answers rejected as invalid', '',
-      'These were re-asked until the model returned a well-formed answer, so no batch is short because of them. A high rate means the model struggles with the schema.', '',
+      'These were re-asked within the attempt and wall-clock budgets. If repeated rejection leaves a batch short, the completeness gate blocks publication until it is resumed. A high rate means the model struggles with the schema.', '',
       ...rejecting.flatMap(r => [`- **${r.label}** (\`${r.key}\`)`,
         ...[...new Set(r.failures.filter(f => f.kind === 'permanent').map(f => f.reason))].map(reason => `  - ${reason}`)]));
   }

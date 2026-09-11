@@ -2,7 +2,7 @@
 // Import raw batch files from runs/ into public/data.js.
 //
 // Reads every end-state batch in runs/ — written by tools/run-elicitation.mjs
-// or exported by forecast-ingest_1.html — and rewrites the IMPORTED END-STATE
+// or exported by tools/manual-ingest.html — and rewrites the IMPORTED END-STATE
 // RUNS block in public/data.js with each model's newest run in each horizon:
 // median allocation per state, renormalized to integers summing to 100.
 //

@@ -1,0 +1,9 @@
+# Machine-produced artifacts are canonical or reproducible, but their bulk
+# should not bury hand-authored changes in GitHub pull-request diffs.
+/runs/*.json linguist-generated=true
+/data/*.csv linguist-generated=true
+/data/forecasts.json linguist-generated=true
+/tools/seen-models.json linguist-generated=true
+
+# public/data.js intentionally remains unmarked: its forecast block is
+# generated, but its taxonomy and horizon-specific copy are hand-maintained.

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Integrity check for the raw batches in runs/ — the irreplaceable half of
-// this repository. public/data.js can always be regenerated from these files;
-// these files cannot be regenerated from anything.
+// this repository. The generated forecast block in public/data.js can always
+// be rebuilt from these files; these files cannot be regenerated from it.
 //
 // Runs on every push, not only after elicitation, so corruption or a bad
 // hand-edit is caught when it lands rather than at the next monthly sweep.

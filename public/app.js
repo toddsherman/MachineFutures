@@ -111,8 +111,8 @@
   const extinctionLabels = { gone: 'Humanity is gone', risk: 'Humanity might perish' };
   // Straight from rule 3 of the taxonomy, so the marks explain themselves in
   // the same words the models were given.
-  const extinctionTip = tier => {
-    if (isSnapshot()) {
+  const extinctionTip = (tier, snapshot = isSnapshot()) => {
+    if (snapshot) {
       return tier === 'gone'
         ? 'States 1–3. Humans died or were destroyed without continuity of individual identity.'
         : 'States 4–5. Humanity survives in some versions and perishes in others.';
@@ -128,7 +128,7 @@
   // Android both substitute a colour emoji, which would put back on the page
   // the one thing these marks deliberately do not use: hue.
   const MARK_GLYPHS = { gone: '\u2620\uFE0E' };
-  const extinctionMark = state => {
+  const extinctionMark = (state, { snapshot = isSnapshot(), compact = false } = {}) => {
     const tier = state.extinction;
     if (!tier) return '';
     const label = extinctionLabels[tier];
@@ -137,7 +137,10 @@
       ? MARK_GLYPHS[tier]
       : `<svg viewBox="0 0 22 22" aria-hidden="true">${MARK_SHAPES[tier]}</svg>`;
     const glyph = MARK_GLYPHS[tier] ? ' is-glyph' : '';
-    return `<span class="state-mark is-${tier}${glyph}" role="img" data-mark="${tier}" aria-label="${label}. ${extinctionTip(tier)}">${body}</span>`;
+    const compactClass = compact ? ' is-compact' : '';
+    const interactive = compact ? '' : ` data-mark="${tier}"`;
+    const accessibleLabel = compact ? label : `${label}. ${extinctionTip(tier, snapshot)}`;
+    return `<span class="state-mark is-${tier}${glyph}${compactClass}" role="img"${interactive} aria-label="${accessibleLabel}">${body}</span>`;
   };
 
   // Rationales are model-authored: they arrive from a provider API, pass
@@ -363,7 +366,7 @@
     });
     const description = $('#horizon-chart-svg-desc');
     if (description) {
-      description.textContent = `Eleven solid scenario-coloured curves connect lab-balanced mean probabilities for 2030, 2040, 2050, 2060, and 3000 on a log elapsed-time axis. ${selected.year} is selected on the page and marked by a vertical dashed guide. Curves are visual connectors, not intermediate forecasts.`;
+      description.textContent = `Eleven solid scenario-coloured curves connect lab-balanced mean probabilities for 2030, 2040, 2050, 2060, and 3000 on a log elapsed-time axis. ${selected.year} is selected on the page and marked by a vertical dotted guide. Curves are visual connectors, not intermediate forecasts.`;
     }
   }
 
@@ -418,7 +421,7 @@
       'aria-hidden': 'true'
     })));
     tooltip.innerHTML = `<strong>${nearest.year}${nearest.id === 'long-term' ? ' · Long term' : ''}</strong>${rows.map(({ series, value }) => `
-      <span class="horizon-chart-tooltip-row"><i style="--state:${series.color}"></i><span>${series.id}. ${esc(series.name)}</span><b>${aggregatePercent(value)}</b></span>`).join('')}`;
+      <span class="horizon-chart-tooltip-row"><i style="--state:${series.color}"></i><span class="horizon-chart-tooltip-name"><span>${series.id}. ${esc(series.name)}</span>${extinctionMark(series, { snapshot: nearest.id !== 'long-term', compact: true })}</span><b>${aggregatePercent(value)}</b></span>`).join('')}`;
     tooltip.hidden = false;
     const plotBounds = tooltip.parentElement.getBoundingClientRect();
     const tooltipBounds = tooltip.getBoundingClientRect();
@@ -457,7 +460,7 @@
 
   function renderHorizonChartTable(data) {
     const table = $('#horizon-chart-table');
-    table.innerHTML = `<table><caption>Lab-balanced mean scenario probabilities by forecast horizon.</caption><thead><tr><th>Scenario</th>${data.horizons.map(horizon => `<th>${horizon.year}</th>`).join('')}</tr></thead><tbody>${data.series.map(series => `<tr><th>${series.id}. ${esc(series.name)}</th>${series.points.map(point => `<td>${aggregatePercent(point.value)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+    table.innerHTML = `<table><caption>Lab-balanced mean scenario probabilities by forecast horizon.</caption><thead><tr><th>Scenario</th>${data.horizons.map(horizon => `<th>${horizon.year}</th>`).join('')}</tr></thead><tbody>${data.series.map(series => `<tr><th>${series.id}. ${esc(series.name)}${series.extinction ? ` — ${extinctionLabels[series.extinction]}` : ''}</th>${series.points.map(point => `<td>${aggregatePercent(point.value)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
   }
 
   function drawHorizonChart() {

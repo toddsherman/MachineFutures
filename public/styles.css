@@ -276,7 +276,7 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 
 /* One chart carries the same scenario identity used throughout the page:
    colour belongs to the scenario, while the selected horizon is a neutral
-   dashed guide controlled by the primary picker. */
+   dotted guide controlled by the primary picker. */
 .horizon-chart-section { border-top: 1px solid var(--line); }
 .horizon-chart { min-width: 0; }
 .horizon-chart-legend { display: flex; flex-wrap: wrap; gap: 3px 18px; margin-bottom: 22px; }
@@ -302,6 +302,9 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .horizon-chart-tooltip strong { display: block; margin-bottom: 6px; font-size: 11px; }
 .horizon-chart-tooltip-row { display: grid; grid-template-columns: 8px minmax(0, 1fr) auto; align-items: center; gap: 7px; margin-top: 3px; }
 .horizon-chart-tooltip-row i { width: 6px; height: 6px; background: var(--state); }
+.horizon-chart-tooltip-name { min-width: 0; display: inline-flex; align-items: center; gap: 4px; }
+.horizon-chart-tooltip-name .state-mark { display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; margin-left: 0; vertical-align: 0; flex: 0 0 12px; }
+.horizon-chart-tooltip-name .state-mark.is-glyph { width: 12px; height: 12px; font-size: 14px; line-height: 1; }
 .horizon-chart-tooltip-row b { font-weight: 800; font-variant-numeric: tabular-nums; }
 .horizon-chart-caption { max-width: 74ch; margin: 16px 0 0; color: var(--muted); font: 11px/1.55 var(--mono); }
 

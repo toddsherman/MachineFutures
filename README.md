@@ -1,6 +1,6 @@
 # Machine Futures
 
-A responsive, data-driven site publishing what frontier AI models think humanity's relationship with AI will look like in 2030, in 2040, and in the long-term year-3000 state.
+A responsive, data-driven site publishing what frontier AI models think humanity's relationship with AI will look like in 2030, 2040, 2050, and in the long-term year-3000 state.
 
 For each horizon, every active model allocates exactly 100 percentage points across the same eleven mutually exclusive states, twenty times, at its own default settings. The site shows the median allocation per model, renormalized to integers summing to 100, the spread between models, and each model's reasoning per state. The long-term view remains the default.
 
@@ -16,7 +16,7 @@ Then open `http://localhost:4173`.
 
 ## Private authoring tool
 
-`forecast-ingest_1.html` is an owner-only local utility for pasting model output by hand, kept for one-off runs and models without an API. It lives outside `public/` and is excluded from production deployments. (It still understands the retired 2030 format as well.)
+`forecast-ingest_1.html` is an owner-only local utility for pasting long-term year-3000 model output by hand, kept for one-off runs and models without an API. Dated snapshots use the automated harness so their horizon provenance cannot be mislabeled. The utility lives outside `public/` and is excluded from production deployments. (It still understands the retired 2030 format as well.)
 
 ## Plan of record
 
@@ -31,7 +31,7 @@ The site's headline forecast for the selected horizon is the coordinate-wise med
 
 Extinction-risk exposure is the sum of the five extinction-risk medians, and the error quoted beneath that chart is bootstrapped from the model's own samples so it describes that estimator rather than the mean of per-sample totals. The two disagree enough to reorder the board, which is why `exposurePublished` exists alongside `exposure`.
 
-The authoring path is `tools/run-elicitation.mjs --horizon <long-term|2030|2040>` -> horizon-tagged batch JSON in `runs/` -> `node tools/import-runs.mjs` -> `node tools/export-data.mjs` -> git push -> Vercel deploy. The importer rewrites the IMPORTED END-STATE RUNS block in `public/data.js` with each model's newest run inside each horizon and updates that horizon's dataset badge date and leader history.
+The authoring path is `tools/run-elicitation.mjs --horizon <long-term|2030|2040|2050>` -> horizon-tagged batch JSON in `runs/` -> `node tools/import-runs.mjs` -> `node tools/export-data.mjs` -> git push -> Vercel deploy. The importer rewrites the IMPORTED END-STATE RUNS block in `public/data.js` with each model's newest run inside each horizon and updates that horizon's dataset badge date and leader history.
 
 Run identity always comes from the model id actually called, never the model's self-report — models are unreliable narrators about their own version. The self-report is stored as `model.self_reported_name` for interest.
 
@@ -39,7 +39,7 @@ The 50-question 2030 benchmark was retired in August 2026; its prompt and only r
 
 ## Automated elicitation
 
-`.github/workflows/elicit.yml` runs the selected prompt against every active model in `tools/models.json` — 20 samples per model and horizon at provider-default settings, no tools — then validates, aggregates, writes `runs/` batches, regenerates `public/data.js`, and pushes an `elicitation/<run-id>` branch. One matrix job owns one model and asks its selected horizons in sequence, so slow models do not force the entire roster through one runner. Open a PR from the generated branch and merge to publish via Vercel.
+`.github/workflows/elicit.yml` runs the selected prompt against every active model in `tools/models.json` — 20 samples per model and horizon at provider-default settings, no tools — then validates, aggregates, writes `runs/` batches, regenerates `public/data.js`, and pushes an `elicitation/<run-id>` branch. For a four-horizon sweep, each model's work is split across two ordered jobs of at most two horizons each; the second wave waits for the first, so the same model is never called concurrently and slow models do not force the entire roster through one runner. Open a PR from the generated branch and merge to publish via Vercel.
 
 ### Not losing the data
 
@@ -61,7 +61,7 @@ Errors are sorted into three kinds, because the right response differs:
 - **quota** — the provider says the account is out of money. Recognised across providers by body text as well as status, since OpenAI returns 429 for both "slow down" and "you're broke". The model stops immediately rather than spending eighteen minutes of backoff on a call that cannot succeed.
 - **permanent** — a bad model id, a refusal, an unparseable answer. The attempt fails and the next sample is tried.
 
-The attempt budget is `ceil(samples × 1.5) + 5`, and each model has a 100-minute wall-clock budget per horizon by default. Each model runs in its own job, so a slow provider cannot starve the rest of the roster.
+The attempt budget is `ceil(samples × 1.5) + 5`, and each model has a 100-minute wall-clock budget per horizon by default. Each model runs in its own isolated job in each ordered wave, so a slow provider cannot starve the rest of the roster.
 
 ### Knowing you have run out of credit
 
@@ -75,7 +75,7 @@ Three signals, in increasing order of how hard they are to miss:
 
 ### Ongoing cadence
 
-**Monthly, automatically.** The schedule runs on the 1st at 14:00 UTC, re-asking every active model for all three horizons: long term, 2030, and 2040. This produces three isolated longitudinal series using the same taxonomy and each horizon's versioned prompt. Gated on the repository variable `ELICITATION_ENABLED`; set it to anything other than `true` to pause.
+**Monthly, automatically.** The schedule runs on the 1st at 14:00 UTC, re-asking every active model for all four horizons: long term, 2030, 2040, and 2050. This produces four isolated longitudinal series using the same taxonomy and each horizon's versioned prompt. Gated on the repository variable `ELICITATION_ENABLED`; set it to anything other than `true` to pause.
 
 **When a lab ships a new model**, three steps:
 
@@ -95,7 +95,7 @@ Adding a model is one entry in `tools/models.json` plus its key. Anything with a
 
 ### Methodology guarantees encoded in the harness
 
-- The selected prompt is read verbatim from `public/end_states.md`, `public/end_states_2030.md`, or `public/end_states_2040.md` between the PROMPT BEGINS/ENDS delimiters. The short horizons use the same taxonomy but ask what is actually in place at year-end without a durability requirement.
+- The selected prompt is read verbatim from `public/end_states.md`, `public/end_states_2030.md`, `public/end_states_2040.md`, or `public/end_states_2050.md` between the PROMPT BEGINS/ENDS delimiters. The dated horizons use the same taxonomy but ask what is actually in place at year-end without a durability requirement.
 - No fallback models are configured: a refusal or invalid response is recorded as a failed sample, never answered by a different model.
 - Sampling parameters are omitted, so every provider runs at its own defaults.
 - Run identity is the model id actually called. Models are unreliable narrators about their own version — one run had Gemini 3.1 Pro answer `gpt-4o` — so the self-report is stored as `model.self_reported_name` and never used as identity.
@@ -119,7 +119,7 @@ The suite is checked by reintroducing each fixed bug and confirming it fails; a 
 - `public/` — the complete deployable website
 - `public/data.js` — the end-state taxonomy and imported forecasts
 - `public/end_states.md` — long-term year-3000 prompt and taxonomy
-- `public/end_states_2030.md`, `public/end_states_2040.md` — year-end snapshot prompts using the same taxonomy
+- `public/end_states_2030.md`, `public/end_states_2040.md`, `public/end_states_2050.md` — year-end snapshot prompts using the same taxonomy
 - `forecast-ingest_1.html` — private local ingestion utility
 - `runs/` — raw sample batches + aggregates exported by the ingester (committed, never deployed)
 - `tools/import-runs.mjs` — imports `runs/*.json` into `public/data.js`

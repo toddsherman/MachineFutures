@@ -7,7 +7,7 @@
 //
 // Usage:
 //   node tools/check-sweep.mjs --resolve-plan \
-//     --horizons-json '["2030","2040"]' --date 2026-09-10 --samples 20
+//     --horizons-json '["2030","2040","2050"]' --date 2026-09-10 --samples 20
 //   node tools/check-sweep.mjs --prepare-work \
 //     --plan-json "$SWEEP_PLAN_JSON" --horizons-json '["2030"]' \
 //     --requested-models 'anthropic,openai'

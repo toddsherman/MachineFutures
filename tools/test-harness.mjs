@@ -26,7 +26,8 @@ const RUN_ID = `${DATE}__${slug(rosterEntry.model)}__closed_book__end-states`;
 const HORIZON_META = {
   'long-term': { targetYear: 3000, questionSet: 'end-states-v3', suffix: 'end-states', promptFile: 'public/end_states.md' },
   '2030': { targetYear: 2030, questionSet: 'end-states-2030-v2', suffix: 'end-states-2030', promptFile: 'public/end_states_2030.md' },
-  '2040': { targetYear: 2040, questionSet: 'end-states-2040-v2', suffix: 'end-states-2040', promptFile: 'public/end_states_2040.md' }
+  '2040': { targetYear: 2040, questionSet: 'end-states-2040-v2', suffix: 'end-states-2040', promptFile: 'public/end_states_2040.md' },
+  '2050': { targetYear: 2050, questionSet: 'end-states-2050-v2', suffix: 'end-states-2050', promptFile: 'public/end_states_2050.md' }
 };
 const runIdFor = (horizon, date = DATE) => `${date}__${slug(rosterEntry.model)}__closed_book__${HORIZON_META[horizon].suffix}`;
 
@@ -212,7 +213,7 @@ test('each horizon has a collision-safe run id and trusted instrument metadata',
     assert.equal(batch.harness.prompt_file, expected.promptFile);
     assert.match(batch.harness.prompt_sha256, /^[a-f0-9]{64}$/);
   }
-  assert.equal(readdirSync(dir).filter(file => file.endsWith('.json')).length, 3);
+  assert.equal(readdirSync(dir).filter(file => file.endsWith('.json')).length, 4);
   rmSync(dir, { recursive: true, force: true });
 });
 
@@ -259,7 +260,7 @@ test('topping up one horizon never reuses or changes another horizon', () => {
 });
 
 test('--horizon rejects unknown or missing values before a run can spend money', () => {
-  for (const args of [['--horizon', '2050'], ['--horizon']]) {
+  for (const args of [['--horizon', '2060'], ['--horizon']]) {
     const r = run(['--mock', '--models', MODEL_KEY, '--samples', '1', ...args], { expectFail: true });
     assert.equal(r.ok, false);
     assert.match(r.out, /--horizon/);
@@ -294,7 +295,7 @@ test('the workflow preserves complete prior data when resuming a model subset', 
   const workflow = readFileSync(join(root, '.github', 'workflows', 'elicit.yml'), 'utf8');
   const aggregate = workflow.slice(workflow.indexOf('\n  aggregate:'));
   const restore = aggregate.indexOf('name: Restore the previous combined run');
-  const current = aggregate.indexOf('name: Download every model artifact');
+  const current = aggregate.indexOf('name: Download every first-wave model artifact');
   assert.ok(restore >= 0 && current > restore, 'aggregate must restore the prior combined artifact before current model artifacts');
   assert.match(aggregate, /name: runs-\$\{\{ inputs\.resume_from_run_id \}\}[\s\S]*?path: restored\/[\s\S]*?run-id: \$\{\{ inputs\.resume_from_run_id \}\}/);
   assert.match(aggregate, /if \[ -d restored \]; then\s+cp -R restored\/\. runs\/\s+fi\s+# Current artifacts win[\s\S]*?cp -R collected\/\. runs\//,
@@ -324,7 +325,9 @@ test('the workflow preserves raw results but gates every site step on same-date 
 test('the workflow persists and reuses an immutable full-sweep plan across targeted resumes', () => {
   const workflow = readFileSync(join(root, '.github', 'workflows', 'elicit.yml'), 'utf8');
   const plan = workflow.slice(workflow.indexOf('\n  plan:'), workflow.indexOf('\n  utility:'));
-  const elicit = workflow.slice(workflow.indexOf('\n  elicit:'), workflow.indexOf('\n  aggregate:'));
+  const waveOne = workflow.slice(workflow.indexOf('\n  elicit_wave_one:'), workflow.indexOf('\n  elicit_wave_two:'));
+  const waveTwo = workflow.slice(workflow.indexOf('\n  elicit_wave_two:'), workflow.indexOf('\n  aggregate:'));
+  const elicit = `${waveOne}\n${waveTwo}`;
   const aggregate = workflow.slice(workflow.indexOf('\n  aggregate:'));
   assert.match(plan, /sweep_horizons: \$\{\{ steps\.plan\.outputs\.sweep_horizons \}\}/);
   assert.match(plan, /target_samples: \$\{\{ steps\.plan\.outputs\.target_samples \}\}/);
@@ -337,10 +340,14 @@ test('the workflow persists and reuses an immutable full-sweep plan across targe
     'model matrix selection must come from the frozen cohort and validate prompt hashes');
   assert.match(plan, /name: Stage the immutable sweep plan[\s\S]*?name: Upload the immutable sweep plan[\s\S]*?name: sweep-plan-\$\{\{ github\.run_id \}\}/,
     'the authoritative plan must be uploaded by the plan job before paid model jobs start');
-  assert.doesNotMatch(elicit.slice(0, elicit.indexOf('name: Elicit selected horizons')), /\.sweep-plan\.json/,
-    'model artifacts must not contain duplicate last-writer-wins plan manifests');
-  assert.match(elicit, /HORIZONS_JSON: \$\{\{ needs\.plan\.outputs\.horizons \}\}/,
-    'a targeted resume should work only on its selected horizon subset');
+  assert.doesNotMatch(waveOne.slice(0, waveOne.indexOf('name: Elicit first horizon wave')), /\.sweep-plan\.json/,
+    'first-wave model artifacts must not contain duplicate last-writer-wins plan manifests');
+  assert.doesNotMatch(waveTwo.slice(0, waveTwo.indexOf('name: Elicit second horizon wave')), /\.sweep-plan\.json/,
+    'second-wave model artifacts must not contain duplicate last-writer-wins plan manifests');
+  assert.match(waveOne, /HORIZONS_JSON: \$\{\{ needs\.plan\.outputs\.wave_one_horizons \}\}/,
+    'the first wave must work only on its selected horizon subset');
+  assert.match(waveTwo, /HORIZONS_JSON: \$\{\{ needs\.plan\.outputs\.wave_two_horizons \}\}/,
+    'the second wave must work only on its selected horizon subset');
   assert.match(elicit, /SWEEP_PLAN_JSON: \$\{\{ needs\.plan\.outputs\.sweep_plan \}\}[\s\S]*?node tools\/run-elicitation\.mjs/,
     'the harness must receive the frozen plan for a final pre-call binding check');
   assert.match(elicit, /SAMPLES: \$\{\{ needs\.plan\.outputs\.target_samples \}\}/,
@@ -438,11 +445,33 @@ test('a workflow-free squash preserves newer default content and non-workflow fe
   }
 });
 
-test('the workflow default budget fits all three horizons inside the model-job window', () => {
+test('the workflow default budget fits four horizons across two ordered model waves', () => {
   const workflow = readFileSync(join(root, '.github', 'workflows', 'elicit.yml'), 'utf8');
+  const waveOne = workflow.slice(workflow.indexOf('\n  elicit_wave_one:'), workflow.indexOf('\n  elicit_wave_two:'));
+  const waveTwo = workflow.slice(workflow.indexOf('\n  elicit_wave_two:'), workflow.indexOf('\n  aggregate:'));
+  const aggregate = workflow.slice(workflow.indexOf('\n  aggregate:'));
   assert.match(workflow, /budget_minutes:[\s\S]*?default: '100'/);
-  assert.equal((workflow.match(/inputs\.budget_minutes \|\| '100'/g) || []).length, 2,
-    'plan and model jobs must use the same 100-minute default');
+  assert.equal((workflow.match(/inputs\.budget_minutes \|\| '100'/g) || []).length, 3,
+    'plan and both model waves must use the same 100-minute default');
+  assert.match(workflow, /all\) horizons='\["long-term","2030","2040","2050"\]'/);
+  assert.match(workflow, /horizons\.slice\(0, 2\)/);
+  assert.match(workflow, /horizons\.slice\(2, 4\)/);
+  assert.match(workflow, /const count = Math\.min\(JSON\.parse\(process\.env\.HORIZONS_JSON\)\.length, 2\)/,
+    'the timeout guard must bound one wave rather than rejecting the four-horizon sweep');
   assert.match(workflow, /if \(\(budget \+ 5\) \* count > 315\)/);
-  assert.match(workflow, /\n    timeout-minutes: 330\n/);
+  assert.equal((workflow.match(/\n    timeout-minutes: 330\n/g) || []).length, 2,
+    'each two-horizon wave needs its own hosted-runner window');
+  assert.match(waveTwo, /needs: \[plan, elicit_wave_one\][\s\S]*?if: \$\{\{ !cancelled\(\).*has_wave_two == 'true'/,
+    'the second matrix must wait through first-wave failures but never start new paid calls after cancellation');
+  assert.match(waveTwo, /previous_status="prior-wave\/\.partial\/\.status-wave-1-\$\{MODEL_KEY\}"[\s\S]*?grep -q '\^quota=true\$'/,
+    'a provider quota stop in wave one must suppress later calls for the same model');
+  const revisionFilter = String.raw`__r(?:[2-9]|[1-9][0-9])\\.json$`;
+  assert.equal(workflow.split(revisionFilter).length - 1, 2,
+    'both isolated workspaces must resume every valid immutable revision from r2 through r99');
+  assert.match(waveOne, /\.artifact-wave-1-\$\{MODEL_KEY\}[\s\S]*?\.status-wave-1-\$\{MODEL_KEY\}[\s\S]*?model-\$\{\{ matrix\.model \}\}-wave-1-\$\{\{ github\.run_id \}\}/,
+    'first-wave markers, status, and artifacts must be uniquely named');
+  assert.match(waveTwo, /\.artifact-wave-2-\$\{MODEL_KEY\}[\s\S]*?\.status-wave-2-\$\{MODEL_KEY\}[\s\S]*?model-\$\{\{ matrix\.model \}\}-wave-2-\$\{\{ github\.run_id \}\}/,
+    'second-wave markers, status, and artifacts must be uniquely named');
+  assert.match(aggregate, /pattern: model-\*-wave-1-\$\{\{ github\.run_id \}\}[\s\S]*?pattern: model-\*-wave-2-\$\{\{ github\.run_id \}\}/,
+    'aggregation must merge both disjoint wave artifacts');
 });

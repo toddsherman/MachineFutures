@@ -16,7 +16,7 @@ Everything Machine Futures publishes, in formats that open in a spreadsheet with
 
 Each model allocates exactly 100 whole percentage points across eleven mutually exclusive states, twenty times per horizon, at its own default settings. The published figure per ending is the median across that model's samples, renormalized so the eleven still sum to 100.
 
-Every combined CSV begins with a `horizon` column. Its canonical values are `long-term`, `2030`, and `2040`; historical raw batches without a horizon belong to `long-term`. `question_set` and `prompt_sha256` identify the exact instrument where available. In `forecasts.json`, `default_horizon` names the default view, `horizons` carries display metadata, `endings` preserves the long-term taxonomy for compatibility, `endings_by_horizon` carries the displayed wording, and each `datasets.<horizon>` object carries its own dataset date and models. Values from different horizons or prompt versions are never pooled.
+Every combined CSV begins with a `horizon` column. Its canonical values are `long-term`, `2030`, `2040`, and `2050`; historical raw batches without a horizon belong to `long-term`. `question_set` and `prompt_sha256` identify the exact instrument where available. In `forecasts.json`, `default_horizon` names the default view, `horizons` carries display metadata, `endings` preserves the long-term taxonomy for compatibility, `endings_by_horizon` carries the displayed wording, and each `datasets.<horizon>` object carries its own dataset date and models. Values from different horizons or prompt versions are never pooled.
 
 `probability_pct` is the published figure. `samples_min_pct` and `samples_max_pct` are the full spread across the model's samples; `middle_half_low_pct` and `middle_half_high_pct` are its quartiles. A gap between two models means little unless it clears the sampling error — see `bootstrap_standard_error` in `exposure.csv`.
 
@@ -32,4 +32,4 @@ A model that returns a malformed allocation is re-asked until it returns a valid
 
 ## Reuse
 
-The data is free to use with attribution to machinefutures.ai. The versioned prompts that produced it are `public/end_states.md`, `public/end_states_2030.md`, and `public/end_states_2040.md`, reproduced verbatim so anyone can run them and get their own numbers.
+The data is free to use with attribution to machinefutures.ai. The versioned prompts that produced it are `public/end_states.md`, `public/end_states_2030.md`, `public/end_states_2040.md`, and `public/end_states_2050.md`, reproduced verbatim so anyone can run them and get their own numbers.

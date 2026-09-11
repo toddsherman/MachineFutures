@@ -89,7 +89,7 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .horizon-toggle-dock { position: sticky; top: max(0px, env(safe-area-inset-top, 0px)); z-index: 20; padding-block: 18px; display: flex; justify-content: flex-end; pointer-events: none; }
 .horizon-toggle { display: inline-flex; flex: 0 0 auto; border: 1px solid var(--ink); background: var(--paper); pointer-events: auto; }
 .horizon-picker-rule { border-bottom: 1px solid var(--line); }
-.horizon-button { min-width: 92px; min-height: 40px; padding: 9px 14px; border: 0; background: transparent; font: 800 11px var(--mono); letter-spacing: .03em; text-transform: uppercase; cursor: pointer; }
+.horizon-button { min-width: 92px; min-height: 40px; padding: 9px 14px; border: 0; background: transparent; font: 800 11px var(--mono); letter-spacing: .03em; text-transform: uppercase; white-space: nowrap; cursor: pointer; }
 .horizon-button + .horizon-button { border-left: 1px solid var(--ink); }
 .horizon-button:hover { background: rgba(17, 18, 15, .08); }
 .horizon-button.active { color: var(--paper); background: var(--ink); }
@@ -437,7 +437,7 @@ body.dialog-open { overflow: hidden; }
   .origin-tweet blockquote p { font-size: 19px; }
   .hero h1, .end-hero h1 { font-size: clamp(44px, 16vw, 86px); }
   .horizon-toggle { width: 100%; }
-  .horizon-button { min-width: 0; flex: 1 1 0; padding-inline: 8px; }
+  .horizon-button { min-width: 0; flex: 1 1 0; padding-inline: 6px; }
   .signal-section, .states-section, .model-mix { padding-block: 76px; }
   .section-heading { margin-bottom: 36px; }
   .section-heading h2, .leader-title, .method-hero h1 { font-size: clamp(38px, 12vw, 52px); }
@@ -475,6 +475,7 @@ body.dialog-open { overflow: hidden; }
 /* The dated note wraps on the narrowest phones. Reserve its second line so a
    horizon change at the top of the page cannot push everything below it. */
 @media (max-width: 360px) {
+  .horizon-button[data-horizon="long-term"] { flex-grow: 1.25; }
   .horizon-picker-copy p { min-height: 2.9em; }
 }
 

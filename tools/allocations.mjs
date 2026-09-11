@@ -67,3 +67,48 @@ export function renormalizeAllocation(values, hard = [], soft = [], target = 100
   if (delta !== 0) throw new RangeError(`allocation could not be normalized to ${target} within its hard bounds`);
   return out;
 }
+
+// Average forecasts without allowing labs that publish more model variants to
+// receive more weight. Each model is first averaged within its lab; those lab
+// vectors are then averaged with one equal vote per lab.
+export function labBalancedMean(rows) {
+  if (!Array.isArray(rows) || !rows.length) {
+    throw new TypeError('lab-balanced mean requires at least one forecast');
+  }
+
+  const width = rows[0]?.values?.length;
+  if (!Number.isInteger(width) || width < 1) {
+    throw new TypeError('forecast values must be a non-empty array');
+  }
+
+  const labs = new Map();
+  for (const row of rows) {
+    if (typeof row?.lab !== 'string' || !row.lab.trim()) {
+      throw new TypeError('every forecast must name its lab');
+    }
+    if (!Array.isArray(row.values) || row.values.length !== width
+      || row.values.some(value => !Number.isFinite(value) || value < 0)) {
+      throw new TypeError(`every forecast must have ${width} non-negative finite values`);
+    }
+    const lab = row.lab.trim();
+    if (!labs.has(lab)) labs.set(lab, []);
+    labs.get(lab).push(row.values);
+  }
+
+  const labMeans = [...labs.values()].map(vectors =>
+    vectors[0].map((_, index) => vectors.reduce((sum, vector) => sum + vector[index], 0) / vectors.length));
+  return labMeans[0].map((_, index) =>
+    labMeans.reduce((sum, vector) => sum + vector[index], 0) / labMeans.length);
+}
+
+// Largest-remainder quantization at an explicit decimal precision. The site
+// uses one decimal place for its lab-balanced aggregate, so all displayed
+// coordinates add to 100.0 rather than drifting after independent rounding.
+export function quantizeAllocation(values, decimalPlaces = 1, target = 100) {
+  if (!Number.isInteger(decimalPlaces) || decimalPlaces < 0 || decimalPlaces > 6) {
+    throw new TypeError('decimalPlaces must be an integer from 0 through 6');
+  }
+  const scale = 10 ** decimalPlaces;
+  const units = renormalizeAllocation(values.map(value => value * scale), [], [], Math.round(target * scale));
+  return units.map(value => value / scale);
+}

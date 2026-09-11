@@ -11,6 +11,7 @@ import { readFileSync, writeFileSync, readdirSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, horizonOfBatch } from './horizons.mjs';
+import { labBalancedMean, quantizeAllocation } from './allocations.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outDir = join(root, 'data');
@@ -55,6 +56,47 @@ const write = (name, contents) => {
 const horizonIds = [...new Set([...horizonMetadata.map(item => item.id), ...Object.keys(datasets)])];
 const runs = horizonIds.flatMap(horizon =>
   Object.entries(datasets[horizon]?.endStateRuns || {}).map(([apiId, run]) => ({ horizon, apiId, run })));
+
+const stableNumber = value => Math.round(value * 1e12) / 1e12;
+const meanVector = vectors => vectors[0].map((_, index) =>
+  vectors.reduce((sum, vector) => sum + vector[index], 0) / vectors.length);
+const aggregateFor = horizon => {
+  const horizonRuns = runs.filter(row => row.horizon === horizon);
+  if (!horizonRuns.length) return null;
+  const rows = horizonRuns.map(({ run }) => ({
+    lab: run.provider,
+    values: STATE_IDS.map(id => run.probabilities[id])
+  }));
+  const labMean = labBalancedMean(rows);
+  const equalModelMean = meanVector(rows.map(row => row.values));
+  const displayed = quantizeAllocation(labMean);
+  return {
+    method_id: 'lab-balanced-arithmetic-mean',
+    method_name: 'Lab-balanced arithmetic mean',
+    lab_count: new Set(rows.map(row => row.lab.trim())).size,
+    model_count: rows.length,
+    probabilities: Object.fromEntries(STATE_IDS.map((id, index) => [id, displayed[index]])),
+    unrounded_lab_balanced_probabilities: Object.fromEntries(STATE_IDS.map((id, index) => [id, stableNumber(labMean[index])])),
+    equal_model_mean_probabilities: Object.fromEntries(STATE_IDS.map((id, index) => [id, stableNumber(equalModelMean[index])]))
+  };
+};
+const aggregates = Object.fromEntries(horizonIds.map(horizon => [horizon, aggregateFor(horizon)]));
+
+/* ---------- the combined forecast ---------- */
+write('aggregates.csv', csv(
+  ['horizon', 'dataset_date', 'aggregate_method_id', 'aggregate_method', 'lab_count', 'model_count', 'ending_id', 'ending',
+   'display_probability_pct', 'unrounded_lab_balanced_mean_pct', 'equal_model_mean_pct'],
+  horizonIds.flatMap(horizon => {
+    const aggregate = aggregates[horizon];
+    if (!aggregate) return [];
+    const horizonRuns = runs.filter(row => row.horizon === horizon);
+    const datasetDate = horizonRuns.map(({ run }) => run.date).filter(Boolean).sort().at(-1) || '';
+    const stateById = stateByIdFor(horizon);
+    return STATE_IDS.map(id => [horizon, datasetDate, aggregate.method_id, aggregate.method_name,
+      aggregate.lab_count, aggregate.model_count, id, stateById.get(id).name, aggregate.probabilities[id].toFixed(1),
+      aggregate.unrounded_lab_balanced_probabilities[id], aggregate.equal_model_mean_probabilities[id]]);
+  })
+));
 
 /* ---------- the published board ---------- */
 write('forecasts.csv', csv(
@@ -150,6 +192,7 @@ write('forecasts.json', JSON.stringify({
   ])),
   datasets: Object.fromEntries(HORIZON_IDS.map(horizon => [horizon, {
     dataset_date: datasets[horizon]?.datasetDate || null,
+    aggregate: aggregates[horizon] || null,
     models: runs.filter(run => run.horizon === horizon).map(({ apiId, run }) => ({
       model: run.label, provider: run.provider, api_model_id: apiId,
       asked_on: run.date, samples: run.sampleCount, question_set: run.questionSet,

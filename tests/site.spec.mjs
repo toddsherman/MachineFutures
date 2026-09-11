@@ -18,10 +18,10 @@ const settle = async (page, url = '/') => {
   // The leader riffles through the endings on load; wait for it to land, or a
   // test reads a passing frame and believes it.
   await page.waitForFunction(() => {
-    const top = window.MF_TEST?.stateMedians().slice().sort((a, b) => b.probability - a.probability)[0];
+    const top = window.MF_TEST?.stateAggregate().slice().sort((a, b) => b.probability - a.probability)[0];
     const name = document.querySelector('.leader-name');
     const figure = document.querySelector('.end-leader strong');
-    return top && name?.textContent === top.name && figure?.textContent === `${top.probability}%`
+    return top && name?.textContent === top.name && figure?.textContent === `${top.probability.toFixed(1)}%`
       && !name.classList.contains('is-settling');
   });
   await page.evaluate(() => {
@@ -362,15 +362,15 @@ test.describe('forecast horizons', () => {
     });
     expect(snapshot).toEqual({
       activeHorizon: '2030', models: '2', labs: '2', date: '02.03.26',
-      title: '2030 MEDIAN MACHINE FORECAST',
+      title: '2030 LAB-BALANCED MEAN',
       note: 'Snapshot at the end of 2030; it need not yet be durable.',
-      leader: 'The Held Leash', leaderValue: '45%',
-      leaderUnit: 'Median across 2 models · 2030 · of 100 points',
-      timelineLast: 'The Held Leash', card: '45%', matrix: ['45', '45'],
+      leader: 'The Held Leash', leaderValue: '45.0%',
+      leaderUnit: 'Lab-balanced mean across 2 labs (2 models) · 2030 · of 100 points',
+      timelineLast: 'The Held Leash', card: '45.0%', matrix: ['45', '45'],
       cardDescription: snapshotHeldLeashDescription,
       leaderDescription: snapshotHeldLeashDescription,
       exposure: ['15%', '15%'], matrixLabel: '2030 probability by structural state and model',
-      barLabel: 'Median probability by structural state for 2030',
+      barLabel: 'Lab-balanced mean probability by structural state for 2030',
       summary: 'We asked 2 of the leading AI models from 2 labs to assign 100 percentage points across 11 mutually exclusive structural states for humanity’s relationship with AI.',
       exposureHint: 'Hover a bar for the states inside it',
       prompt: '/end_states_2030.md', pressed: '2030'
@@ -379,6 +379,7 @@ test.describe('forecast horizons', () => {
     await page.locator('.state-card[data-state="9"]').click();
     await expect(page.locator('#dialog-content .dialog-kicker')).toContainText('Humanity remains in control · 2030');
     await expect(page.locator('#dialog-content .dialog-description')).toHaveText(snapshotHeldLeashDescription);
+    await expect(page.locator('#dialog-content .dialog-summary > div').first()).toHaveText('45.0%2030 lab-balanced mean');
     await expect(page.locator('#dialog-content .model-answer p').first()).toContainText('2030');
     await page.locator('#dialog-close').click();
 
@@ -400,7 +401,7 @@ test.describe('forecast horizons', () => {
     }));
     expect(next).toEqual({ horizon: '2040', models: '3', labs: '3', date: '03.04.26',
       leader: 'Coexistence', leaderDescription: snapshotCoexistenceDescription,
-      card: '28%', heldLeashDescription: snapshotHeldLeashDescription,
+      card: '28.0%', heldLeashDescription: snapshotHeldLeashDescription,
       exposure: ['27%', '27%', '27%'], matrixLabel: '2040 probability by structural state and model',
       summary: 'We asked 3 of the leading AI models from 3 labs to assign 100 percentage points across 11 mutually exclusive structural states for humanity’s relationship with AI.',
       prompt: '/end_states_2040.md' });
@@ -437,14 +438,14 @@ test.describe('forecast horizons', () => {
     });
     expect(farSnapshot).toEqual({
       horizon: '2050', models: '3', labs: '3', date: '04.05.26',
-      title: '2050 MEDIAN MACHINE FORECAST',
+      title: '2050 LAB-BALANCED MEAN',
       note: 'Snapshot at the end of 2050; it need not yet be durable.',
-      leader: 'The Preserve', leaderValue: '30%',
-      leaderUnit: 'Median across 3 models · 2050 · of 100 points',
-      card: '30%', cardDescription: snapshotPreserveDescription,
+      leader: 'The Preserve', leaderValue: '30.0%',
+      leaderUnit: 'Lab-balanced mean across 3 labs (3 models) · 2050 · of 100 points',
+      card: '30.0%', cardDescription: snapshotPreserveDescription,
       matrix: ['30', '30', '30'], exposure: ['37%', '37%', '37%'],
       matrixLabel: '2050 probability by structural state and model',
-      barLabel: 'Median probability by structural state for 2050',
+      barLabel: 'Lab-balanced mean probability by structural state for 2050',
       summary: 'We asked 3 of the leading AI models from 3 labs to assign 100 percentage points across 11 mutually exclusive structural states for humanity’s relationship with AI.',
       prompt: '/end_states_2050.md', pressed: '2050'
     });
@@ -482,14 +483,14 @@ test.describe('forecast horizons', () => {
     });
     expect(laterSnapshot).toEqual({
       horizon: '2060', models: '3', labs: '3', date: '05.06.26',
-      title: '2060 MEDIAN MACHINE FORECAST',
+      title: '2060 LAB-BALANCED MEAN',
       note: 'Snapshot at the end of 2060; it need not yet be durable.',
-      leader: 'The Merger', leaderValue: '20%',
-      leaderUnit: 'Median across 3 models · 2060 · of 100 points',
-      card: '20%', cardDescription: snapshotMergerDescription,
+      leader: 'The Merger', leaderValue: '20.0%',
+      leaderUnit: 'Lab-balanced mean across 3 labs (3 models) · 2060 · of 100 points',
+      card: '20.0%', cardDescription: snapshotMergerDescription,
       matrix: ['20', '20', '20'], exposure: ['45%', '45%', '45%'],
       matrixLabel: '2060 probability by structural state and model',
-      barLabel: 'Median probability by structural state for 2060',
+      barLabel: 'Lab-balanced mean probability by structural state for 2060',
       summary: 'We asked 3 of the leading AI models from 3 labs to assign 100 percentage points across 11 mutually exclusive structural states for humanity’s relationship with AI.',
       prompt: '/end_states_2060.md', pressed: '2060'
     });
@@ -512,13 +513,13 @@ test.describe('forecast horizons', () => {
     await page.locator('#dialog-close').click();
   });
 
-  test('the URL shares both selectors and an unavailable model resets to Median', async ({ page }) => {
+  test('the URL shares both selectors and an unavailable model resets to the aggregate', async ({ page }) => {
     await settleWithHorizons(page, '/?utm_source=fixture&model=beta');
     await expect(page.locator('.end-toggle-button.active')).toHaveAttribute('data-end-forecast', 'beta');
 
     const horizon = page.getByRole('group', { name: 'Forecast horizon' });
     await horizon.getByRole('button', { name: '2030', exact: true }).click();
-    await expect(page.locator('.end-toggle-button.active')).toHaveAttribute('data-end-forecast', 'Median');
+    await expect(page.locator('.end-toggle-button.active')).toHaveAttribute('data-end-forecast', 'Aggregate');
     const afterReset = new URL(page.url());
     expect(afterReset.searchParams.get('horizon')).toBe('2030');
     expect(afterReset.searchParams.get('model')).toBeNull();
@@ -773,6 +774,45 @@ test.describe('the 2030 exposure chart on a phone', () => {
 });
 
 test.describe('every model view', () => {
+  test('the aggregate is lab-balanced and published to tenths', async ({ page }) => {
+    await settle(page);
+    const computed = await page.evaluate(() => {
+      const vector = (...values) => Object.fromEntries(
+        Array.from({ length: 11 }, (_, index) => [index + 1, values[index] || 0])
+      );
+      const runs = [
+        { provider: 'Lab A', probabilities: vector(100) },
+        { provider: 'Lab A', probabilities: vector(0, 100) },
+        { provider: 'Lab B', probabilities: vector(0, 0, 100) },
+        { provider: 'Lab C', probabilities: vector(0, 0, 0, 100) }
+      ];
+      const values = window.MF_TEST.aggregateOf(runs);
+      return { values, sum: values.reduce((total, value) => total + value, 0) };
+    });
+    // Lab A contributes one third in total despite having two models. An
+    // equal-model mean would instead put 25 points on each of states 1–4.
+    expect(computed.values.slice(0, 4)).toEqual([16.7, 16.7, 33.3, 33.3]);
+    expect(computed.values.slice(4)).toEqual([0, 0, 0, 0, 0, 0, 0]);
+    expect(computed.sum).toBeCloseTo(100, 9);
+  });
+
+  test('aggregate figures show tenths while individual models stay whole', async ({ page }) => {
+    await settle(page);
+    await expect(page.locator('.end-toggle-button').first()).toHaveText('Lab-balanced mean');
+    const aggregateFigures = await page.evaluate(() => ({
+      leader: document.querySelector('.end-leader strong').textContent,
+      cards: [...document.querySelectorAll('.state-card-meta strong')].map(element => element.textContent),
+      legend: [...document.querySelectorAll('#consensus-legend b')].map(element => element.textContent)
+    }));
+    expect([aggregateFigures.leader, ...aggregateFigures.cards, ...aggregateFigures.legend]
+      .every(value => /^\d+\.\d%$/.test(value))).toBe(true);
+
+    await page.locator('.end-toggle-button').nth(1).click();
+    await page.waitForTimeout(700);
+    const modelFigures = await page.locator('#consensus-legend b').allTextContents();
+    expect(modelFigures.every(value => /^\d+%$/.test(value))).toBe(true);
+  });
+
   test('each strip agrees with its own numbers', async ({ page }) => {
     await settle(page);
     const views = await page.locator('.end-toggle-button').count();
@@ -794,17 +834,16 @@ test.describe('every model view', () => {
             if (!el.hidden && el.offsetWidth < 1) bad.push(`S${id}: the ${name} band draws at zero width`);
           }
           const centre = tick.offsetLeft + tick.offsetWidth / 2;
-          if (centre < iqr.offsetLeft - 1 || centre > iqr.offsetLeft + iqr.offsetWidth + 1) bad.push(`S${id}: the published figure sits outside its middle half`);
           if (centre < range.offsetLeft - 1 || centre > range.offsetLeft + range.offsetWidth + 1) bad.push(`S${id}: the published figure sits outside its full range`);
           if (range.offsetLeft + range.offsetWidth > axisW + 1) bad.push(`S${id}: the range runs off the axis`);
-          const onCard = parseInt(card.querySelector('.state-card-meta strong').textContent, 10);
-          const median = window.MF_TEST.stateMedians().find(m => String(m.id) === id).probability;
-          if (onCard !== median) bad.push(`S${id}: card says ${onCard}%, the median is ${median}%`);
+          const onCard = parseFloat(card.querySelector('.state-card-meta strong').textContent);
+          const aggregate = window.MF_TEST.stateAggregate().find(item => String(item.id) === id).probability;
+          if (onCard !== aggregate) bad.push(`S${id}: card says ${onCard}%, the lab-balanced mean is ${aggregate}%`);
           if (!/across \d+ models/.test(card.querySelector('.range-text').textContent)) {
             bad.push(`S${id}: the card's caption stopped describing the spread across models`);
           }
         });
-        const legend = [...document.querySelectorAll('#consensus-legend > button b')].map(b => parseInt(b.textContent, 10));
+        const legend = [...document.querySelectorAll('#consensus-legend > button b')].map(b => parseFloat(b.textContent));
         const sum = legend.reduce((a, c) => a + c, 0);
         if (sum !== 100) bad.push(`the allocation sums to ${sum}, not 100`);
         [...document.querySelectorAll('#consensus-bar > button')].forEach((seg, i) => {
@@ -961,11 +1000,13 @@ test.describe('the leader timeline', () => {
     expect(tl, 'no timeline rendered').not.toBeNull();
     expect(tl.insidePanel, 'the timeline should live in the leader panel').toBe(true);
     expect(tl.rows.length, 'a row per date in the data').toBe(tl.history.length);
-    // Dates run forward, and the model count never goes backwards.
+    // Dates run forward, and neither cohort count goes backwards.
     const dates = tl.history.map(h => h.date);
     expect([...dates].sort()).toEqual(dates);
     const counts = tl.history.map(h => h.models);
     expect(counts.every((n, i) => i === 0 || n >= counts[i - 1]), 'model count went backwards').toBe(true);
+    const labCounts = tl.history.map(h => h.labs);
+    expect(labCounts.every((n, i) => i === 0 || n >= labCounts[i - 1]), 'lab count went backwards').toBe(true);
     // A row flagged as a change must actually differ from the row before it.
     tl.history.forEach((h, i) => {
       const differs = i === 0 || tl.history[i - 1].stateId !== h.stateId;
@@ -973,6 +1014,7 @@ test.describe('the leader timeline', () => {
       const state = tl.states.find(candidate => candidate.id === h.stateId);
       expect(tl.rows[i].mark, `row ${i} (${h.date}) has the wrong hazard mark`).toBe(state.extinction ?? null);
       expect(Boolean(tl.rows[i].markLabel), `row ${i} (${h.date}) has an unlabelled hazard mark`).toBe(Boolean(state.extinction));
+      expect(tl.rows[i].text).toContain(`${h.models} models · ${h.labs} labs`);
     });
     expect(tl.rows.filter(r => r.change).length).toBe(tl.history.filter(h => h.changed).length);
   });
@@ -982,7 +1024,7 @@ test.describe('the leader timeline', () => {
     const same = await page.evaluate(() => {
       const history = window.MF_TEST.activeDataset().leaderHistory;
       const latest = history.at(-1);
-      const named = window.MF_TEST.stateMedians().slice().sort((a, b) => b.probability - a.probability)[0];
+      const named = window.MF_TEST.stateAggregate().slice().sort((a, b) => b.probability - a.probability)[0];
       return { timelineSays: latest.stateId, panelSays: named.id, share: latest.share, panelShare: named.probability };
     });
     expect(same.timelineSays, 'the timeline ends on a different ending than the panel names').toBe(same.panelSays);
@@ -1016,8 +1058,8 @@ test.describe('the leader settles on its answer', () => {
     const result = await page.evaluate(() => new Promise(resolve => {
       const name = document.querySelector('.leader-name');
       const figure = document.querySelector('.end-leader strong');
-      const top = window.MF_TEST.stateMedians().slice().sort((a, b) => b.probability - a.probability)[0];
-      const expected = { name: top.name, figure: `${top.probability}%` };
+      const top = window.MF_TEST.stateAggregate().slice().sort((a, b) => b.probability - a.probability)[0];
+      const expected = { name: top.name, figure: `${top.probability.toFixed(1)}%` };
       const seen = new Set(), blurs = new Set();
       document.querySelector('.end-leader-section').scrollIntoView();
       const t0 = performance.now();
@@ -1050,7 +1092,7 @@ test.describe('the leader settles on its answer', () => {
       figure: document.querySelector('.end-leader strong').textContent
     }));
     expect(atFirstPaint.name.length).toBeGreaterThan(2);
-    expect(atFirstPaint.figure).toMatch(/^\d+%$/);
+    expect(atFirstPaint.figure).toMatch(/^\d+\.\d%$/);
   });
 
   test('reduced motion gets the answer with no riffle', async ({ page }) => {
@@ -1072,7 +1114,7 @@ test.describe('the leader settles on its answer', () => {
 });
 
 test.describe('the forecast plays itself', () => {
-  test('it steps through every model and returns to the median', async ({ page }) => {
+  test('it steps through every model and returns to the aggregate', async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('.end-toggle-button');
     const result = await page.evaluate(() => new Promise(resolve => {
@@ -1088,7 +1130,7 @@ test.describe('the forecast plays itself', () => {
           clearInterval(watch);
           const gaps = seen.slice(1).map((s, i) => s.at - seen[i].at).sort((a, b) => a - b);
           resolve({ visited: seen.map(s => s.key), models: Object.keys(window.MF_TEST.activeDataset().endStateRuns).length,
-                    medianGap: gaps[Math.floor(gaps.length / 2)], ended: active() });
+                    aggregateGap: gaps[Math.floor(gaps.length / 2)], ended: active() });
         }
       }, 30);
       // The site uses smooth scrolling for readers. CI WebKit can leave that
@@ -1099,12 +1141,12 @@ test.describe('the forecast plays itself', () => {
       document.documentElement.style.scrollBehavior = 'auto';
       document.querySelector('.end-consensus').scrollIntoView({ block: 'start' });
     }));
-    const models = result.visited.filter(k => k !== 'Median');
+    const models = result.visited.filter(k => k !== 'Aggregate');
     expect(models.length, 'the sweep did not visit every model').toBe(result.models);
     expect(new Set(models).size, 'a model was shown twice').toBe(result.models);
-    expect(result.medianGap, 'the step should be about half a second').toBeGreaterThan(400);
-    expect(result.medianGap).toBeLessThan(700);
-    expect(result.ended, 'it should come to rest on the median').toBe('Median');
+    expect(result.aggregateGap, 'the step should be about half a second').toBeGreaterThan(400);
+    expect(result.aggregateGap).toBeLessThan(700);
+    expect(result.ended, 'it should come to rest on the aggregate').toBe('Aggregate');
   });
 
   test('a click takes it over', async ({ page }) => {
@@ -1126,7 +1168,7 @@ test.describe('the forecast plays itself', () => {
     await page.evaluate(() => document.querySelector('.end-consensus').scrollIntoView());
     await page.waitForTimeout(2000);
     const active = await page.evaluate(() => document.querySelector('.end-toggle-button.active')?.dataset.endForecast);
-    expect(active, 'the selection moved under reduced motion').toBe('Median');
+    expect(active, 'the selection moved under reduced motion').toBe('Aggregate');
   });
 });
 
@@ -1163,22 +1205,20 @@ test.describe('behaviour', () => {
 
   test('the published aggregate stays inside the spread it is drawn against', async ({ page }) => {
     await settle(page);
-    // Exercises the shipped normalisation, not a copy: the across-model
-    // medians do not sum to 100, and handing the remainder out blindly once
-    // pushed a figure outside its own band.
+    // A mean can legitimately sit outside the middle half, but as a convex
+    // combination it must remain within the complete model range.
     const bad = await page.evaluate(() => {
-      const { stateMedians } = window.MF_TEST;
+      const { stateAggregate } = window.MF_TEST;
       const runs = Object.values(window.MF_TEST.activeDataset().endStateRuns);
       const out = [];
-      for (const state of stateMedians()) {
+      for (const state of stateAggregate()) {
         const column = runs.map(r => r.probabilities[state.id]).sort((a, b) => a - b);
-        const at = f => { const k = (column.length - 1) * f, lo = Math.floor(k), hi = Math.ceil(k); return column[lo] + (column[hi] - column[lo]) * (k - lo); };
-        if (state.probability < at(0.25) || state.probability > at(0.75)) {
-          out.push(`S${state.id}: ${state.probability}% outside the models' middle half ${at(0.25)}-${at(0.75)}%`);
+        if (state.probability < column[0] || state.probability > column.at(-1)) {
+          out.push(`S${state.id}: ${state.probability}% outside the model range ${column[0]}-${column.at(-1)}%`);
         }
       }
-      const sum = stateMedians().reduce((a, s) => a + s.probability, 0);
-      if (sum !== 100) out.push(`the aggregate sums to ${sum}`);
+      const sum = stateAggregate().reduce((a, s) => a + s.probability, 0);
+      if (Math.abs(sum - 100) > 1e-9) out.push(`the aggregate sums to ${sum}`);
       return out;
     });
     expect(bad).toEqual([]);

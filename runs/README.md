@@ -1,6 +1,8 @@
 # Runs
 
-Raw forecast batches written by [`tools/run-elicitation.mjs`](../tools/run-elicitation.mjs), or long-term batches exported by [`tools/manual-ingest.html`](../tools/manual-ingest.html) for models without an API — one JSON file per model, date, prompt family, and horizon. Dated snapshots always use the automated harness so their horizon provenance is explicit. Each file holds every raw sample plus the normalized aggregate (mean/median/min/max per question, with the rationale closest to the median).
+Raw forecast batches written by [`tools/run-elicitation.mjs`](../tools/run-elicitation.mjs), or long-term batches exported by [`tools/manual-ingest.html`](../tools/manual-ingest.html) for models without an API — one JSON file per model, date, prompt family, and horizon. Dated snapshots always use the automated harness so their horizon provenance is explicit. Each file holds every raw sample plus a within-run sampling summary (mean/median/min/max per question, with the rationale closest to the median).
+
+The raw batch field named `aggregate` describes one model's repeated samples; it is not the site's cross-model aggregate. During publication, the coordinate medians from a batch are converted to that model's 100-point published allocation. The site-wide result is then derived separately by averaging published models within each provider/lab and averaging those lab means equally. See [Methodology](../docs/METHODOLOGY.md) for the full rule.
 
 Naming: the legacy long-term family uses `YYYY-MM-DD__<model-slug>__closed_book__end-states.json`; dated snapshots add the horizon, as in `…__end-states-2030.json`, `…__end-states-2040.json`, `…__end-states-2050.json`, and `…__end-states-2060.json`. The retired 50-question 2030 benchmark is kept separately in `archive/` and is never imported into these datasets.
 

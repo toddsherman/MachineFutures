@@ -1,6 +1,6 @@
 # Documentation
 
-- [Methodology](METHODOLOGY.md) — sampling, normalization, exposure, provenance, and interpretation
+- [Methodology](METHODOLOGY.md) — sampling, per-model summaries, lab-balanced aggregation, exposure, provenance, and interpretation
 - [Prompt management](PROMPTS.md) — current prompt catalog, versioning rules, and the checklist for a new horizon
 - [Operations](OPERATIONS.md) — automation schedules, paid-sample recovery, roster changes, verification, and publishing
 - [Roadmap](ROADMAP.md) — active product and data-model work

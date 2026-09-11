@@ -70,13 +70,11 @@
   });
   const $ = selector => document.querySelector(selector);
   const $$ = selector => [...document.querySelectorAll(selector)];
-  const median = values => {
-    const sorted = [...values].sort((a, b) => a - b);
-    const middle = Math.floor(sorted.length / 2);
-    return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
-  };
+  const mean = values => values.reduce((sum, value) => sum + value, 0) / values.length;
+  const AGGREGATE_KEY = 'Aggregate';
+  const aggregatePercent = value => `${Number(value).toFixed(1)}%`;
 
-  let activeEndForecast = 'Median';
+  let activeEndForecast = AGGREGATE_KEY;
 
   // Horizon and selected model live in real query params so a link is shareable:
   //   /?horizon=2030&model=claude-fable-5
@@ -93,16 +91,20 @@
     if (!model && legacy) {
       model = decodeURIComponent(legacy[1]);
     }
+    // The aggregate has never needed a query parameter. Treat the old internal
+    // selector key as that default so previously shared URLs still open cleanly.
+    const requestedAggregate = model === 'Median' || model === AGGREGATE_KEY;
+    if (requestedAggregate) model = null;
     const invalidModel = model && !endStateRuns[model];
-    activeEndForecast = model && endStateRuns[model] ? model : 'Median';
-    if (legacy || invalidHorizon || invalidModel) updateUrl();
+    activeEndForecast = model && endStateRuns[model] ? model : AGGREGATE_KEY;
+    if (legacy || invalidHorizon || invalidModel || requestedAggregate) updateUrl();
   }
 
   function updateUrl() {
     const url = new URL(location.href);
     if (activeHorizon === fallbackHorizon) url.searchParams.delete('horizon');
     else url.searchParams.set('horizon', activeHorizon);
-    if (activeEndForecast === 'Median') url.searchParams.delete('model');
+    if (activeEndForecast === AGGREGATE_KEY) url.searchParams.delete('model');
     else url.searchParams.set('model', activeEndForecast);
     history.replaceState(null, '', url.pathname + url.search + url.hash);
   }
@@ -152,50 +154,51 @@
     return { ...sums, total: sums.gone + sums.risk };
   };
 
-  // Largest-remainder, matching tools/import-runs.mjs. Coordinate-wise medians
-  // of eleven allocations that each sum to 100 need not sum to 100 themselves
-  // — as published they sum to 99 — and the bar used to divide by that 99
-  // while the legend printed the raw figures, so widths and labels described
-  // two different vectors. Normalise once here and everything downstream
-  // (legend, bar, cards, leader, dialog) reads the same numbers.
-  function normalizeTo100(values, soft, hard) {
+  // Quantise a complete allocation with largest remainder. The lab-balanced
+  // arithmetic mean already sums to 100 before floating-point noise; working
+  // in tenths keeps the accepted display precision while guaranteeing that the
+  // eleven published values still add to exactly 100.0.
+  function quantizeTo100(values, digits = 1) {
     const total = values.reduce((sum, v) => sum + v, 0);
     if (!total) return values.map(() => 0);
-    const scaled = values.map(v => (v / total) * 100);
+    const units = 10 ** digits;
+    const scaled = values.map(v => (v / total) * 100 * units);
     const out = scaled.map(Math.floor);
-    const shortfall = 100 - out.reduce((sum, v) => sum + v, 0);
+    const shortfall = 100 * units - out.reduce((sum, v) => sum + v, 0);
     const order = scaled.map((v, i) => [v - out[i], i]).sort((a, b) => b[0] - a[0]).map(([, i]) => i);
-    const ceiling = (bounds, i) => (Number.isFinite(bounds?.[i]) ? bounds[i] : Infinity);
-
-    // Offer each remainder first to a state still inside its middle half
-    // across models, then to one still inside the full spread, and only then
-    // without a bound.
-    let given = 0;
-    for (const bounds of [soft, hard, null]) {
-      if (given >= shortfall) break;
-      for (const i of order) {
-        if (given >= shortfall) break;
-        if (bounds && out[i] + 1 > ceiling(bounds, i)) continue;
-        out[i] += 1;
-        given += 1;
-      }
-    }
-    return out;
+    for (let i = 0; i < shortfall; i += 1) out[order[i % order.length]] += 1;
+    return out.map(value => Number((value / units).toFixed(digits)));
   }
 
-  // The board's aggregate for an arbitrary set of runs, so the same rule can be
-  // applied to a resample of the models as to the models themselves.
+  function runsByLab(runList) {
+    const groups = new Map();
+    runList.forEach((run, index) => {
+      const provider = String(run.provider || '').trim();
+      // Missing provider metadata must not accidentally give unrelated models
+      // one shared vote. Treat each such run as its own lab until it is fixed.
+      const key = provider || `__model_${index}`;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(run);
+    });
+    return [...groups.values()];
+  }
+
+  // Each lab gets one equal vote: first average model vectors within a lab,
+  // then average those lab vectors. Per-model figures remain the medians of
+  // their repeated samples; this is only the cross-model board aggregate.
   function aggregateOf(runList) {
     if (!runList.length) return [];
-    const columns = endingOrder().map(state => runList.map(run => stateValue(run, state)).sort((a, b) => a - b));
-    const at = (col, f) => { const i = (col.length - 1) * f, lo = Math.floor(i), hi = Math.ceil(i); return col[lo] + (col[hi] - col[lo]) * (i - lo); };
-    return normalizeTo100(columns.map(median), columns.map(col => at(col, 0.75)), columns.map(col => col.at(-1)));
+    const labVectors = runsByLab(runList).map(labRuns =>
+      endingOrder().map(state => mean(labRuns.map(run => stateValue(run, state))))
+    );
+    const raw = endingOrder().map((state, index) => mean(labVectors.map(vector => vector[index])));
+    return quantizeTo100(raw);
   }
 
-  function stateMedians() {
-    const normalized = aggregateOf(Object.values(endStateRuns));
-    if (!normalized.length) return [];
-    return endingOrder().map((state, i) => ({ ...state, probability: normalized[i] }));
+  function stateAggregate() {
+    const aggregate = aggregateOf(Object.values(endStateRuns));
+    if (!aggregate.length) return [];
+    return endingOrder().map((state, i) => ({ ...state, probability: aggregate[i] }));
   }
 
   // The panel settles on its answer rather than simply having it: the name
@@ -219,7 +222,7 @@
     const SPIN_MS = 1150;
     const land = () => {
       nameEl.textContent = leader.name;
-      figureEl.textContent = `${leader.probability}%`;
+      figureEl.textContent = aggregatePercent(leader.probability);
       nameEl.classList.remove('is-settling');
       figureEl.classList.remove('is-settling');
       nameEl.style.removeProperty('--blur');
@@ -240,7 +243,7 @@
         nameEl.style.setProperty('--blur', `${blur}px`);
         figureEl.style.setProperty('--blur', `${blur}px`);
         nameEl.textContent = others[Math.floor(eased * others.length * 2.6) % others.length];
-        figureEl.textContent = `${Math.max(1, Math.round(leader.probability * (0.35 + eased * 0.65) + (1 - eased) * 9))}%`;
+        figureEl.textContent = aggregatePercent(Math.max(1, leader.probability * (0.35 + eased * 0.65) + (1 - eased) * 9));
         requestAnimationFrame(frame);
       };
       requestAnimationFrame(frame);
@@ -268,13 +271,15 @@
 
   function leaderTimelineMarkup() {
     if (leaderHistory.length < 2) return '';
+    const cohort = entry => `${entry.models} models${Number.isFinite(entry.labs) ? ` · ${entry.labs} labs` : ''}`;
+    const cohortInSentence = entry => `${entry.models} models${Number.isFinite(entry.labs) ? ` across ${entry.labs} labs` : ''}`;
     const rows = leaderHistory.map(entry => {
       const state = states.find(candidate => candidate.id === entry.stateId);
       return `<li${entry.changed ? ' class="is-change"' : ''}>
           <span class="tl-date">${esc(shortDate(entry.date))}</span>
           <span class="tl-name" style="--state:${state?.color}">${esc(state?.name)}${state ? extinctionMark(state) : ''}</span>
-          <span class="tl-share">${entry.share}%</span>
-          <span class="tl-models">${entry.models} models</span>
+          <span class="tl-share">${aggregatePercent(entry.share)}</span>
+          <span class="tl-models">${esc(cohort(entry))}</span>
         </li>`;
     }).join('');
     const changes = leaderHistory.filter(e => e.changed);
@@ -283,7 +288,7 @@
     // often than because a model revised its own answer, and the two read
     // identically unless the count is on the page.
     const note = changes.length > 1 && last
-      ? `It changed on ${esc(shortDate(last.date))}, when the board went from ${leaderHistory[leaderHistory.indexOf(last) - 1].models} models to ${last.models}.`
+      ? `It changed on ${esc(shortDate(last.date))}, when the board went from ${esc(cohortInSentence(leaderHistory[leaderHistory.indexOf(last) - 1]))} to ${esc(cohortInSentence(last))}.`
       : 'It has led on every date the board has been asked.';
     return `<div class="leader-timeline">
       <h3>How this has moved</h3>
@@ -293,8 +298,8 @@
   }
 
   // How many models put this ending at the top of their own allocation, and
-  // how many put it second. A rank, not a share: it says how many independent
-  // boards agree, which the median alone does not.
+  // how many put it second. A rank, not a share: it shows how broadly models
+  // support the lab-balanced result.
   function supportFor(stateId) {
     const runList = Object.values(endStateRuns);
     const rankIn = run => {
@@ -342,11 +347,11 @@
   }
 
   function selectedEndStates() {
-    if (activeEndForecast !== 'Median' && endStateRuns[activeEndForecast]) {
+    if (activeEndForecast !== AGGREGATE_KEY && endStateRuns[activeEndForecast]) {
       return endingOrder().map(state => ({ ...state, probability: stateValue(endStateRuns[activeEndForecast], state) }));
     }
-    activeEndForecast = 'Median';
-    return stateMedians();
+    activeEndForecast = AGGREGATE_KEY;
+    return stateAggregate();
   }
 
   // Lab marks, monochrome, so model identity is carried by shape rather than
@@ -426,9 +431,9 @@
   }
 
   function renderEndForecastToggle(entries) {
-    const options = [{ key: 'Median', label: 'Median' }, ...entries.map(entry => ({ key: entry.runKey, label: entry.label, provider: entry.provider }))];
+    const options = [{ key: AGGREGATE_KEY, label: 'Lab-balanced mean' }, ...entries.map(entry => ({ key: entry.runKey, label: entry.label, provider: entry.provider }))];
     $('#end-forecast-toggle').innerHTML = options.map(option =>
-      `<button type="button" class="end-toggle-button${option.provider ? '' : ' is-median'}${option.key === activeEndForecast ? ' active' : ''}" data-end-forecast="${esc(option.key)}" aria-pressed="${option.key === activeEndForecast}">${option.provider ? labLogo(option.provider) : ''}${esc(option.label)}</button>`
+      `<button type="button" class="end-toggle-button${option.provider ? '' : ' is-aggregate'}${option.key === activeEndForecast ? ' active' : ''}" data-end-forecast="${esc(option.key)}" aria-pressed="${option.key === activeEndForecast}">${option.provider ? labLogo(option.provider) : ''}${esc(option.label)}</button>`
     ).join('');
   }
 
@@ -503,15 +508,15 @@
   const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Count a figure from where it is to where it lands, matching the target's
-  // precision so a median of 13.5 does not render as 14 mid-flight. rAF is
+  // requested precision so a lab-balanced 13.5 does not render as 14
+  // mid-flight. rAF is
   // paused in a hidden tab, so a timer guarantees the value still lands, and a
   // token drops stale tweens when a selection changes mid-flight.
   const tweenTimers = new WeakMap();
   const tweenTokens = new WeakMap();
-  function tweenNumber(el, to, suffix = '%') {
+  function tweenNumber(el, to, suffix = '%', digits = Number.isInteger(to) ? 0 : 1) {
     const from = parseFloat(el.textContent);
-    const dp = Number.isInteger(to) ? 0 : 1;
-    const land = () => { el.textContent = to + suffix; };
+    const land = () => { el.textContent = Number(to).toFixed(digits) + suffix; };
     clearTimeout(tweenTimers.get(el));
     const token = {};
     tweenTokens.set(el, token);
@@ -521,7 +526,7 @@
       if (tweenTokens.get(el) !== token) return;
       const t = Math.min((now - started) / MOTION_MS, 1);
       const eased = 1 - Math.pow(1 - t, 3);
-      el.textContent = (from + (to - from) * eased).toFixed(dp) + suffix;
+      el.textContent = (from + (to - from) * eased).toFixed(digits) + suffix;
       if (t < 1) requestAnimationFrame(step); else land();
     };
     requestAnimationFrame(step);
@@ -542,7 +547,7 @@
     const heading = horizon.id === 'long-term'
       ? 'Most likely <em>ending</em>'
       : `Most likely in <em>${esc(horizon.targetYear || horizon.label)}</em>`;
-    activeEndForecast = 'Median';
+    activeEndForecast = AGGREGATE_KEY;
     axisMax = 40;
     renderEndForecastToggle([]);
     $('#end-forecast-title').innerHTML = `${esc(horizonMeta().label)} <em>forecast</em>`;
@@ -684,11 +689,12 @@
 
   function applyForecast({ animate }) {
     const activeRun = endStateRuns[activeEndForecast];
+    const showingAggregate = !activeRun;
     const horizon = horizonMeta();
     const horizonLabel = horizon.id === 'long-term' ? 'Long-term' : horizon.label;
     const activeLabel = activeRun
       ? `${activeRun.label || activeEndForecast} · ${horizonLabel} forecast`
-      : `${horizonLabel} median machine forecast`;
+      : `${horizonLabel} lab-balanced mean`;
     const words = activeLabel.split(' ');
     const trailing = words.pop();
     $('#end-forecast-title').innerHTML = words.length
@@ -700,7 +706,7 @@
     const total = selectedStates.reduce((sum, state) => sum + state.probability, 0);
     const bar = $('#consensus-bar');
     const legend = $('#consensus-legend');
-    bar.setAttribute('aria-label', `${activeRun ? activeRun.label : 'Median'} probability by ${stateTerm(false)} for ${horizon.label}`);
+    bar.setAttribute('aria-label', `${activeRun ? activeRun.label : 'Lab-balanced mean'} probability by ${stateTerm(false)} for ${horizon.label}`);
     bar.classList.toggle('is-animating', Boolean(animate) && !reduceMotion());
 
     // The selector governs this one chart. The bar and its legend follow it.
@@ -708,18 +714,18 @@
       const segment = bar.children[index];
       segment.style.width = `${(state.probability / total) * 100}%`;
       const spread = activeRun?.range?.[state.id];
-      segment.title = `${state.name}: ${state.probability}%${spread ? ` (${spread[0]}–${spread[1]}% across samples)` : ''}${state.extinction ? ` · ${extinctionLabels[state.extinction]}` : ''}`;
-      segment.setAttribute('aria-label', `${state.name}: ${state.probability}% — jump to this ${outcomeTerm(false)}`);
+      const displayed = showingAggregate ? aggregatePercent(state.probability) : `${state.probability}%`;
+      segment.title = `${state.name}: ${displayed}${spread ? ` (${spread[0]}–${spread[1]}% across samples)` : ''}${state.extinction ? ` · ${extinctionLabels[state.extinction]}` : ''}`;
+      segment.setAttribute('aria-label', `${state.name}: ${displayed} — jump to this ${outcomeTerm(false)}`);
 
       const value = legend.children[index].querySelector('b');
-      animate ? tweenNumber(value, state.probability) : (value.textContent = `${state.probability}%`);
+      animate ? tweenNumber(value, state.probability, '%', showingAggregate ? 1 : undefined) : (value.textContent = displayed);
     });
 
     // The ending cards do not. They are the board's account of each ending —
-    // the median across models and the spread between them — and a selection
-    // made in the chart above should not quietly rewrite eleven other panels
-    // further down the page.
-    stateMedians().forEach(state => {
+    // the lab-balanced mean and the spread between models — and a selection
+    // made in the chart above should not quietly rewrite eleven other panels.
+    stateAggregate().forEach(state => {
       const card = $(`#state-${state.id}`);
       if (!card) return;
 
@@ -763,7 +769,7 @@
       if (tick) {
         const at = pct(state.probability);
         tick.style.left = `${at.toFixed(2)}%`;
-        tick.querySelector('span').textContent = `${state.probability}%`;
+        tick.querySelector('span').textContent = aggregatePercent(state.probability);
         // Near either end the centred label would hang off the card, so it
         // anchors to the tick instead.
         tick.classList.toggle('at-start', at < 9);
@@ -771,14 +777,14 @@
       }
 
       const figure = card.querySelector('.state-card-meta strong');
-      animate ? tweenNumber(figure, state.probability) : (figure.textContent = `${state.probability}%`);
-      card.setAttribute('aria-label', `${state.name}: ${state.probability}% — see each model's reasoning`);
+      animate ? tweenNumber(figure, state.probability, '%', 1) : (figure.textContent = aggregatePercent(state.probability));
+      card.setAttribute('aria-label', `${state.name}: ${aggregatePercent(state.probability)} — see each model's reasoning`);
     });
 
-    // Always the median across models, never the selected model: this panel
-    // states the board's answer, and tying it to the selector turned one
-    // model's opinion into the headline as you browsed.
-    const leader = [...stateMedians()].sort((a, b) => b.probability - a.probability)[0];
+    // Always the lab-balanced mean, never the selected model: this panel states
+    // the board's answer, and tying it to the selector would turn one model's
+    // opinion into the headline as the reader browsed.
+    const leader = [...stateAggregate()].sort((a, b) => b.probability - a.probability)[0];
     const leaderEl = $('#end-leader');
     const paint = () => {
       const support = supportFor(leader.id);
@@ -786,7 +792,9 @@
       const heading = horizon.id === 'long-term'
         ? 'Most likely <em>ending</em>'
         : `Most likely in <em>${esc(horizon.targetYear || horizon.label)}</em>`;
-      leaderEl.innerHTML = `<h2 class="leader-title" id="leader-title">${heading}</h2><div class="leader-answer"><p class="leader-name">${esc(leader.name)}</p><strong>${leader.probability}%</strong><span class="leader-unit">Median across ${Object.keys(endStateRuns).length} models &middot; ${esc(horizon.label)} &middot; of 100 points</span>${leaderTimelineMarkup()}</div><div class="leader-detail"><p class="leader-description">${esc(leader.description)}</p><p class="leader-method">${plural(support.first, 'model')} picked this as their highest-weighted prediction, and ${support.second} more had it as their second. ${esc(support.top.label)} from ${esc(support.top.provider)} put the most weight on it, at ${support.top.value}%; ${esc(support.bottom.label)} from ${esc(support.bottom.provider)} the least, at ${support.bottom.value}%.</p></div>`;
+      const modelCount = Object.keys(endStateRuns).length;
+      const labCount = runsByLab(Object.values(endStateRuns)).length;
+      leaderEl.innerHTML = `<h2 class="leader-title" id="leader-title">${heading}</h2><div class="leader-answer"><p class="leader-name">${esc(leader.name)}</p><strong>${aggregatePercent(leader.probability)}</strong><span class="leader-unit">Lab-balanced mean across ${plural(labCount, 'lab')} (${plural(modelCount, 'model')}) &middot; ${esc(horizon.label)} &middot; of 100 points</span>${leaderTimelineMarkup()}</div><div class="leader-detail"><p class="leader-description">${esc(leader.description)}</p><p class="leader-method">${plural(support.first, 'model')} picked this as their highest-weighted prediction, and ${support.second} more had it as their second. ${esc(support.top.label)} from ${esc(support.top.provider)} put the most weight on it, at ${support.top.value}%; ${esc(support.bottom.label)} from ${esc(support.bottom.provider)} the least, at ${support.bottom.value}%.</p></div>`;
     };
     // Selecting a model no longer moves this panel, so there is nothing to
     // animate: without this it would re-tween the same figure on every click.
@@ -799,7 +807,7 @@
     if (!animate || reduceMotion() || Number(leaderEl.dataset.leader) === leader.id) {
       const previous = leaderEl.querySelector('strong');
       if (animate && !reduceMotion() && previous && Number(leaderEl.dataset.leader) === leader.id) {
-        tweenNumber(previous, leader.probability);
+        tweenNumber(previous, leader.probability, '%', 1);
       } else paint();
     } else {
       leaderEl.classList.add('is-swapping');
@@ -817,7 +825,7 @@
     const entries = forecastEntries()
       .map(entry => ({ ...entry, value: stateValue(entry, state) }))
       .sort((a, b) => b.value - a.value);
-    const consensus = median(entries.map(entry => entry.value));
+    const consensus = stateAggregate().find(candidate => candidate.id === state.id)?.probability ?? 0;
     // Same ruler as the cards, so a position carries over from the page.
     const pos = v => (v / axisMax) * 100;
     const ticks = [10, 20, 30, 40, 50].filter(t => t < axisMax - 2);
@@ -850,7 +858,7 @@
       <div class="dialog-kicker"><span>${String(state.id).padStart(2, '0')}</span>${esc(state.family)} &middot; ${esc(horizon.label)}</div>
       <h2 id="dialog-title">${esc(state.name)}${extinctionMark(state)}</h2>
       <div class="dialog-summary">
-        <div><strong>${consensus}%</strong><span>${esc(horizon.label)} median</span></div>
+        <div><strong>${aggregatePercent(consensus)}</strong><span>${esc(horizon.label)} lab-balanced mean</span></div>
         <div><strong>${entries.at(-1).value}–${entries[0].value}%</strong><span>model range</span></div>
         <div><strong>${entries.length}</strong><span>models</span></div>
       </div>
@@ -1080,7 +1088,7 @@
     const viewportPosition = viewportHold.position;
 
     useDataset(key);
-    if (activeEndForecast !== 'Median' && !endStateRuns[activeEndForecast]) activeEndForecast = 'Median';
+    if (activeEndForecast !== AGGREGATE_KEY && !endStateRuns[activeEndForecast]) activeEndForecast = AGGREGATE_KEY;
     leaderSettled = false;
     settleCancelled = false;
     renderEndStates();
@@ -1106,7 +1114,7 @@
   }
 
   // On reaching the forecast, the board plays itself once: every model in turn,
-  // half a second each, ending back on the median. Seventeen allocations in
+  // half a second each, ending back on the lab-balanced mean. Seventeen allocations in
   // nine seconds says more about how far apart the models are than any single
   // one of them does.
   let sweepTimer = null;
@@ -1122,7 +1130,7 @@
     // Not if motion is unwelcome, and not if the reader asked for one model by
     // URL — that is a request for that model, not for a tour.
     if (reduceMotion() || !('IntersectionObserver' in window)) return;
-    if (activeEndForecast !== 'Median') return;
+    if (activeEndForecast !== AGGREGATE_KEY) return;
     const order = Object.keys(endStateRuns);
     if (!order.length) return;
 
@@ -1133,7 +1141,7 @@
       let step = 0;
       sweepTimer = setInterval(() => {
         if (step < order.length) selectForecast(order[step++]);
-        else { stopSweep(); selectForecast('Median'); }
+        else { stopSweep(); selectForecast(AGGREGATE_KEY); }
       }, 500);
     }, { threshold: 0.35 });
     io.observe(panel);
@@ -1256,11 +1264,11 @@
   applyUrlState();
   renderEndStates();
   window.MF_TEST = {
-    normalizeTo100, stateMedians, extinctionSums, esc, median, stopSweep,
+    quantizeTo100, aggregateOf, stateAggregate, extinctionSums, esc, stopSweep,
     activeDataset, activeHorizon: () => activeHorizon, selectHorizon,
     disableLeaderSettle: () => { leaderSettled = true; settleCancelled = true; },
     replayLeader: () => {
-      const leader = stateMedians().slice().sort((a, b) => b.probability - a.probability)[0];
+      const leader = stateAggregate().slice().sort((a, b) => b.probability - a.probability)[0];
       if (!leader) return;
       leaderSettled = false;
       settleCancelled = false;

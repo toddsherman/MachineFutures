@@ -9,9 +9,9 @@ This file tracks active design and data-model decisions only. Completed work rem
 - [ ] Add an ISO `released` date to each roster entry, source it per lab, and carry it into the published payload and exports. Do not guess uncertain dates.
 - [ ] Define current-view behavior so `active` and `paused` models count while `retired` models remain in history but no longer affect current aggregates.
 - [ ] Add a shareable `current` / `all` / `legacy` scope control.
-- [ ] Recompute the headline, ending medians, exposure ranking, and model/lab counts for the selected scope.
+- [ ] Recompute the headline, ending aggregates, exposure ranking, and model/lab counts for the selected scope.
 - [ ] Decide whether the leader timeline is always current-scope or changes with the selected scope, and label that behavior explicitly.
-- [ ] Record retirement events and model counts in the leader timeline so compositional changes are explicit.
+- [ ] Record retirement events and lab/model counts in the leader timeline so compositional changes are explicit.
 - [ ] Decide whether a lab with no current models remains in the lab total.
 - [ ] Extend site, export, and browser checks to cover every scope.
 

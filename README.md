@@ -2,7 +2,7 @@
 
 [Machine Futures](https://www.machinefutures.ai/) is a public record of what frontier AI models forecast about humanity's relationship with AI in 2030, 2040, 2050, 2060, and the long-term year-3000 state.
 
-Every active model allocates exactly 100 percentage points across the same eleven mutually exclusive states, twenty times, at its default settings. The site publishes the median allocation, the spread between samples and models, and the reasoning nearest each model's median.
+Every active model allocates exactly 100 percentage points across the same eleven mutually exclusive states, twenty times, at its default settings. The site publishes each model's median allocation, its sampling spread, and the reasoning nearest that median. The site's cross-model probability aggregate uses a lab-balanced arithmetic mean: published model allocations are averaged within each provider/lab, then the lab means are averaged equally. The downloads retain an equal-model mean only as a secondary comparison.
 
 ## Data flow
 
@@ -39,7 +39,7 @@ public/end_states*.md + tools/models.json
 | [`public/end_states*.md`](public/) | Five versioned elicitation prompts and their taxonomy | Hand-authored source; paths are stable provenance | Yes |
 | [`tools/horizons.mjs`](tools/horizons.mjs) | Horizon ids, target years, prompt paths, and question-set versions | Canonical configuration | No |
 | [`tools/models.json`](tools/models.json) | Model roster, API ids, providers, and lifecycle status | Canonical configuration | No |
-| [`runs/`](runs/) | Raw samples, rationales, recorded failures, aggregates, and integrity digests | Canonical forecast evidence; completed batches are preserved | No |
+| [`runs/`](runs/) | Raw samples, rationales, recorded failures, within-run sampling summaries, and integrity digests | Canonical forecast evidence; completed batches are preserved | No |
 | [`public/data.js`](public/data.js) | Taxonomy copy plus the generated forecast payload used by the browser | Mixed hand-authored/generated runtime file | Yes |
 | [`data/`](data/) | Combined CSV and JSON downloads, each keyed by horizon | Generated from `public/data.js` and `runs/` | No |
 | [`tools/`](tools/) | Elicitation, import, export, validation, and analysis | Hand-authored code | No |
@@ -94,7 +94,7 @@ See [Operations](docs/OPERATIONS.md) for schedules, recovery, model and horizon 
 
 ## Documentation
 
-- [Methodology](docs/METHODOLOGY.md) — sampling, normalization, exposure, and interpretation
+- [Methodology](docs/METHODOLOGY.md) — sampling, per-model summaries, lab-balanced aggregation, exposure, and interpretation
 - [Prompt management](docs/PROMPTS.md) — prompt catalog, path stability, and versioning rules
 - [Operations](docs/OPERATIONS.md) — automation, recovery, roster changes, testing, and publishing
 - [Data dictionary](data/README.md) — generated CSV and JSON schemas

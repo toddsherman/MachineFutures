@@ -545,7 +545,7 @@
         }
       },
       datasetDate: "09.05.26",
-      leaderHistory: [{"date":"2026-08-24","stateId":3,"share":16,"models":5,"changed":true},{"date":"2026-08-25","stateId":3,"share":18,"models":11,"changed":false},{"date":"2026-08-27","stateId":3,"share":17,"models":17,"changed":false},{"date":"2026-09-01","stateId":3,"share":17,"models":18,"changed":false},{"date":"2026-09-02","stateId":6,"share":17,"models":20,"changed":true},{"date":"2026-09-05","stateId":3,"share":17,"models":21,"changed":true}]
+      leaderHistory: [{"date":"2026-08-24","stateId":5,"share":17,"labs":5,"models":5,"changed":true},{"date":"2026-08-25","stateId":3,"share":16.6,"labs":5,"models":11,"changed":true},{"date":"2026-08-27","stateId":6,"share":16,"labs":8,"models":17,"changed":true},{"date":"2026-09-01","stateId":6,"share":16.2,"labs":8,"models":18,"changed":false},{"date":"2026-09-02","stateId":6,"share":16.2,"labs":8,"models":20,"changed":false},{"date":"2026-09-05","stateId":6,"share":16.4,"labs":8,"models":21,"changed":false}]
     },
     "2030": {
       endStateRuns: {
@@ -1011,7 +1011,7 @@
         }
       },
       datasetDate: "09.10.26",
-      leaderHistory: [{"date":"2026-09-10","stateId":9,"share":62,"models":20,"changed":true}]
+      leaderHistory: [{"date":"2026-09-10","stateId":9,"share":58.8,"labs":8,"models":20,"changed":true}]
     },
     "2040": {
       endStateRuns: {
@@ -1477,7 +1477,7 @@
         }
       },
       datasetDate: "09.10.26",
-      leaderHistory: [{"date":"2026-09-10","stateId":9,"share":36,"models":20,"changed":true}]
+      leaderHistory: [{"date":"2026-09-10","stateId":9,"share":36.6,"labs":8,"models":20,"changed":true}]
     },
     "2050": {
       endStateRuns: {
@@ -1943,7 +1943,7 @@
         }
       },
       datasetDate: "09.11.26",
-      leaderHistory: [{"date":"2026-09-11","stateId":9,"share":28,"models":20,"changed":true}]
+      leaderHistory: [{"date":"2026-09-11","stateId":9,"share":29,"labs":8,"models":20,"changed":true}]
     },
     "2060": {
       endStateRuns: {
@@ -2409,7 +2409,7 @@
         }
       },
       datasetDate: "09.11.26",
-      leaderHistory: [{"date":"2026-09-11","stateId":9,"share":24,"models":20,"changed":true}]
+      leaderHistory: [{"date":"2026-09-11","stateId":9,"share":24.4,"labs":8,"models":20,"changed":true}]
     }
   };
   /* END IMPORTED END-STATE RUNS */

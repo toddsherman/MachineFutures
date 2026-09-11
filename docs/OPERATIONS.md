@@ -31,6 +31,7 @@ elicit workflow
 Before merging a data refresh, confirm:
 
 - Every planned active model and horizon reached the frozen sample target.
+- Every published model has the intended provider/lab grouping, and the aggregate's lab and model counts match the cohort.
 - `npm run check` passes.
 - `npm run data:rebuild` leaves no unexpected diff beyond the intended generated outputs.
 - The pull request contains raw batches as well as the site and download exports.
@@ -80,6 +81,8 @@ Quota exhaustion appears in three places: the per-model job summary, exit code 4
 ## Model roster
 
 [`tools/models.json`](../tools/models.json) is the canonical roster. A roster entry is keyed by the exact provider API model id; never use a drifting alias such as a provider's `latest` name.
+
+The provider/lab assignment is methodologically significant: it determines the first stage of the lab-balanced site aggregate. Adding another model from an existing lab changes that lab's internal mean but does not give the lab more total weight; adding a newly represented lab changes the equally weighted lab cohort. Review this field as carefully as the model id.
 
 Lifecycle status means:
 

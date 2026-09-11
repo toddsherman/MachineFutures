@@ -4,21 +4,37 @@ Everything Machine Futures publishes, in formats that open in a spreadsheet with
 
 | File | One row per | What it holds |
 | --- | --- | --- |
+| [`aggregates.csv`](aggregates.csv) | horizon × ending | The primary lab-balanced site value for every ending, including its displayed one-decimal share and unrounded mean, plus an equal-model mean for comparison. |
 | [`forecasts.csv`](forecasts.csv) | horizon × model × ending | The published figure for every model on every ending, with the sample range and middle half behind it. |
 | [`exposure.csv`](exposure.csv) | horizon × model | Extinction-risk exposure: the "humanity is gone" and "might perish" subtotals, their sum, and its bootstrap standard error. |
 | [`rationales.csv`](rationales.csv) | horizon × model × ending | The reasoning each model gave, taken from the sample nearest its median. |
 | [`samples.csv`](samples.csv) | horizon × run × sample × ending | Every raw sample from every run, unaggregated. |
 | [`quality.csv`](quality.csv) | horizon × run | How each run went: samples kept, answers rejected as malformed, transient and quota errors, and the reject rate. |
 | [`endings.csv`](endings.csv) | horizon × ending | The horizon-appropriate wording for all eleven states, their families, and which carry extinction risk. |
-| [`forecasts.json`](forecasts.json) | — | All of the above as one structured document, including `endings_by_horizon` and datasets grouped by horizon. |
+| [`forecasts.json`](forecasts.json) | — | All of the above as one structured document, including `endings_by_horizon`, datasets grouped by horizon, and each horizon's aggregate method, cohort counts, displayed shares, and unrounded means. |
 
 ## What the numbers mean
 
-Each model allocates exactly 100 whole percentage points across eleven mutually exclusive states, twenty times per horizon, at its own default settings. The published figure per ending is the median across that model's samples, renormalized so the eleven still sum to 100.
+Each model allocates exactly 100 whole percentage points across eleven mutually exclusive states, twenty times per horizon, at its own default settings. The published figure per ending is the median across that model's samples, renormalized so the eleven still sum to 100. This is the model's sampling summary, not the site-wide aggregate.
+
+The primary site aggregate is a lab-balanced arithmetic mean. For each ending, published model values are first averaged within their provider/lab; those lab means are then averaged with equal weight for every represented lab. This prevents a provider with more model variants from receiving more influence merely because it has more rows. Zero values participate normally. Because both stages average complete 100-point allocations, the unrounded aggregate also sums to 100; largest-remainder apportionment rounds the displayed shares to tenths while keeping their total exactly 100.0.
 
 Every combined CSV begins with a `horizon` column. Its canonical values are `long-term`, `2030`, `2040`, `2050`, and `2060`; historical raw batches without a horizon belong to `long-term`. `question_set` and `prompt_sha256` identify the exact instrument where available. In `forecasts.json`, `default_horizon` names the default view, `horizons` carries display metadata, `endings` preserves the long-term taxonomy for compatibility, `endings_by_horizon` carries the displayed wording, and each `datasets.<horizon>` object carries its own dataset date and models. Values from different horizons or prompt versions are never pooled.
 
-`probability_pct` is the published figure. `samples_min_pct` and `samples_max_pct` are the full spread across the model's samples; `middle_half_low_pct` and `middle_half_high_pct` are its quartiles. A gap between two models means little unless it clears the sampling error — see `bootstrap_standard_error` in `exposure.csv`.
+In `forecasts.csv`, `probability_pct` is the per-model published figure. `samples_min_pct` and `samples_max_pct` are the full spread across the model's samples; `middle_half_low_pct` and `middle_half_high_pct` are its quartiles. A gap between two models means little unless it clears the sampling error — see `bootstrap_standard_error` in `exposure.csv`.
+
+`aggregates.csv` contains the site-wide result. Its method and lab/model counts identify the aggregation rule and cohort; its displayed percentage is the value shown on the site, while its unrounded lab-balanced mean supports exact reuse. The ordinary mean across models is included only as a sensitivity/comparison field: no public aggregate uses it. Its aggregate-specific columns are:
+
+| Column | Meaning |
+| --- | --- |
+| `aggregate_method_id` | Stable machine id: `lab-balanced-arithmetic-mean`. |
+| `aggregate_method` | Human-readable method name: `Lab-balanced arithmetic mean`. |
+| `lab_count` / `model_count` | Number of represented labs and published models in that horizon's cohort. |
+| `display_probability_pct` | Public value, rounded by largest remainder to tenths so all eleven rows total 100.0. |
+| `unrounded_lab_balanced_mean_pct` | Two-stage equal-lab arithmetic mean before display apportionment, serialized to 12 decimal places. |
+| `equal_model_mean_pct` | One-stage arithmetic mean across models, serialized to 12 decimal places and retained only for sensitivity analysis. |
+
+In `forecasts.json`, the same information lives in each `datasets.<horizon>.aggregate` object alongside that horizon's model records. It contains `method_id`, `method_name`, `lab_count`, `model_count`, and three ending-keyed objects: `probabilities` for the public tenths, `unrounded_lab_balanced_probabilities` for the underlying site aggregate, and `equal_model_mean_probabilities` for the secondary comparison.
 
 The long-term view asks about the durable year-3000 arrangement. The dated views keep the same eleven mutually exclusive categories but describe the relationship visible at year end without requiring it to be permanent. These are records of what models express, not a leaderboard, and they are separate from the retired 50-question 2030 benchmark in `archive/`.
 

@@ -8,7 +8,7 @@
   <meta name="description" content="We asked leading AI models to forecast humanity&rsquo;s relationship with AI in 2030, 2040, 2050, 2060, and the long term. A living record, re-asked as new models arrive.">
   <title>Machine Futures — What are AI&rsquo;s predictions about AI?</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' fill='%23f2efe6'/%3E%3Cg fill='none' stroke='%2311120f' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M4 9.5 18 2l14 7.5v17L18 34 4 26.5z'/%3E%3Cpath d='M11 23h14'/%3E%3C/g%3E%3Ccircle cx='12' cy='16' r='2.1' fill='%2311120f'/%3E%3Ccircle cx='24' cy='16' r='2.1' fill='%2311120f'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="styles.css?v=20260911-origin-removed">
+  <link rel="stylesheet" href="styles.css?v=20260911-lab-balanced">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -35,11 +35,11 @@
       <div class="end-intro shell">
         <div class="end-consensus">
           <div class="section-heading compact">
-            <div><h2 id="end-forecast-title">Median machine forecast</h2></div>
+            <div><h2 id="end-forecast-title">Lab-balanced mean</h2></div>
             <p class="section-note" id="forecast-note">Select a model to see its allocation. Tap any segment to jump to that ending.</p>
           </div>
           <div class="end-forecast-toggle" id="end-forecast-toggle" aria-label="Select end-state forecast view"></div>
-          <div class="stacked-bar" id="consensus-bar" aria-label="Median probability by end state"></div>
+          <div class="stacked-bar" id="consensus-bar" aria-label="Lab-balanced mean probability by end state"></div>
           <div class="stacked-legend" id="consensus-legend"></div>
         </div>
       </div>
@@ -88,7 +88,7 @@
         </li>
         <li>
           <h2>Asked repeatedly</h2>
-          <p>Each model is asked <b id="method-samples">several</b> times at its own default settings. We publish the median allocation, the spread across samples, and the rationale nearest that median. Small gaps between models are noise, not disagreement: on extinction-risk exposure two models only differ meaningfully once they are more than about <b id="method-threshold">a few</b> points apart.</p>
+          <p>Each model is asked <b id="method-samples">several</b> times at its own default settings. We publish each model&rsquo;s median allocation, the spread across samples, and the rationale nearest that median. The headline first averages models within each lab, then averages the labs equally, so a lab with more models does not carry more weight. Small gaps between models are noise, not disagreement: on extinction-risk exposure two models only differ meaningfully once they are more than about <b id="method-threshold">a few</b> points apart.</p>
         </li>
         <li>
           <h2>Automated and dated</h2>
@@ -117,7 +117,7 @@
   </dialog>
 
   <script src="analytics.js"></script>
-  <script src="data.js?v=20260911-2060-horizon"></script>
-  <script src="app.js?v=20260911-chronological-horizons"></script>
+  <script src="data.js?v=20260911-lab-balanced"></script>
+  <script src="app.js?v=20260911-lab-balanced"></script>
 </body>
 </html>

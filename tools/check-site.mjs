@@ -7,10 +7,11 @@
 // chart describes the figure the chart draws.
 //
 // Usage: node tools/check-site.mjs
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, HORIZON_RUN_CONFIG, renderHorizonPrompt } from './horizons.mjs';
+import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, HORIZON_RUN_CONFIG, compareRunPreference, horizonOfBatch, renderHorizonPrompt } from './horizons.mjs';
+import { labBalancedMean, quantizeAllocation } from './allocations.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const roster = JSON.parse(readFileSync(join(root, 'tools', 'models.json'), 'utf8')).models;
@@ -22,11 +23,37 @@ const { defaultHorizon, horizons, datasets, states, statesByHorizon } = shim.MF_
 const STATE_IDS = Array.from({ length: 11 }, (_, i) => i + 1);
 const EXPOSURE_IDS = [1, 2, 3, 4, 5];
 const problems = [];
-const median = list => { const s = [...list].sort((a, b) => a - b); const n = s.length; return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2; };
-const quantile = (column, f) => { const k = (column.length - 1) * f, lo = Math.floor(k), hi = Math.ceil(k); return column[lo] + (column[hi] - column[lo]) * (k - lo); };
 const badgeOf = iso => {
   const [year, month, day] = iso.split('-');
   return `${month}.${day}.${year.slice(2)}`;
+};
+
+// Re-read the current raw instrument solely to verify the model and lab counts
+// recorded in every historical leader entry. This is deliberately independent
+// of the generated public/data.js timeline it checks.
+const historyBatches = readdirSync(join(root, 'runs')).filter(file => file.endsWith('.json')).flatMap(file => {
+  const batch = JSON.parse(readFileSync(join(root, 'runs', file), 'utf8'));
+  if (batch.prompt_family !== 'end_states' || !batch.samples?.length || !batch.model?.provider) return [];
+  let horizon;
+  try { horizon = horizonOfBatch(batch); } catch { return []; }
+  if (batch.question_set !== HORIZON_RUN_CONFIG[horizon].questionSet) return [];
+  return [{
+    file,
+    horizon,
+    asked_on: batch.asked_on,
+    runKey: batch.model?.api_string || batch.model?.name || batch.run_id,
+    provider: batch.model.provider,
+    samples: batch.samples
+  }];
+});
+const replayCounts = (horizon, date) => {
+  const newest = new Map();
+  for (const batch of historyBatches.filter(candidate => candidate.horizon === horizon && candidate.asked_on <= date)) {
+    const prior = newest.get(batch.runKey);
+    if (!prior || compareRunPreference(batch, prior) < 0) newest.set(batch.runKey, batch);
+  }
+  const chosen = [...newest.values()];
+  return { models: chosen.length, labs: new Set(chosen.map(batch => batch.provider.trim())).size };
 };
 
 if (defaultHorizon !== DEFAULT_HORIZON) problems.push(`defaultHorizon must be ${DEFAULT_HORIZON}, received ${JSON.stringify(defaultHorizon)}`);
@@ -93,8 +120,8 @@ if (!statesByHorizon || typeof statesByHorizon !== 'object' || Array.isArray(sta
   }
 }
 
-// Coordinate-wise medians need not sum to 100, which is why the site
-// renormalizes them. Run the same assertion independently for each horizon.
+// The site first averages model vectors within each lab, then gives every lab
+// equal weight. Run the same assertion independently for each horizon.
 function validateDataset(horizon, dataset) {
   const prefix = `[${horizon}]`;
   if (!dataset || typeof dataset !== 'object' || Array.isArray(dataset)) {
@@ -132,6 +159,8 @@ function validateDataset(horizon, dataset) {
 
   for (const [key, run] of entries) {
     const runPrefix = `${prefix} ${key}`;
+    if (typeof run.provider !== 'string' || !run.provider.trim()) problems.push(`${runPrefix}: provider/lab is missing`);
+    else if (run.provider !== run.provider.trim()) problems.push(`${runPrefix}: provider/lab has surrounding whitespace`);
     if (run.horizon !== horizon) problems.push(`${runPrefix}: horizon is ${JSON.stringify(run.horizon)}`);
     if (run.questionSet !== HORIZON_RUN_CONFIG[horizon].questionSet) {
       problems.push(`${runPrefix}: questionSet is ${JSON.stringify(run.questionSet)}, expected ${HORIZON_RUN_CONFIG[horizon].questionSet}`);
@@ -167,30 +196,19 @@ function validateDataset(horizon, dataset) {
     else if (published.value !== drawn) problems.push(`${runPrefix}: exposurePublished.value ${published.value} != drawn total ${drawn}`);
   }
 
-  const medians = STATE_IDS.map(id => median(entries.map(([, run]) => run.probabilities[id])));
-  const total = medians.reduce((acc, value) => acc + value, 0);
-  const columns = STATE_IDS.map(id => entries.map(([, run]) => run.probabilities[id]).sort((a, b) => a - b));
-  const scaled = medians.map(value => (value / total) * 100);
-  const out = scaled.map(Math.floor);
-  const order = scaled.map((value, index) => [value - out[index], index]).sort((a, b) => b[0] - a[0]).map(([, index]) => index);
-  let given = 0;
-  const shortfall = 100 - out.reduce((acc, value) => acc + value, 0);
-  for (const bounds of [columns.map(column => quantile(column, 0.75)), columns.map(column => column.at(-1)), null]) {
-    if (given >= shortfall) break;
-    for (const index of order) {
-      if (given >= shortfall) break;
-      if (bounds && out[index] + 1 > bounds[index]) continue;
-      out[index] += 1; given += 1;
-    }
-  }
-  const aggregateSum = out.reduce((acc, value) => acc + value, 0);
-  if (aggregateSum !== 100) problems.push(`${prefix} headline aggregate normalises to ${aggregateSum}, not 100`);
-  for (const [index, id] of STATE_IDS.entries()) {
-    const column = columns[index];
-    const low = quantile(column, 0.25), high = quantile(column, 0.75);
-    if (out[index] < low || out[index] > high) {
-      problems.push(`${prefix} headline S${id} published ${out[index]}% outside the models' middle half ${low}-${high}%`);
-    }
+  const rows = entries.map(([, run]) => ({
+    lab: run.provider,
+    values: STATE_IDS.map(id => run.probabilities[id])
+  }));
+  const rawAggregate = labBalancedMean(rows);
+  const total = rawAggregate.reduce((acc, value) => acc + value, 0);
+  const out = quantizeAllocation(rawAggregate);
+  const labs = new Set(rows.map(row => row.lab.trim())).size;
+  if (Math.abs(total - 100) > 1e-9) problems.push(`${prefix} raw lab-balanced mean sums to ${total}, not 100`);
+  const aggregateTenths = out.reduce((acc, value) => acc + Math.round(value * 10), 0);
+  if (aggregateTenths !== 1000) problems.push(`${prefix} headline aggregate quantizes to ${aggregateTenths / 10}, not 100.0`);
+  if (out.some(value => Math.abs(value * 10 - Math.round(value * 10)) > 1e-9)) {
+    problems.push(`${prefix} headline aggregate is not expressed in tenths`);
   }
 
   if (entries.length >= 2 && !timeline.length) problems.push(`${prefix} leaderHistory is empty despite ${entries.length} published models`);
@@ -199,10 +217,18 @@ function validateDataset(horizon, dataset) {
     if (dates.some((date, index) => index && date <= dates[index - 1])) problems.push(`${prefix} leaderHistory dates are not in ascending order`);
     const counts = timeline.map(entry => entry.models);
     if (counts.some((count, index) => index && count < counts[index - 1])) problems.push(`${prefix} leaderHistory model count goes backwards`);
+    const labCounts = timeline.map(entry => entry.labs);
+    if (labCounts.some((count, index) => index && count < labCounts[index - 1])) problems.push(`${prefix} leaderHistory lab count goes backwards`);
     timeline.forEach((entry, index) => {
+      const replayed = replayCounts(horizon, entry.date);
       if (!STATE_IDS.includes(entry.stateId)) problems.push(`${prefix} leaderHistory ${entry.date} names ending ${entry.stateId}, which is not in the taxonomy`);
-      if (!Number.isInteger(entry.share) || entry.share < 0 || entry.share > 100) problems.push(`${prefix} leaderHistory ${entry.date} has invalid share ${entry.share}`);
+      if (!Number.isFinite(entry.share) || entry.share < 0 || entry.share > 100 || Math.abs(entry.share * 10 - Math.round(entry.share * 10)) > 1e-9) {
+        problems.push(`${prefix} leaderHistory ${entry.date} has invalid one-decimal share ${entry.share}`);
+      }
+      if (!Number.isInteger(entry.labs) || entry.labs < 1 || entry.labs > labs) problems.push(`${prefix} leaderHistory ${entry.date} has invalid lab count ${entry.labs}`);
       if (!Number.isInteger(entry.models) || entry.models < 2 || entry.models > entries.length) problems.push(`${prefix} leaderHistory ${entry.date} has invalid model count ${entry.models}`);
+      if (entry.labs !== replayed.labs) problems.push(`${prefix} leaderHistory ${entry.date} records ${entry.labs} labs but raw-run replay has ${replayed.labs}`);
+      if (entry.models !== replayed.models) problems.push(`${prefix} leaderHistory ${entry.date} records ${entry.models} models but raw-run replay has ${replayed.models}`);
       const differs = index === 0 || timeline[index - 1].stateId !== entry.stateId;
       if (entry.changed !== differs) problems.push(`${prefix} leaderHistory ${entry.date} is flagged changed=${entry.changed} but differs=${differs}`);
     });
@@ -210,11 +236,12 @@ function validateDataset(horizon, dataset) {
     const leaderIndex = out.indexOf(Math.max(...out));
     if (latest.stateId !== leaderIndex + 1) problems.push(`${prefix} leaderHistory ends on ending ${latest.stateId} but the aggregate leads with ${leaderIndex + 1}`);
     if (latest.share !== out[leaderIndex]) problems.push(`${prefix} leaderHistory ends at ${latest.share}% but the aggregate leader is ${out[leaderIndex]}%`);
+    if (latest.labs !== labs) problems.push(`${prefix} leaderHistory ends with ${latest.labs} labs but ${labs} are published`);
     if (latest.models !== entries.length) problems.push(`${prefix} leaderHistory ends with ${latest.models} models but ${entries.length} are published`);
     if (newestDate && latest.date !== newestDate) problems.push(`${prefix} leaderHistory ends on ${latest.date}, not newest run date ${newestDate}`);
   }
 
-  return { runs: entries.length, timeline: timeline.length, total, aggregate: out };
+  return { runs: entries.length, labs, timeline: timeline.length, total, aggregate: out };
 }
 
 const summaries = HORIZON_IDS.map(horizon => [horizon, validateDataset(horizon, datasets?.[horizon])]);
@@ -224,5 +251,5 @@ const totalTimeline = summaries.reduce((sum, [, summary]) => sum + summary.timel
 console.log(`✓ ${totalRuns} runs valid across ${HORIZON_IDS.length} horizons, ${totalTimeline} timeline entries — datasets are isolated and every published allocation sums to 100`);
 for (const [horizon, summary] of summaries) {
   if (!summary.runs) console.log(`  ${horizon}: empty, ready for initial collection`);
-  else console.log(`  ${horizon}: ${summary.runs} runs; raw medians sum to ${summary.total}, published as ${summary.aggregate.join(', ')}`);
+  else console.log(`  ${horizon}: ${summary.runs} models across ${summary.labs} labs; raw lab-balanced mean sums to ${summary.total.toFixed(6)}, published as ${summary.aggregate.join(', ')}`);
 }

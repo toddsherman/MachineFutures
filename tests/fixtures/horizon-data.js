@@ -84,14 +84,17 @@
     '2060': [5, 5, 15, 12, 8, 20, 18, 8, 4, 3, 2]
   };
 
-  const dataFor = (horizon, date, models, leader) => ({
-    datasetDate: date.split('-').slice(1).concat(date.slice(2, 4)).join('.'),
-    endStateRuns: Object.fromEntries(models.map(([key, provider, label]) => [key, makeRun(horizon, provider, label, vectors[horizon], date)])),
-    leaderHistory: [
-      { date: '2026-01-01', stateId: leader, share: vectors[horizon][leader - 1], models: 1, changed: true },
-      { date, stateId: leader, share: vectors[horizon][leader - 1], models: models.length, changed: false }
-    ]
-  });
+  const dataFor = (horizon, date, models, leader) => {
+    const labs = new Set(models.map(([, provider]) => provider)).size;
+    return {
+      datasetDate: date.split('-').slice(1).concat(date.slice(2, 4)).join('.'),
+      endStateRuns: Object.fromEntries(models.map(([key, provider, label]) => [key, makeRun(horizon, provider, label, vectors[horizon], date)])),
+      leaderHistory: [
+        { date: '2026-01-01', stateId: leader, share: vectors[horizon][leader - 1], models: 1, labs: 1, changed: true },
+        { date, stateId: leader, share: vectors[horizon][leader - 1], models: models.length, labs, changed: false }
+      ]
+    };
+  };
 
   window.MF_DATA = {
     states,

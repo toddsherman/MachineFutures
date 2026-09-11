@@ -12,7 +12,7 @@ import { createHash } from 'node:crypto';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, HORIZON_RUN_CONFIG, compareRunPreference, horizonOfBatch } from './horizons.mjs';
-import { renormalizeAllocation } from './allocations.mjs';
+import { labBalancedMean, quantizeAllocation, renormalizeAllocation } from './allocations.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const runsDir = join(root, 'runs');
@@ -190,7 +190,7 @@ for (const file of files) {
     );
     if (probs.reduce((a, c) => a + c, 0) !== 100) { problems.push(`${file}: renormalized probabilities sum to ${probs.reduce((a, c) => a + c, 0)}, not 100`); continue; }
     rawEndStateBatches.push({
-      file, run_id: batch.run_id, asked_on: batch.asked_on, runKey: runKeyOf(batch), horizon,
+      file, run_id: batch.run_id, asked_on: batch.asked_on, runKey: runKeyOf(batch), horizon, provider,
       questionSet, promptSha256: batch.harness?.prompt_sha256 || null, samples: batch.samples || []
     });
     endStateBatches.push({
@@ -279,9 +279,9 @@ for (const b of Object.values(entriesByHorizon).flat()) {
 }
 // How the board's leading ending has moved. Reconstructed by replaying the
 // batches date by date: on each date, take each model's newest run as of then
-// and aggregate exactly as the site does. The model count travels with each
-// entry because it is usually the explanation — the board's answer changes
-// when the board changes, not because a model revised its own.
+// and aggregate exactly as the site does. Models are averaged within each lab,
+// then the available labs are averaged equally. Counts for both units travel
+// with every entry because changes to either can explain a changed board.
 function leaderTimeline(batches) {
   const dates = [...new Set(batches.map(b => b.asked_on).filter(Boolean))].sort();
   const timeline = [];
@@ -291,13 +291,15 @@ function leaderTimeline(batches) {
       const prior = newest[batch.runKey];
       if (!prior || compareRunPreference(batch, prior) < 0) newest[batch.runKey] = batch;
     }
-    const published = Object.values(newest).map(b => publishedVector(b.samples)).filter(Boolean);
+    const published = Object.values(newest)
+      .map(batch => ({ lab: batch.provider, values: publishedVector(batch.samples) }))
+      .filter(row => row.values);
     if (published.length < 2) continue;
-    const columns = STATE_IDS.map((_, i) => published.map(v => v[i]).sort((a, b) => a - b));
-    const board = renormalizeAllocation(columns.map(median), columns.map(c => [c[0], c.at(-1)]), columns.map(c => [quartile(c, 0.25), quartile(c, 0.75)]));
+    const board = quantizeAllocation(labBalancedMean(published));
+    const labs = new Set(published.map(row => row.lab.trim())).size;
     const top = board.indexOf(Math.max(...board));
     const previous = timeline.at(-1);
-    timeline.push({ date, stateId: top + 1, share: board[top], models: published.length,
+    timeline.push({ date, stateId: top + 1, share: board[top], labs, models: published.length,
                     changed: !previous || previous.stateId !== top + 1 });
   }
   return timeline;

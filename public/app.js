@@ -4,7 +4,7 @@
   // Forecasts now share one taxonomy but belong to distinct horizons. Keep the
   // legacy shape readable so a partially regenerated checkout still opens on
   // the existing long-term board rather than failing before the controls paint.
-  const horizonOptions = Array.isArray(payload.horizons) && payload.horizons.length
+  const configuredHorizons = Array.isArray(payload.horizons) && payload.horizons.length
     ? payload.horizons
     : [{ id: 'long-term', label: 'Long term', targetYear: 3000 }];
   const datasets = payload.datasets || {
@@ -17,6 +17,12 @@
   const fallbackHorizon = datasets[payload.defaultHorizon]
     ? payload.defaultHorizon
     : (datasets['long-term'] ? 'long-term' : Object.keys(datasets)[0]);
+  // A horizon becomes selectable only when it has something to show. This
+  // keeps staged prompts and pipeline changes from exposing a control that
+  // would collapse every data section—and the reader's viewport—on selection.
+  const hasForecasts = horizon => Object.keys(datasets[horizon]?.endStateRuns || {}).length > 0;
+  const horizonOptions = configuredHorizons.filter(option => option.id === fallbackHorizon || hasForecasts(option.id));
+  const isSelectableHorizon = horizon => horizonOptions.some(option => option.id === horizon);
 
   let activeHorizon = fallbackHorizon || 'long-term';
   let states = baseStates;
@@ -34,7 +40,7 @@
     ? (plural ? 'states' : 'state')
     : (plural ? 'endings' : 'ending');
   function useDataset(horizon) {
-    activeHorizon = datasets[horizon] ? horizon : (fallbackHorizon || 'long-term');
+    activeHorizon = isSelectableHorizon(horizon) ? horizon : (fallbackHorizon || 'long-term');
     states = Array.isArray(statesByHorizon[activeHorizon])
       ? statesByHorizon[activeHorizon]
       : baseStates;
@@ -71,8 +77,8 @@
   function applyUrlState() {
     const params = new URLSearchParams(location.search);
     const requestedHorizon = params.get('horizon');
-    const invalidHorizon = requestedHorizon && !datasets[requestedHorizon];
-    useDataset(requestedHorizon && datasets[requestedHorizon] ? requestedHorizon : fallbackHorizon);
+    const invalidHorizon = requestedHorizon && !isSelectableHorizon(requestedHorizon);
+    useDataset(requestedHorizon && isSelectableHorizon(requestedHorizon) ? requestedHorizon : fallbackHorizon);
     let model = params.get('model');
     // Links shared before the site became a single page used
     // #end-states?model=X. Honour them, then rewrite to the current form.
@@ -96,9 +102,15 @@
   const extinctionLabels = { gone: 'Humanity is gone', risk: 'Humanity might perish' };
   // Straight from rule 3 of the taxonomy, so the marks explain themselves in
   // the same words the models were given.
-  const extinctionTips = {
-    gone: 'Endings 1–3. Humans died or were destroyed without continuity of individual identity.',
-    risk: 'Endings 4–5. Humanity survives in some versions of the ending and perishes in others.'
+  const extinctionTip = tier => {
+    if (isSnapshot()) {
+      return tier === 'gone'
+        ? 'States 1–3. Humans died or were destroyed without continuity of individual identity.'
+        : 'States 4–5. Humanity survives in some versions and perishes in others.';
+    }
+    return tier === 'gone'
+      ? 'Endings 1–3. Humans died or were destroyed without continuity of individual identity.'
+      : 'Endings 4–5. Humanity survives in some versions of the ending and perishes in others.';
   };
   const MARK_SHAPES = {
     risk: '<path d="M11 3.2 20.1 18.5H1.9Z"/><path d="M11 9.1v3.9M11 15.8h.01"/>'
@@ -116,7 +128,7 @@
       ? MARK_GLYPHS[tier]
       : `<svg viewBox="0 0 22 22" aria-hidden="true">${MARK_SHAPES[tier]}</svg>`;
     const glyph = MARK_GLYPHS[tier] ? ' is-glyph' : '';
-    return `<span class="state-mark is-${tier}${glyph}" role="img" data-mark="${tier}" aria-label="${label}. ${extinctionTips[tier]}">${body}</span>`;
+    return `<span class="state-mark is-${tier}${glyph}" role="img" data-mark="${tier}" aria-label="${label}. ${extinctionTip(tier)}">${body}</span>`;
   };
 
   // Rationales are model-authored: they arrive from a provider API, pass
@@ -354,7 +366,8 @@
   const promptForHorizon = {
     'long-term': 'end_states.md',
     '2030': 'end_states_2030.md',
-    '2040': 'end_states_2040.md'
+    '2040': 'end_states_2040.md',
+    '2050': 'end_states_2050.md'
   };
 
   function renderHorizonContext() {
@@ -858,7 +871,7 @@
     const tier = mark.dataset.mark;
     if (!tier || markTipFor === mark) return;
     markTipFor = mark;
-    markTip.innerHTML = `<b>${extinctionLabels[tier]}</b><span>${extinctionTips[tier]}</span>`;
+    markTip.innerHTML = `<b>${extinctionLabels[tier]}</b><span>${extinctionTip(tier)}</span>`;
     // A modal dialog paints in the top layer, above anything parented to the
     // body — so inside one, the tooltip has to live in the dialog.
     const host = mark.closest('dialog[open]') || document.body;
@@ -1044,7 +1057,7 @@
   }
 
   function selectHorizon(key) {
-    if (!datasets[key] || key === activeHorizon) return;
+    if (!isSelectableHorizon(key) || key === activeHorizon) return;
     stopSweep();
     hideMarkTip();
     const dialog = $('#detail-dialog');

@@ -58,7 +58,7 @@
     }
   };
   const snapshotStates = states.map(state => ({ ...state, ...(snapshotCopy[state.id] || {}) }));
-  const statesByHorizon = { 'long-term': states, '2030': snapshotStates, '2040': snapshotStates };
+  const statesByHorizon = { 'long-term': states, '2030': snapshotStates, '2040': snapshotStates, '2050': snapshotStates };
 
   const makeRun = (horizon, provider, label, probabilities, date) => ({
     horizon,
@@ -79,7 +79,8 @@
   const vectors = {
     'long-term': [5, 5, 10, 10, 10, 10, 10, 5, 25, 5, 5],
     '2030': [2, 2, 4, 4, 3, 5, 5, 15, 45, 10, 5],
-    '2040': [3, 3, 8, 7, 6, 12, 12, 28, 10, 6, 5]
+    '2040': [3, 3, 8, 7, 6, 12, 12, 28, 10, 6, 5],
+    '2050': [4, 4, 12, 10, 7, 15, 30, 8, 4, 4, 2]
   };
 
   const dataFor = (horizon, date, models, leader) => ({
@@ -98,12 +99,14 @@
     horizons: [
       { id: 'long-term', label: 'Long term', targetYear: 3000 },
       { id: '2030', label: '2030', targetYear: 2030 },
-      { id: '2040', label: '2040', targetYear: 2040 }
+      { id: '2040', label: '2040', targetYear: 2040 },
+      { id: '2050', label: '2050', targetYear: 2050 }
     ],
     datasets: {
       'long-term': dataFor('long-term', '2026-01-02', [['alpha', 'Anthropic', 'Alpha'], ['beta', 'OpenAI', 'Beta']], 9),
       '2030': dataFor('2030', '2026-02-03', [['alpha', 'Anthropic', 'Alpha'], ['gamma', 'Google', 'Gamma']], 9),
-      '2040': dataFor('2040', '2026-03-04', [['alpha', 'Anthropic', 'Alpha'], ['beta', 'OpenAI', 'Beta'], ['gamma', 'Google', 'Gamma']], 8)
+      '2040': dataFor('2040', '2026-03-04', [['alpha', 'Anthropic', 'Alpha'], ['beta', 'OpenAI', 'Beta'], ['gamma', 'Google', 'Gamma']], 8),
+      '2050': dataFor('2050', '2026-04-05', [['alpha', 'Anthropic', 'Alpha'], ['beta', 'OpenAI', 'Beta'], ['gamma', 'Google', 'Gamma']], 7)
     }
   };
 })();

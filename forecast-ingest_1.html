@@ -86,7 +86,7 @@
   <div class="sub">Paste one model run of either the 50-question 2030 benchmark or the 11-end-state (year-3000) prompt, validate it against the matching spec, stack repeated samples, export one JSON per model. Nothing leaves your browser.</div>
 
   <div class="topnote">
-    Paste the JSON object returned by either prompt family &mdash; the 50-question 2030 benchmark (<code>answers</code>) or the 11-end-state forecast (<code>end_states</code>). The ingester validates against the matching spec: answers, numeric types, units, ordering, and metadata for the benchmark; canonical state names, integer probabilities, and a sum of exactly 100 for the end states. It can safely restore missing closing <code>]}</code> characters when a response is cut off immediately after the final entry. The earlier <code>Q1: 23% | rationale</code> format remains supported for the 2030 family.
+    Paste the JSON object returned by either prompt family &mdash; the retired 50-question 2030 benchmark (<code>answers</code>) or the long-term year-3000 end-state forecast (<code>end_states</code>). Dated structural snapshots are intentionally handled only by the automated harness, which records their horizon provenance. The ingester validates against the matching spec: answers, numeric types, units, ordering, and metadata for the benchmark; canonical state names, integer probabilities, and a sum of exactly 100 for the end states. It can safely restore missing closing <code>]}</code> characters when a response is cut off immediately after the final entry. The earlier <code>Q1: 23% | rationale</code> format remains supported for the 2030 family.
   </div>
 
   <div class="grid">

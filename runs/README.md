@@ -1,8 +1,8 @@
 # Runs
 
-Raw forecast batches written by `tools/run-elicitation.mjs`, or exported by `forecast-ingest_1.html` for models without an API — one JSON file per model, date, prompt family, and horizon. Each file holds every raw sample plus the normalized aggregate (mean/median/min/max per question, with the rationale closest to the median).
+Raw forecast batches written by `tools/run-elicitation.mjs`, or long-term batches exported by `forecast-ingest_1.html` for models without an API — one JSON file per model, date, prompt family, and horizon. Dated snapshots always use the automated harness so their horizon provenance is explicit. Each file holds every raw sample plus the normalized aggregate (mean/median/min/max per question, with the rationale closest to the median).
 
-Naming: the legacy long-term family uses `YYYY-MM-DD__<model-slug>__closed_book__end-states.json`; dated snapshots add the horizon, as in `…__end-states-2030.json` and `…__end-states-2040.json`. The retired 50-question 2030 benchmark is kept separately in `archive/` and is never imported into these datasets.
+Naming: the legacy long-term family uses `YYYY-MM-DD__<model-slug>__closed_book__end-states.json`; dated snapshots add the horizon, as in `…__end-states-2030.json`, `…__end-states-2040.json`, and `…__end-states-2050.json`. The retired 50-question 2030 benchmark is kept separately in `archive/` and is never imported into these datasets.
 
 This directory is committed for provenance but never deployed (`vercel.json` restricts the Vercel output to `public/`). The website reads only `public/data.js`. Regenerate it with `node tools/import-runs.mjs`, which the elicitation workflow runs automatically; `node tools/check-site.mjs` then verifies the result.
 

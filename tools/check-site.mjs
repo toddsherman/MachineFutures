@@ -86,8 +86,10 @@ if (!statesByHorizon || typeof statesByHorizon !== 'object' || Array.isArray(sta
       problems.push(`statesByHorizon ${horizon} does not match the taxonomy in ${HORIZON_RUN_CONFIG[horizon].promptFile}`);
     }
   }
-  if (JSON.stringify(publicTaxonomy(statesByHorizon['2030'])) !== JSON.stringify(publicTaxonomy(statesByHorizon['2040']))) {
-    problems.push('2030 and 2040 snapshot taxonomies must use the same copy');
+  const snapshotHorizons = HORIZON_IDS.filter(horizon => horizon !== DEFAULT_HORIZON);
+  const canonicalSnapshot = JSON.stringify(publicTaxonomy(statesByHorizon[snapshotHorizons[0]]));
+  if (snapshotHorizons.some(horizon => JSON.stringify(publicTaxonomy(statesByHorizon[horizon])) !== canonicalSnapshot)) {
+    problems.push(`${snapshotHorizons.join(', ')} snapshot taxonomies must use the same copy`);
   }
 }
 

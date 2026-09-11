@@ -18,12 +18,13 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 test('horizon registry has stable public ids and default', () => {
   assert.equal(DEFAULT_HORIZON, 'long-term');
-  assert.deepEqual(HORIZON_IDS, ['long-term', '2030', '2040']);
+  assert.deepEqual(HORIZON_IDS, ['long-term', '2030', '2040', '2050']);
   assert.deepEqual(HORIZONS.map(({ id, targetYear }) => [id, targetYear]), [
-    ['long-term', 3000], ['2030', 2030], ['2040', 2040]
+    ['long-term', 3000], ['2030', 2030], ['2040', 2040], ['2050', 2050]
   ]);
   assert.equal(HORIZON_RUN_CONFIG['2030'].questionSet, 'end-states-2030-v2');
   assert.equal(HORIZON_RUN_CONFIG['2040'].questionSet, 'end-states-2040-v2');
+  assert.equal(HORIZON_RUN_CONFIG['2050'].questionSet, 'end-states-2050-v2');
 });
 
 test('legacy batches without horizon metadata remain long-term', () => {
@@ -35,6 +36,7 @@ test('legacy batches without horizon metadata remain long-term', () => {
 test('dated batches require mutually consistent horizon provenance', () => {
   assert.equal(horizonOfBatch({ horizon: '2030', target_year: 2030, question_set: 'end-states-2030-v1' }), '2030');
   assert.equal(horizonOfBatch({ horizon: '2040', target_year: 2040, question_set: 'end-states-2040-v2' }), '2040');
+  assert.equal(horizonOfBatch({ horizon: '2050', target_year: 2050, question_set: 'end-states-2050-v2' }), '2050');
   assert.throws(
     () => horizonOfBatch({ horizon: '2030', target_year: 2040, question_set: 'end-states-2030-v1' }),
     /conflicting horizon metadata/
@@ -74,8 +76,11 @@ test('persisted horizon metadata is exact and complete', () => {
 });
 
 test('unknown horizons are rejected', () => {
-  assert.equal(normalizeHorizon('2050'), null);
-  assert.throws(() => horizonOfBatch({ horizon: '2050', target_year: 2050 }), /unsupported horizon/);
+  assert.equal(normalizeHorizon('2050'), '2050');
+  assert.equal(normalizeHorizon('year_2050'), '2050');
+  assert.equal(normalizeHorizon('horizon-2050'), '2050');
+  assert.equal(normalizeHorizon('2060'), null);
+  assert.throws(() => horizonOfBatch({ horizon: '2060', target_year: 2060 }), /unsupported horizon/);
 });
 
 test('runtime prompt identity hashes the exact date-substituted prompt', () => {
@@ -92,11 +97,13 @@ test('runtime prompt identity hashes the exact date-substituted prompt', () => {
   assert.notEqual(first.identity.prompt_sha256, second.identity.prompt_sha256);
 });
 
-test('both dated prompts use the same v2 snapshot rules', () => {
+test('all dated prompts use the same v2 snapshot rules', () => {
   const prompt2030 = renderHorizonPrompt(root, '2030', '2026-09-10');
   const prompt2040 = renderHorizonPrompt(root, '2040', '2026-09-10');
+  const prompt2050 = renderHorizonPrompt(root, '2050', '2026-09-10');
   assert.equal(prompt2040.identity.question_set, 'end-states-2040-v2');
-  for (const { prompt } of [prompt2030, prompt2040]) {
+  assert.equal(prompt2050.identity.question_set, 'end-states-2050-v2');
+  for (const { prompt } of [prompt2030, prompt2040, prompt2050]) {
     assert.match(prompt, /Zero is a valid probability; no state is required to receive positive points\./);
     assert.match(prompt, /Many AIs compete; no one dominates/);
     assert.match(prompt, /Powerful AI has been deliberately given up/);

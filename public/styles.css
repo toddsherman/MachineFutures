@@ -113,6 +113,21 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .leader-unit { display: block; margin-top: 12px; color: var(--muted); font: 10px var(--mono); text-transform: uppercase; letter-spacing: .06em; }
 .end-leader strong { display: block; margin: 6px 0 0; font: 900 clamp(64px, 8vw, 112px)/.8 var(--display); letter-spacing: -.06em; }
 .leader-description { margin: 20px 0 0; max-width: 52ch; color: var(--muted); font-size: 16px; line-height: 1.6; }
+
+/* A sibling to the leader panel: the same headline scale and two-column
+   rhythm, but one composite measure rather than one winning scenario. */
+.pdoom-section { padding: 52px 0 56px; border-bottom: 1px solid var(--line); }
+.pdoom { --pdoom-muted: #67685f; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; column-gap: 60px; }
+.pdoom .leader-title { grid-column: 1 / -1; display: flex; align-items: center; gap: clamp(10px, 1.5vw, 22px); color: var(--ink); text-transform: none; }
+.pdoom .leader-title .state-mark.is-glyph { margin-left: 0; color: var(--ink); font-size: .9em; line-height: 1; vertical-align: 0; }
+.pdoom-answer, .pdoom-detail { min-width: 0; }
+.pdoom-name { margin: 20px 0 0; color: transparent; font: 900 clamp(30px, 10.6vw, 42px)/.9 var(--display); text-transform: uppercase; letter-spacing: -.05em; white-space: nowrap; -webkit-text-stroke: 1.5px var(--ink); paint-order: stroke fill; }
+.pdoom-figure { display: block; margin: 6px 0 0; font: 900 clamp(64px, 8vw, 112px)/.8 var(--display); letter-spacing: -.06em; font-variant-numeric: tabular-nums; }
+.pdoom-figure.is-settling { filter: blur(var(--blur, 0px)); }
+.pdoom .leader-unit { display: flex; flex-wrap: wrap; gap: 2px .65em; color: var(--pdoom-muted); }
+.pdoom .leader-unit > span { white-space: nowrap; }
+.pdoom-description { margin: 20px 0 0; max-width: 52ch; color: var(--pdoom-muted); font-size: 16px; line-height: 1.6; }
+.pdoom-method { margin: 18px 0 0; max-width: 52ch; padding-top: 16px; border-top: 1px solid var(--line); color: var(--pdoom-muted); font: 13px/1.6 var(--sans); }
 /* Inside the leader panel, under the ending it names. */
 .leader-timeline { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--line); max-width: 44ch; }
 .leader-timeline h3 { margin: 0 0 12px; color: var(--muted); font: 700 10px var(--mono); text-transform: uppercase; letter-spacing: .1em; }
@@ -131,7 +146,7 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .data-empty { margin: 0; padding: 28px 0; color: var(--muted); font: 700 11px/1.5 var(--mono); letter-spacing: .04em; text-transform: uppercase; }
 .stacked-bar.is-empty { min-height: 100px; height: auto; align-items: center; justify-content: center; border-color: var(--line); }
 .state-grid > .data-empty { grid-column: 1 / -1; padding: 48px 24px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.end-leader > .data-empty { grid-column: 1 / -1; padding-top: 32px; }
+.end-leader > .data-empty, .pdoom > .data-empty { grid-column: 1 / -1; padding-top: 32px; }
 .matrix > .data-empty, .doomer-ratings > .data-empty { padding-block: 42px; }
 .state-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
 .state-card { min-height: 420px; padding: 24px; display: flex; flex-direction: column; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: linear-gradient(to bottom, transparent 80%, color-mix(in srgb, var(--state) 20%, transparent)); }
@@ -422,8 +437,8 @@ body.dialog-open { overflow: hidden; }
   .section-heading, .section-heading.compact { align-items: start; flex-direction: column; gap: 22px; }
   .end-hero { padding-block: 40px 34px; gap: 22px; }
   .end-consensus { padding: 40px 0 44px; }
-  .end-leader { grid-template-columns: minmax(0, 1fr); column-gap: 0; }
-  .leader-detail { margin-top: 26px; }
+  .end-leader, .pdoom { grid-template-columns: minmax(0, 1fr); column-gap: 0; }
+  .leader-detail, .pdoom-detail { margin-top: 26px; }
   /* Twelve pills wrap to seven rows at this width, which would bury the chart
      under its own controls. One swipeable row instead, bled to the edge so the
      cut-off pill signals there is more. */
@@ -432,7 +447,7 @@ body.dialog-open { overflow: hidden; }
     scrollbar-width: none; }
   .end-forecast-toggle::-webkit-scrollbar { display: none; }
   .end-toggle-button { flex: 0 0 auto; }
-  .end-leader-section { padding: 40px 0 44px; }
+  .end-leader-section, .pdoom-section { padding: 40px 0 44px; }
   .state-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .state-card-head { row-gap: 12px; }
   .state-card-head h3 { font-size: 32px; }

@@ -128,7 +128,7 @@
   // Android both substitute a colour emoji, which would put back on the page
   // the one thing these marks deliberately do not use: hue.
   const MARK_GLYPHS = { gone: '\u2620\uFE0E' };
-  const extinctionMark = (state, { snapshot = isSnapshot(), compact = false } = {}) => {
+  const extinctionMark = (state, { snapshot = isSnapshot(), compact = false, decorative = false } = {}) => {
     const tier = state.extinction;
     if (!tier) return '';
     const label = extinctionLabels[tier];
@@ -140,7 +140,10 @@
     const compactClass = compact ? ' is-compact' : '';
     const interactive = compact ? '' : ` data-mark="${tier}"`;
     const accessibleLabel = compact ? label : `${label}. ${extinctionTip(tier, snapshot)}`;
-    return `<span class="state-mark is-${tier}${glyph}${compactClass}" role="img"${interactive} aria-label="${accessibleLabel}">${body}</span>`;
+    const accessibility = decorative
+      ? ' aria-hidden="true"'
+      : ` role="img" aria-label="${accessibleLabel}"`;
+    return `<span class="state-mark is-${tier}${glyph}${compactClass}"${interactive}${accessibility}>${body}</span>`;
   };
 
   // Rationales are model-authored: they arrive from a provider API, pass
@@ -203,6 +206,20 @@
     if (!aggregate.length) return [];
     return endingOrder().map((state, i) => ({ ...state, probability: aggregate[i] }));
   }
+
+  // A composite figure should be rounded only after it has been assembled.
+  // Sum the included states for each model, average models within each lab,
+  // then give every lab one equal vote. Summing the already-quantised board
+  // figures would let their display rounding leak into the result.
+  function labBalancedShare(runList, predicate) {
+    if (!runList.length) return 0;
+    const includedStates = endingOrder().filter(predicate);
+    return mean(runsByLab(runList).map(labRuns =>
+      mean(labRuns.map(run => includedStates.reduce((sum, state) => sum + stateValue(run, state), 0)))
+    ));
+  }
+
+  const pDoomOf = runList => labBalancedShare(runList, state => state.extinction === 'gone');
 
   const SVG_NS = 'http://www.w3.org/2000/svg';
   const horizonChartActive = new Set(baseStates.map(state => state.id));
@@ -673,6 +690,60 @@
     // already the text on screen.
   }
 
+  // pDoom is a sum, not a contest between the three included scenarios. It
+  // borrows the leader panel's count-up, blur and deceleration without
+  // riffling the label through outcomes, which would imply one of them won.
+  let pdoomSettled = false;
+  let pdoomSettleCancelled = false;
+  let pdoomSettleToken = 0;
+  function landPdoom(panel) {
+    const figureEl = panel?.querySelector('.pdoom-figure');
+    const value = Number(panel?.dataset.pdoomValue);
+    if (!figureEl || !Number.isFinite(value)) return;
+    figureEl.textContent = aggregatePercent(value);
+    figureEl.classList.remove('is-settling');
+    figureEl.style.removeProperty('--blur');
+  }
+
+  function settlePdoom(panel, value) {
+    if (pdoomSettled || reduceMotion() || !('IntersectionObserver' in window)) return;
+    pdoomSettled = true;
+    const figureEl = panel.querySelector('.pdoom-figure');
+    if (!figureEl) return;
+
+    const token = ++pdoomSettleToken;
+    const SPIN_MS = 1150;
+    const land = () => {
+      if (token !== pdoomSettleToken) return;
+      landPdoom(panel);
+    };
+    const run = () => {
+      if (pdoomSettleCancelled || token !== pdoomSettleToken) return;
+      figureEl.textContent = aggregatePercent(0);
+      figureEl.classList.add('is-settling');
+      figureEl.style.setProperty('--blur', '7px');
+      const failsafe = setTimeout(land, SPIN_MS + 400);
+      const started = performance.now();
+      const frame = now => {
+        if (token !== pdoomSettleToken) { clearTimeout(failsafe); return; }
+        const t = Math.min((now - started) / SPIN_MS, 1);
+        if (t >= 1) { clearTimeout(failsafe); land(); return; }
+        const eased = 1 - Math.pow(1 - t, 3);
+        figureEl.style.setProperty('--blur', `${((1 - eased) * 7).toFixed(2)}px`);
+        figureEl.textContent = aggregatePercent(value * eased);
+        requestAnimationFrame(frame);
+      };
+      requestAnimationFrame(frame);
+    };
+
+    const io = new IntersectionObserver((records, observer) => {
+      if (!records.some(record => record.isIntersecting)) return;
+      observer.disconnect();
+      run();
+    }, { threshold: 0.15 });
+    io.observe(panel);
+  }
+
   // The board's leader over time, replayed from the runs. Dates are when a
   // model was asked, not when it shipped: nothing here can say what a model
   // would have answered before it was put the question.
@@ -956,6 +1027,26 @@
 
   const emptyMessage = () => `${horizonMeta().label} forecasts are being collected.`;
 
+  function pdoomTitleMarkup() {
+    const goneState = endingOrder().find(state => state.extinction === 'gone');
+    const mark = goneState ? extinctionMark(goneState, { compact: true, decorative: true }) : '';
+    return `<h2 class="leader-title" id="pdoom-title"><span>pDoom</span>${mark}</h2>`;
+  }
+
+  function renderPdoom(entries) {
+    const panel = $('#pdoom');
+    const value = pDoomOf(entries);
+    const labCount = runsByLab(entries).length;
+    const modelCount = entries.length;
+    const horizon = horizonMeta();
+    const plural = (count, word) => `${count} ${word}${count === 1 ? '' : 's'}`;
+
+    panel.dataset.pdoomValue = String(value);
+    panel.dataset.renderedHorizon = activeHorizon;
+    panel.innerHTML = `${pdoomTitleMarkup()}<div class="pdoom-answer"><p class="pdoom-name"><span>Humanity is gone</span></p><strong class="pdoom-figure" id="pdoom-value" aria-label="${value.toFixed(1)} percent">${aggregatePercent(value)}</strong><span class="leader-unit" id="pdoom-unit"><span>Lab-balanced mean across ${plural(labCount, 'lab')} (${plural(modelCount, 'model')})</span><span>&middot; ${esc(horizon.label)}</span><span>&middot; states 1&ndash;3</span></span></div><div class="pdoom-detail"><p class="pdoom-description" id="pdoom-description">The combined probability assigned to Terminal Silence, The Inheritance, and Bootloader&mdash;the three scenarios in which humanity is gone. States 4&ndash;5 are not included because extinction occurs only in some versions.</p><p class="pdoom-method">Each model&rsquo;s shares for states 1&ndash;3 are added first; models are averaged within their lab, then the labs are weighted equally.</p></div>`;
+    settlePdoom(panel, value);
+  }
+
   function renderEmptyDataset() {
     const horizon = horizonMeta();
     const heading = horizon.id === 'long-term'
@@ -980,6 +1071,9 @@
     $('#end-leader').removeAttribute('data-leader-value');
     $('#end-leader').removeAttribute('data-rendered-horizon');
     $('#end-leader').innerHTML = `<h2 class="leader-title" id="leader-title">${heading}</h2><p class="data-empty" role="status">${esc(emptyMessage())}</p>`;
+    $('#pdoom').removeAttribute('data-pdoom-value');
+    $('#pdoom').removeAttribute('data-rendered-horizon');
+    $('#pdoom').innerHTML = `${pdoomTitleMarkup()}<p class="data-empty" id="pdoom-description" role="status">${esc(emptyMessage())}</p>`;
   }
 
   function renderEndStates() {
@@ -992,6 +1086,7 @@
       return;
     }
     renderEndForecastToggle(entries);
+    renderPdoom(entries);
 
     // The visible glyph is just the ending's number, so the name and the
     // current share go in an aria-label, refreshed per selection below.
@@ -1412,6 +1507,8 @@
       '.horizon-picker-copy', '.horizon-picker-rule',
       '.end-hero h1', '#forecast-summary', '.leader-title', '.leader-name',
       '.leader-unit', '.leader-timeline', '.leader-description', '.leader-method',
+      '#pdoom-title', '.pdoom-name', '#pdoom-value', '#pdoom-unit',
+      '#pdoom-description', '.pdoom-method',
       '#end-forecast-title', '#forecast-note', '#end-forecast-toggle',
       '#consensus-bar', '#consensus-legend', '.doomer-key', '#horizon-chart-title',
       '#horizon-chart-legend', '#horizon-chart-svg', '.horizon-chart-caption',
@@ -1420,7 +1517,7 @@
 
     // Broad sections are fallbacks for whitespace between the smaller blocks.
     [
-      '.end-hero', '.end-leader-section', '.end-intro',
+      '.end-hero', '.end-leader-section', '.pdoom-section', '.end-intro',
       '.states-section', '.matrix-section', '.model-mix', '.horizon-chart-section', '#method', '.site-footer'
     ].forEach(selector => add($(selector), () => $(selector), 2));
 
@@ -1499,6 +1596,9 @@
     const leaderEl = $('#end-leader');
     clearTimeout(leaderEl._swap);
     leaderEl.classList.remove('is-swapping');
+    pdoomSettleCancelled = true;
+    pdoomSettleToken += 1;
+    landPdoom($('#pdoom'));
     const openExposureKey = $('.doomer-row.is-open')?.dataset.runKey;
 
     const viewportHold = holdViewport(captureViewportPosition());
@@ -1509,6 +1609,8 @@
     if (activeEndForecast !== AGGREGATE_KEY && !endStateRuns[activeEndForecast]) activeEndForecast = AGGREGATE_KEY;
     leaderSettled = false;
     settleCancelled = false;
+    pdoomSettled = false;
+    pdoomSettleCancelled = false;
     renderEndStates();
     if (openExposureKey) {
       const openExposure = $$('.doomer-row[data-run-key]').find(row => row.dataset.runKey === openExposureKey);
@@ -1687,15 +1789,30 @@
   renderEndStates();
   renderHorizonChart();
   window.MF_TEST = {
-    quantizeTo100, aggregateOf, stateAggregate, extinctionSums, esc, stopSweep,
+    quantizeTo100, aggregateOf, stateAggregate, pDoomOf, extinctionSums, esc, stopSweep,
     activeDataset, activeHorizon: () => activeHorizon, selectHorizon, horizonChartData,
     disableLeaderSettle: () => { leaderSettled = true; settleCancelled = true; },
+    disablePdoomSettle: () => {
+      pdoomSettled = true;
+      pdoomSettleCancelled = true;
+      pdoomSettleToken += 1;
+      landPdoom($('#pdoom'));
+    },
     replayLeader: () => {
       const leader = stateAggregate().slice().sort((a, b) => b.probability - a.probability)[0];
       if (!leader) return;
       leaderSettled = false;
       settleCancelled = false;
       settleLeader($('#end-leader'), leader);
+    },
+    replayPdoom: () => {
+      const panel = $('#pdoom');
+      const value = pDoomOf(Object.values(endStateRuns));
+      pdoomSettleToken += 1;
+      landPdoom(panel);
+      pdoomSettled = false;
+      pdoomSettleCancelled = false;
+      settlePdoom(panel, value);
     }
   };
 

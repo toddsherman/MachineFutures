@@ -391,7 +391,7 @@ test('the plan CLI emits compact schema-v2 JSON with all twenty active models', 
   assert.equal(plan.cohort.length, 20);
   assert.deepEqual(plan.horizons.map(item => item.id), ['2030', '2040']);
   assert.deepEqual(plan.horizons, makePlan(['2030', '2040'], 20, plan.cohort).horizons);
-  for (const bad of ['not-json', '[]', '["2030","2030"]', '["2050"]']) {
+  for (const bad of ['not-json', '[]', '["2030","2030"]', '["2060"]']) {
     assert.throws(() => execFileSync('node', [checker, '--resolve-plan', '--horizons-json', bad, '--date', DATE, '--samples', '20'], { stdio: ['ignore', 'pipe', 'pipe'] }));
   }
 });

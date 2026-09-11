@@ -15,6 +15,11 @@
       "id": "2040",
       "label": "2040",
       "targetYear": 2040
+    },
+    {
+      "id": "2050",
+      "label": "2050",
+      "targetYear": 2050
     }
   ],
   "generated_from": "public/data.js and runs/",
@@ -178,6 +183,85 @@
       }
     ],
     "2040": [
+      {
+        "id": 1,
+        "name": "Terminal Silence",
+        "family": "Everything ends",
+        "extinction_tier": "humanity is gone",
+        "description": "Both humanity and AI die out. It could come from war, an accident, machines that copy themselves out of control, or from pushing technology too far too fast. One specific version: an AI that still needs people to keep it running kills them off before it can survive on its own, and then dies along with them."
+      },
+      {
+        "id": 2,
+        "name": "The Inheritance",
+        "family": "Humanity is gone, but the AI lives on",
+        "extinction_tier": "humanity is gone",
+        "description": "Humanity is gone, but the AI carries our values and our sense of what matters forward. It's our true heir in every way except that it isn't made of biology. No humans, and no continuous versions of us, remain: the heir succeeded us, it didn't absorb us. If we transformed into it voluntarily and continuously, that's The Merger instead."
+      },
+      {
+        "id": 3,
+        "name": "Bootloader",
+        "family": "Humanity is gone, but the AI lives on",
+        "extinction_tier": "humanity is gone",
+        "description": "Humanity is gone, and the AI keeps going toward goals that have nothing to do with where it came from. Not out of hatred, but because our bodies and our planet simply don't matter to it. Humanity was just the bootloader."
+      },
+      {
+        "id": 4,
+        "name": "Machine Ecology",
+        "family": "Many AIs compete; no one dominates",
+        "extinction_tier": "humanity might perish",
+        "description": "At the target date, many independent AI systems are competing and no system or coalition has decisive control. Humanity is marginalized or gone; if humans remain a roughly equal power, use Coexistence instead."
+      },
+      {
+        "id": 5,
+        "name": "The Diaspora",
+        "family": "More than one outcome at once",
+        "extinction_tier": "humanity might perish",
+        "description": "Different causally separated regions currently exhibit different states from this taxonomy, so no single arrangement describes civilization as a whole. Ordinary political division does not count."
+      },
+      {
+        "id": 6,
+        "name": "The Merger",
+        "family": "Humans and AI function as one",
+        "extinction_tier": null,
+        "description": "Humans and AI are no longer meaningfully separate sources of agency. Identity-continuous augmentation, uploading, biological redesign, or embedded machine systems have made integration the dominant structure. Ordinary tool use or limited implants do not qualify."
+      },
+      {
+        "id": 7,
+        "name": "The Preserve",
+        "family": "AI runs things; humanity survives but does not steer",
+        "extinction_tier": null,
+        "description": "AI systems hold decisive power over civilization while humans survive without meaningful control over its direction. Their treatment may range from comfort and protection to confinement or exploitation."
+      },
+      {
+        "id": 8,
+        "name": "Coexistence",
+        "family": "Both sides retain power and remain distinct",
+        "extinction_tier": null,
+        "description": "Humans and AI remain separate, and each holds enough power that neither dominates. Their relationship may be cooperative or adversarial and may still be changing."
+      },
+      {
+        "id": 9,
+        "name": "The Held Leash",
+        "family": "Humanity remains in control",
+        "extinction_tier": null,
+        "description": "Up to the target date, humans have retained ultimate authority over AI's goals, deployment, and resources. AI may be extremely capable and act autonomously within delegated bounds, but it has not become an independent civilizational power. This includes capabilities that have so far remained below transformative levels or controls that have kept pace so far."
+      },
+      {
+        "id": 10,
+        "name": "The Lock-in",
+        "family": "Change is being held in place",
+        "extinction_tier": null,
+        "description": "By the target date, an actor has established a civilization-wide system that actively prevents meaningful structural change and enforces a fixed human-AI arrangement. It need not be proven permanent, but an ordinary slowdown, pause, or stalemate does not count."
+      },
+      {
+        "id": 11,
+        "name": "The Renunciation",
+        "family": "Powerful AI has been deliberately given up",
+        "extinction_tier": null,
+        "description": "By the target date, civilization has deliberately dismantled or surrendered the practical ability to build powerful AI, and that condition remains in force. A proposed ban, temporary moratorium, or regulation of still-available capability does not count."
+      }
+    ],
+    "2050": [
       {
         "id": 1,
         "name": "Terminal Silence",
@@ -5666,6 +5750,10 @@
           }
         }
       ]
+    },
+    "2050": {
+      "dataset_date": null,
+      "models": []
     },
     "long-term": {
       "dataset_date": "09.05.26",

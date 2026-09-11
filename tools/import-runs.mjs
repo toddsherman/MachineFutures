@@ -202,7 +202,7 @@ for (const file of files) {
       date: batch.asked_on,
       questionSet,
       promptSha256: batch.harness?.prompt_sha256 || null,
-      promptVersion: Number((batch.question_set || '').match(/end-states(?:-(?:2030|2040))?-v(\d+)/)?.[1]) || null,
+      promptVersion: Number((batch.question_set || '').match(/end-states(?:-\d{4})?-v(\d+)/)?.[1]) || null,
       knowledgeCutoff: batch.model?.self_reported_cutoff || null,
       sampleCount: sampleList.length,
       probabilities: Object.fromEntries(probs.map((p, i) => [i + 1, p])),

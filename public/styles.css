@@ -40,7 +40,7 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .text-link span { font-size: 18px; transition: transform .2s ease; }
 .text-link:hover span { transform: translateY(3px); }
 
-.states-section, .model-mix, .matrix-section { padding-block: 76px; }
+.states-section, .model-mix, .matrix-section, .horizon-chart-section { padding-block: 76px; }
 .section-heading { margin-bottom: 52px; display: flex; align-items: flex-end; justify-content: space-between; gap: 48px; }
 .section-heading h2, .leader-title, .method-hero h1 { margin: 0; font: 900 clamp(46px, 7vw, 112px)/.78 var(--display); letter-spacing: -.085em; text-transform: uppercase; }
 /* The note can no longer share a line with type this size, so cap it and let
@@ -273,6 +273,41 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .doomer-key .key-gone i { background: var(--tier-gone); }
 .doomer-key .key-risk i { background: var(--tier-risk); }
 .doomer-key .key-hint { color: var(--muted); font-style: italic; text-transform: none; letter-spacing: .01em; }
+
+/* One chart carries the same scenario identity used throughout the page:
+   colour belongs to the scenario, while the selected horizon is a neutral
+   dashed guide controlled by the primary picker. */
+.horizon-chart-section { border-top: 1px solid var(--line); }
+.horizon-chart { min-width: 0; }
+.horizon-chart-legend { display: flex; flex-wrap: wrap; gap: 3px 18px; margin-bottom: 22px; }
+.horizon-chart-legend-button { min-height: 30px; padding: 2px 0; display: inline-flex; align-items: center; gap: 7px; border: 0; background: transparent; color: var(--ink); font: 700 11px var(--mono); cursor: pointer; }
+.horizon-chart-legend-button[aria-pressed="false"] { opacity: .34; }
+.horizon-chart-legend-button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.horizon-chart-legend-line { width: 18px; border-top: 1.2px solid var(--state); }
+.horizon-chart-plot { position: relative; min-width: 0; }
+#horizon-chart-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.horizon-chart-frame { fill: none; stroke: var(--line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.horizon-chart-grid { stroke: var(--line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.horizon-chart-axis { stroke: var(--line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.horizon-chart-label, .horizon-chart-tick, .horizon-chart-axis-title { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+.horizon-chart-tick.is-selected { fill: var(--ink); font-weight: 900; }
+.horizon-chart-axis-title { fill: var(--ink); }
+.horizon-chart-series { fill: none; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.horizon-chart-point { stroke: none; vector-effect: non-scaling-stroke; }
+.horizon-chart-guide { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 1 5; stroke-linecap: round; opacity: .56; vector-effect: non-scaling-stroke; pointer-events: none; }
+.horizon-chart-hover-guide { stroke: var(--muted); stroke-width: 1; opacity: .45; vector-effect: non-scaling-stroke; pointer-events: none; }
+.horizon-chart-hover-point { stroke: var(--paper); stroke-width: 1; vector-effect: non-scaling-stroke; pointer-events: none; }
+.horizon-chart-hit { fill: transparent; cursor: crosshair; }
+.horizon-chart-tooltip { position: absolute; z-index: 6; width: min(270px, calc(100% - 16px)); padding: 9px 11px; border: 1px solid var(--ink); background: var(--paper); box-shadow: 3px 3px 0 rgba(17,18,15,.14); color: var(--ink); pointer-events: none; font: 11px/1.45 var(--mono); }
+.horizon-chart-tooltip strong { display: block; margin-bottom: 6px; font-size: 11px; }
+.horizon-chart-tooltip-row { display: grid; grid-template-columns: 8px minmax(0, 1fr) auto; align-items: center; gap: 7px; margin-top: 3px; }
+.horizon-chart-tooltip-row i { width: 6px; height: 6px; background: var(--state); }
+.horizon-chart-tooltip-row b { font-weight: 800; font-variant-numeric: tabular-nums; }
+.horizon-chart-caption { max-width: 74ch; margin: 16px 0 0; color: var(--muted); font: 11px/1.55 var(--mono); }
+
+@media (pointer: coarse) {
+  .horizon-chart-legend-button { min-height: 44px; }
+}
 /* The affordance differs by device, so name the one the reader actually has. */
 .doomer-key .key-hint .on-hover { display: none; }
 @media (hover: hover) and (pointer: fine) {
@@ -398,7 +433,7 @@ body.dialog-open { overflow: hidden; }
   .state-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .state-card-head { row-gap: 12px; }
   .state-card-head h3 { font-size: 32px; }
-  .states-section, .model-mix, .matrix-section { padding-block: 52px; }
+  .states-section, .model-mix, .matrix-section, .horizon-chart-section { padding-block: 52px; }
   .doomer-row { grid-template-columns: 150px minmax(0, 1fr) 70px; gap: 14px; }
 }
 

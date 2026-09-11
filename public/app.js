@@ -186,12 +186,12 @@
   // Each lab gets one equal vote: first average model vectors within a lab,
   // then average those lab vectors. Per-model figures remain the medians of
   // their repeated samples; this is only the cross-model board aggregate.
-  function aggregateOf(runList) {
+  function aggregateOf(runList, orderedStates = endingOrder()) {
     if (!runList.length) return [];
     const labVectors = runsByLab(runList).map(labRuns =>
-      endingOrder().map(state => mean(labRuns.map(run => stateValue(run, state))))
+      orderedStates.map(state => mean(labRuns.map(run => stateValue(run, state))))
     );
-    const raw = endingOrder().map((state, index) => mean(labVectors.map(vector => vector[index])));
+    const raw = orderedStates.map((state, index) => mean(labVectors.map(vector => vector[index])));
     return quantizeTo100(raw);
   }
 
@@ -199,6 +199,416 @@
     const aggregate = aggregateOf(Object.values(endStateRuns));
     if (!aggregate.length) return [];
     return endingOrder().map((state, i) => ({ ...state, probability: aggregate[i] }));
+  }
+
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const horizonChartActive = new Set(baseStates.map(state => state.id));
+  let horizonChartLayout = null;
+  let horizonChartDataCache = null;
+  let horizonChartObserver = null;
+  let horizonChartPinned = false;
+
+  function svgNode(tag, attributes = {}, text = '') {
+    const node = document.createElementNS(SVG_NS, tag);
+    Object.entries(attributes).forEach(([name, value]) => {
+      if (value !== null && value !== undefined) node.setAttribute(name, String(value));
+    });
+    if (text) node.textContent = text;
+    return node;
+  }
+
+  function endpointSlope(hThis, hNext, deltaThis, deltaNext) {
+    let slope = ((2 * hThis + hNext) * deltaThis - hThis * deltaNext) / (hThis + hNext);
+    if (Math.sign(slope) !== Math.sign(deltaThis)) slope = 0;
+    else if (Math.sign(deltaThis) !== Math.sign(deltaNext) && Math.abs(slope) > Math.abs(3 * deltaThis)) {
+      slope = 3 * deltaThis;
+    }
+    return slope;
+  }
+
+  function shapePreservingModel(points, finalSlope) {
+    const xs = points.map(point => point.year);
+    const ys = points.map(point => point.value);
+    const widths = xs.slice(0, -1).map((value, index) => xs[index + 1] - value);
+    const deltas = widths.map((width, index) => (ys[index + 1] - ys[index]) / width);
+    const slopes = new Array(points.length).fill(0);
+    slopes[0] = endpointSlope(widths[0], widths[1], deltas[0], deltas[1]);
+    for (let index = 1; index < points.length - 1; index += 1) {
+      if (deltas[index - 1] === 0 || deltas[index] === 0 || Math.sign(deltas[index - 1]) !== Math.sign(deltas[index])) {
+        slopes[index] = 0;
+        continue;
+      }
+      const weightOne = 2 * widths[index] + widths[index - 1];
+      const weightTwo = widths[index] + 2 * widths[index - 1];
+      slopes[index] = (weightOne + weightTwo) /
+        (weightOne / deltas[index - 1] + weightTwo / deltas[index]);
+    }
+    slopes[slopes.length - 1] = finalSlope;
+
+    return year => {
+      let index = 0;
+      while (index < xs.length - 2 && year > xs[index + 1]) index += 1;
+      const width = widths[index];
+      const t = (year - xs[index]) / width;
+      const t2 = t * t;
+      const t3 = t2 * t;
+      return (2 * t3 - 3 * t2 + 1) * ys[index] +
+        (t3 - 2 * t2 + t) * width * slopes[index] +
+        (-2 * t3 + 3 * t2) * ys[index + 1] +
+        (t3 - t2) * width * slopes[index + 1];
+    };
+  }
+
+  function c4TailModel(points) {
+    const previous = points.at(-3);
+    const start = points.at(-2);
+    const end = points.at(-1);
+    const duration = end.year - start.year;
+    const incomingSlope = (start.value - previous.value) / (start.year - previous.year);
+    const change = end.value - start.value;
+    if (Math.abs(change) < Number.EPSILON) return () => start.value;
+    const reversesAtStart = incomingSlope && Math.sign(incomingSlope) !== Math.sign(change);
+    const slopeRatio = (reversesAtStart ? 0 : incomingSlope) * duration / change;
+
+    return year => {
+      const t = Math.max(0, Math.min(1, (year - start.year) / duration));
+      let progress;
+      if (slopeRatio > 1) {
+        progress = 1 - Math.pow(1 - t, slopeRatio);
+      } else {
+        const power = slopeRatio < 0 ? 1 - slopeRatio : 2;
+        const blend = (slopeRatio - 1) / (power - 1);
+        progress = blend * (1 - Math.pow(1 - t, power)) + (1 - blend) * t;
+      }
+      return start.value + change * progress;
+    };
+  }
+
+  function sampleHorizonCurve(points) {
+    if (points.length < 3) return points;
+    const earlyPoints = points.slice(0, -1);
+    const previous = earlyPoints.at(-2);
+    const lastEarly = earlyPoints.at(-1);
+    const incomingSlope = (lastEarly.value - previous.value) / (lastEarly.year - previous.year);
+    const tailChange = points.at(-1).value - lastEarly.value;
+    // A direction reversal is a turning point. Flatten the shared tangent so
+    // the connector does not invent a probability beyond either observation.
+    const reversesAtTail = incomingSlope && tailChange && Math.sign(incomingSlope) !== Math.sign(tailChange);
+    const finalEarlySlope = reversesAtTail ? 0 : incomingSlope;
+    const earlyValue = shapePreservingModel(earlyPoints, finalEarlySlope);
+    const tailValue = c4TailModel(points);
+    const firstYear = points[0].year;
+    const tailYear = points.at(-2).year;
+    const lastYear = points.at(-1).year;
+    const early = Array.from({ length: 91 }, (_, index) => {
+      const year = firstYear + (tailYear - firstYear) * index / 90;
+      return { year, value: earlyValue(year) };
+    });
+    const tail = Array.from({ length: 481 }, (_, index) => {
+      const normalized = index / 480;
+      const year = tailYear + (lastYear - tailYear) * normalized * normalized;
+      return { year, value: tailValue(year) };
+    });
+    return early.concat(tail.slice(1));
+  }
+
+  function horizonChartData() {
+    const orderedStates = [...baseStates].sort((left, right) => left.id - right.id);
+    const horizons = horizonOptions.map(option => ({
+      id: option.id,
+      label: option.label,
+      year: Number(option.targetYear)
+    })).filter(option => Number.isFinite(option.year));
+    const vectors = horizons.map(option => aggregateOf(
+      Object.values(datasets[option.id]?.endStateRuns || {}),
+      orderedStates
+    ));
+    const series = orderedStates.map((state, stateIndex) => ({
+      ...state,
+      points: horizons.map((horizon, horizonIndex) => ({
+        ...horizon,
+        value: vectors[horizonIndex]?.[stateIndex]
+      }))
+    })).filter(item => item.points.every(point => Number.isFinite(point.value)));
+    series.forEach(item => { item.curve = sampleHorizonCurve(item.points); });
+    return { horizons, series };
+  }
+
+  function horizonChartTickVisibility(selectedId) {
+    if (!horizonChartLayout?.compact) return new Set(horizonChartDataCache.horizons.map(item => item.id));
+    const first = horizonChartDataCache.horizons[0]?.id;
+    const last = horizonChartDataCache.horizons.at(-1)?.id;
+    const lastDated = horizonChartDataCache.horizons.at(-2)?.id;
+    const middleSelection = selectedId !== first && selectedId !== lastDated && selectedId !== last;
+    return new Set([first, middleSelection ? selectedId : lastDated, last].filter(Boolean));
+  }
+
+  function updateHorizonChartSelection() {
+    if (!horizonChartLayout || !horizonChartDataCache) return;
+    const selected = horizonChartDataCache.horizons.find(item => item.id === activeHorizon)
+      || horizonChartDataCache.horizons.at(-1);
+    if (!selected) return;
+    const guide = $('#horizon-chart-svg .horizon-chart-guide');
+    if (guide) {
+      const x = horizonChartLayout.x(selected.year);
+      guide.setAttribute('x1', x);
+      guide.setAttribute('x2', x);
+      guide.dataset.horizon = selected.id;
+    }
+    const visibleTicks = horizonChartTickVisibility(selected.id);
+    $$('#horizon-chart-svg .horizon-chart-tick[data-horizon]').forEach(tick => {
+      const on = tick.dataset.horizon === selected.id;
+      tick.classList.toggle('is-selected', on);
+      tick.style.display = visibleTicks.has(tick.dataset.horizon) ? '' : 'none';
+    });
+    const description = $('#horizon-chart-svg-desc');
+    if (description) {
+      description.textContent = `Eleven solid scenario-coloured curves connect lab-balanced mean probabilities for 2030, 2040, 2050, 2060, and 3000 on a log elapsed-time axis. ${selected.year} is selected on the page and marked by a vertical dashed guide. Curves are visual connectors, not intermediate forecasts.`;
+    }
+  }
+
+  function updateHorizonChartVisibility() {
+    if (!horizonChartDataCache) return;
+    $$('#horizon-chart-svg [data-state]').forEach(node => {
+      node.style.display = horizonChartActive.has(Number(node.dataset.state)) ? '' : 'none';
+    });
+    $$('#horizon-chart-legend .horizon-chart-legend-button[data-state]').forEach(button => {
+      const on = horizonChartActive.has(Number(button.dataset.state));
+      button.setAttribute('aria-pressed', String(on));
+      button.setAttribute('aria-label', `${on ? 'Hide' : 'Show'} ${button.dataset.stateName}`);
+    });
+  }
+
+  function hideHorizonChartTooltip() {
+    const tooltip = $('#horizon-chart-tooltip');
+    if (tooltip) tooltip.hidden = true;
+    const hoverGuide = $('#horizon-chart-svg .horizon-chart-hover-guide');
+    if (hoverGuide) hoverGuide.setAttribute('visibility', 'hidden');
+    $$('#horizon-chart-svg .horizon-chart-hover-point').forEach(node => node.remove());
+  }
+
+  function showHorizonChartTooltip(event) {
+    if (!horizonChartLayout || !horizonChartDataCache || !horizonChartActive.size) return;
+    const svg = $('#horizon-chart-svg');
+    const tooltip = $('#horizon-chart-tooltip');
+    const bounds = svg.getBoundingClientRect();
+    const svgX = (event.clientX - bounds.left) * horizonChartLayout.width / bounds.width;
+    const nearest = horizonChartDataCache.horizons.reduce((best, horizon) =>
+      Math.abs(horizonChartLayout.x(horizon.year) - svgX) < Math.abs(horizonChartLayout.x(best.year) - svgX)
+        ? horizon : best
+    );
+    const horizonIndex = horizonChartDataCache.horizons.indexOf(nearest);
+    const x = horizonChartLayout.x(nearest.year);
+    const hoverGuide = svg.querySelector('.horizon-chart-hover-guide');
+    hoverGuide.setAttribute('x1', x);
+    hoverGuide.setAttribute('x2', x);
+    hoverGuide.setAttribute('visibility', 'visible');
+    $$('#horizon-chart-svg .horizon-chart-hover-point').forEach(node => node.remove());
+    const markerLayer = svg.querySelector('.horizon-chart-hover-layer');
+    const rows = horizonChartDataCache.series
+      .filter(series => horizonChartActive.has(series.id))
+      .map(series => ({ series, value: series.points[horizonIndex].value }))
+      .sort((left, right) => right.value - left.value);
+    rows.forEach(({ series, value }) => markerLayer.appendChild(svgNode('circle', {
+      class: 'horizon-chart-hover-point',
+      cx: x,
+      cy: horizonChartLayout.y(value),
+      r: 3,
+      fill: series.color,
+      'aria-hidden': 'true'
+    })));
+    tooltip.innerHTML = `<strong>${nearest.year}${nearest.id === 'long-term' ? ' · Long term' : ''}</strong>${rows.map(({ series, value }) => `
+      <span class="horizon-chart-tooltip-row"><i style="--state:${series.color}"></i><span>${series.id}. ${esc(series.name)}</span><b>${aggregatePercent(value)}</b></span>`).join('')}`;
+    tooltip.hidden = false;
+    const plotBounds = tooltip.parentElement.getBoundingClientRect();
+    const tooltipBounds = tooltip.getBoundingClientRect();
+    let left = event.clientX - plotBounds.left + 14;
+    let top = event.clientY - plotBounds.top + 14;
+    if (left + tooltipBounds.width > plotBounds.width - 4) left -= tooltipBounds.width + 28;
+    left = Math.max(4, Math.min(left, plotBounds.width - tooltipBounds.width - 4));
+    top = Math.max(4, Math.min(top, plotBounds.height - tooltipBounds.height - 4));
+    tooltip.style.left = `${Math.round(left)}px`;
+    tooltip.style.top = `${Math.round(top)}px`;
+  }
+
+  function renderHorizonChartLegend(series) {
+    const legend = $('#horizon-chart-legend');
+    legend.innerHTML = '';
+    series.forEach(state => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'horizon-chart-legend-button';
+      button.dataset.state = String(state.id);
+      button.dataset.stateName = state.name;
+      button.style.setProperty('--state', state.color);
+      button.setAttribute('aria-pressed', String(horizonChartActive.has(state.id)));
+      button.setAttribute('aria-label', `Hide ${state.name}`);
+      button.innerHTML = `<span class="horizon-chart-legend-line" aria-hidden="true"></span><span>${state.id}. ${esc(state.name)}</span>`;
+      button.addEventListener('click', () => {
+        if (horizonChartActive.has(state.id)) horizonChartActive.delete(state.id);
+        else horizonChartActive.add(state.id);
+        horizonChartPinned = false;
+        hideHorizonChartTooltip();
+        updateHorizonChartVisibility();
+      });
+      legend.appendChild(button);
+    });
+  }
+
+  function renderHorizonChartTable(data) {
+    const table = $('#horizon-chart-table');
+    table.innerHTML = `<table><caption>Lab-balanced mean scenario probabilities by forecast horizon.</caption><thead><tr><th>Scenario</th>${data.horizons.map(horizon => `<th>${horizon.year}</th>`).join('')}</tr></thead><tbody>${data.series.map(series => `<tr><th>${series.id}. ${esc(series.name)}</th>${series.points.map(point => `<td>${aggregatePercent(point.value)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  }
+
+  function drawHorizonChart() {
+    const host = $('#horizon-chart');
+    const svg = $('#horizon-chart-svg');
+    if (!host || !svg) return;
+    const data = horizonChartData();
+    horizonChartDataCache = data;
+    const section = $('.horizon-chart-section');
+    if (data.horizons.length < 3 || data.series.length !== baseStates.length) {
+      section.hidden = true;
+      return;
+    }
+    section.hidden = false;
+    const measured = Math.max(320, Math.floor(svg.parentElement.getBoundingClientRect().width || 736));
+    const compact = measured < 520;
+    const height = compact ? 460 : 520;
+    const margin = { top: 18, right: compact ? 13 : 18, bottom: compact ? 70 : 62, left: compact ? 54 : 66 };
+    const plotLeft = margin.left + 5;
+    const plotRight = measured - margin.right - 5;
+    const plotTop = margin.top + 5;
+    const plotBottom = height - margin.bottom - 5;
+    const years = data.horizons.map(horizon => horizon.year);
+    const firstYear = Math.min(...years);
+    const logElapsed = year => Math.log1p((year - firstYear) / 10);
+    const logMin = logElapsed(firstYear);
+    const logMax = logElapsed(Math.max(...years));
+    const x = year => plotLeft + (logElapsed(year) - logMin) / (logMax - logMin) * (plotRight - plotLeft);
+    const allValues = data.series.flatMap(series => series.curve.map(point => point.value));
+    const maximum = Math.max(...allValues);
+    const yMax = Math.ceil((maximum * 1.04) / 5) * 5;
+    const y = value => plotBottom - value / yMax * (plotBottom - plotTop);
+    horizonChartLayout = { width: measured, height, compact, x, y, plotLeft, plotRight, plotTop, plotBottom };
+
+    svg.replaceChildren();
+    svg.setAttribute('viewBox', `0 0 ${measured} ${height}`);
+    svg.appendChild(svgNode('title', { id: 'horizon-chart-svg-title' }, 'Mean scenario probabilities by horizon'));
+    svg.appendChild(svgNode('desc', { id: 'horizon-chart-svg-desc' }));
+    svg.appendChild(svgNode('rect', {
+      class: 'horizon-chart-frame',
+      x: margin.left,
+      y: margin.top,
+      width: measured - margin.left - margin.right,
+      height: height - margin.top - margin.bottom
+    }));
+
+    const yTicks = Array.from({ length: Math.floor(yMax / 10) + 1 }, (_, index) => index * 10);
+    yTicks.forEach(value => {
+      const at = y(value);
+      svg.appendChild(svgNode('line', { class: 'horizon-chart-grid', x1: margin.left, x2: measured - margin.right, y1: at, y2: at }));
+      svg.appendChild(svgNode('text', { class: 'horizon-chart-label', x: margin.left - 9, y: at + 4, 'text-anchor': 'end' }, `${value}%`));
+    });
+    data.horizons.forEach(horizon => {
+      const at = x(horizon.year);
+      svg.appendChild(svgNode('line', { class: 'horizon-chart-axis', x1: at, x2: at, y1: plotBottom, y2: plotBottom + 5 }));
+      svg.appendChild(svgNode('text', {
+        class: 'horizon-chart-tick',
+        'data-horizon': horizon.id,
+        x: at,
+        y: plotBottom + 20,
+        'text-anchor': horizon === data.horizons[0] ? 'start' : horizon === data.horizons.at(-1) ? 'end' : 'middle'
+      }, horizon.year));
+    });
+    svg.appendChild(svgNode('text', {
+      class: 'horizon-chart-axis-title',
+      x: (margin.left + measured - margin.right) / 2,
+      y: height - 9,
+      'text-anchor': 'middle'
+    }, compact ? 'Forecast year · log scale' : 'Forecast year · log elapsed time after 2030 · 3000 is long term'));
+    svg.appendChild(svgNode('text', {
+      class: 'horizon-chart-axis-title',
+      x: -(margin.top + (height - margin.top - margin.bottom) / 2),
+      y: 14,
+      transform: 'rotate(-90)',
+      'text-anchor': 'middle'
+    }, 'Lab-balanced mean probability (%)'));
+
+    svg.appendChild(svgNode('line', {
+      class: 'horizon-chart-guide',
+      'data-horizon': activeHorizon,
+      x1: 0,
+      x2: 0,
+      y1: plotTop,
+      y2: plotBottom,
+      'stroke-dasharray': '1 5',
+      'aria-hidden': 'true'
+    }));
+    data.series.forEach(series => {
+      const path = series.curve.map((point, index) => `${index ? 'L' : 'M'}${x(point.year).toFixed(2)},${y(point.value).toFixed(2)}`).join(' ');
+      svg.appendChild(svgNode('path', {
+        class: 'horizon-chart-series',
+        'data-state': series.id,
+        d: path,
+        stroke: series.color,
+        'aria-hidden': 'true'
+      }));
+      series.points.forEach(point => svg.appendChild(svgNode('circle', {
+        class: 'horizon-chart-point',
+        'data-state': series.id,
+        'data-horizon': point.id,
+        cx: x(point.year),
+        cy: y(point.value),
+        r: 1.8,
+        fill: series.color,
+        'aria-hidden': 'true'
+      })));
+    });
+    svg.appendChild(svgNode('line', {
+      class: 'horizon-chart-hover-guide',
+      x1: 0,
+      x2: 0,
+      y1: plotTop,
+      y2: plotBottom,
+      visibility: 'hidden',
+      'aria-hidden': 'true'
+    }));
+    svg.appendChild(svgNode('g', { class: 'horizon-chart-hover-layer', 'aria-hidden': 'true' }));
+    const overlay = svgNode('rect', {
+      class: 'horizon-chart-hit',
+      x: plotLeft,
+      y: plotTop,
+      width: plotRight - plotLeft,
+      height: plotBottom - plotTop,
+      'aria-hidden': 'true'
+    });
+    overlay.addEventListener('pointermove', event => {
+      if (!horizonChartPinned || event.pointerType === 'mouse') showHorizonChartTooltip(event);
+    });
+    overlay.addEventListener('pointerleave', () => {
+      if (!horizonChartPinned) hideHorizonChartTooltip();
+    });
+    overlay.addEventListener('click', event => {
+      horizonChartPinned = !horizonChartPinned;
+      showHorizonChartTooltip(event);
+    });
+    svg.appendChild(overlay);
+
+    renderHorizonChartLegend(data.series);
+    renderHorizonChartTable(data);
+    updateHorizonChartSelection();
+    updateHorizonChartVisibility();
+  }
+
+  function renderHorizonChart() {
+    drawHorizonChart();
+    if (horizonChartObserver || !('ResizeObserver' in window)) return;
+    horizonChartObserver = new ResizeObserver(records => {
+      const width = Math.floor(records[0].contentRect.width);
+      if (!horizonChartLayout || Math.abs(width - horizonChartLayout.width) >= 2) drawHorizonChart();
+    });
+    horizonChartObserver.observe($('#horizon-chart-svg').parentElement);
   }
 
   // The panel settles on its answer rather than simply having it: the name
@@ -428,6 +838,7 @@
     if (matrixNote) matrixNote.textContent = `Every model's number for every ${ending}, grouped by lab. Read one column for a single model's theory of the future, or one row to see where the labs disagree.`;
     const exposureNote = $('#exposure-note');
     if (exposureNote) exposureNote.textContent = `Each model's total across the ${endings} where humanity is gone (1–3) or might perish (4–5).`;
+    updateHorizonChartSelection();
   }
 
   function renderEndForecastToggle(entries) {
@@ -999,13 +1410,15 @@
       '.end-hero h1', '#forecast-summary', '.leader-title', '.leader-name',
       '.leader-unit', '.leader-timeline', '.leader-description', '.leader-method',
       '#end-forecast-title', '#forecast-note', '#end-forecast-toggle',
-      '#consensus-bar', '#consensus-legend', '.doomer-key', '.method-hero', '.footer-mark', '.footer-note'
+      '#consensus-bar', '#consensus-legend', '.doomer-key', '#horizon-chart-title',
+      '#horizon-chart-legend', '#horizon-chart-svg', '.horizon-chart-caption',
+      '.method-hero', '.footer-mark', '.footer-note'
     ].forEach(selector => add($(selector), () => $(selector)));
 
     // Broad sections are fallbacks for whitespace between the smaller blocks.
     [
       '.end-hero', '.end-leader-section', '.end-intro',
-      '.states-section', '.matrix-section', '.model-mix', '#method', '.site-footer'
+      '.states-section', '.matrix-section', '.model-mix', '.horizon-chart-section', '#method', '.site-footer'
     ].forEach(selector => add($(selector), () => $(selector), 2));
 
     anchors.sort((a, b) => {
@@ -1076,6 +1489,8 @@
     if (!isSelectableHorizon(key) || key === activeHorizon) return;
     stopSweep();
     hideMarkTip();
+    horizonChartPinned = false;
+    hideHorizonChartTooltip();
     const dialog = $('#detail-dialog');
     if (dialog.open) dialog.close();
     const leaderEl = $('#end-leader');
@@ -1185,7 +1600,11 @@
 
   document.addEventListener('keydown', event => {
     stopSweep();
-    if (event.key === 'Escape') hideMarkTip();
+    if (event.key === 'Escape') {
+      hideMarkTip();
+      horizonChartPinned = false;
+      hideHorizonChartTooltip();
+    }
     if (event.key !== 'Enter' && event.key !== ' ') return;
     const exposureRow = event.target.closest?.('.doomer-row');
     if (exposureRow) {
@@ -1263,9 +1682,10 @@
 
   applyUrlState();
   renderEndStates();
+  renderHorizonChart();
   window.MF_TEST = {
     quantizeTo100, aggregateOf, stateAggregate, extinctionSums, esc, stopSweep,
-    activeDataset, activeHorizon: () => activeHorizon, selectHorizon,
+    activeDataset, activeHorizon: () => activeHorizon, selectHorizon, horizonChartData,
     disableLeaderSettle: () => { leaderSettled = true; settleCancelled = true; },
     replayLeader: () => {
       const leader = stateAggregate().slice().sort((a, b) => b.probability - a.probability)[0];

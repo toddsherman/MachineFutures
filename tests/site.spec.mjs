@@ -28,6 +28,7 @@ const settle = async (page, url = '/') => {
     document.documentElement.style.scrollBehavior = 'auto';
     window.MF_TEST?.stopSweep();
     window.MF_TEST?.disableLeaderSettle();
+    window.MF_TEST?.disablePdoomSettle();
   });
 };
 
@@ -1541,5 +1542,172 @@ test.describe('mean scenario probabilities by horizon', () => {
     expect(accessibility.values, 'the table needs all 55 plotted observations').toBe(55);
     expect(accessibility.tableHiddenVisually, 'the table should be visually hidden, not painted under the chart').toBe(true);
     expect(accessibility.tableHiddenFromAT, 'the data table must remain available to assistive technology').toBe(false);
+  });
+});
+
+test.describe('lab-balanced pDoom', () => {
+  const horizonValues = [
+    ['2030', '2030', '4.0%'],
+    ['2040', '2040', '9.1%'],
+    ['2050', '2050', '12.1%'],
+    ['2060', '2060', '14.5%'],
+    ['Long term', 'long-term', '25.6%']
+  ];
+
+  test('sits between the leader and forecast and follows every horizon', async ({ page }) => {
+    await settle(page);
+    const placement = await page.locator('#pdoom').evaluate(panel => {
+      const section = panel.closest('.pdoom-section');
+      return {
+        afterLeader: section?.previousElementSibling?.matches('.end-leader-section'),
+        beforeForecast: section?.nextElementSibling?.matches('.end-intro'),
+        ownsTitle: panel.contains(document.querySelector('#pdoom-title')),
+        ownsValue: panel.contains(document.querySelector('#pdoom-value')),
+        ownsUnit: panel.contains(document.querySelector('#pdoom-unit')),
+        title: document.querySelector('#pdoom-title')?.textContent.trim(),
+        unit: document.querySelector('#pdoom-unit')?.textContent.trim(),
+        titleIsSolid: getComputedStyle(document.querySelector('#pdoom-title span')).color === 'rgb(17, 18, 15)',
+        titleHasOutline: Boolean(document.querySelector('#pdoom-title em')),
+        titleHasSkull: Boolean(document.querySelector('#pdoom-title > .state-mark.is-gone.is-glyph[aria-hidden="true"]')),
+        skullScale: parseFloat(getComputedStyle(document.querySelector('#pdoom-title > .state-mark')).fontSize) /
+          parseFloat(getComputedStyle(document.querySelector('#pdoom-title')).fontSize),
+        labelHasSkull: Boolean(document.querySelector('.pdoom-name .state-mark')),
+        labelColor: getComputedStyle(document.querySelector('.pdoom-name')).color,
+        labelStroke: getComputedStyle(document.querySelector('.pdoom-name')).webkitTextStrokeWidth
+      };
+    });
+    expect(placement.afterLeader, 'pDoom does not immediately follow the leading scenario').toBe(true);
+    expect(placement.beforeForecast, 'the model forecast begins before pDoom finishes').toBe(true);
+    expect(placement.ownsTitle && placement.ownsValue && placement.ownsUnit, 'the pDoom panel is missing one of its named parts').toBe(true);
+    expect(placement.title).toContain('pDoom');
+    expect(placement.unit).toBeTruthy();
+    expect(placement.titleIsSolid, 'pDoom should be solid black').toBe(true);
+    expect(placement.titleHasOutline, 'pDoom should not retain outlined letters').toBe(false);
+    expect(placement.titleHasSkull, 'the larger skull should sit beside pDoom').toBe(true);
+    expect(placement.skullScale, 'the skull should read as a title mark rather than punctuation').toBeGreaterThanOrEqual(.85);
+    expect(placement.labelHasSkull, 'the skull should no longer sit beside Humanity is gone').toBe(false);
+    expect(placement.labelColor, 'Humanity is gone should have a transparent fill').toBe('rgba(0, 0, 0, 0)');
+    expect(parseFloat(placement.labelStroke), 'Humanity is gone should retain a visible outline').toBeGreaterThanOrEqual(1);
+    await expect(page.locator('#pdoom-value')).toHaveText('25.6%');
+
+    const toggle = page.getByRole('group', { name: 'Forecast horizon' });
+    for (const [label, horizon, value] of horizonValues) {
+      await toggle.getByRole('button', { name: label, exact: true }).click();
+      await expect(page.locator(`.horizon-button[data-horizon="${horizon}"]`)).toHaveAttribute('aria-pressed', 'true');
+      await expect(page.locator('#pdoom-value'), `pDoom did not update for ${label}`).toHaveText(value);
+    }
+  });
+
+  test('stays an aggregate when the model forecast selector changes', async ({ page }) => {
+    await settle(page);
+    const before = await page.locator('#pdoom').innerText();
+    const buttons = page.locator('.end-toggle-button').filter({ hasNotText: 'Lab-balanced mean' });
+    expect(await buttons.count()).toBeGreaterThan(1);
+    for (const index of [0, 1]) {
+      await buttons.nth(index).click();
+      await page.waitForTimeout(700);
+      await expect(page.locator('#pdoom-value')).toHaveText('25.6%');
+      expect(await page.locator('#pdoom').innerText(), 'pDoom followed the per-model selector').toBe(before);
+    }
+  });
+
+  test('keeps the pDoom reading position fixed while horizons change', async ({ page, browserName }) => {
+    await settle(page);
+    const before = await parkViewportAnchor(page, '#pdoom-value', 'center');
+    await page.getByRole('group', { name: 'Forecast horizon' })
+      .getByRole('button', { name: '2030', exact: true }).click();
+    await nextPaint(page);
+    const after = await page.locator('#pdoom-value').evaluate(value => value.getBoundingClientRect().top);
+    expect(Math.abs(after - before), 'the pDoom figure jumped when its horizon changed')
+      .toBeLessThanOrEqual(viewportToleranceFor(browserName));
+  });
+
+  test('balances labs equally, excludes states 4–5, and rounds only the final total', async ({ page }) => {
+    await settle(page);
+    const arithmetic = await page.evaluate(() => {
+      const vector = (...values) => Object.fromEntries(
+        Array.from({ length: 11 }, (_, index) => [index + 1, values[index] || 0])
+      );
+      const unequalLabs = [
+        { provider: 'Lab A', probabilities: vector(0, 0, 0, 100) },
+        { provider: ' Lab A ', probabilities: vector(100) },
+        { provider: 'Lab B', probabilities: vector(20, 0, 0, 0, 80) }
+      ];
+      const roundOnce = [
+        { provider: 'Lab A', probabilities: vector(1, 0, 0, 2, 0, 0, 97) },
+        { provider: 'Lab B', probabilities: vector(0, 1, 0, 0, 2, 0, 97) },
+        { provider: 'Lab C', probabilities: vector(0, 0, 1, 0, 0, 2, 97) }
+      ];
+      return {
+        balanced: window.MF_TEST.pDoomOf(unequalLabs),
+        equalModel: unequalLabs.reduce((sum, run) => sum + run.probabilities[1] + run.probabilities[2] + run.probabilities[3], 0) / unequalLabs.length,
+        rawTotal: window.MF_TEST.pDoomOf(roundOnce),
+        prematurelyQuantized: window.MF_TEST.aggregateOf(roundOnce).slice(0, 3).reduce((sum, value) => sum + value, 0)
+      };
+    });
+
+    // Lab A's two models average to 50 and Lab B contributes 20, so equal
+    // labs produce 35. States 4–5 contain the other 100/80 points and must not
+    // enter pDoom. Giving every model equal weight would incorrectly give 40.
+    expect(arithmetic.balanced).toBeCloseTo(35, 9);
+    expect(arithmetic.equalModel).toBeCloseTo(40, 9);
+    // Each of S1–S3 has a raw mean of one third. Summing those raw means gives
+    // 1.0; quantizing the complete 11-state vector first gives 0.9 because its
+    // largest remainders occur outside pDoom.
+    expect(arithmetic.rawTotal).toBeCloseTo(1, 9);
+    expect(arithmetic.prematurelyQuantized).toBeCloseTo(0.9, 9);
+  });
+
+  test('settles through changing blurred figures and lands on the exact result', async ({ page }) => {
+    await settle(page);
+    const result = await page.evaluate(() => new Promise(resolve => {
+      const figure = document.querySelector('#pdoom-value');
+      const expected = `${window.MF_TEST.pDoomOf(Object.values(window.MF_TEST.activeDataset().endStateRuns)).toFixed(1)}%`;
+      const figures = new Set();
+      const filters = new Set();
+      document.querySelector('.pdoom-section').scrollIntoView({ block: 'center' });
+      const started = performance.now();
+      window.MF_TEST.replayPdoom();
+      const poll = () => {
+        figures.add(figure.textContent);
+        filters.add(getComputedStyle(figure).filter);
+        if (performance.now() - started < 1700) requestAnimationFrame(poll);
+        else resolve({
+          expected,
+          figures: figures.size,
+          blurred: [...filters].some(filter => filter !== 'none'),
+          final: figure.textContent,
+          filterCleared: getComputedStyle(figure).filter === 'none'
+        });
+      };
+      requestAnimationFrame(poll);
+    }));
+
+    expect(result.figures, 'the pDoom figure never changed during its settle').toBeGreaterThan(3);
+    expect(result.blurred, 'the pDoom settle never applied blur').toBe(true);
+    expect(result.final).toBe(result.expected);
+    expect(result.filterCleared, 'pDoom retained blur after landing').toBe(true);
+  });
+
+  test('reduced motion shows the exact pDoom immediately', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await settle(page);
+    const result = await page.evaluate(() => new Promise(resolve => {
+      const figure = document.querySelector('#pdoom-value');
+      const expected = `${window.MF_TEST.pDoomOf(Object.values(window.MF_TEST.activeDataset().endStateRuns)).toFixed(1)}%`;
+      const seen = new Set([figure.textContent]);
+      window.MF_TEST.replayPdoom();
+      let frames = 0;
+      const poll = () => {
+        seen.add(figure.textContent);
+        if (++frames < 40) requestAnimationFrame(poll);
+        else resolve({ expected, values: seen.size, final: figure.textContent, filter: getComputedStyle(figure).filter });
+      };
+      requestAnimationFrame(poll);
+    }));
+
+    expect(result.values, 'pDoom should not count through values under reduced motion').toBe(1);
+    expect(result.final).toBe(result.expected);
+    expect(result.filter).toBe('none');
   });
 });

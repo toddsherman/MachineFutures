@@ -86,7 +86,7 @@ test.describe('layout', () => {
           return r.width > 0 && r.right > doc.clientWidth + 1 && !el.closest('[style*="overflow"], .matrix-scroll, .end-forecast-toggle');
         })
         .slice(0, 5)
-        .map(el => `${el.tagName}.${(el.className || '').toString().split(' ')[0]} "${el.innerText.replace(/\s+/g, ' ').trim().slice(0, 30)}"`);
+        .map(el => `${el.tagName}.${(el.className || '').toString().split(' ')[0]} "${(el.innerText ?? el.textContent ?? '').replace(/\s+/g, ' ').trim().slice(0, 30)}"`);
       return { by: doc.scrollWidth - doc.clientWidth, wide };
     });
     expect(overflow.by, `elements past the right edge: ${overflow.wide.join(', ')}`).toBeLessThanOrEqual(0);
@@ -197,7 +197,10 @@ test.describe('forecast horizons', () => {
 
   test('the full exposure ranking reorders in place', async ({ page, browserName }) => {
     await settle(page);
-    const viewportTolerance = browserName === 'webkit' ? 2 : 1;
+    // Chromium can report 1/8px differences for the same text edge at 320px
+    // under a fully parallel run. Keep the allowance below 1.5px so a real
+    // one-pixel-plus layout shift still cannot disappear into rounding.
+    const viewportTolerance = browserName === 'webkit' ? 2 : 1.25;
     const horizon = page.getByRole('group', { name: 'Forecast horizon' });
     const modelOrder = () => page.locator('.doomer-row').evaluateAll(rows => rows.map(row => row.dataset.runKey));
 
@@ -237,7 +240,7 @@ test.describe('forecast horizons', () => {
         `.doomer-row:nth-child(${rank})`,
         rank === 1 ? 'near-top' : 'center'
       ]),
-      ['exposure boundary', '.method-hero', 'near-top']
+      ['exposure boundary', '.horizon-chart-section', 'near-top']
     ];
     const populatedHorizons = await page.evaluate(() => window.MF_DATA.horizons
       .filter(({ id }) => Object.keys(window.MF_DATA.datasets[id]?.endStateRuns || {}).length)
@@ -1258,5 +1261,233 @@ test.describe('behaviour', () => {
     expect(mark, 'no extinction glyph rendered').not.toBeNull();
     expect(mark.points, 'the glyph must carry U+FE0E, the text-presentation selector').toEqual(['2620', 'fe0e']);
     expect(mark.ratio, 'the glyph rendered at emoji width — the engine substituted a colour emoji').toBeLessThan(0.9);
+  });
+});
+
+test.describe('mean scenario probabilities by horizon', () => {
+  const horizons = [
+    ['2030', '2030'],
+    ['2040', '2040'],
+    ['2050', '2050'],
+    ['2060', '2060'],
+    ['Long term', 'long-term']
+  ];
+
+  test('sits directly below extinction-risk exposure and paints every scenario in its site colour', async ({ page }) => {
+    await settle(page);
+
+    const chart = await page.evaluate(() => {
+      const exposure = document.querySelector('.model-mix');
+      const section = document.querySelector('.horizon-chart-section');
+      const normalizeColour = value => {
+        const probe = document.createElement('i');
+        probe.style.color = value;
+        document.body.append(probe);
+        const colour = getComputedStyle(probe).color;
+        probe.remove();
+        return colour;
+      };
+      const stateColours = new Map(window.MF_DATA.states.map(state => [String(state.id), normalizeColour(state.color)]));
+      const paths = [...document.querySelectorAll('path.horizon-chart-series[data-state]')];
+      const points = [...document.querySelectorAll('circle.horizon-chart-point[data-state][data-horizon]')];
+      return {
+        followsExposure: exposure?.nextElementSibling === section,
+        paths: paths.map(path => ({
+          state: path.dataset.state,
+          expected: stateColours.get(path.dataset.state),
+          stroke: getComputedStyle(path).stroke,
+          dash: getComputedStyle(path).strokeDasharray
+        })),
+        points: points.map(point => ({
+          key: `${point.dataset.state}:${point.dataset.horizon}`,
+          state: point.dataset.state,
+          expected: stateColours.get(point.dataset.state),
+          fill: getComputedStyle(point).fill,
+          radius: parseFloat(point.getAttribute('r'))
+        }))
+      };
+    });
+
+    expect(chart.followsExposure, 'the horizon chart is not the exposure section\'s next section').toBe(true);
+    expect(chart.paths, 'there must be one path for each of the 11 scenarios').toHaveLength(11);
+    expect(new Set(chart.paths.map(path => path.state)).size).toBe(11);
+    expect(chart.paths.filter(path => path.stroke !== path.expected), 'a scenario path stopped using its state colour').toEqual([]);
+    expect(chart.paths.filter(path => !['none', ''].includes(path.dash)), 'scenario paths must all remain solid').toEqual([]);
+
+    expect(chart.points, '11 scenarios at five observed horizons should paint 55 points').toHaveLength(55);
+    expect(new Set(chart.points.map(point => point.key)).size, 'a scenario/horizon point is duplicated or missing').toBe(55);
+    expect(chart.points.filter(point => point.fill !== point.expected), 'an observation is hollow or has the wrong fill').toEqual([]);
+    expect(chart.points.filter(point => !(point.radius > 0 && point.radius <= 3.5)), 'observation dots should be small, filled circles').toEqual([]);
+  });
+
+  test('curves land on every observation without inventing extrema between them', async ({ page }) => {
+    await settle(page);
+    const issues = await page.evaluate(() => window.MF_TEST.horizonChartData().series.flatMap(series => {
+      const observed = series.points.map(point => point.value);
+      const low = Math.min(...observed);
+      const high = Math.max(...observed);
+      const outside = series.curve.filter(point => point.value < low - 1e-9 || point.value > high + 1e-9);
+      const missed = series.points.filter(point => !series.curve.some(sample =>
+        Math.abs(sample.year - point.year) < 1e-9 && Math.abs(sample.value - point.value) < 1e-9
+      ));
+      return [
+        ...outside.map(point => `${series.name} leaves its observed range at ${point.year}: ${point.value}`),
+        ...missed.map(point => `${series.name} misses ${point.year}: ${point.value}`)
+      ];
+    }));
+    expect(issues).toEqual([]);
+  });
+
+  test('the primary horizon toggle moves one dotted guide and bolds the matching year', async ({ page }) => {
+    await settle(page);
+    const group = page.getByRole('group', { name: 'Forecast horizon' });
+    const selectedChartState = () => page.evaluate(() => {
+      const guides = [...document.querySelectorAll('line.horizon-chart-guide[data-horizon]')];
+      const ticks = [...document.querySelectorAll('text.horizon-chart-tick[data-horizon]')];
+      const selected = ticks.filter(tick => tick.classList.contains('is-selected'));
+      const guide = guides[0];
+      const tick = selected[0];
+      const guideStyle = guide ? getComputedStyle(guide) : null;
+      // Chromium serializes this as "1px, 5px" while WebKit may return
+      // "1px 5px". Read the numeric pattern instead of matching either
+      // engine's punctuation.
+      const guideDash = guideStyle?.strokeDasharray.match(/-?(?:\d+\.?\d*|\.\d+)/g)?.map(Number) || [];
+      return {
+        guides: guides.length,
+        guideHorizon: guide?.dataset.horizon,
+        guideDash,
+        guideStrokeWidth: guideStyle ? parseFloat(guideStyle.strokeWidth) : null,
+        guideLineCap: guideStyle?.strokeLinecap,
+        guideVertical: guide ? Math.abs(parseFloat(guide.getAttribute('x1')) - parseFloat(guide.getAttribute('x2'))) < 0.01 : false,
+        selectedTicks: selected.length,
+        tickHorizon: tick?.dataset.horizon,
+        tickText: tick?.textContent.trim(),
+        tickWeight: tick ? getComputedStyle(tick).fontWeight : null,
+        aligned: guide && tick
+          ? Math.abs(parseFloat(guide.getAttribute('x1')) - parseFloat(tick.getAttribute('x'))) < 0.01
+          : false
+      };
+    });
+    const assertSelection = async (horizon, label) => {
+      const selected = await selectedChartState();
+      expect(selected.guides, 'the chart should have exactly one selected-horizon guide').toBe(1);
+      expect(selected.guideHorizon).toBe(horizon);
+      expect(selected.guideDash.length, 'the selected-horizon guide should use a repeating dot pattern').toBeGreaterThanOrEqual(2);
+      expect(selected.guideDash[0], 'each guide mark should be no longer than its stroke is wide').toBeLessThanOrEqual(selected.guideStrokeWidth);
+      expect(selected.guideDash[1], 'the space between guide dots should exceed each dot mark').toBeGreaterThan(selected.guideDash[0]);
+      expect(selected.guideLineCap, 'short guide marks need round caps to paint as dots').toBe('round');
+      expect(selected.guideVertical, 'the selected-horizon guide should be vertical').toBe(true);
+      expect(selected.selectedTicks, 'exactly one x-axis label should be selected').toBe(1);
+      expect(selected.tickHorizon).toBe(horizon);
+      expect(selected.tickText).toBe(horizon === 'long-term' ? '3000' : label);
+      expect(parseInt(selected.tickWeight, 10), 'the selected year is not bold').toBeGreaterThanOrEqual(700);
+      expect(selected.aligned, 'the guide is not aligned with the selected year').toBe(true);
+    };
+
+    await assertSelection('long-term', 'Long term');
+    for (const [label, horizon] of horizons) {
+      await group.getByRole('button', { name: label, exact: true }).click();
+      await expect(page.locator(`.horizon-button[data-horizon="${horizon}"]`)).toHaveAttribute('aria-pressed', 'true');
+      await nextPaint(page);
+      await assertSelection(horizon, label);
+    }
+  });
+
+  test('switching horizons leaves the chart dimensions and viewport position unchanged', async ({ page, browserName }) => {
+    await settleWithHorizons(page);
+    const viewportTolerance = browserName === 'webkit' ? 2 : 1;
+    const group = page.getByRole('group', { name: 'Forecast horizon' });
+    await parkViewportAnchor(page, '.horizon-chart-plot', 'center');
+    const initial = await page.locator('#horizon-chart').evaluate(chart => {
+      const plot = chart.querySelector('.horizon-chart-plot').getBoundingClientRect();
+      const svg = chart.querySelector('#horizon-chart-svg').getBoundingClientRect();
+      return { width: chart.getBoundingClientRect().width, height: chart.getBoundingClientRect().height,
+               plotTop: plot.top, plotWidth: plot.width, plotHeight: plot.height,
+               svgWidth: svg.width, svgHeight: svg.height };
+    });
+
+    for (const [label, horizon] of horizons) {
+      const beforeTop = await page.locator('.horizon-chart-plot').evaluate(plot => plot.getBoundingClientRect().top);
+      await group.getByRole('button', { name: label, exact: true }).click();
+      await expect(page.locator(`line.horizon-chart-guide[data-horizon="${horizon}"]`)).toHaveCount(1);
+      await nextPaint(page);
+      const after = await page.locator('#horizon-chart').evaluate(chart => {
+        const plot = chart.querySelector('.horizon-chart-plot').getBoundingClientRect();
+        const svg = chart.querySelector('#horizon-chart-svg').getBoundingClientRect();
+        return { width: chart.getBoundingClientRect().width, height: chart.getBoundingClientRect().height,
+                 plotTop: plot.top, plotWidth: plot.width, plotHeight: plot.height,
+                 svgWidth: svg.width, svgHeight: svg.height };
+      });
+      expect(Math.abs(after.plotTop - beforeTop), `the chart moved in the viewport while switching to ${label}`).toBeLessThanOrEqual(viewportTolerance);
+      for (const dimension of ['width', 'height', 'plotWidth', 'plotHeight', 'svgWidth', 'svgHeight']) {
+        expect(Math.abs(after[dimension] - initial[dimension]), `${dimension} changed while switching to ${label}`).toBeLessThanOrEqual(viewportTolerance);
+      }
+    }
+  });
+
+  test('the selected middle-year label remains visible and bold on mobile without page overflow', async ({ page }) => {
+    test.skip((page.viewportSize()?.width || 999) > 390, 'mobile layout check');
+    await settle(page);
+    const group = page.getByRole('group', { name: 'Forecast horizon' });
+
+    for (const horizon of ['2040', '2050']) {
+      await group.getByRole('button', { name: horizon, exact: true }).click();
+      await nextPaint(page);
+      const layout = await page.locator(`text.horizon-chart-tick[data-horizon="${horizon}"]`).evaluate(tick => {
+        const rect = tick.getBoundingClientRect();
+        const svg = tick.ownerSVGElement.getBoundingClientRect();
+        const style = getComputedStyle(tick);
+        return {
+          selected: tick.classList.contains('is-selected'),
+          weight: parseInt(style.fontWeight, 10),
+          visible: style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0,
+          inside: rect.left >= svg.left - 0.5 && rect.right <= svg.right + 0.5 && rect.top >= svg.top - 0.5 && rect.bottom <= svg.bottom + 0.5,
+          overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth
+        };
+      });
+      expect(layout.selected, `${horizon} did not become the selected axis label`).toBe(true);
+      expect(layout.weight, `${horizon} is not bold`).toBeGreaterThanOrEqual(700);
+      expect(layout.visible, `${horizon} disappeared at mobile width`).toBe(true);
+      expect(layout.inside, `${horizon} is clipped outside the SVG`).toBe(true);
+      expect(layout.overflow, 'the horizon chart makes the mobile page scroll sideways').toBeLessThanOrEqual(0);
+    }
+  });
+
+  test('the SVG is named and described, with an accessible hidden table for all observations', async ({ page }) => {
+    await settle(page);
+    const accessibility = await page.evaluate(() => {
+      const svg = document.querySelector('#horizon-chart-svg');
+      const labelledBy = (svg.getAttribute('aria-labelledby') || '').trim().split(/\s+/).filter(Boolean);
+      const labelledElements = labelledBy.map(id => document.getElementById(id));
+      const root = document.querySelector('#horizon-chart-table');
+      const table = root?.matches('table') ? root : root?.querySelector('table');
+      const style = root ? getComputedStyle(root) : null;
+      return {
+        role: svg.getAttribute('role'),
+        labels: labelledElements.map(element => ({ tag: element?.tagName.toLowerCase(), text: element?.textContent.trim() })),
+        labelsInsideSvg: labelledElements.every(element => element && svg.contains(element)),
+        tableExists: Boolean(table),
+        tableCaption: table?.querySelector('caption')?.textContent.trim(),
+        columnHeaders: [...(table?.querySelectorAll('thead th') || [])].map(cell => cell.textContent.trim()),
+        rows: table?.querySelectorAll('tbody tr').length || 0,
+        values: table?.querySelectorAll('tbody td').length || 0,
+        tableHiddenVisually: Boolean(root && style && style.position === 'absolute'
+          && parseFloat(style.width) <= 1 && parseFloat(style.height) <= 1 && style.overflow === 'hidden'),
+        tableHiddenFromAT: root?.hidden || root?.getAttribute('aria-hidden') === 'true'
+      };
+    });
+
+    expect(accessibility.role).toBe('img');
+    expect(accessibility.labelsInsideSvg, 'the SVG title and description should be contained in the SVG').toBe(true);
+    expect(accessibility.labels).toHaveLength(2);
+    expect(accessibility.labels.map(label => label.tag)).toEqual(['title', 'desc']);
+    expect(accessibility.labels.filter(label => !label.text), 'the SVG title or description is empty').toEqual([]);
+    expect(accessibility.tableExists, 'the chart has no semantic data table').toBe(true);
+    expect(accessibility.tableCaption, 'the hidden data table has no caption').toBeTruthy();
+    expect(accessibility.columnHeaders.length, 'the table needs a scenario column plus five horizon columns').toBe(6);
+    expect(accessibility.rows, 'the table needs one row for every scenario').toBe(11);
+    expect(accessibility.values, 'the table needs all 55 plotted observations').toBe(55);
+    expect(accessibility.tableHiddenVisually, 'the table should be visually hidden, not painted under the chart').toBe(true);
+    expect(accessibility.tableHiddenFromAT, 'the data table must remain available to assistive technology').toBe(false);
   });
 });

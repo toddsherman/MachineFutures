@@ -21,7 +21,14 @@
   // keeps staged prompts and pipeline changes from exposing a control that
   // would collapse every data section—and the reader's viewport—on selection.
   const hasForecasts = horizon => Object.keys(datasets[horizon]?.endStateRuns || {}).length > 0;
-  const horizonOptions = configuredHorizons.filter(option => option.id === fallbackHorizon || hasForecasts(option.id));
+  const horizonOptions = configuredHorizons
+    .filter(option => option.id === fallbackHorizon || hasForecasts(option.id))
+    .sort((left, right) => {
+      if (left.id === right.id) return 0;
+      if (left.id === 'long-term') return 1;
+      if (right.id === 'long-term') return -1;
+      return Number(left.targetYear) - Number(right.targetYear);
+    });
   const isSelectableHorizon = horizon => horizonOptions.some(option => option.id === horizon);
 
   let activeHorizon = fallbackHorizon || 'long-term';

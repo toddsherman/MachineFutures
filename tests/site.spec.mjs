@@ -313,8 +313,13 @@ test.describe('forecast horizons', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await settleWithHorizons(page);
     const group = page.getByRole('group', { name: 'Forecast horizon' });
-    await expect(group.getByRole('button')).toHaveText(['Long term', '2030', '2040', '2050', '2060']);
+    await expect(group.getByRole('button')).toHaveText(['2030', '2040', '2050', '2060', 'Long term']);
     await expect(group.getByRole('button', { name: 'Long term' })).toHaveAttribute('aria-pressed', 'true');
+    const selectedHorizon = group.locator('.horizon-button[aria-pressed="true"]');
+    await expect(selectedHorizon).toHaveCount(1);
+    await expect(selectedHorizon).toHaveAttribute('data-horizon', 'long-term');
+    expect(await page.evaluate(() => window.MF_TEST.activeHorizon())).toBe('long-term');
+    expect(new URL(page.url()).searchParams.get('horizon')).toBeNull();
     await expect(page.locator('#horizon-note')).toHaveText('Durable arrangement by the year 3000');
     await expect(page.locator('#forecast-summary')).toContainText('11 mutually exclusive end states');
     await expect(page.locator('#matrix')).toHaveAttribute('aria-label', 'Long term probability by end state and model');
@@ -540,7 +545,7 @@ test.describe('forecast horizons', () => {
     const empty2060 = `${horizonFixture}\nwindow.MF_DATA.datasets['2060'] = { endStateRuns: {}, datasetDate: null, leaderHistory: [] };`;
     await settleWithHorizons(page, '/?horizon=2060&utm_source=fixture', empty2060);
     const group = page.getByRole('group', { name: 'Forecast horizon' });
-    await expect(group.getByRole('button')).toHaveText(['Long term', '2030', '2040', '2050']);
+    await expect(group.getByRole('button')).toHaveText(['2030', '2040', '2050', 'Long term']);
     await expect(group.getByRole('button', { name: '2060', exact: true })).toHaveCount(0);
     await expect(group.getByRole('button', { name: 'Long term' })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator('.state-card')).toHaveCount(11);
@@ -706,7 +711,7 @@ test.describe('the 2030 exposure chart on a phone', () => {
     expect(placement.top, 'the controls start above the viewport').toBeGreaterThanOrEqual(-0.5);
     expect(placement.bottom, 'the controls fall below the initial viewport').toBeLessThanOrEqual(placement.viewportHeight + 0.5);
     expect(placement.overflow, 'the sticky controls make the page scroll sideways').toBeLessThanOrEqual(0);
-    expect(placement.buttons.map(button => button.label)).toEqual(['Long term', '2030', '2040', '2050', '2060']);
+    expect(placement.buttons.map(button => button.label)).toEqual(['2030', '2040', '2050', '2060', 'Long term']);
     expect(placement.buttons.filter(button => button.lines !== 1), 'a horizon label wrapped onto a second line').toEqual([]);
     expect(placement.buttons.filter(button => !button.textFits), 'a horizon label crossed its button border').toEqual([]);
     expect(Math.max(...placement.buttons.map(button => button.height)), 'the five-button row grew taller than its one-line control height').toBeLessThanOrEqual(40.5);

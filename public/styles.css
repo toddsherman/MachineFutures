@@ -473,9 +473,11 @@ body.dialog-open { overflow: hidden; }
 }
 
 /* The dated note wraps on the narrowest phones. Reserve its second line so a
-   horizon change at the top of the page cannot push everything below it. */
+   horizon change at the top of the page cannot push everything below it. The
+   five-button row also gives its only word label enough room not to cross the
+   border into the first year. */
 @media (max-width: 360px) {
-  .horizon-button[data-horizon="long-term"] { flex-grow: 1.25; }
+  .horizon-button[data-horizon="long-term"] { flex-grow: 1.5; }
   .horizon-picker-copy p { min-height: 2.9em; }
 }
 

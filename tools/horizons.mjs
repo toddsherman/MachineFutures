@@ -13,7 +13,8 @@ export const HORIZONS = Object.freeze([
   Object.freeze({ id: 'long-term', label: 'Long term', targetYear: 3000 }),
   Object.freeze({ id: '2030', label: '2030', targetYear: 2030 }),
   Object.freeze({ id: '2040', label: '2040', targetYear: 2040 }),
-  Object.freeze({ id: '2050', label: '2050', targetYear: 2050 })
+  Object.freeze({ id: '2050', label: '2050', targetYear: 2050 }),
+  Object.freeze({ id: '2060', label: '2060', targetYear: 2060 })
 ]);
 
 export const HORIZON_IDS = Object.freeze(HORIZONS.map(horizon => horizon.id));
@@ -22,7 +23,8 @@ export const HORIZON_RUN_CONFIG = Object.freeze({
   'long-term': Object.freeze({ promptFile: 'public/end_states.md', questionSet: 'end-states-v3', runSuffix: 'end-states' }),
   '2030': Object.freeze({ promptFile: 'public/end_states_2030.md', questionSet: 'end-states-2030-v2', runSuffix: 'end-states-2030' }),
   '2040': Object.freeze({ promptFile: 'public/end_states_2040.md', questionSet: 'end-states-2040-v2', runSuffix: 'end-states-2040' }),
-  '2050': Object.freeze({ promptFile: 'public/end_states_2050.md', questionSet: 'end-states-2050-v2', runSuffix: 'end-states-2050' })
+  '2050': Object.freeze({ promptFile: 'public/end_states_2050.md', questionSet: 'end-states-2050-v2', runSuffix: 'end-states-2050' }),
+  '2060': Object.freeze({ promptFile: 'public/end_states_2060.md', questionSet: 'end-states-2060-v2', runSuffix: 'end-states-2060' })
 });
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
@@ -85,11 +87,12 @@ export function normalizeHorizon(value) {
   if (compact === '2030' || compact === 'year2030' || compact === 'horizon2030') return '2030';
   if (compact === '2040' || compact === 'year2040' || compact === 'horizon2040') return '2040';
   if (compact === '2050' || compact === 'year2050' || compact === 'horizon2050') return '2050';
+  if (compact === '2060' || compact === 'year2060' || compact === 'horizon2060') return '2060';
   return null;
 }
 
 export function horizonOfBatch(batch) {
-  const questionSetHorizon = String(batch?.question_set || '').match(/^end-states-(2030|2040|2050)-v\d+$/)?.[1] || null;
+  const questionSetHorizon = String(batch?.question_set || '').match(/^end-states-(2030|2040|2050|2060)-v\d+$/)?.[1] || null;
   const hasHorizon = batch?.horizon !== undefined && batch?.horizon !== null && batch?.horizon !== '';
   const hasTargetYear = batch?.target_year !== undefined && batch?.target_year !== null && batch?.target_year !== '';
 

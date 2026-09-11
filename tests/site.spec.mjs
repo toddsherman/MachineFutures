@@ -44,6 +44,11 @@ const nextPaint = page => page.evaluate(() => new Promise(resolve => {
   requestAnimationFrame(() => requestAnimationFrame(resolve));
 }));
 
+// Layout engines expose text edges in fractional CSS pixels. Chromium can
+// vary by 1/8px under parallel load, while WebKit rounds more coarsely.
+// Keeping both tolerances below 2.5px still catches a visible layout shift.
+const viewportToleranceFor = browserName => browserName === 'webkit' ? 2 : 1.25;
+
 const makeGammaLeadExposure = page => page.evaluate(() => {
   const run = window.MF_DATA.datasets['2030'].endStateRuns.gamma;
   const probabilities = [10, 10, 10, 10, 10, 10, 10, 10, 10, 5, 5];
@@ -147,8 +152,8 @@ test.describe('forecast horizons', () => {
     await settleWithHorizons(page);
     // WebKit quantizes both the parked and restored scroll positions. Their
     // independent rounding can differ by nearly two CSS pixels even when the
-    // same content remains visually stationary; Chromium stays within one.
-    const viewportTolerance = browserName === 'webkit' ? 2 : 1;
+    // same content remains visually stationary; Chromium stays near one.
+    const viewportTolerance = viewportToleranceFor(browserName);
     // Make a shared model move from first to second in the exposure ranking.
     // A ranking should update inside a stationary chart; following that model
     // to its new rank would scroll the whole section instead.
@@ -197,10 +202,7 @@ test.describe('forecast horizons', () => {
 
   test('the full exposure ranking reorders in place', async ({ page, browserName }) => {
     await settle(page);
-    // Chromium can report 1/8px differences for the same text edge at 320px
-    // under a fully parallel run. Keep the allowance below 1.5px so a real
-    // one-pixel-plus layout shift still cannot disappear into rounding.
-    const viewportTolerance = browserName === 'webkit' ? 2 : 1.25;
+    const viewportTolerance = viewportToleranceFor(browserName);
     const horizon = page.getByRole('group', { name: 'Forecast horizon' });
     const modelOrder = () => page.locator('.doomer-row').evaluateAll(rows => rows.map(row => row.dataset.runKey));
 
@@ -261,7 +263,7 @@ test.describe('forecast horizons', () => {
 
   test('a disappearing final exposure rank stays in the same viewport slot', async ({ page, browserName }) => {
     await settleWithHorizons(page);
-    const viewportTolerance = browserName === 'webkit' ? 2 : 1;
+    const viewportTolerance = viewportToleranceFor(browserName);
     const horizon = page.getByRole('group', { name: 'Forecast horizon' });
     await horizon.getByRole('button', { name: '2040', exact: true }).click();
     await nextPaint(page);
@@ -279,7 +281,7 @@ test.describe('forecast horizons', () => {
   test('a reordered open exposure breakdown remains stable and open', async ({ page, browserName }) => {
     await settleWithHorizons(page);
     await makeGammaLeadExposure(page);
-    const viewportTolerance = browserName === 'webkit' ? 2 : 1;
+    const viewportTolerance = viewportToleranceFor(browserName);
     const row = page.locator('.doomer-row[data-run-key="alpha"]');
     await row.click();
     await expect(row).toHaveAttribute('aria-expanded', 'true');
@@ -1395,7 +1397,7 @@ test.describe('mean scenario probabilities by horizon', () => {
 
   test('switching horizons leaves the chart dimensions and viewport position unchanged', async ({ page, browserName }) => {
     await settleWithHorizons(page);
-    const viewportTolerance = browserName === 'webkit' ? 2 : 1;
+    const viewportTolerance = viewportToleranceFor(browserName);
     const group = page.getByRole('group', { name: 'Forecast horizon' });
     await parkViewportAnchor(page, '.horizon-chart-plot', 'center');
     const initial = await page.locator('#horizon-chart').evaluate(chart => {

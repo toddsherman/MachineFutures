@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 const lab = page => page.locator('.lab-button[data-lab="Anthropic"]');
 const start = async page => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/');
+  await page.goto('/?horizon=long-term');
   await expect(lab(page)).toBeVisible();
 };
 
@@ -164,4 +164,19 @@ test('lab and model selections preserve the reading position throughout the page
   await nextPaint();
   expect(Math.abs(await page.locator('#pdoom-value').evaluate(el => el.getBoundingClientRect().top) - before)).toBeLessThanOrEqual(tolerance);
   expect(await page.evaluate(() => document.documentElement.style.overflowAnchor)).toBe('');
+});
+
+
+test('the landing page defaults to 2030 and keeps explicit horizon links', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await expect(page.locator('.horizon-button')).toHaveText(['2030', '2040', '2050', '2060', 'Long term']);
+  await expect(page.locator('.horizon-button[aria-pressed="true"]')).toHaveAttribute('data-horizon', '2030');
+  await expect(page.locator('#pdoom-unit')).toContainText('2030');
+  await page.locator('.horizon-button[data-horizon="long-term"]').click();
+  await expect(page).toHaveURL(/horizon=long-term/);
+  await page.reload();
+  await expect(page.locator('.horizon-button[aria-pressed="true"]')).toHaveAttribute('data-horizon', 'long-term');
+  await page.locator('.horizon-button[data-horizon="2030"]').click();
+  expect(new URL(page.url()).searchParams.has('horizon')).toBe(false);
 });

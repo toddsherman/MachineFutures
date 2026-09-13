@@ -893,7 +893,7 @@
       // physically put. Build them once so a click does not discard the
       // focused element, then only update their selected state.
       if (!toggle.children.length) {
-        toggle.innerHTML = [...horizonOptions].reverse().map(option =>
+        toggle.innerHTML = horizonOptions.map(option =>
           `<button type="button" class="horizon-button" data-horizon="${esc(option.id)}" aria-pressed="false">${esc(option.label)}</button>`
         ).join('');
       }

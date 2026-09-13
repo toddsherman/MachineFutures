@@ -8,6 +8,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 export const DEFAULT_HORIZON = 'long-term';
+// The landing view is independent of the legacy horizon for historical runs.
+export const DEFAULT_VIEW_HORIZON = '2030';
 
 export const HORIZONS = Object.freeze([
   Object.freeze({ id: 'long-term', label: 'Long term', targetYear: 3000 }),

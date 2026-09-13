@@ -11,7 +11,7 @@ import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, HORIZON_RUN_CONFIG, compareRunPreference, horizonOfBatch } from './horizons.mjs';
+import { DEFAULT_VIEW_HORIZON, DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, HORIZON_RUN_CONFIG, compareRunPreference, horizonOfBatch } from './horizons.mjs';
 import { labBalancedMean, quantizeAllocation, renormalizeAllocation } from './allocations.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -325,7 +325,7 @@ ${indent}  endStateRuns: {${dataset.entries.length ? `\n${dataset.entries.map(en
 ${indent}  datasetDate: ${JSON.stringify(badgeOf(dataset.datasetDate))},
 ${indent}  leaderHistory: ${JSON.stringify(dataset.leaderHistory)}
 ${indent}}`;
-const generatedBlock = `const defaultHorizon = ${JSON.stringify(DEFAULT_HORIZON)};
+const generatedBlock = `const defaultHorizon = ${JSON.stringify(DEFAULT_VIEW_HORIZON)};
   const horizons = ${JSON.stringify(HORIZONS)};
   const datasets = {
 ${HORIZON_IDS.map(horizon => emitDataset(horizon, datasets[horizon])).join(',\n')}

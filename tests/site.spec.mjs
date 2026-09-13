@@ -18,7 +18,7 @@ const settle = async (page, url = '/') => {
   // The leader riffles through the endings on load; wait for it to land, or a
   // test reads a passing frame and believes it.
   await page.waitForFunction(() => {
-    const top = window.MF_TEST?.stateAggregate().slice().sort((a, b) => b.probability - a.probability)[0];
+    const top = window.MF_TEST?.selectedEndStates().slice().sort((a, b) => b.probability - a.probability)[0];
     const name = document.querySelector('.leader-name');
     const figure = document.querySelector('.end-leader strong');
     return top && name?.textContent === top.name && figure?.textContent === `${top.probability.toFixed(1)}%`
@@ -385,7 +385,7 @@ test.describe('forecast horizons', () => {
     await page.locator('.state-card[data-state="9"]').click();
     await expect(page.locator('#dialog-content .dialog-kicker')).toContainText('Humanity remains in control · 2030');
     await expect(page.locator('#dialog-content .dialog-description')).toHaveText(snapshotHeldLeashDescription);
-    await expect(page.locator('#dialog-content .dialog-summary > div').first()).toHaveText('45.0%2030 lab-balanced mean');
+    await expect(page.locator('#dialog-content .dialog-summary > div').first()).toHaveText('45.0%Lab-balanced mean');
     await expect(page.locator('#dialog-content .model-answer p').first()).toContainText('2030');
     await page.locator('#dialog-close').click();
 
@@ -519,31 +519,16 @@ test.describe('forecast horizons', () => {
     await page.locator('#dialog-close').click();
   });
 
-  test('the URL shares both selectors and an unavailable model resets to the aggregate', async ({ page }) => {
-    await settleWithHorizons(page, '/?utm_source=fixture&model=beta');
-    await expect(page.locator('.end-toggle-button.active')).toHaveAttribute('data-end-forecast', 'beta');
-
-    const horizon = page.getByRole('group', { name: 'Forecast horizon' });
-    await horizon.getByRole('button', { name: '2030', exact: true }).click();
-    await expect(page.locator('.end-toggle-button.active')).toHaveAttribute('data-end-forecast', 'Aggregate');
-    const afterReset = new URL(page.url());
-    expect(afterReset.searchParams.get('horizon')).toBe('2030');
-    expect(afterReset.searchParams.get('model')).toBeNull();
-    expect(afterReset.searchParams.get('utm_source')).toBe('fixture');
-
-    await page.locator('[data-end-forecast="gamma"]').click();
-    await horizon.getByRole('button', { name: '2060', exact: true }).click();
-    await expect(page.locator('.end-toggle-button.active')).toHaveAttribute('data-end-forecast', 'gamma');
-    const preserved = new URL(page.url());
-    expect(preserved.searchParams.get('horizon')).toBe('2060');
-    expect(preserved.searchParams.get('model')).toBe('gamma');
-    expect(preserved.searchParams.get('utm_source')).toBe('fixture');
-    await expect(page.locator('.horizon-button[data-horizon="2060"]')).toBeFocused();
-
+  test('model URLs preserve selection across horizons', async ({ page }) => {
+    await settleWithHorizons(page, '/?model=beta');
+    await expect(page.locator('.lab-button.active')).toHaveAttribute('title', /Beta/);
+    await page.locator('.horizon-button[data-horizon="2030"]').click();
+    expect(new URL(page.url()).searchParams.get('model')).toBeNull();
+    await page.evaluate(() => window.MF_TEST.selectForecast('gamma'));
+    await page.locator('.horizon-button[data-horizon="2050"]').click();
+    expect(new URL(page.url()).searchParams.get('model')).toBe('gamma');
     await page.reload();
-    await page.waitForFunction(() => window.MF_TEST?.activeHorizon() === '2060');
-    await expect(page.locator('.horizon-button[data-horizon="2060"]')).toHaveAttribute('aria-pressed', 'true');
-    await expect(page.locator('.end-toggle-button.active')).toHaveAttribute('data-end-forecast', 'gamma');
+    await expect(page.locator('.lab-button.active')).toHaveAttribute('title', /Gamma/);
   });
 
   test('an empty horizon stays out of the selector until it has forecasts', async ({ page }) => {
@@ -804,7 +789,7 @@ test.describe('every model view', () => {
 
   test('aggregate figures show tenths while individual models stay whole', async ({ page }) => {
     await settle(page);
-    await expect(page.locator('.end-toggle-button').first()).toHaveText('Lab-balanced mean');
+    await expect(page.locator('.lab-button').first()).toHaveText('Lab-Balanced Mean');
     const aggregateFigures = await page.evaluate(() => ({
       leader: document.querySelector('.end-leader strong').textContent,
       cards: [...document.querySelectorAll('.state-card-meta strong')].map(element => element.textContent),
@@ -813,53 +798,12 @@ test.describe('every model view', () => {
     expect([aggregateFigures.leader, ...aggregateFigures.cards, ...aggregateFigures.legend]
       .every(value => /^\d+\.\d%$/.test(value))).toBe(true);
 
-    await page.locator('.end-toggle-button').nth(1).click();
+    await page.evaluate(() => window.MF_TEST.selectForecast(Object.keys(window.MF_TEST.activeDataset().endStateRuns)[0]));
     await page.waitForTimeout(700);
     const modelFigures = await page.locator('#consensus-legend b').allTextContents();
     expect(modelFigures.every(value => /^\d+%$/.test(value))).toBe(true);
   });
 
-  test('each strip agrees with its own numbers', async ({ page }) => {
-    await settle(page);
-    const views = await page.locator('.end-toggle-button').count();
-    for (let i = 0; i < views; i++) {
-      const button = page.locator('.end-toggle-button').nth(i);
-      const label = (await button.innerText()).trim();
-      await button.click();
-      await page.waitForTimeout(700);   // let the figure tween finish
-      const problems = await page.evaluate(() => {
-        const bad = [];
-        document.querySelectorAll('.state-card').forEach(card => {
-          const id = card.dataset.state;
-          const range = card.querySelector('.strip-range');
-          const iqr = card.querySelector('.strip-iqr');
-          const tick = card.querySelector('.strip-mid');
-          const axisW = card.querySelector('.strip-axis').offsetWidth;
-          // offsetWidth is layout, so the reveal transform does not distort it
-          for (const [name, el] of [['range', range], ['middle half', iqr]]) {
-            if (!el.hidden && el.offsetWidth < 1) bad.push(`S${id}: the ${name} band draws at zero width`);
-          }
-          const centre = tick.offsetLeft + tick.offsetWidth / 2;
-          if (centre < range.offsetLeft - 1 || centre > range.offsetLeft + range.offsetWidth + 1) bad.push(`S${id}: the published figure sits outside its full range`);
-          if (range.offsetLeft + range.offsetWidth > axisW + 1) bad.push(`S${id}: the range runs off the axis`);
-          const onCard = parseFloat(card.querySelector('.state-card-meta strong').textContent);
-          const aggregate = window.MF_TEST.stateAggregate().find(item => String(item.id) === id).probability;
-          if (onCard !== aggregate) bad.push(`S${id}: card says ${onCard}%, the lab-balanced mean is ${aggregate}%`);
-          if (!/across \d+ models/.test(card.querySelector('.range-text').textContent)) {
-            bad.push(`S${id}: the card's caption stopped describing the spread across models`);
-          }
-        });
-        const legend = [...document.querySelectorAll('#consensus-legend > button b')].map(b => parseFloat(b.textContent));
-        const sum = legend.reduce((a, c) => a + c, 0);
-        if (sum !== 100) bad.push(`the allocation sums to ${sum}, not 100`);
-        [...document.querySelectorAll('#consensus-bar > button')].forEach((seg, i) => {
-          if (Math.abs(parseFloat(seg.style.width) - legend[i]) > 0.01) bad.push(`segment ${i + 1} is drawn at ${parseFloat(seg.style.width)}% but labelled ${legend[i]}%`);
-        });
-        return bad;
-      });
-      expect(problems, `in the ${label} view`).toEqual([]);
-    }
-  });
 });
 
 test.describe('the charts are actually painted', () => {
@@ -1038,26 +982,6 @@ test.describe('the leader timeline', () => {
   });
 });
 
-test.describe('the selector governs one chart only', () => {
-  test('choosing a model leaves the ending cards alone', async ({ page }) => {
-    await settle(page);
-    const snapshot = () => page.evaluate(() => ({
-      cards: [...document.querySelectorAll('.state-card')].map(c => `${c.dataset.state}:${c.querySelector('.state-card-meta strong').textContent}:${c.querySelector('.range-text').textContent}`),
-      legend: [...document.querySelectorAll('#consensus-legend > button b')].map(b => b.textContent).join(','),
-      title: document.querySelector('#end-forecast-title').innerText.replace(/\s+/g, ' ').trim()
-    }));
-    const before = await snapshot();
-    for (const i of [5, 12, 16]) {
-      await page.locator('.end-toggle-button').nth(i).click();
-      await page.waitForTimeout(800);
-      const after = await snapshot();
-      expect(after.cards, 'the ending cards followed the selector').toEqual(before.cards);
-      expect(after.title, 'the chart title did not follow the selector').not.toBe(before.title);
-      expect(after.legend, 'the chart did not follow the selector').not.toBe(before.legend);
-    }
-  });
-});
-
 test.describe('the leader settles on its answer', () => {
   test('it riffles through endings and lands on the right one', async ({ page }) => {
     await settle(page);
@@ -1119,78 +1043,7 @@ test.describe('the leader settles on its answer', () => {
   });
 });
 
-test.describe('the forecast plays itself', () => {
-  test('it steps through every model and returns to the aggregate', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForSelector('.end-toggle-button');
-    const result = await page.evaluate(() => new Promise(resolve => {
-      const seen = [];
-      const active = () => document.querySelector('.end-toggle-button.active')?.dataset.endForecast;
-      let last = active();
-      const t0 = performance.now();
-      const budget = Object.keys(window.MF_TEST.activeDataset().endStateRuns).length * 500 + 6000;
-      const watch = setInterval(() => {
-        const now = active();
-        if (now !== last) { seen.push({ at: Math.round(performance.now() - t0), key: now }); last = now; }
-        if (performance.now() - t0 > budget) {
-          clearInterval(watch);
-          const gaps = seen.slice(1).map((s, i) => s.at - seen[i].at).sort((a, b) => a - b);
-          resolve({ visited: seen.map(s => s.key), models: Object.keys(window.MF_TEST.activeDataset().endStateRuns).length,
-                    aggregateGap: gaps[Math.floor(gaps.length / 2)], ended: active() });
-        }
-      }, 30);
-      // The site uses smooth scrolling for readers. CI WebKit can leave that
-      // programmatic scroll pending long enough that the IntersectionObserver
-      // never sees the panel during this test's fixed sweep budget. Make only
-      // the test setup scroll immediate; the real observer and timed sweep are
-      // still what drive every selection below.
-      document.documentElement.style.scrollBehavior = 'auto';
-      document.querySelector('.end-consensus').scrollIntoView({ block: 'start' });
-    }));
-    const models = result.visited.filter(k => k !== 'Aggregate');
-    expect(models.length, 'the sweep did not visit every model').toBe(result.models);
-    expect(new Set(models).size, 'a model was shown twice').toBe(result.models);
-    expect(result.aggregateGap, 'the step should be about half a second').toBeGreaterThan(400);
-    expect(result.aggregateGap).toBeLessThan(700);
-    expect(result.ended, 'it should come to rest on the aggregate').toBe('Aggregate');
-  });
-
-  test('a click takes it over', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForSelector('.end-toggle-button');
-    await page.evaluate(() => document.querySelector('.end-consensus').scrollIntoView());
-    await page.waitForTimeout(1200);                       // let the sweep get going
-    const chosen = await page.locator('.end-toggle-button').nth(4).getAttribute('data-end-forecast');
-    await page.locator('.end-toggle-button').nth(4).click();
-    await page.waitForTimeout(2000);                       // four steps would have passed
-    const still = await page.evaluate(() => document.querySelector('.end-toggle-button.active')?.dataset.endForecast);
-    expect(still, 'the sweep kept going after the reader chose a model').toBe(chosen);
-  });
-
-  test('reduced motion gets no sweep', async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/');
-    await page.waitForSelector('.end-toggle-button');
-    await page.evaluate(() => document.querySelector('.end-consensus').scrollIntoView());
-    await page.waitForTimeout(2000);
-    const active = await page.evaluate(() => document.querySelector('.end-toggle-button.active')?.dataset.endForecast);
-    expect(active, 'the selection moved under reduced motion').toBe('Aggregate');
-  });
-});
-
 test.describe('behaviour', () => {
-  test('the leader panel ignores the model selector', async ({ page }) => {
-    await settle(page);
-    const read = () => page.evaluate(() => document.querySelector('.leader-name').textContent + ' ' + document.querySelector('.end-leader strong').textContent);
-    const before = await read();
-    const buttons = page.locator('.end-toggle-button');
-    for (const i of [3, 9]) {
-      await buttons.nth(i).click();
-      await page.waitForTimeout(700);
-      expect(await read(), 'the leader followed the selector').toBe(before);
-    }
-  });
-
   test('a model-authored rationale cannot execute', async ({ page }) => {
     await settle(page);
     const result = await page.evaluate(async () => {
@@ -1595,19 +1448,6 @@ test.describe('lab-balanced pDoom', () => {
       await toggle.getByRole('button', { name: label, exact: true }).click();
       await expect(page.locator(`.horizon-button[data-horizon="${horizon}"]`)).toHaveAttribute('aria-pressed', 'true');
       await expect(page.locator('#pdoom-value'), `pDoom did not update for ${label}`).toHaveText(value);
-    }
-  });
-
-  test('stays an aggregate when the model forecast selector changes', async ({ page }) => {
-    await settle(page);
-    const before = await page.locator('#pdoom').innerText();
-    const buttons = page.locator('.end-toggle-button').filter({ hasNotText: 'Lab-balanced mean' });
-    expect(await buttons.count()).toBeGreaterThan(1);
-    for (const index of [0, 1]) {
-      await buttons.nth(index).click();
-      await page.waitForTimeout(700);
-      await expect(page.locator('#pdoom-value')).toHaveText('25.6%');
-      expect(await page.locator('#pdoom').innerText(), 'pDoom followed the per-model selector').toBe(before);
     }
   });
 

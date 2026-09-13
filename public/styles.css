@@ -601,3 +601,25 @@ body.dialog-open { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .matrix .matrix-cell, .matrix .matrix-model { opacity: 1; transform: none; transition: none; }
 }
+
+/* One sticky control with attached horizon and lab rows. */
+.horizon-toggle-dock { flex-direction: column; align-items: stretch; }
+.horizon-toggle { align-self: flex-end; }
+.lab-toggle { display: flex; align-self: flex-end; max-width: 100%; min-width: 0; overflow-x: auto; border: 1px solid var(--ink); background: var(--paper); pointer-events: auto; margin-top: -1px; scrollbar-width: thin; }
+.lab-button { flex: 0 0 auto; min-height: 48px; padding: 9px 12px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 0; background: transparent; color: var(--ink); font: 800 10px var(--mono); text-transform: uppercase; white-space: nowrap; cursor: pointer; }
+.lab-button + .lab-button { border-left: 1px solid var(--ink); }
+.lab-button:hover { background: rgba(17, 18, 15, .08); }
+.lab-button.active { color: var(--paper); background: var(--ink); }
+.lab-button[data-lab]:not([data-lab=""]) { width: 48px; padding-inline: 12px; }
+.lab-button .lab-logo { width: 20px; height: 20px; }
+.lab-button:focus-visible, .model-dropdown button:focus-visible { outline: 2px solid var(--blue); outline-offset: -3px; }
+.model-dropdown { position: absolute; top: calc(100% - 18px); z-index: 25; width: 250px; max-width: 100%; max-height: min(320px, 50vh); overflow-y: auto; border: 1px solid var(--ink); background: var(--paper); box-shadow: 0 8px 16px #11120f20; pointer-events: auto; }
+.model-dropdown[hidden] { display: none; }
+.model-dropdown button { display: block; width: 100%; border: 0; padding: 14px; background: transparent; color: var(--ink); text-align: left; font: 700 12px var(--mono); cursor: pointer; }
+.model-dropdown button + button { border-top: 1px solid var(--line); }
+.model-dropdown button:hover { background: #11120f10; }
+.model-dropdown button[aria-pressed="true"] { color: var(--paper); background: var(--ink); }
+@media (max-width: 600px) {
+  .horizon-toggle { align-self: stretch; }
+  .lab-button { flex-grow: 0; }
+}

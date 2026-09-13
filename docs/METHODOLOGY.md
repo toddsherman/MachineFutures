@@ -64,3 +64,7 @@ Raw batches in [`runs/`](../runs/) are the canonical forecast evidence. Their ge
 ## Interpretation
 
 These results record what models express under a fixed elicitation procedure. They are not calibrated probabilities, expert consensus, or a leaderboard. Small gaps between models should not be treated as meaningful unless they clear the sampling uncertainty. Changes over time can reflect a model release, a model's revised answers, or a change in the roster; the leader timeline carries lab and model counts to make compositional changes visible.
+
+## Global forecast selection
+
+The attached lab icon row selects the forecast across the page. Select a lab for its mean; select its icon again to open the model dropdown. The headline, pDoom, outcome cards and details, exposure list, and horizon chart follow that selection. The full model matrix and its details retain every model. Horizon, lab, and model choices are shareable URL parameters. The horizon chart uses only measurements available for the selected lab or model.

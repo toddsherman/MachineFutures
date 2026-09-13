@@ -394,7 +394,7 @@
     });
     const description = $('#horizon-chart-svg-desc');
     if (description) {
-      description.textContent = `Eleven solid scenario-coloured curves connect ${selectionLabel()} probabilities at the available measured horizons on a log elapsed-time axis. ${selected.year} is selected on the page and marked by a vertical dotted guide. Curves are visual connectors, not intermediate forecasts.`;
+      description.textContent = `Eleven solid scenario-coloured curves connect ${selectionLabel()} probabilities at the available measured horizons on a split-scale axis with 2060 halfway between 2030 and 3000. ${selected.year} is selected on the page and marked by a vertical dotted guide. Curves are visual connectors, not intermediate forecasts.`;
     }
   }
 
@@ -513,11 +513,12 @@
     const plotTop = margin.top + 5;
     const plotBottom = height - margin.bottom - 5;
     const years = data.horizons.map(horizon => horizon.year);
-    const firstYear = Math.min(...years);
-    const logElapsed = year => Math.log1p((year - firstYear) / 10);
-    const logMin = logElapsed(firstYear);
-    const logMax = logElapsed(Math.max(...years));
-    const x = year => plotLeft + (logElapsed(year) - logMin) / (logMax - logMin) * (plotRight - plotLeft);
+    // Reserve half the axis for the three near-term decades and half for
+    // the interval from 2060 to the long-term horizon.
+    const axisPosition = year => year <= 2060
+      ? (year - 2030) / 60
+      : 0.5 + (year - 2060) / (2 * (3000 - 2060));
+    const x = year => plotLeft + axisPosition(year) * (plotRight - plotLeft);
     const allValues = data.series.flatMap(series => series.curve.map(point => point.value));
     const maximum = Math.max(...allValues);
     const yMax = Math.ceil((maximum * 1.04) / 5) * 5;
@@ -558,7 +559,7 @@
       x: (margin.left + measured - margin.right) / 2,
       y: height - 9,
       'text-anchor': 'middle'
-    }, compact ? 'Forecast year · log scale' : 'Forecast year · log elapsed time after 2030 · 3000 is long term'));
+    }, compact ? 'Forecast year · split scale' : 'Forecast year · split scale at 2060 · 3000 is long term'));
     svg.appendChild(svgNode('text', {
       class: 'horizon-chart-axis-title',
       x: -(margin.top + (height - margin.top - margin.bottom) / 2),

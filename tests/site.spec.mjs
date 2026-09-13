@@ -1176,6 +1176,16 @@ test.describe('mean scenario probabilities by horizon', () => {
     expect(chart.points.filter(point => !(point.radius > 0 && point.radius <= 3.5)), 'observation dots should be small, filled circles').toEqual([]);
   });
 
+  test('2060 is centered and earlier decades are evenly spaced', async ({ page }) => {
+    await settle(page);
+    const positions = await page.locator('.horizon-chart-tick[data-horizon]').evaluateAll(ticks =>
+      Object.fromEntries(ticks.map(tick => [tick.dataset.horizon, Number(tick.getAttribute('x'))])));
+    const span = positions['long-term'] - positions['2030'];
+    for (const [year, fraction] of [['2030', 0], ['2040', 1 / 6], ['2050', 1 / 3], ['2060', 0.5], ['long-term', 1]]) {
+      expect((positions[year] - positions['2030']) / span).toBeCloseTo(fraction, 3);
+    }
+  });
+
   test('tapping outside the chart dismisses its pinned popup and allows reopening', async ({ page }) => {
     await settle(page);
     const hit = page.locator('#horizon-chart-svg .horizon-chart-hit');

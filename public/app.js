@@ -893,7 +893,7 @@
       // physically put. Build them once so a click does not discard the
       // focused element, then only update their selected state.
       if (!toggle.children.length) {
-        toggle.innerHTML = horizonOptions.map(option =>
+        toggle.innerHTML = [...horizonOptions].reverse().map(option =>
           `<button type="button" class="horizon-button" data-horizon="${esc(option.id)}" aria-pressed="false">${esc(option.label)}</button>`
         ).join('');
       }
@@ -1480,6 +1480,8 @@
   window.addEventListener('scroll', hideMarkTip, true);
 
   function selectForecast(key, lab = activeLab) {
+    const viewportHold = holdViewport(captureViewportPosition());
+    const openExposureKey = $('.doomer-row.is-open')?.dataset.runKey;
     closeModelDropdown();
     stopSweep();
     activeEndForecast = key;
@@ -1492,7 +1494,22 @@
     pdoomSettleCancelled = true;
     renderPdoom(scopedEntries());
     applyForecast({ animate: true });
+    if (openExposureKey) {
+      const row = $$('.doomer-row').find(candidate => candidate.dataset.runKey === openExposureKey);
+      if (row) setExposureOpen(row, true);
+    }
+    restoreViewportPosition(viewportHold.position);
     updateUrl();
+    requestAnimationFrame(() => {
+      if (viewportHold.token !== viewportRestoreToken) return;
+      $$('.lab-button').find(button => button.dataset.lab === activeLab)?.focus({ preventScroll: true });
+      restoreViewportPosition(viewportHold.position);
+      requestAnimationFrame(() => {
+        if (viewportHold.token !== viewportRestoreToken) return;
+        restoreViewportPosition(viewportHold.position);
+        releaseViewport(viewportHold.token);
+      });
+    });
   }
 
   // A horizon can change the height of every dynamic section above the

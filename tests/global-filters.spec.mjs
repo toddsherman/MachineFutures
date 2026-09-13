@@ -130,3 +130,38 @@ test('a missing model horizon is unavailable instead of substituting another for
   expect(await page.evaluate(() => window.MF_TEST.horizonChartData().horizons.map(h => h.id))).not.toContain('2030');
   expect(new URL(page.url()).searchParams.get('model')).toBe(key);
 });
+
+test('lab and model selections preserve the reading position throughout the page', async ({ page, browserName }) => {
+  await start(page);
+  const anchors = ['.leader-name', '#pdoom-value', '#state-9', '.matrix-row[data-state="7"]', '.doomer-row', '.horizon-chart-plot', '.method-list > li'];
+  const tolerance = browserName === 'webkit' ? 2 : 1.5;
+  const nextPaint = () => page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  for (const selector of anchors) {
+    for (const provider of ['Anthropic', 'OpenAI', '']) {
+      const before = await page.evaluate(selector => {
+        document.documentElement.style.scrollBehavior = 'auto';
+        const element = document.querySelector(selector);
+        const dock = document.querySelector('.horizon-toggle-dock').getBoundingClientRect();
+        const top = dock.height + (innerHeight - dock.height - element.getBoundingClientRect().height) / 2;
+        window.scrollBy(0, element.getBoundingClientRect().top - Math.max(dock.height + 20, top));
+        return element.getBoundingClientRect().top;
+      }, selector);
+      await page.locator(`.lab-button[data-lab="${provider}"]`).click();
+      await nextPaint();
+      const after = await page.locator(selector).first().evaluate(el => el.getBoundingClientRect().top);
+      expect(Math.abs(after - before), `${selector} shifted selecting ${provider || 'all labs'}`).toBeLessThanOrEqual(tolerance);
+    }
+  }
+  await lab(page).click();
+  await nextPaint();
+  const before = await page.locator('#pdoom-value').evaluate(el => {
+    const dock = document.querySelector('.horizon-toggle-dock');
+    window.scrollBy(0, el.getBoundingClientRect().top - dock.offsetHeight - 100);
+    return el.getBoundingClientRect().top;
+  });
+  await lab(page).click();
+  await page.locator('#model-dropdown button').nth(1).click();
+  await nextPaint();
+  expect(Math.abs(await page.locator('#pdoom-value').evaluate(el => el.getBoundingClientRect().top) - before)).toBeLessThanOrEqual(tolerance);
+  expect(await page.evaluate(() => document.documentElement.style.overflowAnchor)).toBe('');
+});

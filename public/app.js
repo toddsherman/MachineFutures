@@ -1752,6 +1752,12 @@
 
   document.addEventListener('pointerdown', stopSweep, { once: true });
 
+  document.addEventListener('pointerdown', event => {
+    if (event.target.closest?.('.horizon-chart-plot')) return;
+    horizonChartPinned = false;
+    hideHorizonChartTooltip();
+  });
+
   document.addEventListener('keydown', event => {
     stopSweep();
     if (event.key === 'Escape') {

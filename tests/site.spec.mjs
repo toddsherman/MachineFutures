@@ -1176,6 +1176,23 @@ test.describe('mean scenario probabilities by horizon', () => {
     expect(chart.points.filter(point => !(point.radius > 0 && point.radius <= 3.5)), 'observation dots should be small, filled circles').toEqual([]);
   });
 
+  test('tapping outside the chart dismisses its pinned popup and allows reopening', async ({ page }) => {
+    await settle(page);
+    const hit = page.locator('#horizon-chart-svg .horizon-chart-hit');
+    const tooltip = page.locator('#horizon-chart-tooltip');
+    const usesTouch = await page.evaluate(() => navigator.maxTouchPoints > 0);
+    const tap = async (target, options) => usesTouch ? target.tap(options) : target.click(options);
+    await hit.scrollIntoViewIfNeeded();
+    await tap(hit, { position: { x: 8, y: 8 } });
+    await expect(tooltip).toBeVisible();
+    await tap(page.locator('.horizon-chart-caption'));
+    await expect(tooltip).toBeHidden();
+    await expect(page.locator('.horizon-chart-hover-guide')).toHaveAttribute('visibility', 'hidden');
+    await expect(page.locator('.horizon-chart-hover-point')).toHaveCount(0);
+    await tap(hit, { position: { x: 8, y: 8 } });
+    await expect(tooltip).toBeVisible();
+  });
+
   test('the hover or tap overlay carries the existing extinction symbols for states 1–5 only', async ({ page }) => {
     await settle(page);
     const hit = page.locator('#horizon-chart-svg .horizon-chart-hit');

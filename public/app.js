@@ -75,6 +75,8 @@
   const aggregatePercent = value => `${Number(value).toFixed(1)}%`;
 
   let activeEndForecast = AGGREGATE_KEY;
+  let activeLab = '';
+  let dropdownTrigger = null;
 
   // Horizon and selected model live in real query params so a link is shareable:
   //   /?horizon=2030&model=claude-fable-5
@@ -97,13 +99,18 @@
     if (requestedAggregate) model = null;
     const invalidModel = model && !endStateRuns[model];
     activeEndForecast = model && endStateRuns[model] ? model : AGGREGATE_KEY;
-    if (legacy || invalidHorizon || invalidModel || requestedAggregate) updateUrl();
+    const requestedLab = params.get('lab');
+    activeLab = endStateRuns[activeEndForecast]?.provider ||
+      (Object.values(endStateRuns).some(run => run.provider === requestedLab) ? requestedLab : '');
+    if (legacy || invalidHorizon || invalidModel || requestedAggregate || (requestedLab && requestedLab !== activeLab)) updateUrl();
   }
 
   function updateUrl() {
     const url = new URL(location.href);
     if (activeHorizon === fallbackHorizon) url.searchParams.delete('horizon');
     else url.searchParams.set('horizon', activeHorizon);
+    if (activeLab) url.searchParams.set('lab', activeLab);
+    else url.searchParams.delete('lab');
     if (activeEndForecast === AGGREGATE_KEY) url.searchParams.delete('model');
     else url.searchParams.set('model', activeEndForecast);
     history.replaceState(null, '', url.pathname + url.search + url.hash);
@@ -305,7 +312,7 @@
   }
 
   function sampleHorizonCurve(points) {
-    if (points.length < 3) return points;
+    if (points.length < 4) return points;
     const earlyPoints = points.slice(0, -1);
     const previous = earlyPoints.at(-2);
     const lastEarly = earlyPoints.at(-1);
@@ -332,15 +339,19 @@
     return early.concat(tail.slice(1));
   }
 
+  function horizonEntries(id) {
+    return scopedEntries(Object.entries(datasets[id]?.endStateRuns || {}).map(([runKey, run]) => ({ ...run, runKey })));
+  }
+
   function horizonChartData() {
     const orderedStates = [...baseStates].sort((left, right) => left.id - right.id);
     const horizons = horizonOptions.map(option => ({
       id: option.id,
       label: option.label,
       year: Number(option.targetYear)
-    })).filter(option => Number.isFinite(option.year));
+    })).filter(option => Number.isFinite(option.year) && horizonEntries(option.id).length);
     const vectors = horizons.map(option => aggregateOf(
-      Object.values(datasets[option.id]?.endStateRuns || {}),
+      horizonEntries(option.id),
       orderedStates
     ));
     const series = orderedStates.map((state, stateIndex) => ({
@@ -383,7 +394,7 @@
     });
     const description = $('#horizon-chart-svg-desc');
     if (description) {
-      description.textContent = `Eleven solid scenario-coloured curves connect lab-balanced mean probabilities for 2030, 2040, 2050, 2060, and 3000 on a log elapsed-time axis. ${selected.year} is selected on the page and marked by a vertical dotted guide. Curves are visual connectors, not intermediate forecasts.`;
+      description.textContent = `Eleven solid scenario-coloured curves connect ${selectionLabel()} probabilities at the available measured horizons on a log elapsed-time axis. ${selected.year} is selected on the page and marked by a vertical dotted guide. Curves are visual connectors, not intermediate forecasts.`;
     }
   }
 
@@ -477,13 +488,14 @@
 
   function renderHorizonChartTable(data) {
     const table = $('#horizon-chart-table');
-    table.innerHTML = `<table><caption>Lab-balanced mean scenario probabilities by forecast horizon.</caption><thead><tr><th>Scenario</th>${data.horizons.map(horizon => `<th>${horizon.year}</th>`).join('')}</tr></thead><tbody>${data.series.map(series => `<tr><th>${series.id}. ${esc(series.name)}${series.extinction ? ` — ${extinctionLabels[series.extinction]}` : ''}</th>${series.points.map(point => `<td>${aggregatePercent(point.value)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+    table.innerHTML = `<table><caption>${esc(selectionLabel())} scenario probabilities by forecast horizon.</caption><thead><tr><th>Scenario</th>${data.horizons.map(horizon => `<th>${horizon.year}</th>`).join('')}</tr></thead><tbody>${data.series.map(series => `<tr><th>${series.id}. ${esc(series.name)}${series.extinction ? ` — ${extinctionLabels[series.extinction]}` : ''}</th>${series.points.map(point => `<td>${aggregatePercent(point.value)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
   }
 
   function drawHorizonChart() {
     const host = $('#horizon-chart');
     const svg = $('#horizon-chart-svg');
     if (!host || !svg) return;
+    $('#horizon-chart-note').textContent = `${selectionLabel()} at each available horizon. Select a scenario to show or hide its path.`;
     const data = horizonChartData();
     horizonChartDataCache = data;
     const section = $('.horizon-chart-section');
@@ -785,7 +797,7 @@
   // how many put it second. A rank, not a share: it shows how broadly models
   // support the lab-balanced result.
   function supportFor(stateId) {
-    const runList = Object.values(endStateRuns);
+    const runList = scopedEntries();
     const rankIn = run => {
       const value = run.probabilities[stateId];
       return 1 + endingOrder().filter(other => run.probabilities[other.id] > value).length;
@@ -830,12 +842,18 @@
     }));
   }
 
+  function scopedEntries(entries = forecastEntries()) {
+    return entries.filter(entry => activeEndForecast !== AGGREGATE_KEY
+      ? entry.runKey === activeEndForecast : !activeLab || entry.provider === activeLab);
+  }
+
   function selectedEndStates() {
-    if (activeEndForecast !== AGGREGATE_KEY && endStateRuns[activeEndForecast]) {
-      return endingOrder().map(state => ({ ...state, probability: stateValue(endStateRuns[activeEndForecast], state) }));
-    }
-    activeEndForecast = AGGREGATE_KEY;
-    return stateAggregate();
+    const entries = scopedEntries();
+    const values = aggregateOf(entries);
+    return endingOrder().map((state, index) => ({ ...state, probability: values[index] }));
+  }
+  function selectionLabel() {
+    return endStateRuns[activeEndForecast]?.label || (activeLab ? `${activeLab} mean` : 'Lab-balanced mean');
   }
 
   // Lab marks, monochrome, so model identity is carried by shape rather than
@@ -901,9 +919,9 @@
 
     const ending = outcomeTerm(false);
     const endings = outcomeTerm(true);
-    $('#end-forecast-toggle')?.setAttribute('aria-label', `Select ${stateTerm(false)} forecast view`);
+
     const forecastNote = $('#forecast-note');
-    if (forecastNote) forecastNote.textContent = `Select a model to see its allocation. Tap any segment to jump to that ${ending}.`;
+    if (forecastNote) forecastNote.textContent = `${selectionLabel()}. Tap any segment to jump to that ${ending}.`;
     const statesTitle = $('#states-title');
     if (statesTitle) statesTitle.innerHTML = `Eleven <em>${esc(endings)}</em>`;
     const statesNote = $('#states-note');
@@ -915,11 +933,52 @@
     updateHorizonChartSelection();
   }
 
-  function renderEndForecastToggle(entries) {
-    const options = [{ key: AGGREGATE_KEY, label: 'Lab-balanced mean' }, ...entries.map(entry => ({ key: entry.runKey, label: entry.label, provider: entry.provider }))];
-    $('#end-forecast-toggle').innerHTML = options.map(option =>
-      `<button type="button" class="end-toggle-button${option.provider ? '' : ' is-aggregate'}${option.key === activeEndForecast ? ' active' : ''}" data-end-forecast="${esc(option.key)}" aria-pressed="${option.key === activeEndForecast}">${option.provider ? labLogo(option.provider) : ''}${esc(option.label)}</button>`
-    ).join('');
+  function renderLabToggle(entries) {
+    const toggle = $('#lab-toggle');
+    const labs = [...new Set(entries.map(entry => entry.provider))];
+    const keys = ['', ...labs];
+    if (toggle.dataset.labs !== JSON.stringify(labs)) {
+      toggle.dataset.labs = JSON.stringify(labs);
+      toggle.innerHTML = keys.map(lab => `<button type="button" class="lab-button" data-lab="${esc(lab)}" aria-pressed="false"${lab ? ' aria-haspopup="true" aria-expanded="false" aria-controls="model-dropdown"' : ''}></button>`).join('');
+    }
+    [...toggle.children].forEach(button => {
+      const lab = button.dataset.lab;
+      const on = lab === activeLab;
+      button.classList.toggle('active', on);
+      button.setAttribute('aria-pressed', String(on));
+      button.innerHTML = lab ? labLogo(lab) : 'Lab-Balanced Mean';
+      button.title = lab ? (on ? `${selectionLabel()} · Select again to choose a model` : lab) : 'Lab-Balanced Mean';
+      button.setAttribute('aria-label', lab ? `${lab}${on ? `, ${selectionLabel()} selected. Activate to choose a model` : ', select lab mean'}` : 'Lab-Balanced Mean');
+    });
+  }
+
+  function closeModelDropdown(restoreFocus = false) {
+    $('#model-dropdown').hidden = true;
+    if (dropdownTrigger) {
+      dropdownTrigger.setAttribute('aria-expanded', 'false');
+      if (restoreFocus) dropdownTrigger.focus({ preventScroll: true });
+    }
+    dropdownTrigger = null;
+  }
+
+  function openModelDropdown(button) {
+    if (dropdownTrigger === button && !$('#model-dropdown').hidden) {
+      closeModelDropdown(true);
+      return;
+    }
+    closeModelDropdown();
+    dropdownTrigger = button;
+    const menu = $('#model-dropdown');
+    const models = forecastEntries().filter(entry => entry.provider === activeLab);
+    menu.innerHTML = [{ runKey: AGGREGATE_KEY, label: `${activeLab} mean` }, ...models].map(entry =>
+      `<button type="button" data-model="${esc(entry.runKey)}" aria-pressed="${entry.runKey === activeEndForecast}">${esc(entry.label)}</button>`).join('');
+    menu.setAttribute('aria-label', `${activeLab} forecast`);
+    menu.hidden = false;
+    button.setAttribute('aria-expanded', 'true');
+    const dock = $('.horizon-toggle-dock').getBoundingClientRect();
+    const rect = button.getBoundingClientRect();
+    menu.style.left = `${Math.max(0, Math.min(rect.left - dock.left, dock.width - menu.offsetWidth))}px`;
+    menu.querySelector('[aria-pressed="true"]').focus({ preventScroll: true });
   }
 
   // Cell intensity is the state's own hue at an alpha proportional to the
@@ -1043,7 +1102,7 @@
 
     panel.dataset.pdoomValue = String(value);
     panel.dataset.renderedHorizon = activeHorizon;
-    panel.innerHTML = `${pdoomTitleMarkup()}<div class="pdoom-answer"><p class="pdoom-name"><span>Humanity is gone</span></p><strong class="pdoom-figure" id="pdoom-value" aria-label="${value.toFixed(1)} percent">${aggregatePercent(value)}</strong><span class="leader-unit" id="pdoom-unit"><span>Lab-balanced mean across ${plural(labCount, 'lab')} (${plural(modelCount, 'model')})</span><span>&middot; ${esc(horizon.label)}</span><span>&middot; states 1&ndash;3</span></span></div><div class="pdoom-detail"><p class="pdoom-description" id="pdoom-description">The combined probability assigned to Terminal Silence, The Inheritance, and Bootloader&mdash;the three scenarios in which humanity is gone. States 4&ndash;5 are not included because extinction occurs only in some versions.</p><p class="pdoom-method">Each model&rsquo;s shares for states 1&ndash;3 are added first; models are averaged within their lab, then the labs are weighted equally.</p></div>`;
+    panel.innerHTML = `${pdoomTitleMarkup()}<div class="pdoom-answer"><p class="pdoom-name"><span>Humanity is gone</span></p><strong class="pdoom-figure" id="pdoom-value" aria-label="${value.toFixed(1)} percent">${aggregatePercent(value)}</strong><span class="leader-unit" id="pdoom-unit"><span>${esc(selectionLabel())} across ${plural(labCount, 'lab')} (${plural(modelCount, 'model')})</span><span>&middot; ${esc(horizon.label)}</span><span>&middot; states 1&ndash;3</span></span></div><div class="pdoom-detail"><p class="pdoom-description" id="pdoom-description">The combined probability assigned to Terminal Silence, The Inheritance, and Bootloader&mdash;the three scenarios in which humanity is gone. States 4&ndash;5 are not included because extinction occurs only in some versions.</p><p class="pdoom-method">Each model&rsquo;s shares for states 1&ndash;3 are added first; models are averaged within their lab, then the labs are weighted equally.</p></div>`;
     settlePdoom(panel, value);
   }
 
@@ -1054,7 +1113,7 @@
       : `Most likely in <em>${esc(horizon.targetYear || horizon.label)}</em>`;
     activeEndForecast = AGGREGATE_KEY;
     axisMax = 40;
-    renderEndForecastToggle([]);
+    renderLabToggle([]);
     $('#end-forecast-title').innerHTML = `${esc(horizonMeta().label)} <em>forecast</em>`;
     $('#consensus-bar').classList.remove('is-animating');
     $('#consensus-bar').classList.add('is-empty');
@@ -1085,8 +1144,8 @@
       renderEmptyDataset();
       return;
     }
-    renderEndForecastToggle(entries);
-    renderPdoom(entries);
+    renderLabToggle(entries);
+    renderPdoom(scopedEntries(entries));
 
     // The visible glyph is just the ending's number, so the name and the
     // current share go in an aria-label, refreshed per selection below.
@@ -1124,7 +1183,7 @@
     }).join('');
 
     renderMatrix(entries, orderedStates);
-    renderDoomer(entries);
+    renderDoomer(scopedEntries(entries));
     applyForecast({ animate: false });
   }
 
@@ -1203,7 +1262,7 @@
     const horizonLabel = horizon.id === 'long-term' ? 'Long-term' : horizon.label;
     const activeLabel = activeRun
       ? `${activeRun.label || activeEndForecast} · ${horizonLabel} forecast`
-      : `${horizonLabel} lab-balanced mean`;
+      : `${horizonLabel} ${activeLab ? `${activeLab} mean` : 'lab-balanced mean'}`;
     const words = activeLabel.split(' ');
     const trailing = words.pop();
     $('#end-forecast-title').innerHTML = words.length
@@ -1211,14 +1270,14 @@
       : `<em>${esc(trailing)}</em>`;
 
     const selectedStates = selectedEndStates();
-    const entriesForRange = forecastEntries();
+    const entriesForRange = scopedEntries();
     const total = selectedStates.reduce((sum, state) => sum + state.probability, 0);
     const bar = $('#consensus-bar');
     const legend = $('#consensus-legend');
-    bar.setAttribute('aria-label', `${activeRun ? activeRun.label : 'Lab-balanced mean'} probability by ${stateTerm(false)} for ${horizon.label}`);
+    bar.setAttribute('aria-label', `${selectionLabel()} probability by ${stateTerm(false)} for ${horizon.label}`);
     bar.classList.toggle('is-animating', Boolean(animate) && !reduceMotion());
 
-    // The selector governs this one chart. The bar and its legend follow it.
+    // All forecast summaries follow the global selection.
     selectedStates.forEach((state, index) => {
       const segment = bar.children[index];
       segment.style.width = `${(state.probability / total) * 100}%`;
@@ -1231,10 +1290,7 @@
       animate ? tweenNumber(value, state.probability, '%', showingAggregate ? 1 : undefined) : (value.textContent = displayed);
     });
 
-    // The ending cards do not. They are the board's account of each ending —
-    // the lab-balanced mean and the spread between models — and a selection
-    // made in the chart above should not quietly rewrite eleven other panels.
-    stateAggregate().forEach(state => {
+    selectedStates.forEach(state => {
       const card = $(`#state-${state.id}`);
       if (!card) return;
 
@@ -1246,6 +1302,15 @@
       const band = { lo: across[0], hi: across.at(-1), q1: quantile(0.25), q3: quantile(0.75),
         caption: `${across[0]}–${across.at(-1)}% across ${across.length} models`,
         detail: `${across[0]}–${across.at(-1)}% across ${across.length} models · middle half ${quantile(0.25).toFixed(0)}–${quantile(0.75).toFixed(0)}%` };
+
+      if (activeRun) {
+        const spread = activeRun.range?.[state.id];
+        band.lo = spread?.[0] ?? state.probability;
+        band.hi = spread?.[1] ?? state.probability;
+        band.q1 = band.q3 = state.probability;
+        band.caption = spread ? `${band.lo}–${band.hi}% across samples` : selectionLabel();
+        band.detail = `${selectionLabel()} · ${band.caption}`;
+      }
 
       const pct = v => (v / axisMax) * 100;
       const origin = (v, from, to) => to === from ? '50%' : `${(((v - from) / (to - from)) * 100).toFixed(2)}%`;
@@ -1290,10 +1355,7 @@
       card.setAttribute('aria-label', `${state.name}: ${aggregatePercent(state.probability)} — see each model's reasoning`);
     });
 
-    // Always the lab-balanced mean, never the selected model: this panel states
-    // the board's answer, and tying it to the selector would turn one model's
-    // opinion into the headline as the reader browsed.
-    const leader = [...stateAggregate()].sort((a, b) => b.probability - a.probability)[0];
+    const leader = [...selectedStates].sort((a, b) => b.probability - a.probability)[0];
     const leaderEl = $('#end-leader');
     const paint = () => {
       const support = supportFor(leader.id);
@@ -1301,40 +1363,26 @@
       const heading = horizon.id === 'long-term'
         ? 'Most likely <em>ending</em>'
         : `Most likely in <em>${esc(horizon.targetYear || horizon.label)}</em>`;
-      const modelCount = Object.keys(endStateRuns).length;
-      const labCount = runsByLab(Object.values(endStateRuns)).length;
-      leaderEl.innerHTML = `<h2 class="leader-title" id="leader-title">${heading}</h2><div class="leader-answer"><p class="leader-name">${esc(leader.name)}</p><strong>${aggregatePercent(leader.probability)}</strong><span class="leader-unit">Lab-balanced mean across ${plural(labCount, 'lab')} (${plural(modelCount, 'model')}) &middot; ${esc(horizon.label)} &middot; of 100 points</span>${leaderTimelineMarkup()}</div><div class="leader-detail"><p class="leader-description">${esc(leader.description)}</p><p class="leader-method">${plural(support.first, 'model')} picked this as their highest-weighted prediction, and ${support.second} more had it as their second. ${esc(support.top.label)} from ${esc(support.top.provider)} put the most weight on it, at ${support.top.value}%; ${esc(support.bottom.label)} from ${esc(support.bottom.provider)} the least, at ${support.bottom.value}%.</p></div>`;
+      const modelCount = scopedEntries().length;
+      const labCount = runsByLab(scopedEntries()).length;
+      leaderEl.innerHTML = `<h2 class="leader-title" id="leader-title">${heading}</h2><div class="leader-answer"><p class="leader-name">${esc(leader.name)}</p><strong>${aggregatePercent(leader.probability)}</strong><span class="leader-unit">${esc(selectionLabel())} across ${plural(labCount, 'lab')} (${plural(modelCount, 'model')}) &middot; ${esc(horizon.label)} &middot; of 100 points</span>${activeLab ? '' : leaderTimelineMarkup()}</div><div class="leader-detail"><p class="leader-description">${esc(leader.description)}</p><p class="leader-method">${plural(support.first, 'model')} picked this as their highest-weighted prediction, and ${support.second} more had it as their second. ${esc(support.top.label)} from ${esc(support.top.provider)} put the most weight on it, at ${support.top.value}%; ${esc(support.bottom.label)} from ${esc(support.bottom.provider)} the least, at ${support.bottom.value}%.</p></div>`;
     };
-    // Selecting a model no longer moves this panel, so there is nothing to
-    // animate: without this it would re-tween the same figure on every click.
-    if (leaderEl.dataset.renderedHorizon === activeHorizon && Number(leaderEl.dataset.leader) === leader.id && leaderEl.dataset.leaderValue === String(leader.probability)) return;
+    clearTimeout(leaderEl._swap);
+    leaderEl.classList.remove('is-swapping');
     leaderEl.dataset.leaderValue = String(leader.probability);
     leaderEl.dataset.renderedHorizon = activeHorizon;
-    const announce = () => settleLeader(leaderEl, leader);
-    // The leader can become a different ending entirely, so it crossfades
-    // rather than counting between two unrelated states.
-    if (!animate || reduceMotion() || Number(leaderEl.dataset.leader) === leader.id) {
-      const previous = leaderEl.querySelector('strong');
-      if (animate && !reduceMotion() && previous && Number(leaderEl.dataset.leader) === leader.id) {
-        tweenNumber(previous, leader.probability, '%', 1);
-      } else paint();
-    } else {
-      leaderEl.classList.add('is-swapping');
-      clearTimeout(leaderEl._swap);
-      leaderEl._swap = setTimeout(() => { paint(); leaderEl.classList.remove('is-swapping'); }, MOTION_MS * 0.4);
-    }
     leaderEl.dataset.leader = leader.id;
-    announce();
+    paint();
   }
 
-  function openState(id) {
+  function openState(id, allModels = false) {
     const state = states.find(item => item.id === Number(id));
     if (!state) return;
     const horizon = horizonMeta();
-    const entries = forecastEntries()
+    const entries = (allModels ? forecastEntries() : scopedEntries())
       .map(entry => ({ ...entry, value: stateValue(entry, state) }))
       .sort((a, b) => b.value - a.value);
-    const consensus = stateAggregate().find(candidate => candidate.id === state.id)?.probability ?? 0;
+    const consensus = aggregateOf(entries)[endingOrder().findIndex(candidate => candidate.id === state.id)] ?? 0;
     // Same ruler as the cards, so a position carries over from the page.
     const pos = v => (v / axisMax) * 100;
     const ticks = [10, 20, 30, 40, 50].filter(t => t < axisMax - 2);
@@ -1367,7 +1415,7 @@
       <div class="dialog-kicker"><span>${String(state.id).padStart(2, '0')}</span>${esc(state.family)} &middot; ${esc(horizon.label)}</div>
       <h2 id="dialog-title">${esc(state.name)}${extinctionMark(state)}</h2>
       <div class="dialog-summary">
-        <div><strong>${aggregatePercent(consensus)}</strong><span>${esc(horizon.label)} lab-balanced mean</span></div>
+        <div><strong>${aggregatePercent(consensus)}</strong><span>${esc(allModels ? 'Lab-balanced mean' : selectionLabel())}</span></div>
         <div><strong>${entries.at(-1).value}–${entries[0].value}%</strong><span>model range</span></div>
         <div><strong>${entries.length}</strong><span>models</span></div>
       </div>
@@ -1431,14 +1479,20 @@
 
   window.addEventListener('scroll', hideMarkTip, true);
 
-  function selectForecast(key) {
+  function selectForecast(key, lab = activeLab) {
+    closeModelDropdown();
+    stopSweep();
     activeEndForecast = key;
-    $$('.end-toggle-button').forEach(button => {
-      const on = button.dataset.endForecast === activeEndForecast;
-      button.classList.toggle('active', on);
-      button.setAttribute('aria-pressed', on);
-    });
+    activeLab = endStateRuns[key]?.provider || lab;
+    renderLabToggle(forecastEntries());
+    renderHorizonContext();
+    renderDoomer(scopedEntries());
+    renderHorizonChart();
+    pdoomSettleToken += 1;
+    pdoomSettleCancelled = true;
+    renderPdoom(scopedEntries());
     applyForecast({ animate: true });
+    updateUrl();
   }
 
   // A horizon can change the height of every dynamic section above the
@@ -1607,6 +1661,9 @@
 
     useDataset(key);
     if (activeEndForecast !== AGGREGATE_KEY && !endStateRuns[activeEndForecast]) activeEndForecast = AGGREGATE_KEY;
+    if (!Object.values(endStateRuns).some(run => run.provider === activeLab)) activeLab = '';
+    closeModelDropdown();
+    renderHorizonChart();
     leaderSettled = false;
     settleCancelled = false;
     pdoomSettled = false;
@@ -1633,39 +1690,7 @@
     });
   }
 
-  // On reaching the forecast, the board plays itself once: every model in turn,
-  // half a second each, ending back on the lab-balanced mean. Seventeen allocations in
-  // nine seconds says more about how far apart the models are than any single
-  // one of them does.
-  let sweepTimer = null;
-  let sweepCancelled = false;
-  function stopSweep() {
-    sweepCancelled = true;
-    if (!sweepTimer) return;
-    clearInterval(sweepTimer);
-    sweepTimer = null;
-  }
-
-  function sweepForecasts(panel) {
-    // Not if motion is unwelcome, and not if the reader asked for one model by
-    // URL — that is a request for that model, not for a tour.
-    if (reduceMotion() || !('IntersectionObserver' in window)) return;
-    if (activeEndForecast !== AGGREGATE_KEY) return;
-    const order = Object.keys(endStateRuns);
-    if (!order.length) return;
-
-    const io = new IntersectionObserver((records, observer) => {
-      if (!records.some(r => r.isIntersecting)) return;
-      observer.disconnect();
-      if (sweepCancelled) return;
-      let step = 0;
-      sweepTimer = setInterval(() => {
-        if (step < order.length) selectForecast(order[step++]);
-        else { stopSweep(); selectForecast(AGGREGATE_KEY); }
-      }, 500);
-    }, { threshold: 0.35 });
-    io.observe(panel);
-  }
+  function stopSweep() {}
 
   document.addEventListener('click', event => {
     const horizonTarget = event.target.closest('.horizon-button[data-horizon]');
@@ -1674,13 +1699,20 @@
       return;
     }
 
-    const endForecastTarget = event.target.closest('[data-end-forecast]');
-    if (endForecastTarget) {
-      stopSweep();
-      selectForecast(endForecastTarget.dataset.endForecast);
-      updateUrl();
+    const labTarget = event.target.closest('[data-lab]');
+    if (labTarget) {
+      if (labTarget.dataset.lab && labTarget.dataset.lab === activeLab) openModelDropdown(labTarget);
+      else selectForecast(AGGREGATE_KEY, labTarget.dataset.lab);
       return;
     }
+    const modelTarget = event.target.closest('[data-model]');
+    if (modelTarget) {
+      const trigger = dropdownTrigger;
+      selectForecast(modelTarget.dataset.model);
+      trigger?.focus({ preventScroll: true });
+      return;
+    }
+    if (!event.target.closest('#model-dropdown')) closeModelDropdown();
 
     // Legend and consensus-bar segments jump to the card; the card opens detail.
     const jumpTarget = event.target.closest('[data-state-jump]');
@@ -1698,7 +1730,7 @@
     }
 
     const stateTarget = event.target.closest('[data-state]');
-    if (stateTarget) openState(stateTarget.dataset.state);
+    if (stateTarget) openState(stateTarget.dataset.state, Boolean(stateTarget.closest('#matrix')));
   });
 
   document.addEventListener('pointerdown', stopSweep, { once: true });
@@ -1785,11 +1817,29 @@
     // above deals with it the moment somebody does.
   }
 
+  document.addEventListener('keydown', event => {
+    if ($('#model-dropdown').hidden) return;
+    if (event.key === 'Escape') { event.preventDefault(); closeModelDropdown(true); }
+    if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+      event.preventDefault();
+      const buttons = [...$('#model-dropdown').querySelectorAll('button')];
+      const index = buttons.indexOf(document.activeElement);
+      const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1
+        : (index + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length;
+      buttons[next].focus();
+    }
+  });
+  document.addEventListener('focusin', event => {
+    if (dropdownTrigger && !event.target.closest('#model-dropdown') && event.target !== dropdownTrigger) closeModelDropdown();
+  });
+  window.addEventListener('resize', () => closeModelDropdown());
+  $('#lab-toggle').addEventListener('scroll', () => closeModelDropdown());
+
   applyUrlState();
   renderEndStates();
   renderHorizonChart();
   window.MF_TEST = {
-    quantizeTo100, aggregateOf, stateAggregate, pDoomOf, extinctionSums, esc, stopSweep,
+    selectedEndStates, selectionLabel, selectForecast, quantizeTo100, aggregateOf, stateAggregate, pDoomOf, extinctionSums, esc, stopSweep,
     activeDataset, activeHorizon: () => activeHorizon, selectHorizon, horizonChartData,
     disableLeaderSettle: () => { leaderSettled = true; settleCancelled = true; },
     disablePdoomSettle: () => {
@@ -1799,7 +1849,7 @@
       landPdoom($('#pdoom'));
     },
     replayLeader: () => {
-      const leader = stateAggregate().slice().sort((a, b) => b.probability - a.probability)[0];
+      const leader = selectedEndStates().slice().sort((a, b) => b.probability - a.probability)[0];
       if (!leader) return;
       leaderSettled = false;
       settleCancelled = false;
@@ -1816,7 +1866,7 @@
     }
   };
 
-  sweepForecasts($('.end-consensus'));
+
 
   revealOnView('.state-strip', { watch: '.strip-axis', threshold: 1 });
   revealOnView('.matrix', { threshold: 0.12 });

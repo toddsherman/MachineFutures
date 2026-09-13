@@ -244,99 +244,43 @@
     return node;
   }
 
-  function endpointSlope(hThis, hNext, deltaThis, deltaNext) {
-    let slope = ((2 * hThis + hNext) * deltaThis - hThis * deltaNext) / (hThis + hNext);
-    if (Math.sign(slope) !== Math.sign(deltaThis)) slope = 0;
-    else if (Math.sign(deltaThis) !== Math.sign(deltaNext) && Math.abs(slope) > Math.abs(3 * deltaThis)) {
-      slope = 3 * deltaThis;
-    }
-    return slope;
-  }
-
-  function shapePreservingModel(points, finalSlope) {
-    const xs = points.map(point => point.year);
-    const ys = points.map(point => point.value);
-    const widths = xs.slice(0, -1).map((value, index) => xs[index + 1] - value);
-    const deltas = widths.map((width, index) => (ys[index + 1] - ys[index]) / width);
-    const slopes = new Array(points.length).fill(0);
-    slopes[0] = endpointSlope(widths[0], widths[1], deltas[0], deltas[1]);
-    for (let index = 1; index < points.length - 1; index += 1) {
-      if (deltas[index - 1] === 0 || deltas[index] === 0 || Math.sign(deltas[index - 1]) !== Math.sign(deltas[index])) {
-        slopes[index] = 0;
-        continue;
-      }
-      const weightOne = 2 * widths[index] + widths[index - 1];
-      const weightTwo = widths[index] + 2 * widths[index - 1];
-      slopes[index] = (weightOne + weightTwo) /
-        (weightOne / deltas[index - 1] + weightTwo / deltas[index]);
-    }
-    slopes[slopes.length - 1] = finalSlope;
-
-    return year => {
-      let index = 0;
-      while (index < xs.length - 2 && year > xs[index + 1]) index += 1;
-      const width = widths[index];
-      const t = (year - xs[index]) / width;
-      const t2 = t * t;
-      const t3 = t2 * t;
-      return (2 * t3 - 3 * t2 + 1) * ys[index] +
-        (t3 - 2 * t2 + t) * width * slopes[index] +
-        (-2 * t3 + 3 * t2) * ys[index + 1] +
-        (t3 - t2) * width * slopes[index + 1];
-    };
-  }
-
-  function c4TailModel(points) {
-    const previous = points.at(-3);
-    const start = points.at(-2);
-    const end = points.at(-1);
-    const duration = end.year - start.year;
-    const incomingSlope = (start.value - previous.value) / (start.year - previous.year);
-    const change = end.value - start.value;
-    if (Math.abs(change) < Number.EPSILON) return () => start.value;
-    const reversesAtStart = incomingSlope && Math.sign(incomingSlope) !== Math.sign(change);
-    const slopeRatio = (reversesAtStart ? 0 : incomingSlope) * duration / change;
-
-    return year => {
-      const t = Math.max(0, Math.min(1, (year - start.year) / duration));
-      let progress;
-      if (slopeRatio > 1) {
-        progress = 1 - Math.pow(1 - t, slopeRatio);
-      } else {
-        const power = slopeRatio < 0 ? 1 - slopeRatio : 2;
-        const blend = (slopeRatio - 1) / (power - 1);
-        progress = blend * (1 - Math.pow(1 - t, power)) + (1 - blend) * t;
-      }
-      return start.value + change * progress;
-    };
+  function horizonAxisPosition(year) {
+    return year <= 2060 ? (year - 2030) / 60 : 0.5 + (year - 2060) / 1880;
   }
 
   function sampleHorizonCurve(points) {
-    if (points.length < 4) return points;
-    const earlyPoints = points.slice(0, -1);
-    const previous = earlyPoints.at(-2);
-    const lastEarly = earlyPoints.at(-1);
-    const incomingSlope = (lastEarly.value - previous.value) / (lastEarly.year - previous.year);
-    const tailChange = points.at(-1).value - lastEarly.value;
-    // A direction reversal is a turning point. Flatten the shared tangent so
-    // the connector does not invent a probability beyond either observation.
-    const reversesAtTail = incomingSlope && tailChange && Math.sign(incomingSlope) !== Math.sign(tailChange);
-    const finalEarlySlope = reversesAtTail ? 0 : incomingSlope;
-    const earlyValue = shapePreservingModel(earlyPoints, finalEarlySlope);
-    const tailValue = c4TailModel(points);
-    const firstYear = points[0].year;
-    const tailYear = points.at(-2).year;
-    const lastYear = points.at(-1).year;
-    const early = Array.from({ length: 91 }, (_, index) => {
-      const year = firstYear + (tailYear - firstYear) * index / 90;
-      return { year, value: earlyValue(year) };
-    });
-    const tail = Array.from({ length: 481 }, (_, index) => {
-      const normalized = index / 480;
-      const year = tailYear + (lastYear - tailYear) * normalized * normalized;
-      return { year, value: tailValue(year) };
-    });
-    return early.concat(tail.slice(1));
+    if (points.length < 3) return points;
+    // Monotone cubic interpolation in displayed coordinates, matching option B.
+    // The split time axis must shape the tangents as well as position the dots.
+    const xs = points.map(point => horizonAxisPosition(point.year));
+    const widths = xs.slice(1).map((x, i) => x - xs[i]);
+    const secants = widths.map((width, i) => (points[i + 1].value - points[i].value) / width);
+    const slopes = new Array(points.length).fill(0);
+    for (let i = 1; i < points.length - 1; i += 1) {
+      const before = secants[i - 1], after = secants[i];
+      const weighted = (before * widths[i] + after * widths[i - 1]) / (widths[i - 1] + widths[i]);
+      slopes[i] = (Math.sign(before) + Math.sign(after)) *
+        Math.min(Math.abs(before), Math.abs(after), Math.abs(weighted) / 2);
+    }
+    slopes[0] = (3 * secants[0] - slopes[1]) / 2;
+    slopes[points.length - 1] = (3 * secants.at(-1) - slopes.at(-2)) / 2;
+    const samples = [points[0]];
+    for (let i = 0; i < points.length - 1; i += 1) {
+      const start = points[i], end = points[i + 1];
+      for (let step = 1; step <= 120; step += 1) {
+        if (step === 120) { samples.push(end); continue; }
+        const t = step / 120, t2 = t * t, t3 = t2 * t;
+        const position = xs[i] + widths[i] * t;
+        samples.push({
+          year: position <= 0.5 ? 2030 + position * 60 : 2060 + (position - 0.5) * 1880,
+          value: (2 * t3 - 3 * t2 + 1) * start.value +
+            (t3 - 2 * t2 + t) * widths[i] * slopes[i] +
+            (-2 * t3 + 3 * t2) * end.value +
+            (t3 - t2) * widths[i] * slopes[i + 1]
+        });
+      }
+    }
+    return samples;
   }
 
   function horizonEntries(id) {
@@ -515,10 +459,7 @@
     const years = data.horizons.map(horizon => horizon.year);
     // Reserve half the axis for the three near-term decades and half for
     // the interval from 2060 to the long-term horizon.
-    const axisPosition = year => year <= 2060
-      ? (year - 2030) / 60
-      : 0.5 + (year - 2060) / (2 * (3000 - 2060));
-    const x = year => plotLeft + axisPosition(year) * (plotRight - plotLeft);
+    const x = year => plotLeft + horizonAxisPosition(year) * (plotRight - plotLeft);
     const allValues = data.series.flatMap(series => series.curve.map(point => point.value));
     const maximum = Math.max(...allValues);
     const yMax = Math.ceil((maximum * 1.04) / 5) * 5;

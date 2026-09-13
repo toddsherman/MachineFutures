@@ -202,7 +202,7 @@ test.describe('forecast horizons', () => {
   });
 
   test('the full exposure ranking reorders in place', async ({ page, browserName }) => {
-    await settle(page);
+    await settle(page, '/?horizon=long-term');
     const viewportTolerance = viewportToleranceFor(browserName);
     const horizon = page.getByRole('group', { name: 'Forecast horizon' });
     const modelOrder = () => page.locator('.doomer-row').evaluateAll(rows => rows.map(row => row.dataset.runKey));
@@ -319,7 +319,7 @@ test.describe('forecast horizons', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await settleWithHorizons(page);
     const group = page.getByRole('group', { name: 'Forecast horizon' });
-    await expect(group.getByRole('button')).toHaveText(['Long term', '2060', '2050', '2040', '2030']);
+    await expect(group.getByRole('button')).toHaveText(['2030', '2040', '2050', '2060', 'Long term']);
     await expect(group.getByRole('button', { name: 'Long term' })).toHaveAttribute('aria-pressed', 'true');
     const selectedHorizon = group.locator('.horizon-button[aria-pressed="true"]');
     await expect(selectedHorizon).toHaveCount(1);
@@ -537,7 +537,7 @@ test.describe('forecast horizons', () => {
     const empty2060 = `${horizonFixture}\nwindow.MF_DATA.datasets['2060'] = { endStateRuns: {}, datasetDate: null, leaderHistory: [] };`;
     await settleWithHorizons(page, '/?horizon=2060&utm_source=fixture', empty2060);
     const group = page.getByRole('group', { name: 'Forecast horizon' });
-    await expect(group.getByRole('button')).toHaveText(['Long term', '2050', '2040', '2030']);
+    await expect(group.getByRole('button')).toHaveText(['2030', '2040', '2050', 'Long term']);
     await expect(group.getByRole('button', { name: '2060', exact: true })).toHaveCount(0);
     await expect(group.getByRole('button', { name: 'Long term' })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator('.state-card')).toHaveCount(11);
@@ -703,7 +703,7 @@ test.describe('the 2030 exposure chart on a phone', () => {
     expect(placement.top, 'the controls start above the viewport').toBeGreaterThanOrEqual(-0.5);
     expect(placement.bottom, 'the controls fall below the initial viewport').toBeLessThanOrEqual(placement.viewportHeight + 0.5);
     expect(placement.overflow, 'the sticky controls make the page scroll sideways').toBeLessThanOrEqual(0);
-    expect(placement.buttons.map(button => button.label)).toEqual(['Long term', '2060', '2050', '2040', '2030']);
+    expect(placement.buttons.map(button => button.label)).toEqual(['2030', '2040', '2050', '2060', 'Long term']);
     expect(placement.buttons.filter(button => button.lines !== 1), 'a horizon label wrapped onto a second line').toEqual([]);
     expect(placement.buttons.filter(button => !button.textFits), 'a horizon label crossed its button border').toEqual([]);
     expect(Math.max(...placement.buttons.map(button => button.height)), 'the five-button row grew taller than its one-line control height').toBeLessThanOrEqual(40.5);
@@ -932,7 +932,7 @@ test.describe('the charts are actually painted', () => {
 
 test.describe('the leader timeline', () => {
   test('it lists every date and marks the changes', async ({ page }) => {
-    await settle(page);
+    await settle(page, '/?horizon=long-term');
     const tl = await page.evaluate(() => {
       const el = document.querySelector('.leader-timeline');
       if (!el) return null;
@@ -1245,7 +1245,7 @@ test.describe('mean scenario probabilities by horizon', () => {
   });
 
   test('the primary horizon toggle moves one dotted guide and bolds the matching year', async ({ page }) => {
-    await settle(page);
+    await settle(page, '/?horizon=long-term');
     const group = page.getByRole('group', { name: 'Forecast horizon' });
     const selectedChartState = () => page.evaluate(() => {
       const guides = [...document.querySelectorAll('line.horizon-chart-guide[data-horizon]')];
@@ -1408,7 +1408,7 @@ test.describe('lab-balanced pDoom', () => {
   ];
 
   test('sits between the leader and forecast and follows every horizon', async ({ page }) => {
-    await settle(page);
+    await settle(page, '/?horizon=long-term');
     const placement = await page.locator('#pdoom').evaluate(panel => {
       const section = panel.closest('.pdoom-section');
       return {

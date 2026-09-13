@@ -10,7 +10,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, HORIZON_RUN_CONFIG, compareRunPreference, horizonOfBatch, renderHorizonPrompt } from './horizons.mjs';
+import { DEFAULT_VIEW_HORIZON, DEFAULT_HORIZON, HORIZONS, HORIZON_IDS, HORIZON_RUN_CONFIG, compareRunPreference, horizonOfBatch, renderHorizonPrompt } from './horizons.mjs';
 import { labBalancedMean, quantizeAllocation } from './allocations.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -56,7 +56,7 @@ const replayCounts = (horizon, date) => {
   return { models: chosen.length, labs: new Set(chosen.map(batch => batch.provider.trim())).size };
 };
 
-if (defaultHorizon !== DEFAULT_HORIZON) problems.push(`defaultHorizon must be ${DEFAULT_HORIZON}, received ${JSON.stringify(defaultHorizon)}`);
+if (defaultHorizon !== DEFAULT_VIEW_HORIZON) problems.push(`defaultHorizon must be ${DEFAULT_VIEW_HORIZON}, received ${JSON.stringify(defaultHorizon)}`);
 if (!Array.isArray(horizons)) problems.push('horizons metadata must be an array');
 if (!datasets || typeof datasets !== 'object' || Array.isArray(datasets)) problems.push('datasets must be an object');
 

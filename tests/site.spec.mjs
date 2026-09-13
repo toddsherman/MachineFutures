@@ -1256,10 +1256,13 @@ test.describe('mean scenario probabilities by horizon', () => {
   test('curves land on every observation without inventing extrema between them', async ({ page }) => {
     await settle(page);
     const issues = await page.evaluate(() => window.MF_TEST.horizonChartData().series.flatMap(series => {
-      const observed = series.points.map(point => point.value);
-      const low = Math.min(...observed);
-      const high = Math.max(...observed);
-      const outside = series.curve.filter(point => point.value < low - 1e-9 || point.value > high + 1e-9);
+      const outside = series.curve.filter(point => {
+        const endIndex = series.points.findIndex(observation => observation.year >= point.year);
+        const start = series.points[Math.max(0, endIndex - 1)];
+        const end = series.points[endIndex];
+        return point.value < Math.min(start.value, end.value) - 1e-9 ||
+          point.value > Math.max(start.value, end.value) + 1e-9;
+      });
       const missed = series.points.filter(point => !series.curve.some(sample =>
         Math.abs(sample.year - point.year) < 1e-9 && Math.abs(sample.value - point.value) < 1e-9
       ));

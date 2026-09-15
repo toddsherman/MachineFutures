@@ -170,7 +170,7 @@ test('lab and model selections preserve the reading position throughout the page
 test('the landing page defaults to 2030 and keeps explicit horizon links', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
-  await expect(page.locator('.horizon-button')).toHaveText(['2030', '2040', '2050', '2060', 'Long term']);
+  await expect(page.locator('.horizon-button')).toHaveText(['2030', '2035', '2040', '2050', '2060', '2070', '2080', '2090', '2100', '2200', 'Long term']);
   await expect(page.locator('.horizon-button[aria-pressed="true"]')).toHaveAttribute('data-horizon', '2030');
   await expect(page.locator('#pdoom-unit')).toContainText('2030');
   await page.locator('.horizon-button[data-horizon="long-term"]').click();

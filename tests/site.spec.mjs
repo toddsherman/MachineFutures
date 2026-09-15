@@ -1170,8 +1170,8 @@ test.describe('mean scenario probabilities by horizon', () => {
     expect(chart.paths.filter(path => path.stroke !== path.expected), 'a scenario path stopped using its state colour').toEqual([]);
     expect(chart.paths.filter(path => !['none', ''].includes(path.dash)), 'scenario paths must all remain solid').toEqual([]);
 
-    expect(chart.points, '11 scenarios at five observed horizons should paint 55 points').toHaveLength(55);
-    expect(new Set(chart.points.map(point => point.key)).size, 'a scenario/horizon point is duplicated or missing').toBe(55);
+    expect(chart.points, '11 scenarios at eleven observed horizons should paint 121 points').toHaveLength(121);
+    expect(new Set(chart.points.map(point => point.key)).size, 'a scenario/horizon point is duplicated or missing').toBe(121);
     expect(chart.points.filter(point => point.fill !== point.expected), 'an observation is hollow or has the wrong fill').toEqual([]);
     expect(chart.points.filter(point => !(point.radius > 0 && point.radius <= 3.5)), 'observation dots should be small, filled circles').toEqual([]);
   });
@@ -1420,9 +1420,9 @@ test.describe('mean scenario probabilities by horizon', () => {
     expect(accessibility.labels.filter(label => !label.text), 'the SVG title or description is empty').toEqual([]);
     expect(accessibility.tableExists, 'the chart has no semantic data table').toBe(true);
     expect(accessibility.tableCaption, 'the hidden data table has no caption').toBeTruthy();
-    expect(accessibility.columnHeaders.length, 'the table needs a scenario column plus five horizon columns').toBe(6);
+    expect(accessibility.columnHeaders.length, 'the table needs a scenario column plus eleven horizon columns').toBe(12);
     expect(accessibility.rows, 'the table needs one row for every scenario').toBe(11);
-    expect(accessibility.values, 'the table needs all 55 plotted observations').toBe(55);
+    expect(accessibility.values, 'the table needs all 121 plotted observations').toBe(121);
     expect(accessibility.tableHiddenVisually, 'the table should be visually hidden, not painted under the chart').toBe(true);
     expect(accessibility.tableHiddenFromAT, 'the data table must remain available to assistive technology').toBe(false);
   });

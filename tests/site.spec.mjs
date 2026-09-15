@@ -202,6 +202,8 @@ test.describe('forecast horizons', () => {
   });
 
   test('the full exposure ranking reorders in place', async ({ page, browserName }) => {
+    // Eleven horizons exercise 77 viewport-preserving switches on mobile WebKit.
+    test.setTimeout(150_000);
     await settle(page, '/?horizon=long-term');
     const viewportTolerance = viewportToleranceFor(browserName);
     const horizon = page.getByRole('group', { name: 'Forecast horizon' });

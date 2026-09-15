@@ -18,9 +18,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 test('horizon registry has stable public ids and default', () => {
   assert.equal(DEFAULT_HORIZON, 'long-term');
-  assert.deepEqual(HORIZON_IDS, ['long-term', '2030', '2040', '2050', '2060']);
+  assert.deepEqual(HORIZON_IDS, ['long-term', '2030', '2040', '2050', '2060', '2035', '2070', '2080', '2090', '2100', '2200']);
   assert.deepEqual(HORIZONS.map(({ id, targetYear }) => [id, targetYear]), [
-    ['long-term', 3000], ['2030', 2030], ['2040', 2040], ['2050', 2050], ['2060', 2060]
+    ['long-term', 3000], ['2030', 2030], ['2040', 2040], ['2050', 2050], ['2060', 2060], ['2035', 2035], ['2070', 2070], ['2080', 2080], ['2090', 2090], ['2100', 2100], ['2200', 2200]
   ]);
   assert.equal(HORIZON_RUN_CONFIG['2030'].questionSet, 'end-states-2030-v2');
   assert.equal(HORIZON_RUN_CONFIG['2040'].questionSet, 'end-states-2040-v2');
@@ -81,8 +81,8 @@ test('known aliases normalize and unknown horizons are rejected', () => {
   assert.equal(normalizeHorizon('2060'), '2060');
   assert.equal(normalizeHorizon('year_2060'), '2060');
   assert.equal(normalizeHorizon('horizon-2060'), '2060');
-  assert.equal(normalizeHorizon('2070'), null);
-  assert.throws(() => horizonOfBatch({ horizon: '2070', target_year: 2070 }), /unsupported horizon/);
+  assert.equal(normalizeHorizon('2300'), null);
+  assert.throws(() => horizonOfBatch({ horizon: '2300', target_year: 2300 }), /unsupported horizon/);
 });
 
 test('runtime prompt identity hashes the exact date-substituted prompt', () => {
@@ -122,4 +122,14 @@ test('run preference orders numeric revisions rather than lexical filenames', ()
     { file: 'batch__r10.json', date: '2026-09-10', sampleCount: 20 }
   ].sort(compareRunPreference);
   assert.equal(ranked[0].file, 'batch__r10.json');
+});
+
+ test('new snapshots preserve the dated instrument except for the target year', () => {
+  const reference = renderHorizonPrompt(root, '2060', '2026-09-15').prompt;
+  for (const year of ['2035', '2070', '2080', '2090', '2100', '2200']) {
+    const result = renderHorizonPrompt(root, year, '2026-09-15');
+    assert.equal(result.prompt, reference.replaceAll('2060', year));
+    assert.equal(normalizeHorizon(`year_${year}`), year);
+    assert.equal(horizonOfBatch({horizon: year, target_year: Number(year), question_set: `end-states-${year}-v2`}), year);
+  }
 });

@@ -4,7 +4,7 @@ Raw forecast batches written by [`tools/run-elicitation.mjs`](../tools/run-elici
 
 The raw batch field named `aggregate` describes one model's repeated samples; it is not the site's cross-model aggregate. During publication, the coordinate medians from a batch are converted to that model's 100-point published allocation. The site-wide result is then derived separately by averaging published models within each provider/lab and averaging those lab means equally. See [Methodology](../docs/METHODOLOGY.md) for the full rule.
 
-Naming: the legacy long-term family uses `YYYY-MM-DD__<model-slug>__closed_book__end-states.json`; dated snapshots add the horizon, as in `…__end-states-2030.json`, `…__end-states-2040.json`, `…__end-states-2050.json`, and `…__end-states-2060.json`. The retired 50-question 2030 benchmark is kept separately in `archive/` and is never imported into these datasets.
+Naming: the legacy long-term family uses `YYYY-MM-DD__<model-slug>__closed_book__end-states.json`; dated snapshots add the horizon, as in `…__end-states-2030.json`, `…__end-states-2040.json`, `…__end-states-2050.json`, `…__end-states-2060.json`, and the corresponding year suffix for every additional dated horizon. The retired 50-question 2030 benchmark is kept separately in `archive/` and is never imported into these datasets.
 
 This directory is committed for provenance but never deployed ([`vercel.json`](../vercel.json) restricts the Vercel output to `public/`). The website reads only [`public/data.js`](../public/data.js). Regenerate it with `npm run data:import`, which the elicitation workflow runs automatically; `node tools/check-site.mjs` then verifies the result.
 

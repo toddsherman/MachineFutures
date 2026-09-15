@@ -11,6 +11,12 @@
 | 2040 | 2040 | `end-states-2040-v2` | [`public/end_states_2040.md`](../public/end_states_2040.md) | [machinefutures.ai/end_states_2040.md](https://www.machinefutures.ai/end_states_2040.md) |
 | 2050 | 2050 | `end-states-2050-v2` | [`public/end_states_2050.md`](../public/end_states_2050.md) | [machinefutures.ai/end_states_2050.md](https://www.machinefutures.ai/end_states_2050.md) |
 | 2060 | 2060 | `end-states-2060-v2` | [`public/end_states_2060.md`](../public/end_states_2060.md) | [machinefutures.ai/end_states_2060.md](https://www.machinefutures.ai/end_states_2060.md) |
+| 2035 | 2035 | `end-states-2035-v2` | [`public/end_states_2035.md`](../public/end_states_2035.md) | [machinefutures.ai/end_states_2035.md](https://www.machinefutures.ai/end_states_2035.md) |
+| 2070 | 2070 | `end-states-2070-v2` | [`public/end_states_2070.md`](../public/end_states_2070.md) | [machinefutures.ai/end_states_2070.md](https://www.machinefutures.ai/end_states_2070.md) |
+| 2080 | 2080 | `end-states-2080-v2` | [`public/end_states_2080.md`](../public/end_states_2080.md) | [machinefutures.ai/end_states_2080.md](https://www.machinefutures.ai/end_states_2080.md) |
+| 2090 | 2090 | `end-states-2090-v2` | [`public/end_states_2090.md`](../public/end_states_2090.md) | [machinefutures.ai/end_states_2090.md](https://www.machinefutures.ai/end_states_2090.md) |
+| 2100 | 2100 | `end-states-2100-v2` | [`public/end_states_2100.md`](../public/end_states_2100.md) | [machinefutures.ai/end_states_2100.md](https://www.machinefutures.ai/end_states_2100.md) |
+| 2200 | 2200 | `end-states-2200-v2` | [`public/end_states_2200.md`](../public/end_states_2200.md) | [machinefutures.ai/end_states_2200.md](https://www.machinefutures.ai/end_states_2200.md) |
 
 [`tools/horizons.mjs`](../tools/horizons.mjs) is the canonical registry connecting each horizon id to its target year, prompt file, question-set id, and raw-run filename suffix.
 

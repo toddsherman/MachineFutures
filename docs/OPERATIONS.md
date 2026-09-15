@@ -7,7 +7,7 @@
 | Workflow | Schedule | Purpose |
 | --- | --- | --- |
 | [`preflight.yml`](../.github/workflows/preflight.yml) | 25th of each month, 13:00 UTC | Make one inexpensive call per active model to catch missing credit, expired keys, and provider-withdrawn model ids before the paid sweep |
-| [`elicit.yml`](../.github/workflows/elicit.yml) | 1st of each month, 14:00 UTC | Re-ask every active model for all five horizons, validate the sweep, rebuild outputs, and push an elicitation branch |
+| [`elicit.yml`](../.github/workflows/elicit.yml) | 1st of each month, 14:00 UTC | Re-ask every active model for all eleven horizons, validate the sweep, rebuild outputs, and push an elicitation branch |
 | [`watch-models.yml`](../.github/workflows/watch-models.yml) | Mondays, 13:00 UTC | Compare provider catalogs with the roster and update one tracking issue when new models appear |
 | [`ci.yml`](../.github/workflows/ci.yml) | Every push and pull request | Verify raw evidence, reproduce published data, and run browser behavior and layout tests |
 
@@ -39,7 +39,7 @@ Before merging a data refresh, confirm:
 
 Merged pull-request branches are deleted automatically. Failed or incomplete elicitation branches should remain until their paid samples have been resumed into a complete sweep or otherwise reconciled with `main`.
 
-For a five-horizon sweep, each model runs in three globally ordered waves of at most two horizons. A wave waits for the previous wave, so the same model is never called concurrently and one slow provider does not force the whole roster through a single runner.
+For an eleven-horizon sweep, each model runs in six globally ordered waves of at most two horizons. A wave waits for the previous wave, so the same model is never called concurrently and one slow provider does not force the whole roster through a single runner.
 
 ## Protecting paid samples
 
@@ -125,3 +125,7 @@ Mock output lands in the gitignored `runs/.mock/` directory and cannot overwrite
 `npm run check` runs the non-browser suite, including raw-batch integrity, published-data invariants, error classification, links, sweep behavior, and harness recovery cases.
 
 `npm run test:browser` exercises behavior and layout in Chromium and WebKit at multiple widths. Run both before merging changes to prompts, generated data, or the site.
+
+## September 2026 horizon expansion
+
+The `new-horizons` workflow selection collects 2035, 2070, 2080, 2090, 2100, and 2200 only, with the active roster and 20 samples per model and horizon. It uses three ordered waves, retaining the original five datasets. New prompts preserve the v2 dated snapshot instrument with only the target year changed. Publish the six horizons together after the immutable sweep gate passes. Keep failed branches and resume artifacts until all paid samples are reconciled.

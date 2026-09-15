@@ -637,3 +637,7 @@ body.dialog-open { overflow: hidden; }
     text-align: center;
   }
 }
+
+@media (max-width: 600px) {
+  .horizon-label { display: inline-block; transform: rotate(180deg); }
+}

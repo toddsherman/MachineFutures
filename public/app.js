@@ -859,7 +859,7 @@
       // focused element, then only update their selected state.
       if (!toggle.children.length) {
         toggle.innerHTML = horizonOptions.map(option =>
-          `<button type="button" class="horizon-button" data-horizon="${esc(option.id)}" aria-pressed="false">${esc(option.label)}</button>`
+          `<button type="button" class="horizon-button" data-horizon="${esc(option.id)}" aria-pressed="false"><span class="horizon-label">${esc(option.label)}</span></button>`
         ).join('');
       }
       [...toggle.querySelectorAll('.horizon-button[data-horizon]')].forEach(button => {

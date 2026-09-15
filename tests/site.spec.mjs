@@ -689,7 +689,7 @@ test.describe('the 2030 exposure chart on a phone', () => {
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
         buttons: [...toggle.querySelectorAll('.horizon-button')].map(button => {
           const range = document.createRange();
-          range.selectNodeContents(button);
+          range.selectNodeContents(button.querySelector('.horizon-label') || button);
           const text = range.getBoundingClientRect();
           const box = button.getBoundingClientRect();
           const lines = [...range.getClientRects()].filter(rect => rect.width > 0.1 && rect.height > 0.1).length;

@@ -502,3 +502,23 @@ test('the workflow default budget fits eleven horizons across six ordered model 
   assert.match(aggregate, /name: Fail after preserving incomplete results[\s\S]*?has_wave_three == 'true'[\s\S]*?needs\.elicit_wave_three\.result != 'success'/,
     'the aggregate job must fail after preserving an incomplete third wave');
 });
+
+test('all six waves preserve ordered coverage, quota propagation, and publication gates', () => {
+  const workflow = readFileSync(join(root, '.github/workflows/elicit.yml'), 'utf8');
+  const words = ['one','two','three','four','five','six'];
+  const aggregate = workflow.slice(workflow.indexOf('\n  aggregate:'));
+  for (let i=0;i<words.length;i++) {
+    const start=workflow.indexOf(`\n  elicit_wave_${words[i]}:`);
+    const end=workflow.indexOf(i===5?'\n  aggregate:':`\n  elicit_wave_${words[i+1]}:`,start);
+    const wave=workflow.slice(start,end);
+    assert.ok(wave.includes(`wave=${i+1}\\n`));
+    assert.ok(wave.includes(`.status-wave-${i+1}-`));
+    assert.ok(aggregate.includes(`pattern: model-*-wave-${i+1}-`));
+    if (i) {
+      assert.ok(wave.includes(`.status-wave-${i}-`));
+      assert.ok(wave.includes("grep -q '^quota=true$'"));
+      assert.ok(aggregate.includes(`needs.elicit_wave_${words[i]}.result == 'success'`));
+      assert.ok(aggregate.includes(`needs.elicit_wave_${words[i]}.result != 'success'`));
+    }
+  }
+});

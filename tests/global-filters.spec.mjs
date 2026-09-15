@@ -180,3 +180,32 @@ test('the landing page defaults to 2030 and keeps explicit horizon links', async
   await page.locator('.horizon-button[data-horizon="2030"]').click();
   expect(new URL(page.url()).searchParams.has('horizon')).toBe(false);
 });
+
+test('eleven horizons remain reachable without overflowing and update the chart', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.route('**/data.js*', async route => {
+    const response = await route.fetch();
+    const source = await response.text();
+    // Test-only populated copies exercise future-horizon layout before paid runs finish.
+    await route.fulfill({ response, body: source + `
+      for (const year of ['2035','2070','2080','2090','2100','2200']) {
+        window.MF_DATA.datasets[year] = structuredClone(window.MF_DATA.datasets['2060']);
+      }
+    ` });
+  });
+  await page.goto('/');
+  const years = ['2030','2035','2040','2050','2060','2070','2080','2090','2100','2200','long-term'];
+  await expect(page.locator('.horizon-button')).toHaveCount(years.length);
+  for (const year of years) {
+    await page.locator(`.horizon-button[data-horizon="${year}"]`).click();
+    await expect(page.locator('.horizon-button[aria-pressed="true"]')).toHaveAttribute('data-horizon', year);
+    await expect(page.locator(`.horizon-chart-tick[data-horizon="${year}"]`)).toBeVisible();
+    const bounds = await page.evaluate(() => ({ width: innerWidth, page: document.documentElement.scrollWidth,
+      ticks: [...document.querySelectorAll('.horizon-chart-tick')].filter(n => getComputedStyle(n).display !== 'none').map(n => {
+        const box = n.getBoundingClientRect(); return {left:box.left,right:box.right};
+      }).sort((a,b)=>a.left-b.left) }));
+    expect(bounds.page).toBeLessThanOrEqual(bounds.width + 1);
+    for (let i=1;i<bounds.ticks.length;i++) expect(bounds.ticks[i].left).toBeGreaterThanOrEqual(bounds.ticks[i-1].right);
+  }
+  await expect(page.locator('.horizon-chart-point')).toHaveCount(121);
+});

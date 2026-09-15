@@ -663,10 +663,8 @@ jobs:
           echo "::error::$MODEL_KEY did not complete every selected horizon; its paid samples are preserved."
           exit 1
 
-  # The final global barrier keeps the fifth horizon single-flight with both
-  # earlier waves. Quota state is propagated through wave two, so checking its
-  # status suppresses this model even when the original billing failure was in
-  # wave one.
+  # Each later wave waits for all predecessors and inherits the previous
+  # quota status, keeping each model single-flight throughout the sweep.
   elicit_wave_three:
     needs: [plan, elicit_wave_one, elicit_wave_two]
     if: ${{ !cancelled() && needs.plan.outputs.should_elicit == 'true' && needs.plan.outputs.has_wave_three == 'true' }}
@@ -903,7 +901,7 @@ jobs:
           touch "work/runs/.partial/.artifact-wave-4-${MODEL_KEY}"
           printf '%s\n' "$RUN_DATE" > work/runs/.partial/.elicitation-date
 
-      - name: Elicit third horizon wave
+      - name: Elicit fourth horizon wave
         id: elicit
         continue-on-error: true
         env:
@@ -1063,7 +1061,7 @@ jobs:
           touch "work/runs/.partial/.artifact-wave-5-${MODEL_KEY}"
           printf '%s\n' "$RUN_DATE" > work/runs/.partial/.elicitation-date
 
-      - name: Elicit third horizon wave
+      - name: Elicit fifth horizon wave
         id: elicit
         continue-on-error: true
         env:
@@ -1223,7 +1221,7 @@ jobs:
           touch "work/runs/.partial/.artifact-wave-6-${MODEL_KEY}"
           printf '%s\n' "$RUN_DATE" > work/runs/.partial/.elicitation-date
 
-      - name: Elicit third horizon wave
+      - name: Elicit sixth horizon wave
         id: elicit
         continue-on-error: true
         env:

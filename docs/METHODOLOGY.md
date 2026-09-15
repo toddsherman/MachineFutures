@@ -6,7 +6,7 @@
 
 Every model receives one of five versioned prompts and the same taxonomy of eleven mutually exclusive states. It must assign whole-number percentages totaling exactly 100. Zero is explicitly allowed for any state.
 
-The dated horizons describe the arrangement actually visible at the end of 2030, 2040, 2050, or 2060. They do not imply that an arrangement is permanent. The long-term view asks for the durable arrangement by the year 3000. Values from different horizons or prompt versions are never pooled.
+The dated horizons describe the arrangement actually visible at the end of 2030, 2035, 2040, 2050, 2060, 2070, 2080, 2090, 2100, or 2200. They do not imply that an arrangement is permanent. The long-term view asks for the durable arrangement by the year 3000. Values from different horizons or prompt versions are never pooled.
 
 The current instruments and their question-set ids are cataloged in [Prompt management](PROMPTS.md).
 

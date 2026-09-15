@@ -604,7 +604,7 @@ body.dialog-open { overflow: hidden; }
 
 /* One sticky control with attached horizon and lab rows. */
 .horizon-toggle-dock { flex-direction: column; align-items: stretch; }
-.horizon-toggle { align-self: flex-end; }
+.horizon-toggle { align-self: flex-end; max-width: 100%; min-width: 0; overflow-x: auto; scrollbar-width: thin; }
 .lab-toggle { display: flex; align-self: flex-end; max-width: 100%; min-width: 0; overflow-x: auto; border: 1px solid var(--ink); background: var(--paper); pointer-events: auto; margin-top: -1px; scrollbar-width: thin; }
 .lab-button { flex: 0 0 auto; min-height: 48px; padding: 9px 12px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 0; background: transparent; color: var(--ink); font: 800 10px var(--mono); text-transform: uppercase; white-space: nowrap; cursor: pointer; }
 .lab-button + .lab-button { border-left: 1px solid var(--ink); }
@@ -623,3 +623,5 @@ body.dialog-open { overflow: hidden; }
   .horizon-toggle { align-self: stretch; }
   .lab-button { flex-grow: 0; }
 }
+
+.horizon-toggle .horizon-button { flex-shrink: 0; }

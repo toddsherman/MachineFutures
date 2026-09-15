@@ -28,7 +28,13 @@ const HORIZON_META = {
   '2030': { targetYear: 2030, questionSet: 'end-states-2030-v2', suffix: 'end-states-2030', promptFile: 'public/end_states_2030.md' },
   '2040': { targetYear: 2040, questionSet: 'end-states-2040-v2', suffix: 'end-states-2040', promptFile: 'public/end_states_2040.md' },
   '2050': { targetYear: 2050, questionSet: 'end-states-2050-v2', suffix: 'end-states-2050', promptFile: 'public/end_states_2050.md' },
-  '2060': { targetYear: 2060, questionSet: 'end-states-2060-v2', suffix: 'end-states-2060', promptFile: 'public/end_states_2060.md' }
+  '2060': { targetYear: 2060, questionSet: 'end-states-2060-v2', suffix: 'end-states-2060', promptFile: 'public/end_states_2060.md' },
+  '2035': { targetYear: 2035, questionSet: 'end-states-2035-v2', suffix: 'end-states-2035', promptFile: 'public/end_states_2035.md' },
+  '2070': { targetYear: 2070, questionSet: 'end-states-2070-v2', suffix: 'end-states-2070', promptFile: 'public/end_states_2070.md' },
+  '2080': { targetYear: 2080, questionSet: 'end-states-2080-v2', suffix: 'end-states-2080', promptFile: 'public/end_states_2080.md' },
+  '2090': { targetYear: 2090, questionSet: 'end-states-2090-v2', suffix: 'end-states-2090', promptFile: 'public/end_states_2090.md' },
+  '2100': { targetYear: 2100, questionSet: 'end-states-2100-v2', suffix: 'end-states-2100', promptFile: 'public/end_states_2100.md' },
+  '2200': { targetYear: 2200, questionSet: 'end-states-2200-v2', suffix: 'end-states-2200', promptFile: 'public/end_states_2200.md' }
 };
 const runIdFor = (horizon, date = DATE) => `${date}__${slug(rosterEntry.model)}__closed_book__${HORIZON_META[horizon].suffix}`;
 
@@ -214,7 +220,7 @@ test('each horizon has a collision-safe run id and trusted instrument metadata',
     assert.equal(batch.harness.prompt_file, expected.promptFile);
     assert.match(batch.harness.prompt_sha256, /^[a-f0-9]{64}$/);
   }
-  assert.equal(readdirSync(dir).filter(file => file.endsWith('.json')).length, 5);
+  assert.equal(readdirSync(dir).filter(file => file.endsWith('.json')).length, 11);
   rmSync(dir, { recursive: true, force: true });
 });
 
@@ -261,7 +267,7 @@ test('topping up one horizon never reuses or changes another horizon', () => {
 });
 
 test('--horizon rejects unknown or missing values before a run can spend money', () => {
-  for (const args of [['--horizon', '2070'], ['--horizon']]) {
+  for (const args of [['--horizon', '2300'], ['--horizon']]) {
     const r = run(['--mock', '--models', MODEL_KEY, '--samples', '1', ...args], { expectFail: true });
     assert.equal(r.ok, false);
     assert.match(r.out, /--horizon/);
@@ -451,17 +457,17 @@ test('a workflow-free squash preserves newer default content and non-workflow fe
   }
 });
 
-test('the workflow default budget fits five horizons across three ordered model waves', () => {
+test('the workflow default budget fits eleven horizons across six ordered model waves', () => {
   const workflow = readFileSync(join(root, '.github', 'workflows', 'elicit.yml'), 'utf8');
   const waveOne = workflow.slice(workflow.indexOf('\n  elicit_wave_one:'), workflow.indexOf('\n  elicit_wave_two:'));
   const waveTwo = workflow.slice(workflow.indexOf('\n  elicit_wave_two:'), workflow.indexOf('\n  elicit_wave_three:'));
   const waveThree = workflow.slice(workflow.indexOf('\n  elicit_wave_three:'), workflow.indexOf('\n  aggregate:'));
   const aggregate = workflow.slice(workflow.indexOf('\n  aggregate:'));
   assert.match(workflow, /budget_minutes:[\s\S]*?default: '100'/);
-  assert.equal((workflow.match(/inputs\.budget_minutes \|\| '100'/g) || []).length, 4,
-    'plan and all three model waves must use the same 100-minute default');
+  assert.equal((workflow.match(/inputs\.budget_minutes \|\| '100'/g) || []).length, 7,
+    'plan and all six model waves must use the same 100-minute default');
   assert.match(workflow, /2060\) horizons='\["2060"\]'/);
-  assert.match(workflow, /all\) horizons='\["long-term","2030","2040","2050","2060"\]'/);
+  assert.match(workflow, /all\) horizons='\["long-term","2030","2040","2050","2060","2035","2070","2080","2090","2100","2200"\]'/);
   assert.match(workflow, /horizons\.slice\(0, 2\)/);
   assert.match(workflow, /horizons\.slice\(2, 4\)/);
   assert.match(workflow, /horizons\.slice\(4, 6\)/);
@@ -470,7 +476,7 @@ test('the workflow default budget fits five horizons across three ordered model 
   assert.match(workflow, /const count = Math\.min\(horizons\.length, 2\)/,
     'the timeout guard must bound one wave rather than rejecting the five-horizon sweep');
   assert.match(workflow, /if \(\(budget \+ 5\) \* count > 315\)/);
-  assert.equal((workflow.match(/\n    timeout-minutes: 330\n/g) || []).length, 3,
+  assert.equal((workflow.match(/\n    timeout-minutes: 330\n/g) || []).length, 6,
     'each two-horizon wave needs its own hosted-runner window');
   assert.match(waveTwo, /needs: \[plan, elicit_wave_one\][\s\S]*?if: \$\{\{ !cancelled\(\).*has_wave_two == 'true'/,
     'the second matrix must wait through first-wave failures but never start new paid calls after cancellation');
@@ -481,8 +487,8 @@ test('the workflow default budget fits five horizons across three ordered model 
   assert.match(waveThree, /previous_status="prior-wave\/\.partial\/\.status-wave-2-\$\{MODEL_KEY\}"[\s\S]*?grep -q '\^quota=true\$'/,
     'quota state propagated by wave two must suppress the third call for the same model');
   const revisionFilter = String.raw`__r(?:[2-9]|[1-9][0-9])\\.json$`;
-  assert.equal(workflow.split(revisionFilter).length - 1, 3,
-    'all three isolated workspaces must resume every valid immutable revision from r2 through r99');
+  assert.equal(workflow.split(revisionFilter).length - 1, 6,
+    'all six isolated workspaces must resume every valid immutable revision from r2 through r99');
   assert.match(waveOne, /\.artifact-wave-1-\$\{MODEL_KEY\}[\s\S]*?\.status-wave-1-\$\{MODEL_KEY\}[\s\S]*?model-\$\{\{ matrix\.model \}\}-wave-1-\$\{\{ github\.run_id \}\}/,
     'first-wave markers, status, and artifacts must be uniquely named');
   assert.match(waveTwo, /\.artifact-wave-2-\$\{MODEL_KEY\}[\s\S]*?\.status-wave-2-\$\{MODEL_KEY\}[\s\S]*?model-\$\{\{ matrix\.model \}\}-wave-2-\$\{\{ github\.run_id \}\}/,
@@ -495,4 +501,24 @@ test('the workflow default budget fits five horizons across three ordered model 
     'import, site checks, and site push must all require a successful third wave when present');
   assert.match(aggregate, /name: Fail after preserving incomplete results[\s\S]*?has_wave_three == 'true'[\s\S]*?needs\.elicit_wave_three\.result != 'success'/,
     'the aggregate job must fail after preserving an incomplete third wave');
+});
+
+test('all six waves preserve ordered coverage, quota propagation, and publication gates', () => {
+  const workflow = readFileSync(join(root, '.github/workflows/elicit.yml'), 'utf8');
+  const words = ['one','two','three','four','five','six'];
+  const aggregate = workflow.slice(workflow.indexOf('\n  aggregate:'));
+  for (let i=0;i<words.length;i++) {
+    const start=workflow.indexOf(`\n  elicit_wave_${words[i]}:`);
+    const end=workflow.indexOf(i===5?'\n  aggregate:':`\n  elicit_wave_${words[i+1]}:`,start);
+    const wave=workflow.slice(start,end);
+    assert.ok(wave.includes(`wave=${i+1}\\n`));
+    assert.ok(wave.includes(`.status-wave-${i+1}-`));
+    assert.ok(aggregate.includes(`pattern: model-*-wave-${i+1}-`));
+    if (i) {
+      assert.ok(wave.includes(`.status-wave-${i}-`));
+      assert.ok(wave.includes("grep -q '^quota=true$'"));
+      assert.ok(aggregate.includes(`needs.elicit_wave_${words[i]}.result == 'success'`));
+      assert.ok(aggregate.includes(`needs.elicit_wave_${words[i]}.result != 'success'`));
+    }
+  }
 });

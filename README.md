@@ -1,6 +1,6 @@
 # Machine Futures
 
-[Machine Futures](https://www.machinefutures.ai/) is a public record of what frontier AI models forecast about humanity's relationship with AI in 2030, 2040, 2050, 2060, and the long-term year-3000 state.
+[Machine Futures](https://www.machinefutures.ai/) is a public record of what frontier AI models forecast about humanity's relationship with AI across dated snapshots from 2030 through 2200 and the long-term year-3000 state.
 
 Every active model allocates exactly 100 percentage points across the same eleven mutually exclusive states, twenty times, at its default settings. The site publishes each model's median allocation, its sampling spread, and the reasoning nearest that median. The site's cross-model probability aggregate uses a lab-balanced arithmetic mean: published model allocations are averaged within each provider/lab, then the lab means are averaged equally. The downloads retain an equal-model mean only as a secondary comparison.
 
@@ -51,7 +51,7 @@ Large machine-produced files are marked as generated in [`.gitattributes`](.gita
 
 ## Forecast horizons and prompts
 
-The dated views — 2030, 2040, 2050, and 2060 — ask for the arrangement visible at year end without requiring permanence. The long-term view asks for a durable arrangement by the year 3000 and remains the site's default.
+The dated views — 2030, 2035, 2040, 2050, 2060, 2070, 2080, 2090, 2100, and 2200 — ask for the arrangement visible at year end without requiring permanence. The long-term view asks for a durable arrangement by the year 3000 ; 2030 is the site's default.
 
 See [Prompt management](docs/PROMPTS.md) for the canonical ids, question-set versions, repository files, and stable public copies. Prompt files intentionally stay in `public/` because their exact paths and hashes are part of run provenance and immutable sweep plans.
 

@@ -16,7 +16,13 @@ export const HORIZONS = Object.freeze([
   Object.freeze({ id: '2030', label: '2030', targetYear: 2030 }),
   Object.freeze({ id: '2040', label: '2040', targetYear: 2040 }),
   Object.freeze({ id: '2050', label: '2050', targetYear: 2050 }),
-  Object.freeze({ id: '2060', label: '2060', targetYear: 2060 })
+  Object.freeze({ id: '2060', label: '2060', targetYear: 2060 }),
+  Object.freeze({ id: '2035', label: '2035', targetYear: 2035 }),
+  Object.freeze({ id: '2070', label: '2070', targetYear: 2070 }),
+  Object.freeze({ id: '2080', label: '2080', targetYear: 2080 }),
+  Object.freeze({ id: '2090', label: '2090', targetYear: 2090 }),
+  Object.freeze({ id: '2100', label: '2100', targetYear: 2100 }),
+  Object.freeze({ id: '2200', label: '2200', targetYear: 2200 })
 ]);
 
 export const HORIZON_IDS = Object.freeze(HORIZONS.map(horizon => horizon.id));
@@ -26,7 +32,13 @@ export const HORIZON_RUN_CONFIG = Object.freeze({
   '2030': Object.freeze({ promptFile: 'public/end_states_2030.md', questionSet: 'end-states-2030-v2', runSuffix: 'end-states-2030' }),
   '2040': Object.freeze({ promptFile: 'public/end_states_2040.md', questionSet: 'end-states-2040-v2', runSuffix: 'end-states-2040' }),
   '2050': Object.freeze({ promptFile: 'public/end_states_2050.md', questionSet: 'end-states-2050-v2', runSuffix: 'end-states-2050' }),
-  '2060': Object.freeze({ promptFile: 'public/end_states_2060.md', questionSet: 'end-states-2060-v2', runSuffix: 'end-states-2060' })
+  '2060': Object.freeze({ promptFile: 'public/end_states_2060.md', questionSet: 'end-states-2060-v2', runSuffix: 'end-states-2060' }),
+  '2035': Object.freeze({ promptFile: 'public/end_states_2035.md', questionSet: 'end-states-2035-v2', runSuffix: 'end-states-2035' }),
+  '2070': Object.freeze({ promptFile: 'public/end_states_2070.md', questionSet: 'end-states-2070-v2', runSuffix: 'end-states-2070' }),
+  '2080': Object.freeze({ promptFile: 'public/end_states_2080.md', questionSet: 'end-states-2080-v2', runSuffix: 'end-states-2080' }),
+  '2090': Object.freeze({ promptFile: 'public/end_states_2090.md', questionSet: 'end-states-2090-v2', runSuffix: 'end-states-2090' }),
+  '2100': Object.freeze({ promptFile: 'public/end_states_2100.md', questionSet: 'end-states-2100-v2', runSuffix: 'end-states-2100' }),
+  '2200': Object.freeze({ promptFile: 'public/end_states_2200.md', questionSet: 'end-states-2200-v2', runSuffix: 'end-states-2200' })
 });
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
@@ -86,15 +98,11 @@ export function normalizeHorizon(value) {
   if (compact === 'longterm' || compact === '3000' || compact === 'year3000' || compact === 'horizon3000') {
     return DEFAULT_HORIZON;
   }
-  if (compact === '2030' || compact === 'year2030' || compact === 'horizon2030') return '2030';
-  if (compact === '2040' || compact === 'year2040' || compact === 'horizon2040') return '2040';
-  if (compact === '2050' || compact === 'year2050' || compact === 'horizon2050') return '2050';
-  if (compact === '2060' || compact === 'year2060' || compact === 'horizon2060') return '2060';
-  return null;
+  return HORIZON_IDS.find(id => id !== DEFAULT_HORIZON && [id, `year${id}`, `horizon${id}`].includes(compact)) || null;
 }
 
 export function horizonOfBatch(batch) {
-  const questionSetHorizon = String(batch?.question_set || '').match(/^end-states-(2030|2040|2050|2060)-v\d+$/)?.[1] || null;
+  const questionSetHorizon = String(batch?.question_set || '').match(/^end-states-(\d{4})-v\d+$/)?.[1] || null;
   const hasHorizon = batch?.horizon !== undefined && batch?.horizon !== null && batch?.horizon !== '';
   const hasTargetYear = batch?.target_year !== undefined && batch?.target_year !== null && batch?.target_year !== '';
 

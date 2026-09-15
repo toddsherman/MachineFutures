@@ -2,8 +2,8 @@ name: Elicit end-state forecasts
 
 on:
   schedule:
-    # 14:00 UTC on the 1st of every month. Scheduled sweeps ask all five
-    # horizons. Three ordered matrix waves own one active model at a time and ask
+    # 14:00 UTC on the 1st of every month. Scheduled sweeps ask all eleven
+    # horizons. Six ordered matrix waves own one active model at a time and ask
     # at most two horizons in sequence, preserving the per-horizon budget
     # without ever calling the same model concurrently.
     - cron: '0 14 1 * *'
@@ -20,6 +20,13 @@ on:
           - '2040'
           - '2050'
           - '2060'
+          - '2035'
+          - '2070'
+          - '2080'
+          - '2090'
+          - '2100'
+          - '2200'
+          - new-horizons
           - 2030+2040
           - all
       models:
@@ -71,6 +78,12 @@ jobs:
       wave_three_horizons: ${{ steps.plan.outputs.wave_three_horizons }}
       has_wave_two: ${{ steps.plan.outputs.has_wave_two }}
       has_wave_three: ${{ steps.plan.outputs.has_wave_three }}
+      wave_four_horizons: ${{ steps.plan.outputs.wave_four_horizons }}
+      has_wave_four: ${{ steps.plan.outputs.has_wave_four }}
+      wave_five_horizons: ${{ steps.plan.outputs.wave_five_horizons }}
+      has_wave_five: ${{ steps.plan.outputs.has_wave_five }}
+      wave_six_horizons: ${{ steps.plan.outputs.wave_six_horizons }}
+      has_wave_six: ${{ steps.plan.outputs.has_wave_six }}
       sweep_horizons: ${{ steps.plan.outputs.sweep_horizons }}
       target_samples: ${{ steps.plan.outputs.target_samples }}
       sweep_plan: ${{ steps.plan.outputs.sweep_plan }}
@@ -114,6 +127,12 @@ jobs:
             echo 'wave_three_horizons=[]' >> "$GITHUB_OUTPUT"
             echo 'has_wave_two=false' >> "$GITHUB_OUTPUT"
             echo 'has_wave_three=false' >> "$GITHUB_OUTPUT"
+            echo 'wave_four_horizons=[]' >> "$GITHUB_OUTPUT"
+            echo 'has_wave_four=false' >> "$GITHUB_OUTPUT"
+            echo 'wave_five_horizons=[]' >> "$GITHUB_OUTPUT"
+            echo 'has_wave_five=false' >> "$GITHUB_OUTPUT"
+            echo 'wave_six_horizons=[]' >> "$GITHUB_OUTPUT"
+            echo 'has_wave_six=false' >> "$GITHUB_OUTPUT"
             echo 'sweep_horizons=[]' >> "$GITHUB_OUTPUT"
             echo 'target_samples=' >> "$GITHUB_OUTPUT"
             echo 'sweep_plan={}' >> "$GITHUB_OUTPUT"
@@ -146,8 +165,15 @@ jobs:
             2040) horizons='["2040"]' ;;
             2050) horizons='["2050"]' ;;
             2060) horizons='["2060"]' ;;
+            2035) horizons='["2035"]' ;;
+            2070) horizons='["2070"]' ;;
+            2080) horizons='["2080"]' ;;
+            2090) horizons='["2090"]' ;;
+            2100) horizons='["2100"]' ;;
+            2200) horizons='["2200"]' ;;
+            new-horizons) horizons='["2035","2070","2080","2090","2100","2200"]' ;;
             2030+2040) horizons='["2030","2040"]' ;;
-            all) horizons='["long-term","2030","2040","2050","2060"]' ;;
+            all) horizons='["long-term","2030","2040","2050","2060","2035","2070","2080","2090","2100","2200"]' ;;
             *) echo "::error::Unsupported horizon selection: $selection"; exit 1 ;;
           esac
 
@@ -166,7 +192,7 @@ jobs:
           sweep_horizons=$(SWEEP_PLAN_JSON="$sweep_plan" node -e 'process.stdout.write(JSON.stringify(JSON.parse(process.env.SWEEP_PLAN_JSON).horizons.map(horizon => horizon.id)))')
           target_samples=$(SWEEP_PLAN_JSON="$sweep_plan" node -e 'process.stdout.write(String(JSON.parse(process.env.SWEEP_PLAN_JSON).target_samples))')
 
-          # One model's horizons run in three globally ordered waves. Each wave
+          # One model's horizons run in six globally ordered waves. Each wave
           # asks at most two horizons sequentially, so a 100-minute budget still
           # leaves ample time for the always-run artifact upload before the
           # 330-minute job timeout. The barrier between waves prevents the same
@@ -183,15 +209,33 @@ jobs:
             const horizons = JSON.parse(process.env.HORIZONS_JSON);
             process.stdout.write(JSON.stringify(horizons.slice(4, 6)));
           ')
+          wave_four_horizons=$(HORIZONS_JSON="$horizons" node -e '
+            process.stdout.write(JSON.stringify(JSON.parse(process.env.HORIZONS_JSON).slice(6, 8)));
+          ')
+          has_wave_four=$(HORIZONS_JSON="$wave_four_horizons" node -e '
+            process.stdout.write(JSON.parse(process.env.HORIZONS_JSON).length ? "true" : "false");
+          ')
+          wave_five_horizons=$(HORIZONS_JSON="$horizons" node -e '
+            process.stdout.write(JSON.stringify(JSON.parse(process.env.HORIZONS_JSON).slice(8, 10)));
+          ')
+          has_wave_five=$(HORIZONS_JSON="$wave_five_horizons" node -e '
+            process.stdout.write(JSON.parse(process.env.HORIZONS_JSON).length ? "true" : "false");
+          ')
+          wave_six_horizons=$(HORIZONS_JSON="$horizons" node -e '
+            process.stdout.write(JSON.stringify(JSON.parse(process.env.HORIZONS_JSON).slice(10, 12)));
+          ')
+          has_wave_six=$(HORIZONS_JSON="$wave_six_horizons" node -e '
+            process.stdout.write(JSON.parse(process.env.HORIZONS_JSON).length ? "true" : "false");
+          ')
           has_wave_two=$(HORIZONS_JSON="$wave_two_horizons" node -e '
             process.stdout.write(JSON.parse(process.env.HORIZONS_JSON).length ? "true" : "false");
           ')
           has_wave_three=$(HORIZONS_JSON="$wave_three_horizons" node -e '
             process.stdout.write(JSON.parse(process.env.HORIZONS_JSON).length ? "true" : "false");
           ')
-          HORIZONS_JSON="$horizons" WAVE_ONE_JSON="$wave_one_horizons" WAVE_TWO_JSON="$wave_two_horizons" WAVE_THREE_JSON="$wave_three_horizons" node -e '
+          HORIZONS_JSON="$horizons" WAVE_ONE_JSON="$wave_one_horizons" WAVE_TWO_JSON="$wave_two_horizons" WAVE_THREE_JSON="$wave_three_horizons" WAVE_FOUR_JSON="$wave_four_horizons" WAVE_FIVE_JSON="$wave_five_horizons" WAVE_SIX_JSON="$wave_six_horizons" node -e '
             const horizons = JSON.parse(process.env.HORIZONS_JSON);
-            const assigned = [process.env.WAVE_ONE_JSON, process.env.WAVE_TWO_JSON, process.env.WAVE_THREE_JSON]
+            const assigned = [process.env.WAVE_ONE_JSON, process.env.WAVE_TWO_JSON, process.env.WAVE_THREE_JSON, process.env.WAVE_FOUR_JSON, process.env.WAVE_FIVE_JSON, process.env.WAVE_SIX_JSON]
               .flatMap(value => JSON.parse(value));
             if (JSON.stringify(assigned) !== JSON.stringify(horizons)) {
               throw new Error(`ordered waves do not cover every selected horizon exactly once: ${JSON.stringify(horizons)}`);
@@ -216,8 +260,14 @@ jobs:
           echo "wave_one_horizons=$wave_one_horizons" >> "$GITHUB_OUTPUT"
           echo "wave_two_horizons=$wave_two_horizons" >> "$GITHUB_OUTPUT"
           echo "wave_three_horizons=$wave_three_horizons" >> "$GITHUB_OUTPUT"
+          echo "wave_six_horizons=$wave_six_horizons" >> "$GITHUB_OUTPUT"
+          echo "wave_five_horizons=$wave_five_horizons" >> "$GITHUB_OUTPUT"
+          echo "wave_four_horizons=$wave_four_horizons" >> "$GITHUB_OUTPUT"
           echo "has_wave_two=$has_wave_two" >> "$GITHUB_OUTPUT"
           echo "has_wave_three=$has_wave_three" >> "$GITHUB_OUTPUT"
+          echo "has_wave_six=$has_wave_six" >> "$GITHUB_OUTPUT"
+          echo "has_wave_five=$has_wave_five" >> "$GITHUB_OUTPUT"
+          echo "has_wave_four=$has_wave_four" >> "$GITHUB_OUTPUT"
           echo "sweep_horizons=$sweep_horizons" >> "$GITHUB_OUTPUT"
           echo "target_samples=$target_samples" >> "$GITHUB_OUTPUT"
           echo "sweep_plan=$sweep_plan" >> "$GITHUB_OUTPUT"
@@ -613,10 +663,8 @@ jobs:
           echo "::error::$MODEL_KEY did not complete every selected horizon; its paid samples are preserved."
           exit 1
 
-  # The final global barrier keeps the fifth horizon single-flight with both
-  # earlier waves. Quota state is propagated through wave two, so checking its
-  # status suppresses this model even when the original billing failure was in
-  # wave one.
+  # Each later wave waits for all predecessors and inherits the previous
+  # quota status, keeping each model single-flight throughout the sweep.
   elicit_wave_three:
     needs: [plan, elicit_wave_one, elicit_wave_two]
     if: ${{ !cancelled() && needs.plan.outputs.should_elicit == 'true' && needs.plan.outputs.has_wave_three == 'true' }}
@@ -777,8 +825,488 @@ jobs:
           echo "::error::$MODEL_KEY did not complete every selected horizon; its paid samples are preserved."
           exit 1
 
-  aggregate:
+  elicit_wave_four:
     needs: [plan, elicit_wave_one, elicit_wave_two, elicit_wave_three]
+    if: ${{ !cancelled() && needs.plan.outputs.should_elicit == 'true' && needs.plan.outputs.has_wave_four == 'true' }}
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        model: ${{ fromJSON(needs.plan.outputs.models) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Restore a previous run
+        if: ${{ inputs.resume_from_run_id != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: runs-${{ inputs.resume_from_run_id }}
+          path: restored/
+          run-id: ${{ inputs.resume_from_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Consume only the third-wave status here; aggregate combines all selected
+      # horizon-disjoint artifacts after every model finishes.
+      - name: Download this model's third-wave status
+        uses: actions/download-artifact@v4
+        with:
+          name: model-${{ matrix.model }}-wave-3-${{ github.run_id }}
+          path: prior-wave/
+
+      - name: Prepare this model's resumable workspace
+        env:
+          MODEL_KEY: ${{ matrix.model }}
+          RUN_DATE: ${{ needs.plan.outputs.run_date }}
+          HORIZONS_JSON: ${{ needs.plan.outputs.wave_four_horizons }}
+        run: |
+          set -euo pipefail
+          mkdir -p work/runs/.partial
+          for source in runs restored; do
+            if [ ! -d "$source" ]; then continue; fi
+            SOURCE_DIR="$source" DEST_DIR=work/runs MODEL_KEY="$MODEL_KEY" RUN_DATE="$RUN_DATE" HORIZONS_JSON="$HORIZONS_JSON" node --input-type=module <<'NODE'
+          import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
+          import { join } from 'node:path';
+          import { HORIZON_RUN_CONFIG } from './tools/horizons.mjs';
+          const roster = JSON.parse(readFileSync('tools/models.json', 'utf8')).models;
+          const model = roster.find(candidate => candidate.key === process.env.MODEL_KEY);
+          if (!model) throw new Error(`unknown model key ${process.env.MODEL_KEY}`);
+          const slug = model.model.toLowerCase().replace(/[^a-z0-9.]+/g, '-').replace(/^-+|-+$/g, '');
+          const prefixes = JSON.parse(process.env.HORIZONS_JSON).map(horizon => {
+            const config = HORIZON_RUN_CONFIG[horizon];
+            if (!config) throw new Error(`unsupported horizon ${horizon}`);
+            return `${process.env.RUN_DATE}__${slug}__closed_book__${config.runSuffix}`;
+          });
+          const belongs = (file, extension) => prefixes.some(prefix =>
+            file === `${prefix}.${extension}` || (extension === 'json' && new RegExp(`^${prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}__r(?:[2-9]|[1-9][0-9])\\.json$`).test(file)));
+          const source = process.env.SOURCE_DIR;
+          const destination = process.env.DEST_DIR;
+          mkdirSync(join(destination, '.partial'), { recursive: true });
+          for (const file of readdirSync(source).filter(file => belongs(file, 'json'))) {
+            copyFileSync(join(source, file), join(destination, file));
+          }
+          const partial = join(source, '.partial');
+          if (existsSync(partial)) {
+            for (const file of readdirSync(partial).filter(file => belongs(file, 'jsonl'))) {
+              copyFileSync(join(partial, file), join(destination, '.partial', file));
+            }
+          }
+          NODE
+          done
+          touch "work/runs/.partial/.artifact-wave-4-${MODEL_KEY}"
+          printf '%s\n' "$RUN_DATE" > work/runs/.partial/.elicitation-date
+
+      - name: Elicit fourth horizon wave
+        id: elicit
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          META_API_KEY: ${{ secrets.META_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY || secrets.MINSTRAL_API_KEY }}
+          MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY || secrets.KIMI_API_KEY }}
+          MODEL_KEY: ${{ matrix.model }}
+          HORIZONS_JSON: ${{ needs.plan.outputs.wave_four_horizons }}
+          RUN_DATE: ${{ needs.plan.outputs.run_date }}
+          SWEEP_PLAN_JSON: ${{ needs.plan.outputs.sweep_plan }}
+          SAMPLES: ${{ needs.plan.outputs.target_samples }}
+          BUDGET_MINUTES: ${{ inputs.budget_minutes || '100' }}
+        run: |
+          set -uo pipefail
+          result=0
+          quota=false
+          previous_status="prior-wave/.partial/.status-wave-3-${MODEL_KEY}"
+
+          if [ -f "$previous_status" ] && grep -q '^quota=true$' "$previous_status"; then
+            echo "Skipping $MODEL_KEY's third wave because its provider exhausted quota in an earlier wave."
+            quota=true
+            result=4
+          else
+            while IFS= read -r horizon; do
+              echo "Asking $MODEL_KEY for horizon $horizon"
+              timeout_seconds=$(BUDGET_MINUTES="$BUDGET_MINUTES" node -e 'process.stdout.write(String(Math.ceil(Number(process.env.BUDGET_MINUTES) * 60) + 300))')
+              if GITHUB_OUTPUT='' timeout --foreground --signal=TERM --kill-after=30s "${timeout_seconds}s" node tools/run-elicitation.mjs \
+                  --models "$MODEL_KEY" \
+                  --horizon "$horizon" \
+                  --date "$RUN_DATE" \
+                  --samples "$SAMPLES" \
+                  --budget-minutes "$BUDGET_MINUTES" \
+                  --out work/runs; then
+                status=0
+              else
+                status=$?
+              fi
+              if [ "$status" -eq 4 ]; then
+                quota=true
+                result=4
+                break
+              elif [ "$status" -ne 0 ] && [ "$result" -eq 0 ]; then
+                result=2
+              fi
+            done < <(HORIZONS_JSON="$HORIZONS_JSON" node -e 'for (const horizon of JSON.parse(process.env.HORIZONS_JSON)) console.log(horizon)')
+          fi
+
+          echo "quota_exhausted=$quota" >> "$GITHUB_OUTPUT"
+          echo "failed=$([ "$result" -eq 0 ] && echo false || echo true)" >> "$GITHUB_OUTPUT"
+          exit "$result"
+
+      - name: Record model-job status
+        if: always()
+        env:
+          MODEL_KEY: ${{ matrix.model }}
+          OUTCOME: ${{ steps.elicit.outcome }}
+          QUOTA: ${{ steps.elicit.outputs.quota_exhausted || 'false' }}
+        run: |
+          mkdir -p work/runs/.partial
+          printf 'model=%s\nwave=4\noutcome=%s\nquota=%s\n' "$MODEL_KEY" "$OUTCOME" "$QUOTA" > "work/runs/.partial/.status-wave-4-${MODEL_KEY}"
+
+      - name: Upload this model's fourth-wave batches and checkpoints
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-${{ matrix.model }}-wave-4-${{ github.run_id }}
+          path: work/runs/
+          include-hidden-files: true
+          retention-days: 90
+
+      - name: Fail this fourth-wave model job after preserving its data
+        if: steps.elicit.outcome == 'failure'
+        env:
+          MODEL_KEY: ${{ matrix.model }}
+        run: |
+          echo "::error::$MODEL_KEY did not complete every selected horizon; its paid samples are preserved."
+          exit 1
+
+  elicit_wave_five:
+    needs: [plan, elicit_wave_one, elicit_wave_two, elicit_wave_three, elicit_wave_four]
+    if: ${{ !cancelled() && needs.plan.outputs.should_elicit == 'true' && needs.plan.outputs.has_wave_five == 'true' }}
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        model: ${{ fromJSON(needs.plan.outputs.models) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Restore a previous run
+        if: ${{ inputs.resume_from_run_id != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: runs-${{ inputs.resume_from_run_id }}
+          path: restored/
+          run-id: ${{ inputs.resume_from_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Consume only the fourth-wave status here; aggregate combines all selected
+      # horizon-disjoint artifacts after every model finishes.
+      - name: Download this model's fourth-wave status
+        uses: actions/download-artifact@v4
+        with:
+          name: model-${{ matrix.model }}-wave-4-${{ github.run_id }}
+          path: prior-wave/
+
+      - name: Prepare this model's resumable workspace
+        env:
+          MODEL_KEY: ${{ matrix.model }}
+          RUN_DATE: ${{ needs.plan.outputs.run_date }}
+          HORIZONS_JSON: ${{ needs.plan.outputs.wave_five_horizons }}
+        run: |
+          set -euo pipefail
+          mkdir -p work/runs/.partial
+          for source in runs restored; do
+            if [ ! -d "$source" ]; then continue; fi
+            SOURCE_DIR="$source" DEST_DIR=work/runs MODEL_KEY="$MODEL_KEY" RUN_DATE="$RUN_DATE" HORIZONS_JSON="$HORIZONS_JSON" node --input-type=module <<'NODE'
+          import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
+          import { join } from 'node:path';
+          import { HORIZON_RUN_CONFIG } from './tools/horizons.mjs';
+          const roster = JSON.parse(readFileSync('tools/models.json', 'utf8')).models;
+          const model = roster.find(candidate => candidate.key === process.env.MODEL_KEY);
+          if (!model) throw new Error(`unknown model key ${process.env.MODEL_KEY}`);
+          const slug = model.model.toLowerCase().replace(/[^a-z0-9.]+/g, '-').replace(/^-+|-+$/g, '');
+          const prefixes = JSON.parse(process.env.HORIZONS_JSON).map(horizon => {
+            const config = HORIZON_RUN_CONFIG[horizon];
+            if (!config) throw new Error(`unsupported horizon ${horizon}`);
+            return `${process.env.RUN_DATE}__${slug}__closed_book__${config.runSuffix}`;
+          });
+          const belongs = (file, extension) => prefixes.some(prefix =>
+            file === `${prefix}.${extension}` || (extension === 'json' && new RegExp(`^${prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}__r(?:[2-9]|[1-9][0-9])\\.json$`).test(file)));
+          const source = process.env.SOURCE_DIR;
+          const destination = process.env.DEST_DIR;
+          mkdirSync(join(destination, '.partial'), { recursive: true });
+          for (const file of readdirSync(source).filter(file => belongs(file, 'json'))) {
+            copyFileSync(join(source, file), join(destination, file));
+          }
+          const partial = join(source, '.partial');
+          if (existsSync(partial)) {
+            for (const file of readdirSync(partial).filter(file => belongs(file, 'jsonl'))) {
+              copyFileSync(join(partial, file), join(destination, '.partial', file));
+            }
+          }
+          NODE
+          done
+          touch "work/runs/.partial/.artifact-wave-5-${MODEL_KEY}"
+          printf '%s\n' "$RUN_DATE" > work/runs/.partial/.elicitation-date
+
+      - name: Elicit fifth horizon wave
+        id: elicit
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          META_API_KEY: ${{ secrets.META_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY || secrets.MINSTRAL_API_KEY }}
+          MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY || secrets.KIMI_API_KEY }}
+          MODEL_KEY: ${{ matrix.model }}
+          HORIZONS_JSON: ${{ needs.plan.outputs.wave_five_horizons }}
+          RUN_DATE: ${{ needs.plan.outputs.run_date }}
+          SWEEP_PLAN_JSON: ${{ needs.plan.outputs.sweep_plan }}
+          SAMPLES: ${{ needs.plan.outputs.target_samples }}
+          BUDGET_MINUTES: ${{ inputs.budget_minutes || '100' }}
+        run: |
+          set -uo pipefail
+          result=0
+          quota=false
+          previous_status="prior-wave/.partial/.status-wave-4-${MODEL_KEY}"
+
+          if [ -f "$previous_status" ] && grep -q '^quota=true$' "$previous_status"; then
+            echo "Skipping $MODEL_KEY's third wave because its provider exhausted quota in an earlier wave."
+            quota=true
+            result=4
+          else
+            while IFS= read -r horizon; do
+              echo "Asking $MODEL_KEY for horizon $horizon"
+              timeout_seconds=$(BUDGET_MINUTES="$BUDGET_MINUTES" node -e 'process.stdout.write(String(Math.ceil(Number(process.env.BUDGET_MINUTES) * 60) + 300))')
+              if GITHUB_OUTPUT='' timeout --foreground --signal=TERM --kill-after=30s "${timeout_seconds}s" node tools/run-elicitation.mjs \
+                  --models "$MODEL_KEY" \
+                  --horizon "$horizon" \
+                  --date "$RUN_DATE" \
+                  --samples "$SAMPLES" \
+                  --budget-minutes "$BUDGET_MINUTES" \
+                  --out work/runs; then
+                status=0
+              else
+                status=$?
+              fi
+              if [ "$status" -eq 4 ]; then
+                quota=true
+                result=4
+                break
+              elif [ "$status" -ne 0 ] && [ "$result" -eq 0 ]; then
+                result=2
+              fi
+            done < <(HORIZONS_JSON="$HORIZONS_JSON" node -e 'for (const horizon of JSON.parse(process.env.HORIZONS_JSON)) console.log(horizon)')
+          fi
+
+          echo "quota_exhausted=$quota" >> "$GITHUB_OUTPUT"
+          echo "failed=$([ "$result" -eq 0 ] && echo false || echo true)" >> "$GITHUB_OUTPUT"
+          exit "$result"
+
+      - name: Record model-job status
+        if: always()
+        env:
+          MODEL_KEY: ${{ matrix.model }}
+          OUTCOME: ${{ steps.elicit.outcome }}
+          QUOTA: ${{ steps.elicit.outputs.quota_exhausted || 'false' }}
+        run: |
+          mkdir -p work/runs/.partial
+          printf 'model=%s\nwave=5\noutcome=%s\nquota=%s\n' "$MODEL_KEY" "$OUTCOME" "$QUOTA" > "work/runs/.partial/.status-wave-5-${MODEL_KEY}"
+
+      - name: Upload this model's fifth-wave batches and checkpoints
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-${{ matrix.model }}-wave-5-${{ github.run_id }}
+          path: work/runs/
+          include-hidden-files: true
+          retention-days: 90
+
+      - name: Fail this fifth-wave model job after preserving its data
+        if: steps.elicit.outcome == 'failure'
+        env:
+          MODEL_KEY: ${{ matrix.model }}
+        run: |
+          echo "::error::$MODEL_KEY did not complete every selected horizon; its paid samples are preserved."
+          exit 1
+
+  elicit_wave_six:
+    needs: [plan, elicit_wave_one, elicit_wave_two, elicit_wave_three, elicit_wave_four, elicit_wave_five]
+    if: ${{ !cancelled() && needs.plan.outputs.should_elicit == 'true' && needs.plan.outputs.has_wave_six == 'true' }}
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        model: ${{ fromJSON(needs.plan.outputs.models) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Restore a previous run
+        if: ${{ inputs.resume_from_run_id != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: runs-${{ inputs.resume_from_run_id }}
+          path: restored/
+          run-id: ${{ inputs.resume_from_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Consume only the fifth-wave status here; aggregate combines all selected
+      # horizon-disjoint artifacts after every model finishes.
+      - name: Download this model's fifth-wave status
+        uses: actions/download-artifact@v4
+        with:
+          name: model-${{ matrix.model }}-wave-5-${{ github.run_id }}
+          path: prior-wave/
+
+      - name: Prepare this model's resumable workspace
+        env:
+          MODEL_KEY: ${{ matrix.model }}
+          RUN_DATE: ${{ needs.plan.outputs.run_date }}
+          HORIZONS_JSON: ${{ needs.plan.outputs.wave_six_horizons }}
+        run: |
+          set -euo pipefail
+          mkdir -p work/runs/.partial
+          for source in runs restored; do
+            if [ ! -d "$source" ]; then continue; fi
+            SOURCE_DIR="$source" DEST_DIR=work/runs MODEL_KEY="$MODEL_KEY" RUN_DATE="$RUN_DATE" HORIZONS_JSON="$HORIZONS_JSON" node --input-type=module <<'NODE'
+          import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
+          import { join } from 'node:path';
+          import { HORIZON_RUN_CONFIG } from './tools/horizons.mjs';
+          const roster = JSON.parse(readFileSync('tools/models.json', 'utf8')).models;
+          const model = roster.find(candidate => candidate.key === process.env.MODEL_KEY);
+          if (!model) throw new Error(`unknown model key ${process.env.MODEL_KEY}`);
+          const slug = model.model.toLowerCase().replace(/[^a-z0-9.]+/g, '-').replace(/^-+|-+$/g, '');
+          const prefixes = JSON.parse(process.env.HORIZONS_JSON).map(horizon => {
+            const config = HORIZON_RUN_CONFIG[horizon];
+            if (!config) throw new Error(`unsupported horizon ${horizon}`);
+            return `${process.env.RUN_DATE}__${slug}__closed_book__${config.runSuffix}`;
+          });
+          const belongs = (file, extension) => prefixes.some(prefix =>
+            file === `${prefix}.${extension}` || (extension === 'json' && new RegExp(`^${prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}__r(?:[2-9]|[1-9][0-9])\\.json$`).test(file)));
+          const source = process.env.SOURCE_DIR;
+          const destination = process.env.DEST_DIR;
+          mkdirSync(join(destination, '.partial'), { recursive: true });
+          for (const file of readdirSync(source).filter(file => belongs(file, 'json'))) {
+            copyFileSync(join(source, file), join(destination, file));
+          }
+          const partial = join(source, '.partial');
+          if (existsSync(partial)) {
+            for (const file of readdirSync(partial).filter(file => belongs(file, 'jsonl'))) {
+              copyFileSync(join(partial, file), join(destination, '.partial', file));
+            }
+          }
+          NODE
+          done
+          touch "work/runs/.partial/.artifact-wave-6-${MODEL_KEY}"
+          printf '%s\n' "$RUN_DATE" > work/runs/.partial/.elicitation-date
+
+      - name: Elicit sixth horizon wave
+        id: elicit
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          META_API_KEY: ${{ secrets.META_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY || secrets.MINSTRAL_API_KEY }}
+          MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY || secrets.KIMI_API_KEY }}
+          MODEL_KEY: ${{ matrix.model }}
+          HORIZONS_JSON: ${{ needs.plan.outputs.wave_six_horizons }}
+          RUN_DATE: ${{ needs.plan.outputs.run_date }}
+          SWEEP_PLAN_JSON: ${{ needs.plan.outputs.sweep_plan }}
+          SAMPLES: ${{ needs.plan.outputs.target_samples }}
+          BUDGET_MINUTES: ${{ inputs.budget_minutes || '100' }}
+        run: |
+          set -uo pipefail
+          result=0
+          quota=false
+          previous_status="prior-wave/.partial/.status-wave-5-${MODEL_KEY}"
+
+          if [ -f "$previous_status" ] && grep -q '^quota=true$' "$previous_status"; then
+            echo "Skipping $MODEL_KEY's third wave because its provider exhausted quota in an earlier wave."
+            quota=true
+            result=4
+          else
+            while IFS= read -r horizon; do
+              echo "Asking $MODEL_KEY for horizon $horizon"
+              timeout_seconds=$(BUDGET_MINUTES="$BUDGET_MINUTES" node -e 'process.stdout.write(String(Math.ceil(Number(process.env.BUDGET_MINUTES) * 60) + 300))')
+              if GITHUB_OUTPUT='' timeout --foreground --signal=TERM --kill-after=30s "${timeout_seconds}s" node tools/run-elicitation.mjs \
+                  --models "$MODEL_KEY" \
+                  --horizon "$horizon" \
+                  --date "$RUN_DATE" \
+                  --samples "$SAMPLES" \
+                  --budget-minutes "$BUDGET_MINUTES" \
+                  --out work/runs; then
+                status=0
+              else
+                status=$?
+              fi
+              if [ "$status" -eq 4 ]; then
+                quota=true
+                result=4
+                break
+              elif [ "$status" -ne 0 ] && [ "$result" -eq 0 ]; then
+                result=2
+              fi
+            done < <(HORIZONS_JSON="$HORIZONS_JSON" node -e 'for (const horizon of JSON.parse(process.env.HORIZONS_JSON)) console.log(horizon)')
+          fi
+
+          echo "quota_exhausted=$quota" >> "$GITHUB_OUTPUT"
+          echo "failed=$([ "$result" -eq 0 ] && echo false || echo true)" >> "$GITHUB_OUTPUT"
+          exit "$result"
+
+      - name: Record model-job status
+        if: always()
+        env:
+          MODEL_KEY: ${{ matrix.model }}
+          OUTCOME: ${{ steps.elicit.outcome }}
+          QUOTA: ${{ steps.elicit.outputs.quota_exhausted || 'false' }}
+        run: |
+          mkdir -p work/runs/.partial
+          printf 'model=%s\nwave=6\noutcome=%s\nquota=%s\n' "$MODEL_KEY" "$OUTCOME" "$QUOTA" > "work/runs/.partial/.status-wave-6-${MODEL_KEY}"
+
+      - name: Upload this model's sixth-wave batches and checkpoints
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-${{ matrix.model }}-wave-6-${{ github.run_id }}
+          path: work/runs/
+          include-hidden-files: true
+          retention-days: 90
+
+      - name: Fail this sixth-wave model job after preserving its data
+        if: steps.elicit.outcome == 'failure'
+        env:
+          MODEL_KEY: ${{ matrix.model }}
+        run: |
+          echo "::error::$MODEL_KEY did not complete every selected horizon; its paid samples are preserved."
+          exit 1
+
+  aggregate:
+    needs: [plan, elicit_wave_one, elicit_wave_two, elicit_wave_three, elicit_wave_four, elicit_wave_five, elicit_wave_six]
     if: ${{ always() && needs.plan.outputs.should_elicit == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -820,6 +1348,30 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: model-*-wave-3-${{ github.run_id }}
+          path: collected/
+          merge-multiple: true
+
+      - name: Download every fourth-wave model artifact
+        if: needs.plan.outputs.has_wave_four == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          pattern: model-*-wave-4-${{ github.run_id }}
+          path: collected/
+          merge-multiple: true
+
+      - name: Download every fifth-wave model artifact
+        if: needs.plan.outputs.has_wave_five == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          pattern: model-*-wave-5-${{ github.run_id }}
+          path: collected/
+          merge-multiple: true
+
+      - name: Download every sixth-wave model artifact
+        if: needs.plan.outputs.has_wave_six == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          pattern: model-*-wave-6-${{ github.run_id }}
           path: collected/
           merge-multiple: true
 
@@ -1001,18 +1553,18 @@ jobs:
           fi
 
       - name: Import every horizon into site data
-        if: needs.elicit_wave_one.result == 'success' && (needs.plan.outputs.has_wave_two != 'true' || needs.elicit_wave_two.result == 'success') && (needs.plan.outputs.has_wave_three != 'true' || needs.elicit_wave_three.result == 'success') && steps.merge.outputs.failed == 'false' && steps.sweep.outcome == 'success'
+        if: needs.elicit_wave_one.result == 'success' && (needs.plan.outputs.has_wave_two != 'true' || needs.elicit_wave_two.result == 'success') && (needs.plan.outputs.has_wave_three != 'true' || needs.elicit_wave_three.result == 'success') && (needs.plan.outputs.has_wave_four != 'true' || needs.elicit_wave_four.result == 'success') && (needs.plan.outputs.has_wave_five != 'true' || needs.elicit_wave_five.result == 'success') && (needs.plan.outputs.has_wave_six != 'true' || needs.elicit_wave_six.result == 'success') && steps.merge.outputs.failed == 'false' && steps.sweep.outcome == 'success'
         run: |
           set -euo pipefail
           node tools/import-runs.mjs
           node tools/export-data.mjs
 
       - name: Check the complete site
-        if: needs.elicit_wave_one.result == 'success' && (needs.plan.outputs.has_wave_two != 'true' || needs.elicit_wave_two.result == 'success') && (needs.plan.outputs.has_wave_three != 'true' || needs.elicit_wave_three.result == 'success') && steps.merge.outputs.failed == 'false' && steps.sweep.outcome == 'success'
+        if: needs.elicit_wave_one.result == 'success' && (needs.plan.outputs.has_wave_two != 'true' || needs.elicit_wave_two.result == 'success') && (needs.plan.outputs.has_wave_three != 'true' || needs.elicit_wave_three.result == 'success') && (needs.plan.outputs.has_wave_four != 'true' || needs.elicit_wave_four.result == 'success') && (needs.plan.outputs.has_wave_five != 'true' || needs.elicit_wave_five.result == 'success') && (needs.plan.outputs.has_wave_six != 'true' || needs.elicit_wave_six.result == 'success') && steps.merge.outputs.failed == 'false' && steps.sweep.outcome == 'success'
         run: node tools/check-all.mjs
 
       - name: Push the regenerated site
-        if: needs.elicit_wave_one.result == 'success' && (needs.plan.outputs.has_wave_two != 'true' || needs.elicit_wave_two.result == 'success') && (needs.plan.outputs.has_wave_three != 'true' || needs.elicit_wave_three.result == 'success') && steps.merge.outputs.failed == 'false' && steps.sweep.outcome == 'success'
+        if: needs.elicit_wave_one.result == 'success' && (needs.plan.outputs.has_wave_two != 'true' || needs.elicit_wave_two.result == 'success') && (needs.plan.outputs.has_wave_three != 'true' || needs.elicit_wave_three.result == 'success') && (needs.plan.outputs.has_wave_four != 'true' || needs.elicit_wave_four.result == 'success') && (needs.plan.outputs.has_wave_five != 'true' || needs.elicit_wave_five.result == 'success') && (needs.plan.outputs.has_wave_six != 'true' || needs.elicit_wave_six.result == 'success') && steps.merge.outputs.failed == 'false' && steps.sweep.outcome == 'success'
         run: |
           set -euo pipefail
           branch="elicitation/${{ github.run_id }}"
@@ -1026,7 +1578,7 @@ jobs:
           echo "Site data pushed. Open a PR from \`$branch\` to publish." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Fail after preserving incomplete results
-        if: ${{ always() && (needs.elicit_wave_one.result != 'success' || (needs.plan.outputs.has_wave_two == 'true' && needs.elicit_wave_two.result != 'success') || (needs.plan.outputs.has_wave_three == 'true' && needs.elicit_wave_three.result != 'success') || steps.merge.outputs.failed == 'true' || steps.sweep.outcome != 'success') }}
+        if: ${{ always() && (needs.elicit_wave_one.result != 'success' || (needs.plan.outputs.has_wave_two == 'true' && needs.elicit_wave_two.result != 'success') || (needs.plan.outputs.has_wave_three == 'true' && needs.elicit_wave_three.result != 'success') || (needs.plan.outputs.has_wave_four == 'true' && needs.elicit_wave_four.result != 'success') || (needs.plan.outputs.has_wave_five == 'true' && needs.elicit_wave_five.result != 'success') || (needs.plan.outputs.has_wave_six == 'true' && needs.elicit_wave_six.result != 'success') || steps.merge.outputs.failed == 'true' || steps.sweep.outcome != 'success') }}
         run: |
           echo "::error::At least one model/horizon is incomplete or the full same-date sweep gate did not pass. Raw batches and checkpoints were preserved; resume from run ${{ github.run_id }}."
           exit 1

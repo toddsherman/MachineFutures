@@ -245,7 +245,8 @@
   }
 
   function horizonAxisPosition(year) {
-    return year <= 2060 ? (year - 2030) / 60 : 0.5 + (year - 2060) / 1880;
+    return year <= 2060 ? (year - 2030) / 60
+      : 0.5 + 0.5 * Math.log1p((year - 2060) / 20) / Math.log1p(940 / 20);
   }
 
   function sampleHorizonCurve(points) {
@@ -272,7 +273,7 @@
         const t = step / 120, t2 = t * t, t3 = t2 * t;
         const position = xs[i] + widths[i] * t;
         samples.push({
-          year: position <= 0.5 ? 2030 + position * 60 : 2060 + (position - 0.5) * 1880,
+          year: position <= 0.5 ? 2030 + position * 60 : 2060 + 20 * Math.expm1((position - 0.5) * 2 * Math.log1p(940 / 20)),
           value: (2 * t3 - 3 * t2 + 1) * start.value +
             (t3 - 2 * t2 + t) * widths[i] * slopes[i] +
             (-2 * t3 + 3 * t2) * end.value +
@@ -310,12 +311,28 @@
   }
 
   function horizonChartTickVisibility(selectedId) {
-    if (!horizonChartLayout?.compact) return new Set(horizonChartDataCache.horizons.map(item => item.id));
-    const first = horizonChartDataCache.horizons[0]?.id;
-    const last = horizonChartDataCache.horizons.at(-1)?.id;
-    const lastDated = horizonChartDataCache.horizons.at(-2)?.id;
-    const middleSelection = selectedId !== first && selectedId !== lastDated && selectedId !== last;
-    return new Set([first, middleSelection ? selectedId : lastDated, last].filter(Boolean));
+    if (!horizonChartLayout) return new Set();
+    const horizons = horizonChartDataCache.horizons;
+    const first = horizons[0]?.id, last = horizons.at(-1)?.id;
+    const lastDated = horizons.at(-2)?.id;
+    const chosen = [];
+    const bounds = id => {
+      const horizon = horizons.find(item => item.id === id);
+      const at = horizonChartLayout.x(horizon.year);
+      return id === first ? [at, at + 30] : id === last ? [at - 30, at] : [at - 15, at + 15];
+    };
+    // Selected year wins collisions; endpoints and the split point come next.
+    const preferred = horizonChartLayout.compact
+      ? [selectedId, first, last, lastDated, '2060']
+      : [selectedId, first, last, '2060', ...horizons.map(item => item.id)];
+    for (const id of preferred) {
+      if (!horizons.some(item => item.id === id) || chosen.includes(id)) continue;
+      const box = bounds(id);
+      if (chosen.some(other => { const existing = bounds(other); return box[0] < existing[1] + 8 && box[1] > existing[0] - 8; })) continue;
+      if (horizonChartLayout.compact && chosen.length >= 3) continue;
+      chosen.push(id);
+    }
+    return new Set(chosen);
   }
 
   function updateHorizonChartSelection() {
@@ -824,7 +841,13 @@
     '2030': 'end_states_2030.md',
     '2040': 'end_states_2040.md',
     '2050': 'end_states_2050.md',
-    '2060': 'end_states_2060.md'
+    '2060': 'end_states_2060.md',
+    '2035': 'end_states_2035.md',
+    '2070': 'end_states_2070.md',
+    '2080': 'end_states_2080.md',
+    '2090': 'end_states_2090.md',
+    '2100': 'end_states_2100.md',
+    '2200': 'end_states_2200.md'
   };
 
   function renderHorizonContext() {

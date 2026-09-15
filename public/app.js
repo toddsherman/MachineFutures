@@ -245,8 +245,8 @@
   }
 
   function horizonAxisPosition(year) {
-    return year <= 2060 ? (year - 2030) / 60
-      : 0.5 + 0.5 * Math.log1p((year - 2060) / 20) / Math.log1p(940 / 20);
+    return year <= 2100 ? (year - 2030) / 140
+      : 0.5 + 0.5 * Math.log1p((year - 2100) / 20) / Math.log1p(900 / 20);
   }
 
   function sampleHorizonCurve(points) {
@@ -273,7 +273,7 @@
         const t = step / 120, t2 = t * t, t3 = t2 * t;
         const position = xs[i] + widths[i] * t;
         samples.push({
-          year: position <= 0.5 ? 2030 + position * 60 : 2060 + 20 * Math.expm1((position - 0.5) * 2 * Math.log1p(940 / 20)),
+          year: position <= 0.5 ? 2030 + position * 140 : 2100 + 20 * Math.expm1((position - 0.5) * 2 * Math.log1p(900 / 20)),
           value: (2 * t3 - 3 * t2 + 1) * start.value +
             (t3 - 2 * t2 + t) * widths[i] * slopes[i] +
             (-2 * t3 + 3 * t2) * end.value +
@@ -323,8 +323,8 @@
     };
     // Selected year wins collisions; endpoints and the split point come next.
     const preferred = horizonChartLayout.compact
-      ? [selectedId, first, last, lastDated, '2060']
-      : [selectedId, first, last, '2060', ...horizons.map(item => item.id)];
+      ? [selectedId, first, last, lastDated, '2100']
+      : [selectedId, first, last, '2100', ...horizons.map(item => item.id)];
     for (const id of preferred) {
       if (!horizons.some(item => item.id === id) || chosen.includes(id)) continue;
       const box = bounds(id);
@@ -355,7 +355,7 @@
     });
     const description = $('#horizon-chart-svg-desc');
     if (description) {
-      description.textContent = `Eleven solid scenario-coloured curves connect ${selectionLabel()} probabilities at the available measured horizons on a split-scale axis with 2060 halfway between 2030 and 3000. ${selected.year} is selected on the page and marked by a vertical dotted guide. Curves are visual connectors, not intermediate forecasts.`;
+      description.textContent = `Eleven solid scenario-coloured curves connect ${selectionLabel()} probabilities at the available measured horizons on a split-scale axis with 2100 halfway between 2030 and 3000. ${selected.year} is selected on the page and marked by a vertical dotted guide. Curves are visual connectors, not intermediate forecasts.`;
     }
   }
 
@@ -474,8 +474,8 @@
     const plotTop = margin.top + 5;
     const plotBottom = height - margin.bottom - 5;
     const years = data.horizons.map(horizon => horizon.year);
-    // Reserve half the axis for the three near-term decades and half for
-    // the interval from 2060 to the long-term horizon.
+    // Reserve half the axis for 2030–2100 and half for
+    // the interval from 2100 to the long-term horizon.
     const x = year => plotLeft + horizonAxisPosition(year) * (plotRight - plotLeft);
     const allValues = data.series.flatMap(series => series.curve.map(point => point.value));
     const maximum = Math.max(...allValues);
@@ -517,7 +517,7 @@
       x: (margin.left + measured - margin.right) / 2,
       y: height - 9,
       'text-anchor': 'middle'
-    }, compact ? 'Forecast year · split scale' : 'Forecast year · split scale at 2060 · 3000 is long term'));
+    }, compact ? 'Forecast year · split scale' : 'Forecast year · split scale at 2100 · 3000 is long term'));
     svg.appendChild(svgNode('text', {
       class: 'horizon-chart-axis-title',
       x: -(margin.top + (height - margin.top - margin.bottom) / 2),
@@ -1100,7 +1100,7 @@
     $('#pdoom').innerHTML = `${pdoomTitleMarkup()}<p class="data-empty" id="pdoom-description" role="status">${esc(emptyMessage())}</p>`;
   }
 
-  function renderEndStates() {
+  function renderEndStates({ animate = false } = {}) {
     const entries = forecastEntries();
     const orderedStates = endingOrder();
     renderHorizonContext();
@@ -1115,10 +1115,14 @@
     // The visible glyph is just the ending's number, so the name and the
     // current share go in an aria-label, refreshed per selection below.
     $('#consensus-bar').classList.remove('is-empty');
-    $('#consensus-bar').innerHTML = orderedStates.map(state =>
-      `<button type="button" style="--state:${state.color}" data-state-jump="${state.id}"><span>${state.id}</span></button>`).join('');
-    $('#consensus-legend').innerHTML = orderedStates.map(state =>
-      `<button data-state-jump="${state.id}"><i style="--state:${state.color}"></i><span>${state.id}. ${esc(state.name)}${extinctionMark(state)}</span><b></b></button>`).join('');
+    // Preserve bar and legend nodes so year changes interpolate from the
+    // currently displayed values, just like lab changes.
+    if (!animate || $('#consensus-bar').children.length !== orderedStates.length) {
+      $('#consensus-bar').innerHTML = orderedStates.map(state =>
+        `<button type="button" style="--state:${state.color}" data-state-jump="${state.id}"><span>${state.id}</span></button>`).join('');
+      $('#consensus-legend').innerHTML = orderedStates.map(state =>
+        `<button data-state-jump="${state.id}"><i style="--state:${state.color}"></i><span>${state.id}. ${esc(state.name)}${extinctionMark(state)}</span><b></b></button>`).join('');
+    }
 
     // Fixed for every ending: zero to the highest figure any one sample from
     // any model produced, so a position means the same thing on every card.
@@ -1149,7 +1153,7 @@
 
     renderMatrix(entries, orderedStates);
     renderDoomer(scopedEntries(entries));
-    applyForecast({ animate: false });
+    applyForecast({ animate });
   }
 
   function renderDoomer(entries) {
@@ -1251,6 +1255,7 @@
       segment.title = `${state.name}: ${displayed}${spread ? ` (${spread[0]}–${spread[1]}% across samples)` : ''}${state.extinction ? ` · ${extinctionLabels[state.extinction]}` : ''}`;
       segment.setAttribute('aria-label', `${state.name}: ${displayed} — jump to this ${outcomeTerm(false)}`);
 
+      legend.children[index].querySelector('span').innerHTML = `${state.id}. ${esc(state.name)}${extinctionMark(state)}`;
       const value = legend.children[index].querySelector('b');
       animate ? tweenNumber(value, state.probability, '%', showingAggregate ? 1 : undefined) : (value.textContent = displayed);
     });
@@ -1646,11 +1651,12 @@
     if (!Object.values(endStateRuns).some(run => run.provider === activeLab)) activeLab = '';
     closeModelDropdown();
     renderHorizonChart();
-    leaderSettled = false;
-    settleCancelled = false;
-    pdoomSettled = false;
-    pdoomSettleCancelled = false;
-    renderEndStates();
+    leaderSettled = true;
+    settleCancelled = true;
+    pdoomSettled = true;
+    pdoomSettleCancelled = true;
+    renderEndStates({ animate: true });
+    $('#matrix').classList.remove('will-reveal', 'is-in');
     if (openExposureKey) {
       const openExposure = $$('.doomer-row[data-run-key]').find(row => row.dataset.runKey === openExposureKey);
       if (openExposure) setExposureOpen(openExposure, true);
@@ -1658,7 +1664,6 @@
     restoreViewportPosition(viewportPosition);
     updateUrl();
     revealOnView('.state-strip', { watch: '.strip-axis', threshold: 1 });
-    revealOnView('.matrix', { threshold: 0.12 });
     revealOnView('.doomer-list', { threshold: 0.15, delay: 500 });
     requestAnimationFrame(() => {
       if (viewportToken !== viewportRestoreToken) return;

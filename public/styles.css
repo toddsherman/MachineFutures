@@ -625,3 +625,15 @@ body.dialog-open { overflow: hidden; }
 }
 
 .horizon-toggle .horizon-button { flex-shrink: 0; }
+
+@media (max-width: 600px) {
+  .horizon-toggle .horizon-button {
+    writing-mode: vertical-rl;
+    transform: none;
+    flex: 1 0 26px;
+    min-width: 26px;
+    height: 88px;
+    padding: 8px 5px;
+    text-align: center;
+  }
+}

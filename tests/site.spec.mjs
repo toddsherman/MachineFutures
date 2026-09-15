@@ -708,7 +708,7 @@ test.describe('the 2030 exposure chart on a phone', () => {
     expect(placement.buttons.map(button => button.label)).toEqual(['2030', '2040', '2050', '2060', 'Long term']);
     expect(placement.buttons.filter(button => button.lines !== 1), 'a horizon label wrapped onto a second line').toEqual([]);
     expect(placement.buttons.filter(button => !button.textFits), 'a horizon label crossed its button border').toEqual([]);
-    expect(Math.max(...placement.buttons.map(button => button.height)), 'the five-button row grew taller than its one-line control height').toBeLessThanOrEqual(40.5);
+    expect(Math.max(...placement.buttons.map(button => button.height)), 'the vertical year row exceeded its compact height').toBeLessThanOrEqual(88.5);
 
     await page.evaluate(() => document.querySelector('.states-section').scrollIntoView({ block: 'start' }));
     const stuck = await page.evaluate(() => {
@@ -1178,12 +1178,12 @@ test.describe('mean scenario probabilities by horizon', () => {
     expect(chart.points.filter(point => !(point.radius > 0 && point.radius <= 3.5)), 'observation dots should be small, filled circles').toEqual([]);
   });
 
-  test('2060 is centered and earlier decades are evenly spaced', async ({ page }) => {
+  test('2100 is centered and earlier years use linear spacing', async ({ page }) => {
     await settle(page);
-    const positions = await page.locator('.horizon-chart-tick[data-horizon]').evaluateAll(ticks =>
-      Object.fromEntries(ticks.map(tick => [tick.dataset.horizon, Number(tick.getAttribute('x'))])));
+    const positions = await page.locator('.horizon-chart-point[data-state="1"]').evaluateAll(ticks =>
+      Object.fromEntries(ticks.map(tick => [tick.dataset.horizon, Number(tick.getAttribute('cx'))])));
     const span = positions['long-term'] - positions['2030'];
-    for (const [year, fraction] of [['2030', 0], ['2040', 1 / 6], ['2050', 1 / 3], ['2060', 0.5], ['long-term', 1]]) {
+    for (const [year, fraction] of [['2030', 0], ['2035', 5 / 140], ['2040', 10 / 140], ['2060', 30 / 140], ['2100', 0.5], ['long-term', 1]]) {
       expect((positions[year] - positions['2030']) / span).toBeCloseTo(fraction, 3);
     }
   });

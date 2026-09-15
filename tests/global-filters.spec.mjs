@@ -209,3 +209,34 @@ test('eleven horizons remain reachable without overflowing and update the chart'
   }
   await expect(page.locator('.horizon-chart-point')).toHaveCount(121);
 });
+
+
+test('filter changes animate the mean without replaying summary entrances', async ({ page }) => {
+  await page.goto('/');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  const result = await page.evaluate(() => {
+    const bar = document.querySelector('#consensus-bar');
+    const first = bar.firstElementChild;
+    const before = first.style.width;
+    window.MF_TEST.selectHorizon('2100');
+    const year = { sameNode: first === bar.firstElementChild, changed: before !== first.style.width,
+      animated: bar.classList.contains('is-animating') };
+    document.querySelector('.lab-button[data-lab="Anthropic"]').click();
+    return { year, labAnimated: bar.classList.contains('is-animating'),
+      matrixReveal: document.querySelector('#matrix').classList.contains('will-reveal') };
+  });
+  expect(result).toEqual({ year: { sameNode: true, changed: true, animated: true }, labAnimated: true, matrixReveal: false });
+  await page.locator('#pdoom').scrollIntoViewIfNeeded();
+  await expect(page.locator('#pdoom .is-settling, #end-leader .is-settling')).toHaveCount(0);
+});
+
+test('mobile horizon labels are vertical and fit in the attached row', async ({ page }) => {
+  await page.goto('/');
+  if (page.viewportSize().width > 600) return;
+  const layout = await page.locator('#horizon-toggle').evaluate(row => ({
+    fits: row.scrollWidth <= row.clientWidth + 1,
+    modes: [...row.children].map(button => getComputedStyle(button).writingMode)
+  }));
+  expect(layout.fits).toBe(true);
+  expect(layout.modes.every(mode => mode === 'vertical-rl')).toBe(true);
+});

@@ -1431,16 +1431,20 @@ test.describe('mean scenario probabilities by horizon', () => {
 });
 
 test.describe('lab-balanced pDoom', () => {
-  const horizonValues = [
-    ['2030', '2030', '4.0%'],
-    ['2040', '2040', '9.1%'],
-    ['2050', '2050', '12.1%'],
-    ['2060', '2060', '14.5%'],
-    ['Long term', 'long-term', '25.6%']
-  ];
-
   test('sits between the leader and forecast and follows every horizon', async ({ page }) => {
     await settle(page, '/?horizon=long-term');
+    // Derive expected totals from the published records, independently of the
+    // UI helpers, so adding a model does not freeze this layout test in time.
+    const horizonValues = await page.evaluate(() => Object.entries(window.MF_DATA.datasets).map(([horizon, dataset]) => {
+      const labs = new Map();
+      for (const run of Object.values(dataset.endStateRuns)) {
+        const values = labs.get(run.provider) || [];
+        values.push([1, 2, 3].reduce((sum, id) => sum + run.probabilities[id], 0));
+        labs.set(run.provider, values);
+      }
+      const total = [...labs.values()].reduce((sum, values) => sum + values.reduce((a, b) => a + b, 0) / values.length, 0) / labs.size;
+      return [horizon === 'long-term' ? 'Long term' : horizon, horizon, `${total.toFixed(1)}%`];
+    }));
     const placement = await page.locator('#pdoom').evaluate(panel => {
       const section = panel.closest('.pdoom-section');
       return {
@@ -1473,7 +1477,7 @@ test.describe('lab-balanced pDoom', () => {
     expect(placement.labelHasSkull, 'the skull should no longer sit beside Humanity is gone').toBe(false);
     expect(placement.labelColor, 'Humanity is gone should have a transparent fill').toBe('rgba(0, 0, 0, 0)');
     expect(parseFloat(placement.labelStroke), 'Humanity is gone should retain a visible outline').toBeGreaterThanOrEqual(1);
-    await expect(page.locator('#pdoom-value')).toHaveText('25.6%');
+    await expect(page.locator('#pdoom-value')).toHaveText(horizonValues.find(([, horizon]) => horizon === 'long-term')[2]);
 
     const toggle = page.getByRole('group', { name: 'Forecast horizon' });
     for (const [label, horizon, value] of horizonValues) {

@@ -380,7 +380,7 @@ test('plan validation rejects internally mismatched prompt configuration', () =>
   assert.throws(() => normalizeSweepPlan(plan), /prompt_file must be public\/end_states_2030.md/);
 });
 
-test('the plan CLI emits compact schema-v2 JSON with all twenty active models', () => {
+test('the plan CLI emits compact schema-v2 JSON with the full active roster', () => {
   const output = execFileSync('node', [checker, '--resolve-plan', '--horizons-json', '["2040","2030"]', '--date', DATE, '--samples', '20'], {
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe']
@@ -388,7 +388,7 @@ test('the plan CLI emits compact schema-v2 JSON with all twenty active models', 
   assert.equal(output.trim().includes('\n'), false);
   const plan = JSON.parse(output);
   assert.equal(plan.schema_version, 2);
-  assert.equal(plan.cohort.length, 20);
+  assert.deepEqual(plan.cohort, activeCohortOf(JSON.parse(readFileSync(join(projectRoot, 'tools', 'models.json'), 'utf8')).models));
   assert.deepEqual(plan.horizons.map(item => item.id), ['2030', '2040']);
   assert.deepEqual(plan.horizons, makePlan(['2030', '2040'], 20, plan.cohort).horizons);
   for (const bad of ['not-json', '[]', '["2030","2030"]', '["2300"]']) {
@@ -440,7 +440,7 @@ test('the plan CLI upgrades schema-v1 and checkpoint-only artifacts', () => {
     const upgraded = JSON.parse(execFileSync('node', [checker, '--resolve-plan', '--restored', schemaOneDir,
       '--horizons-json', '["2030"]', '--date', DATE, '--samples', '10'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }));
     assert.equal(upgraded.schema_version, 2);
-    assert.equal(upgraded.cohort.length, 20);
+    assert.deepEqual(upgraded.cohort, activeCohortOf(JSON.parse(readFileSync(join(projectRoot, 'tools', 'models.json'), 'utf8')).models));
     assert.equal(upgraded.target_samples, 20);
 
     mkdirSync(join(checkpointDir, '.partial'));

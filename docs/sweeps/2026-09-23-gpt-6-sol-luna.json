@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "run_date": "2026-09-23",
+  "target_samples": 20,
+  "cohort": [
+    {
+      "key": "openai-6-sol",
+      "model": "gpt-6-sol"
+    },
+    {
+      "key": "openai-6-luna",
+      "model": "gpt-6-luna"
+    }
+  ],
+  "horizons": [
+    {
+      "id": "long-term",
+      "target_year": 3000,
+      "prompt_file": "public/end_states.md",
+      "question_set": "end-states-v3",
+      "prompt_sha256": "c0e2822cea16c2f8dfc884ba00a3c1747c87dc40f72338beb9288e7703835dde"
+    },
+    {
+      "id": "2030",
+      "target_year": 2030,
+      "prompt_file": "public/end_states_2030.md",
+      "question_set": "end-states-2030-v2",
+      "prompt_sha256": "089c4574a6a565c35c1115396153bebf88d64ce5627d21a72d9e433f0ed597e5"
+    },
+    {
+      "id": "2040",
+      "target_year": 2040,
+      "prompt_file": "public/end_states_2040.md",
+      "question_set": "end-states-2040-v2",
+      "prompt_sha256": "c3523198a0d120cdd02c168215342b844b1fd32df0633e3bf6d8936f8da10273"
+    },
+    {
+      "id": "2050",
+      "target_year": 2050,
+      "prompt_file": "public/end_states_2050.md",
+      "question_set": "end-states-2050-v2",
+      "prompt_sha256": "dd6cf4ed7d07d49ab0df61628896b2615af4ba3438423524fd32b55b6e92fa7a"
+    },
+    {
+      "id": "2060",
+      "target_year": 2060,
+      "prompt_file": "public/end_states_2060.md",
+      "question_set": "end-states-2060-v2",
+      "prompt_sha256": "09d540786778b8161a99f6c09990e973b207849b415747530821732c9ba55b49"
+    },
+    {
+      "id": "2035",
+      "target_year": 2035,
+      "prompt_file": "public/end_states_2035.md",
+      "question_set": "end-states-2035-v2",
+      "prompt_sha256": "288cc24969669da556095c90dddae56c93760da954e4182f90c6484fcd60a693"
+    },
+    {
+      "id": "2070",
+      "target_year": 2070,
+      "prompt_file": "public/end_states_2070.md",
+      "question_set": "end-states-2070-v2",
+      "prompt_sha256": "298b1637b7f5ffff1125c070ec7b000211f72ef97c01a0301e07ce5b1320f33a"
+    },
+    {
+      "id": "2080",
+      "target_year": 2080,
+      "prompt_file": "public/end_states_2080.md",
+      "question_set": "end-states-2080-v2",
+      "prompt_sha256": "6905f995cb2ec6081f516c71e9061403cea5f5e301d14bc1ff3f8de63dfb5a7e"
+    },
+    {
+      "id": "2090",
+      "target_year": 2090,
+      "prompt_file": "public/end_states_2090.md",
+      "question_set": "end-states-2090-v2",
+      "prompt_sha256": "46725ca78a42e28b4a32378c57345e9a4fe9fde2e1910f76e7b45af8f138baa7"
+    },
+    {
+      "id": "2100",
+      "target_year": 2100,
+      "prompt_file": "public/end_states_2100.md",
+      "question_set": "end-states-2100-v2",
+      "prompt_sha256": "1f02feb47ef3c34e87ed2054b8a82e2d5e170df01724e395b57ee78d14fdb629"
+    },
+    {
+      "id": "2200",
+      "target_year": 2200,
+      "prompt_file": "public/end_states_2200.md",
+      "question_set": "end-states-2200-v2",
+      "prompt_sha256": "7e8ec4fb69444f0c1fbd009bdfcd5e1cccd1c4d4c44e60576a4eb3b173aca7e8"
+    }
+  ]
+}

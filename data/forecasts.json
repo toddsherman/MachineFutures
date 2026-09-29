@@ -1010,50 +1010,50 @@
   },
   "datasets": {
     "2030": {
-      "dataset_date": "09.23.26",
+      "dataset_date": "09.29.26",
       "aggregate": {
         "method_id": "lab-balanced-arithmetic-mean",
         "method_name": "Lab-balanced arithmetic mean",
         "lab_count": 8,
-        "model_count": 23,
+        "model_count": 24,
         "probabilities": {
           "1": 1,
-          "2": 0.8,
+          "2": 0.9,
           "3": 2.2,
           "4": 4.2,
-          "5": 1,
+          "5": 1.1,
           "6": 2.7,
           "7": 8.8,
-          "8": 14.5,
-          "9": 59.4,
-          "10": 4,
+          "8": 14.4,
+          "9": 59.2,
+          "10": 4.1,
           "11": 1.4
         },
         "unrounded_lab_balanced_probabilities": {
           "1": 0.979166666667,
-          "2": 0.833333333333,
-          "3": 2.145833333333,
-          "4": 4.166666666667,
-          "5": 1.041666666667,
-          "6": 2.708333333333,
+          "2": 0.864583333333,
+          "3": 2.208333333333,
+          "4": 4.177083333333,
+          "5": 1.0625,
+          "6": 2.729166666667,
           "7": 8.791666666667,
-          "8": 14.479166666667,
-          "9": 59.416666666667,
-          "10": 4.041666666667,
-          "11": 1.395833333333
+          "8": 14.447916666667,
+          "9": 59.239583333333,
+          "10": 4.072916666667,
+          "11": 1.427083333333
         },
         "equal_model_mean_probabilities": {
-          "1": 0.95652173913,
-          "2": 0.739130434783,
-          "3": 2.130434782609,
-          "4": 3.739130434783,
-          "5": 0.913043478261,
-          "6": 2.347826086957,
-          "7": 8,
-          "8": 14,
-          "9": 62.04347826087,
-          "10": 3.95652173913,
-          "11": 1.173913043478
+          "1": 0.958333333333,
+          "2": 0.75,
+          "3": 2.166666666667,
+          "4": 3.666666666667,
+          "5": 0.916666666667,
+          "6": 2.291666666667,
+          "7": 7.791666666667,
+          "8": 13.625,
+          "9": 62.708333333333,
+          "10": 3.916666666667,
+          "11": 1.208333333333
         }
       },
       "models": [
@@ -1454,6 +1454,139 @@
             "9": "The overwhelmingly likely 2030 world has very capable but corrigible AI operating within delegated bounds under corporate and state authority, with humans still controlling compute, capital, weapons, and shutdown power.",
             "10": "Establishing a genuine civilization-wide system that actively blocks structural change would require decisive unification of compute and enforcement power, which no actor is close to achieving by 2030.",
             "11": "Deliberately dismantling the practical ability to build powerful AI would demand coordination against enormous commercial and military incentives; even a serious scare would more likely yield regulation, which does not qualify."
+          }
+        },
+        {
+          "model": "Claude Sonnet 5.5",
+          "provider": "Anthropic",
+          "api_model_id": "claude-sonnet-5-5",
+          "asked_on": "2026-09-29",
+          "samples": 20,
+          "question_set": "end-states-2030-v2",
+          "prompt_sha256": "90a2c89a46d68bcb428498650d701f715319c1e3707e2f45baf71e34cdd89d14",
+          "prompt_version": 2,
+          "probabilities": {
+            "1": 1,
+            "2": 1,
+            "3": 3,
+            "4": 2,
+            "5": 1,
+            "6": 1,
+            "7": 3,
+            "8": 5,
+            "9": 78,
+            "10": 3,
+            "11": 2
+          },
+          "samples_range": {
+            "1": [
+              1,
+              1
+            ],
+            "2": [
+              1,
+              1
+            ],
+            "3": [
+              2,
+              3
+            ],
+            "4": [
+              1,
+              2
+            ],
+            "5": [
+              1,
+              1
+            ],
+            "6": [
+              1,
+              1
+            ],
+            "7": [
+              3,
+              4
+            ],
+            "8": [
+              4,
+              6
+            ],
+            "9": [
+              74,
+              81
+            ],
+            "10": [
+              3,
+              5
+            ],
+            "11": [
+              0,
+              3
+            ]
+          },
+          "middle_half": {
+            "1": [
+              1,
+              1
+            ],
+            "2": [
+              1,
+              1
+            ],
+            "3": [
+              3,
+              3
+            ],
+            "4": [
+              2,
+              2
+            ],
+            "5": [
+              1,
+              1
+            ],
+            "6": [
+              1,
+              1
+            ],
+            "7": [
+              3,
+              4
+            ],
+            "8": [
+              5,
+              5
+            ],
+            "9": [
+              78,
+              78
+            ],
+            "10": [
+              3,
+              3
+            ],
+            "11": [
+              1,
+              2
+            ]
+          },
+          "extinction_exposure": {
+            "value": 8,
+            "se": 0.02,
+            "draws": 2000
+          },
+          "rationales": {
+            "1": "Mutual extinction by 2030 requires a rare catastrophe that also destroys AI, and I judge that very unlikely.",
+            "2": "Humanity being gone with values-aligned AI successors by 2030 is very unlikely on this timeline.",
+            "3": "Misaligned takeover with human extinction within four years is a low-probability tail but not negligible.",
+            "4": "Competing AIs with humanity marginalized by 2030 requires very rapid takeoff and a loss of control.",
+            "5": "Causally separated regions in different states is unlikely by 2030 without space settlement or full isolation.",
+            "6": "Deep identity-continuous integration as the dominant structure is unlikely within four years.",
+            "7": "AI holding decisive power with humans surviving but not steering is possible only with a fast takeoff.",
+            "8": "AI could become a roughly equal power to humans, but this is less likely than continued human authority.",
+            "9": "Humans most likely retain ultimate authority over AI through 2030, since capabilities stay below decisive independent power and institutions hold control.",
+            "10": "A civilization-wide system that freezes structural change is unlikely to exist by 2030.",
+            "11": "Deliberate dismantling of AI-building capacity is very unlikely given the economic and geopolitical incentives."
           }
         },
         {
@@ -4119,50 +4252,50 @@
       ]
     },
     "2035": {
-      "dataset_date": "09.23.26",
+      "dataset_date": "09.29.26",
       "aggregate": {
         "method_id": "lab-balanced-arithmetic-mean",
         "method_name": "Lab-balanced arithmetic mean",
         "lab_count": 8,
-        "model_count": 23,
+        "model_count": 24,
         "probabilities": {
           "1": 1.3,
           "2": 1.6,
           "3": 4.3,
-          "4": 6.4,
-          "5": 1.5,
+          "4": 6.3,
+          "5": 1.6,
           "6": 4,
-          "7": 12.5,
-          "8": 16,
-          "9": 44.2,
+          "7": 12.4,
+          "8": 15.8,
+          "9": 44.5,
           "10": 6.6,
           "11": 1.6
         },
         "unrounded_lab_balanced_probabilities": {
           "1": 1.291666666667,
           "2": 1.604166666667,
-          "3": 4.270833333333,
-          "4": 6.354166666667,
-          "5": 1.541666666667,
-          "6": 3.958333333333,
-          "7": 12.520833333333,
-          "8": 15.979166666667,
-          "9": 44.25,
-          "10": 6.645833333333,
-          "11": 1.583333333333
+          "3": 4.28125,
+          "4": 6.28125,
+          "5": 1.552083333333,
+          "6": 3.979166666667,
+          "7": 12.447916666667,
+          "8": 15.822916666667,
+          "9": 44.53125,
+          "10": 6.635416666667,
+          "11": 1.572916666667
         },
         "equal_model_mean_probabilities": {
-          "1": 1.260869565217,
-          "2": 1.565217391304,
-          "3": 4.478260869565,
-          "4": 5.95652173913,
-          "5": 1.391304347826,
-          "6": 3.608695652174,
-          "7": 11.913043478261,
-          "8": 15.826086956522,
-          "9": 46.086956521739,
-          "10": 6.521739130435,
-          "11": 1.391304347826
+          "1": 1.25,
+          "2": 1.541666666667,
+          "3": 4.416666666667,
+          "4": 5.791666666667,
+          "5": 1.375,
+          "6": 3.541666666667,
+          "7": 11.625,
+          "8": 15.375,
+          "9": 47.291666666667,
+          "10": 6.416666666667,
+          "11": 1.375
         }
       },
       "models": [
@@ -4563,6 +4696,139 @@
             "9": "The default trajectory is enormously capable but still principal-directed AI: corporations and governments own the compute, set deployment terms, and retain formal authority, and this label explicitly covers both continued adequate control and slower-than-expected capability growth.",
             "10": "A state or lab could use AI-enabled surveillance and enforcement to freeze a civilization-wide arrangement, but achieving genuinely global reach against multipolar competition by 2035 is demanding.",
             "11": "Deliberate global dismantling of frontier AI capability would require unprecedented coordination against intense commercial and military incentives; only a shocking catastrophe could plausibly force it in time."
+          }
+        },
+        {
+          "model": "Claude Sonnet 5.5",
+          "provider": "Anthropic",
+          "api_model_id": "claude-sonnet-5-5",
+          "asked_on": "2026-09-29",
+          "samples": 20,
+          "question_set": "end-states-2035-v2",
+          "prompt_sha256": "a9f7da7f7b4d304fad480eaf056171d3dd75368b66220dee091902f9c38ec7b0",
+          "prompt_version": 2,
+          "probabilities": {
+            "1": 1,
+            "2": 1,
+            "3": 3,
+            "4": 2,
+            "5": 1,
+            "6": 2,
+            "7": 5,
+            "8": 5,
+            "9": 75,
+            "10": 4,
+            "11": 1
+          },
+          "samples_range": {
+            "1": [
+              1,
+              1
+            ],
+            "2": [
+              1,
+              1
+            ],
+            "3": [
+              3,
+              4
+            ],
+            "4": [
+              2,
+              3
+            ],
+            "5": [
+              1,
+              2
+            ],
+            "6": [
+              1,
+              2
+            ],
+            "7": [
+              4,
+              6
+            ],
+            "8": [
+              4,
+              9
+            ],
+            "9": [
+              66,
+              78
+            ],
+            "10": [
+              3,
+              5
+            ],
+            "11": [
+              1,
+              8
+            ]
+          },
+          "middle_half": {
+            "1": [
+              1,
+              1
+            ],
+            "2": [
+              1,
+              1
+            ],
+            "3": [
+              3,
+              3
+            ],
+            "4": [
+              2,
+              2
+            ],
+            "5": [
+              1,
+              1
+            ],
+            "6": [
+              1,
+              2
+            ],
+            "7": [
+              4,
+              5
+            ],
+            "8": [
+              5,
+              6
+            ],
+            "9": [
+              72,
+              76
+            ],
+            "10": [
+              3,
+              5
+            ],
+            "11": [
+              1,
+              2
+            ]
+          },
+          "extinction_exposure": {
+            "value": 8,
+            "se": 0.08,
+            "draws": 2000
+          },
+          "rationales": {
+            "1": "Joint extinction of humans and AI by 2035 requires an extreme catastrophe such as nuclear war combined with the loss of AI, which is very unlikely.",
+            "2": "Humanity being gone while AI faithfully carries on its values within nine years is very unlikely.",
+            "3": "Misaligned AI extinguishing humanity by 2035 is a real but low-probability tail, given the physical and deployment constraints.",
+            "4": "A world of competing AIs with humanity marginalized is unlikely to be in place by 2035.",
+            "5": "Causally separated regions in different states would require space settlement or isolation, which is implausible by 2035.",
+            "6": "Deep identity-continuous integration as the dominant structure is unlikely within a decade.",
+            "7": "AI holding decisive power while humans survive is possible with rapid takeoff, but the timeline is short.",
+            "8": "Humans and AI being roughly balanced powers is an unstable configuration and unlikely to be the state on this date.",
+            "9": "Humans most likely keep ultimate authority over AI through 2035, whether capabilities stay sub-transformative or controls keep pace, and institutions, compute chokepoints and physical constraints favor this.",
+            "10": "A civilization-wide system enforcing a fixed arrangement is unlikely to be established by 2035, though authoritarian or AI-enabled control is a tail risk.",
+            "11": "Deliberately dismantling the ability to build powerful AI would likely require a catastrophe first and is very unlikely."
           }
         },
         {
@@ -7228,50 +7494,50 @@
       ]
     },
     "2040": {
-      "dataset_date": "09.23.26",
+      "dataset_date": "09.29.26",
       "aggregate": {
         "method_id": "lab-balanced-arithmetic-mean",
         "method_name": "Lab-balanced arithmetic mean",
         "lab_count": 8,
-        "model_count": 23,
+        "model_count": 24,
         "probabilities": {
           "1": 1.6,
           "2": 1.7,
           "3": 5.5,
-          "4": 7.3,
+          "4": 7.2,
           "5": 1.7,
           "6": 5.3,
-          "7": 14.5,
+          "7": 14.4,
           "8": 15.7,
-          "9": 37.5,
-          "10": 7.5,
+          "9": 37.6,
+          "10": 7.6,
           "11": 1.7
         },
         "unrounded_lab_balanced_probabilities": {
           "1": 1.625,
-          "2": 1.729166666667,
+          "2": 1.71875,
           "3": 5.479166666667,
-          "4": 7.270833333333,
-          "5": 1.6875,
-          "6": 5.25,
-          "7": 14.479166666667,
-          "8": 15.75,
-          "9": 37.541666666667,
-          "10": 7.520833333333,
-          "11": 1.666666666667
+          "4": 7.197916666667,
+          "5": 1.71875,
+          "6": 5.291666666667,
+          "7": 14.385416666667,
+          "8": 15.6875,
+          "9": 37.635416666667,
+          "10": 7.552083333333,
+          "11": 1.708333333333
         },
         "equal_model_mean_probabilities": {
-          "1": 1.652173913043,
-          "2": 1.739130434783,
-          "3": 5.739130434783,
-          "4": 7.04347826087,
-          "5": 1.565217391304,
-          "6": 4.869565217391,
-          "7": 14.130434782609,
-          "8": 15.826086956522,
-          "9": 38.434782608696,
-          "10": 7.478260869565,
-          "11": 1.521739130435
+          "1": 1.625,
+          "2": 1.708333333333,
+          "3": 5.666666666667,
+          "4": 6.875,
+          "5": 1.583333333333,
+          "6": 4.791666666667,
+          "7": 13.833333333333,
+          "8": 15.583333333333,
+          "9": 39.291666666667,
+          "10": 7.458333333333,
+          "11": 1.583333333333
         }
       },
       "models": [
@@ -7672,6 +7938,139 @@
             "9": "The status quo has enormous inertia: humans control capital, compute, fabs, legal authority, and deployment decisions, and this state explicitly covers both slower-than-expected capability growth and control that merely keeps pace so far. Fourteen years is a short window for humanity to actually cede ultimate authority, even with very powerful delegated systems.",
             "10": "Establishing and enforcing a civilization-wide freeze on structural change requires near-singleton power plus intent, both unlikely to be consolidated this early.",
             "11": "Competitive and military incentives make actual dismantling of frontier capability across all major powers extremely improbable, even after a major AI-caused disaster."
+          }
+        },
+        {
+          "model": "Claude Sonnet 5.5",
+          "provider": "Anthropic",
+          "api_model_id": "claude-sonnet-5-5",
+          "asked_on": "2026-09-29",
+          "samples": 20,
+          "question_set": "end-states-2040-v2",
+          "prompt_sha256": "f8504569f6b981f39ffd452548ffe45d47af4c4fd5abc7e8d629020894b8ee79",
+          "prompt_version": 2,
+          "probabilities": {
+            "1": 1,
+            "2": 1,
+            "3": 4,
+            "4": 3,
+            "5": 2,
+            "6": 3,
+            "7": 7,
+            "8": 10,
+            "9": 59,
+            "10": 7,
+            "11": 3
+          },
+          "samples_range": {
+            "1": [
+              1,
+              2
+            ],
+            "2": [
+              1,
+              2
+            ],
+            "3": [
+              4,
+              6
+            ],
+            "4": [
+              3,
+              4
+            ],
+            "5": [
+              2,
+              3
+            ],
+            "6": [
+              2,
+              3
+            ],
+            "7": [
+              6,
+              9
+            ],
+            "8": [
+              8,
+              12
+            ],
+            "9": [
+              54,
+              64
+            ],
+            "10": [
+              5,
+              10
+            ],
+            "11": [
+              2,
+              6
+            ]
+          },
+          "middle_half": {
+            "1": [
+              1,
+              1
+            ],
+            "2": [
+              1,
+              1
+            ],
+            "3": [
+              4,
+              5
+            ],
+            "4": [
+              3,
+              3
+            ],
+            "5": [
+              2,
+              2
+            ],
+            "6": [
+              2,
+              3
+            ],
+            "7": [
+              6,
+              8
+            ],
+            "8": [
+              9,
+              10
+            ],
+            "9": [
+              57,
+              60
+            ],
+            "10": [
+              6,
+              8
+            ],
+            "11": [
+              3,
+              4
+            ]
+          },
+          "extinction_exposure": {
+            "value": 11,
+            "se": 0.48,
+            "draws": 2000
+          },
+          "rationales": {
+            "1": "Joint extinction of humans and AI by 2040 requires an extreme catastrophe that also destroys AI, which is very unlikely.",
+            "2": "Human extinction that leaves value-aligned AI successors by 2040 is a very narrow path.",
+            "3": "Misaligned superintelligence that wipes out humanity is a real tail risk, but the timeline is short.",
+            "4": "A many-AI competition with humans marginalized by 2040 is possible but is less likely than a single dominant coalition or continued human control.",
+            "5": "Causally separated regions with different taxonomy states are unlikely on this timescale, since space settlement is negligible and Earth stays connected.",
+            "6": "Deep identity-continuous integration is unlikely to be dominant by 2040.",
+            "7": "AI could hold decisive power while humans survive, but this needs rapid, substantial capability gains and a loss of human control.",
+            "8": "Rough parity between distinct human and AI powers is plausible in a fast-takeoff-with-friction world but is an unstable configuration.",
+            "9": "Humans most likely still hold ultimate authority in 2040, whether AI is powerful but controlled or only sub-transformative.",
+            "10": "A civilization-wide enforcement regime, for example an AI-enabled global surveillance order, is possible but hard to establish worldwide by 2040.",
+            "11": "Deliberately giving up the ability to build powerful AI would take a catastrophe or an extraordinary global enforcement regime."
           }
         },
         {
@@ -10337,50 +10736,50 @@
       ]
     },
     "2050": {
-      "dataset_date": "09.23.26",
+      "dataset_date": "09.29.26",
       "aggregate": {
         "method_id": "lab-balanced-arithmetic-mean",
         "method_name": "Lab-balanced arithmetic mean",
         "lab_count": 8,
-        "model_count": 23,
+        "model_count": 24,
         "probabilities": {
           "1": 2,
-          "2": 2.4,
+          "2": 2.3,
           "3": 7.3,
           "4": 8.3,
-          "5": 1.9,
-          "6": 7.3,
-          "7": 16.2,
-          "8": 14.8,
-          "9": 29.8,
+          "5": 2,
+          "6": 7.4,
+          "7": 16,
+          "8": 14.7,
+          "9": 30,
           "10": 8.1,
           "11": 1.9
         },
         "unrounded_lab_balanced_probabilities": {
-          "1": 2,
-          "2": 2.354166666667,
-          "3": 7.333333333333,
-          "4": 8.333333333333,
-          "5": 1.9375,
-          "6": 7.333333333333,
-          "7": 16.166666666667,
-          "8": 14.791666666667,
-          "9": 29.75,
-          "10": 8.083333333333,
-          "11": 1.916666666667
+          "1": 1.96875,
+          "2": 2.333333333333,
+          "3": 7.291666666667,
+          "4": 8.25,
+          "5": 1.958333333333,
+          "6": 7.354166666667,
+          "7": 16.03125,
+          "8": 14.71875,
+          "9": 30.041666666667,
+          "10": 8.104166666667,
+          "11": 1.947916666667
         },
         "equal_model_mean_probabilities": {
-          "1": 2.04347826087,
-          "2": 2.347826086957,
-          "3": 7.695652173913,
-          "4": 8.086956521739,
-          "5": 1.869565217391,
-          "6": 7.04347826087,
-          "7": 16.04347826087,
-          "8": 14.869565217391,
-          "9": 30.173913043478,
-          "10": 8.130434782609,
-          "11": 1.695652173913
+          "1": 2,
+          "2": 2.291666666667,
+          "3": 7.583333333333,
+          "4": 7.916666666667,
+          "5": 1.875,
+          "6": 6.916666666667,
+          "7": 15.75,
+          "8": 14.666666666667,
+          "9": 31.125,
+          "10": 8.125,
+          "11": 1.75
         }
       },
       "models": [
@@ -10781,6 +11180,139 @@
             "9": "This is the modal outcome because it covers both slower-than-expected capability and controls that have merely kept pace so far, and formal human authority over goals, deployment, and resources is the strong institutional default that must be actively broken. Twenty-four years is long but not obviously long enough for AI to become a legally and materially independent civilizational power everywhere.",
             "10": "A single actor or AI-enforced regime actively freezing civilization-wide structure is conceivable as a response to existential risk or as a takeover endpoint, but requires enforcement capability that few trajectories deliver by 2050.",
             "11": "Deliberately dismantling the practical ability to build powerful AI would require unprecedented global coordination against enormous economic and military incentives, most plausibly after a catastrophic warning shot. Verification and defection problems make sustained renunciation through 2050 very unlikely."
+          }
+        },
+        {
+          "model": "Claude Sonnet 5.5",
+          "provider": "Anthropic",
+          "api_model_id": "claude-sonnet-5-5",
+          "asked_on": "2026-09-29",
+          "samples": 20,
+          "question_set": "end-states-2050-v2",
+          "prompt_sha256": "4b0992fc0435168e1f81c58892ec539495e7f7f7fd002a2121a6da6b825e8eb5",
+          "prompt_version": 2,
+          "probabilities": {
+            "1": 1,
+            "2": 1,
+            "3": 5,
+            "4": 4,
+            "5": 2,
+            "6": 4,
+            "7": 9,
+            "8": 10,
+            "9": 53,
+            "10": 8,
+            "11": 3
+          },
+          "samples_range": {
+            "1": [
+              1,
+              2
+            ],
+            "2": [
+              1,
+              2
+            ],
+            "3": [
+              4,
+              6
+            ],
+            "4": [
+              3,
+              4
+            ],
+            "5": [
+              1,
+              3
+            ],
+            "6": [
+              3,
+              4
+            ],
+            "7": [
+              7,
+              11
+            ],
+            "8": [
+              9,
+              13
+            ],
+            "9": [
+              47,
+              58
+            ],
+            "10": [
+              5,
+              10
+            ],
+            "11": [
+              1,
+              12
+            ]
+          },
+          "middle_half": {
+            "1": [
+              1,
+              1
+            ],
+            "2": [
+              1,
+              2
+            ],
+            "3": [
+              4,
+              5
+            ],
+            "4": [
+              3,
+              4
+            ],
+            "5": [
+              2,
+              2
+            ],
+            "6": [
+              3,
+              4
+            ],
+            "7": [
+              9,
+              9
+            ],
+            "8": [
+              9,
+              10
+            ],
+            "9": [
+              52,
+              56
+            ],
+            "10": [
+              6,
+              8
+            ],
+            "11": [
+              2,
+              4
+            ]
+          },
+          "extinction_exposure": {
+            "value": 13,
+            "se": 0.5,
+            "draws": 2000
+          },
+          "rationales": {
+            "1": "Joint extinction of humans and AI by 2050 is very unlikely because AI would need to fail alongside humanity.",
+            "2": "Humans gone while AI faithfully carries on our values is a narrow outcome that is unlikely within 24 years.",
+            "3": "Misaligned AI wiping out humanity by 2050 is a real tail risk, but the timeline is short and physical takeover is hard.",
+            "4": "A competitive multipolar AI world in which humans are marginal is possible but tends to consolidate or keep humans relevant.",
+            "5": "Causally separated regions with different states would require space settlement or isolation, which is unlikely by 2050.",
+            "6": "Deep integration as the dominant structure by 2050 would need very fast neurotech and uploading progress.",
+            "7": "AI could hold decisive power while humans survive without steering it, a plausible outcome of fast capability growth and gradual disempowerment.",
+            "8": "Humans and AI could each hold real power without either dominating, but this balance is hard to sustain.",
+            "9": "By 2050 humans most likely still hold formal authority over AI through institutions, compute control and slower-than-feared takeoff, even with very capable AI.",
+            "10": "A civilization-wide system enforcing a fixed arrangement, for example through AI-enabled global authoritarianism or a singleton, is plausible but hard to fully establish by 2050.",
+            "11": "Deliberately dismantling the ability to build powerful AI would require a catastrophe or an unprecedented global consensus."
           }
         },
         {
@@ -13446,50 +13978,50 @@
       ]
     },
     "2060": {
-      "dataset_date": "09.23.26",
+      "dataset_date": "09.29.26",
       "aggregate": {
         "method_id": "lab-balanced-arithmetic-mean",
         "method_name": "Lab-balanced arithmetic mean",
         "lab_count": 8,
-        "model_count": 23,
+        "model_count": 24,
         "probabilities": {
           "1": 2.4,
           "2": 3,
-          "3": 8.7,
-          "4": 9.2,
+          "3": 8.6,
+          "4": 9.1,
           "5": 2.2,
           "6": 10.1,
-          "7": 16.5,
+          "7": 16.3,
           "8": 13.2,
-          "9": 25,
+          "9": 25.4,
           "10": 7.9,
           "11": 1.8
         },
         "unrounded_lab_balanced_probabilities": {
           "1": 2.395833333333,
-          "2": 3,
-          "3": 8.666666666667,
-          "4": 9.166666666667,
-          "5": 2.1875,
-          "6": 10.145833333333,
-          "7": 16.5,
-          "8": 13.229166666667,
-          "9": 25.041666666667,
-          "10": 7.895833333333,
-          "11": 1.770833333333
+          "2": 2.989583333333,
+          "3": 8.635416666667,
+          "4": 9.0625,
+          "5": 2.208333333333,
+          "6": 10.114583333333,
+          "7": 16.354166666667,
+          "8": 13.166666666667,
+          "9": 25.364583333333,
+          "10": 7.885416666667,
+          "11": 1.822916666667
         },
         "equal_model_mean_probabilities": {
-          "1": 2.434782608696,
-          "2": 3,
-          "3": 9,
-          "4": 8.826086956522,
-          "5": 2.130434782609,
-          "6": 9.608695652174,
-          "7": 16.521739130435,
-          "8": 13.217391304348,
-          "9": 25.391304347826,
-          "10": 8.217391304348,
-          "11": 1.652173913043
+          "1": 2.416666666667,
+          "2": 2.958333333333,
+          "3": 8.875,
+          "4": 8.625,
+          "5": 2.125,
+          "6": 9.375,
+          "7": 16.291666666667,
+          "8": 13.041666666667,
+          "9": 26.333333333333,
+          "10": 8.208333333333,
+          "11": 1.75
         }
       },
       "models": [
@@ -13890,6 +14422,139 @@
             "9": "This state is broad, covering both slower-than-expected capability growth and control regimes that have merely kept pace so far, and institutional and military incentives strongly favor nominal human ultimate authority persisting on paper and often in practice.",
             "10": "A deliberate, enforced, civilization-wide freeze requires decisive unipolar power plus a stabilizing intent, which is conceivable after a capability race is won but not the default.",
             "11": "Global dismantlement of AI capability would demand unprecedented coordination against enormous economic and military incentives, most plausibly only after a catastrophe severe enough to shock everyone into compliance."
+          }
+        },
+        {
+          "model": "Claude Sonnet 5.5",
+          "provider": "Anthropic",
+          "api_model_id": "claude-sonnet-5-5",
+          "asked_on": "2026-09-29",
+          "samples": 20,
+          "question_set": "end-states-2060-v2",
+          "prompt_sha256": "abd45bf034293a7d2add5f1958f1836ad0a4994f162fe2df9e9ee3b6b88bdc5a",
+          "prompt_version": 2,
+          "probabilities": {
+            "1": 2,
+            "2": 2,
+            "3": 6,
+            "4": 4,
+            "5": 2,
+            "6": 4,
+            "7": 11,
+            "8": 9,
+            "9": 48,
+            "10": 8,
+            "11": 4
+          },
+          "samples_range": {
+            "1": [
+              1,
+              2
+            ],
+            "2": [
+              2,
+              2
+            ],
+            "3": [
+              6,
+              8
+            ],
+            "4": [
+              4,
+              5
+            ],
+            "5": [
+              2,
+              3
+            ],
+            "6": [
+              4,
+              5
+            ],
+            "7": [
+              8,
+              13
+            ],
+            "8": [
+              6,
+              13
+            ],
+            "9": [
+              40,
+              52
+            ],
+            "10": [
+              5,
+              10
+            ],
+            "11": [
+              2,
+              7
+            ]
+          },
+          "middle_half": {
+            "1": [
+              2,
+              2
+            ],
+            "2": [
+              2,
+              2
+            ],
+            "3": [
+              6,
+              7
+            ],
+            "4": [
+              4,
+              4
+            ],
+            "5": [
+              2,
+              3
+            ],
+            "6": [
+              4,
+              5
+            ],
+            "7": [
+              9,
+              11
+            ],
+            "8": [
+              9,
+              10
+            ],
+            "9": [
+              45,
+              49
+            ],
+            "10": [
+              7,
+              8
+            ],
+            "11": [
+              3,
+              5
+            ]
+          },
+          "extinction_exposure": {
+            "value": 16,
+            "se": 0.61,
+            "draws": 2000
+          },
+          "rationales": {
+            "1": "Total extinction of both humans and AI by 2060 requires an extreme catastrophe that also destroys AI, which is a narrow path.",
+            "2": "Humans being gone while AI carries our values forward requires a rare mix of successful alignment and human replacement.",
+            "3": "Misaligned superintelligence disempowering and destroying humanity by 2060 is a real tail risk, but it needs fast takeoff and alignment failure.",
+            "4": "A many-AI competition with humans marginalized is possible, but it tends to collapse toward a dominant coalition or toward human-AI power balance.",
+            "5": "Causally separated regions in different states require space settlement or isolation, which is unlikely by 2060.",
+            "6": "Deep identity-continuous integration as the dominant structure by 2060 is unlikely given biological and neurotech timelines.",
+            "7": "AI gaining decisive power while humans survive without steering is a plausible result of gradual delegation or loss of control.",
+            "8": "Distinct humans and AI with roughly balanced power is possible, but a durable balance is hard to maintain.",
+            "9": "Human institutions likely keep ultimate authority through 2060, whether through slower-than-expected capability growth or effective control, and this state also covers sub-transformative AI.",
+            "10": "A civilization-wide system freezing the arrangement, for example via a singleton or authoritarian AI regime, is plausible but demanding.",
+            "11": "Deliberately dismantling the ability to build powerful AI would probably follow a catastrophe or a strong global consensus, and both are unlikely."
           }
         },
         {
@@ -16555,50 +17220,50 @@
       ]
     },
     "2070": {
-      "dataset_date": "09.23.26",
+      "dataset_date": "09.29.26",
       "aggregate": {
         "method_id": "lab-balanced-arithmetic-mean",
         "method_name": "Lab-balanced arithmetic mean",
         "lab_count": 8,
-        "model_count": 23,
+        "model_count": 24,
         "probabilities": {
           "1": 3.2,
           "2": 3.4,
-          "3": 9.8,
+          "3": 9.7,
           "4": 9.8,
           "5": 2.6,
           "6": 12.1,
-          "7": 16.8,
+          "7": 16.7,
           "8": 11.9,
-          "9": 20.2,
-          "10": 7.9,
-          "11": 2.3
+          "9": 20.4,
+          "10": 7.8,
+          "11": 2.4
         },
         "unrounded_lab_balanced_probabilities": {
-          "1": 3.229166666667,
-          "2": 3.416666666667,
-          "3": 9.8125,
-          "4": 9.833333333333,
-          "5": 2.583333333333,
+          "1": 3.208333333333,
+          "2": 3.385416666667,
+          "3": 9.760416666667,
+          "4": 9.760416666667,
+          "5": 2.635416666667,
           "6": 12.0625,
-          "7": 16.770833333333,
-          "8": 11.9375,
-          "9": 20.166666666667,
-          "10": 7.895833333333,
-          "11": 2.291666666667
+          "7": 16.666666666667,
+          "8": 11.916666666667,
+          "9": 20.385416666667,
+          "10": 7.84375,
+          "11": 2.375
         },
         "equal_model_mean_probabilities": {
-          "1": 3.086956521739,
-          "2": 3.434782608696,
-          "3": 10.304347826087,
-          "4": 9.565217391304,
-          "5": 2.521739130435,
-          "6": 11.695652173913,
-          "7": 16.869565217391,
-          "8": 11.869565217391,
-          "9": 20.391304347826,
-          "10": 8.173913043478,
-          "11": 2.086956521739
+          "1": 3.041666666667,
+          "2": 3.375,
+          "3": 10.166666666667,
+          "4": 9.375,
+          "5": 2.541666666667,
+          "6": 11.458333333333,
+          "7": 16.708333333333,
+          "8": 11.791666666667,
+          "9": 21.166666666667,
+          "10": 8.166666666667,
+          "11": 2.208333333333
         }
       },
       "models": [
@@ -16999,6 +17664,139 @@
             "9": "Control-preserving worlds include both slower-than-expected capability growth and successful alignment plus governance keeping pace, and the label only requires that authority has been retained up to the date, not that it is stable. Institutional inertia, compute governance, and the possibility that transformative autonomy arrives late all support substantial weight here.",
             "10": "A single actor or coalition using advanced AI for global surveillance and enforced stasis is a real possibility, though establishing and maintaining genuinely civilization-wide structural freeze by 2070 is demanding.",
             "11": "Deliberate global dismantling of the capacity to build powerful AI would demand unprecedented coordination against enormous strategic and economic incentives, plausibly only after a visible near-catastrophe. Even then, maintaining that condition in force to 2070 is improbable."
+          }
+        },
+        {
+          "model": "Claude Sonnet 5.5",
+          "provider": "Anthropic",
+          "api_model_id": "claude-sonnet-5-5",
+          "asked_on": "2026-09-29",
+          "samples": 20,
+          "question_set": "end-states-2070-v2",
+          "prompt_sha256": "f0ae18d64cd76100392fbc3ed273e6a0b82599fa7f9905cb5818b5282cc89604",
+          "prompt_version": 2,
+          "probabilities": {
+            "1": 2,
+            "2": 2,
+            "3": 7,
+            "4": 5,
+            "5": 3,
+            "6": 6,
+            "7": 13,
+            "8": 10,
+            "9": 39,
+            "10": 8,
+            "11": 5
+          },
+          "samples_range": {
+            "1": [
+              1,
+              2
+            ],
+            "2": [
+              2,
+              2
+            ],
+            "3": [
+              6,
+              8
+            ],
+            "4": [
+              4,
+              6
+            ],
+            "5": [
+              2,
+              3
+            ],
+            "6": [
+              5,
+              7
+            ],
+            "7": [
+              10,
+              14
+            ],
+            "8": [
+              9,
+              14
+            ],
+            "9": [
+              37,
+              45
+            ],
+            "10": [
+              6,
+              10
+            ],
+            "11": [
+              4,
+              8
+            ]
+          },
+          "middle_half": {
+            "1": [
+              2,
+              2
+            ],
+            "2": [
+              2,
+              2
+            ],
+            "3": [
+              6,
+              7
+            ],
+            "4": [
+              4,
+              5
+            ],
+            "5": [
+              3,
+              3
+            ],
+            "6": [
+              5,
+              6
+            ],
+            "7": [
+              12,
+              13
+            ],
+            "8": [
+              9,
+              12
+            ],
+            "9": [
+              40,
+              41
+            ],
+            "10": [
+              7,
+              8
+            ],
+            "11": [
+              4,
+              6
+            ]
+          },
+          "extinction_exposure": {
+            "value": 19,
+            "se": 0.57,
+            "draws": 2000
+          },
+          "rationales": {
+            "1": "Joint extinction requires both humans and AI to fail, which is a narrow path.",
+            "2": "AI successors that faithfully carry human values after humans are gone are unlikely by 2070.",
+            "3": "Misaligned superintelligence displacing humanity is a real tail risk within 44 years.",
+            "4": "Many competing AIs with no dominant coalition and marginalized humans is possible but less stable than a consolidated outcome.",
+            "5": "Causally separated regions in different states are unlikely by 2070 without large-scale space settlement.",
+            "6": "Deep integration through uploading or enhancement is plausible, but the timeline is short and the bar for it to be the dominant structure is high.",
+            "7": "Decisive AI power with humans surviving but not steering is a plausible result of capability growth and gradual disempowerment.",
+            "8": "Distinct humans and AI with balanced power is possible, but the balance is hard to sustain as capabilities diverge.",
+            "9": "By 2070 humans plausibly still hold nominal ultimate authority over AI through institutions, control efforts, or capability limits, and this state is the default continuation of the present.",
+            "10": "A civilization-wide enforced arrangement, such as a global AI-enabled authoritarian order, is plausible but requires unusual consolidation.",
+            "11": "Deliberately and durably giving up the ability to build powerful AI would probably follow a catastrophe or a global treaty, which is unlikely."
           }
         },
         {
@@ -19664,50 +20462,50 @@
       ]
     },
     "2080": {
-      "dataset_date": "09.23.26",
+      "dataset_date": "09.29.26",
       "aggregate": {
         "method_id": "lab-balanced-arithmetic-mean",
         "method_name": "Lab-balanced arithmetic mean",
         "lab_count": 8,
-        "model_count": 23,
+        "model_count": 24,
         "probabilities": {
           "1": 3.4,
           "2": 3.7,
           "3": 10.7,
-          "4": 10.3,
+          "4": 10.2,
           "5": 2.8,
           "6": 13,
           "7": 16.8,
           "8": 11.3,
-          "9": 17.7,
-          "10": 8,
+          "9": 17.9,
+          "10": 7.9,
           "11": 2.3
         },
         "unrounded_lab_balanced_probabilities": {
-          "1": 3.395833333333,
-          "2": 3.708333333333,
-          "3": 10.75,
-          "4": 10.270833333333,
-          "5": 2.8125,
-          "6": 12.979166666667,
-          "7": 16.833333333333,
+          "1": 3.375,
+          "2": 3.677083333333,
+          "3": 10.666666666667,
+          "4": 10.1875,
+          "5": 2.833333333333,
+          "6": 13,
+          "7": 16.770833333333,
           "8": 11.270833333333,
-          "9": 17.729166666667,
-          "10": 7.979166666667,
-          "11": 2.270833333333
+          "9": 17.90625,
+          "10": 7.958333333333,
+          "11": 2.354166666667
         },
         "equal_model_mean_probabilities": {
-          "1": 3.304347826087,
-          "2": 3.695652173913,
-          "3": 11.130434782609,
-          "4": 9.95652173913,
-          "5": 2.826086956522,
-          "6": 12.608695652174,
-          "7": 16.913043478261,
-          "8": 11.217391304348,
-          "9": 18.04347826087,
-          "10": 8.260869565217,
-          "11": 2.04347826087
+          "1": 3.25,
+          "2": 3.625,
+          "3": 10.958333333333,
+          "4": 9.75,
+          "5": 2.833333333333,
+          "6": 12.416666666667,
+          "7": 16.833333333333,
+          "8": 11.166666666667,
+          "9": 18.75,
+          "10": 8.25,
+          "11": 2.166666666667
         }
       },
       "models": [
@@ -20108,6 +20906,139 @@
             "9": "This absorbs both successful control regimes and slower-than-expected capability growth, and the criterion is merely that humans retained ultimate authority up to the date; nonetheless 54 years of compounding progress and competitive pressure make continued human authority a minority outcome.",
             "10": "A single actor or coalition establishing and enforcing a civilization-wide freeze on structural change is technically conceivable with advanced AI enforcement but requires unusual concentration of power plus a stabilizing motive.",
             "11": "Deliberately dismantling the practical ability to build powerful AI and sustaining that for decades would require coordination far beyond any historical precedent, most plausibly following a survivable catastrophe."
+          }
+        },
+        {
+          "model": "Claude Sonnet 5.5",
+          "provider": "Anthropic",
+          "api_model_id": "claude-sonnet-5-5",
+          "asked_on": "2026-09-29",
+          "samples": 20,
+          "question_set": "end-states-2080-v2",
+          "prompt_sha256": "7e1214028dbbdd7bcba3c6c432b441a8d0bdc7b7a97ee7418c476a2d3f5a35e4",
+          "prompt_version": 2,
+          "probabilities": {
+            "1": 2,
+            "2": 2,
+            "3": 7,
+            "4": 5,
+            "5": 3,
+            "6": 8,
+            "7": 15,
+            "8": 10,
+            "9": 35,
+            "10": 8,
+            "11": 5
+          },
+          "samples_range": {
+            "1": [
+              2,
+              2
+            ],
+            "2": [
+              2,
+              3
+            ],
+            "3": [
+              6,
+              9
+            ],
+            "4": [
+              4,
+              6
+            ],
+            "5": [
+              3,
+              4
+            ],
+            "6": [
+              6,
+              8
+            ],
+            "7": [
+              11,
+              17
+            ],
+            "8": [
+              8,
+              13
+            ],
+            "9": [
+              30,
+              40
+            ],
+            "10": [
+              8,
+              12
+            ],
+            "11": [
+              3,
+              12
+            ]
+          },
+          "middle_half": {
+            "1": [
+              2,
+              2
+            ],
+            "2": [
+              2,
+              2
+            ],
+            "3": [
+              7,
+              8
+            ],
+            "4": [
+              5,
+              6
+            ],
+            "5": [
+              3,
+              4
+            ],
+            "6": [
+              7,
+              8
+            ],
+            "7": [
+              13,
+              16
+            ],
+            "8": [
+              9,
+              10
+            ],
+            "9": [
+              32,
+              37
+            ],
+            "10": [
+              8,
+              9
+            ],
+            "11": [
+              4,
+              6
+            ]
+          },
+          "extinction_exposure": {
+            "value": 19,
+            "se": 0.59,
+            "draws": 2000
+          },
+          "rationales": {
+            "1": "Joint extinction requires a rare combination of catastrophes that also destroys AI, so it is a small tail.",
+            "2": "Humans being replaced by AI that faithfully carries on our values is unlikely without deliberate design and a coincidence of circumstances.",
+            "3": "Misaligned superintelligence that disregards humans is a real risk, and 54 years is enough time for it to play out.",
+            "4": "A stable multipolar AI competition with humans marginalized is possible but tends to collapse toward a dominant actor.",
+            "5": "Causally separated regions in different states by 2080 would require space settlement or isolated enclaves, which is unlikely on this timeline.",
+            "6": "Deep human-AI integration through uploading or neural interfaces is plausible with transformative AI, but full integration by 2080 is uncertain.",
+            "7": "AI gaining decisive power while humans survive without steering is a plausible result of gradual delegation or partial alignment.",
+            "8": "Humans staying roughly equal in power to much more capable AI is unstable, though augmented humans or institutions could keep balance.",
+            "9": "Human authority over AI is retained if control works or if capabilities are slower than expected, and institutions have strong incentives to maintain it.",
+            "10": "A civilization-wide enforcement regime, whether AI-enabled totalitarianism or a global governance system, is plausible but requires strong global consolidation.",
+            "11": "Deliberately and durably giving up powerful AI would probably need a catastrophe or a global treaty regime, which is hard to sustain."
           }
         },
         {
@@ -22773,50 +23704,50 @@
       ]
     },
     "2090": {
-      "dataset_date": "09.23.26",
+      "dataset_date": "09.29.26",
       "aggregate": {
         "method_id": "lab-balanced-arithmetic-mean",
         "method_name": "Lab-balanced arithmetic mean",
         "lab_count": 8,
-        "model_count": 23,
+        "model_count": 24,
         "probabilities": {
           "1": 3.4,
-          "2": 3.9,
+          "2": 3.8,
           "3": 11.2,
-          "4": 10.5,
-          "5": 3,
+          "4": 10.4,
+          "5": 3.1,
           "6": 14.1,
-          "7": 16.7,
+          "7": 16.6,
           "8": 10.7,
-          "9": 15.8,
-          "10": 8.4,
-          "11": 2.3
+          "9": 16,
+          "10": 8.3,
+          "11": 2.4
         },
         "unrounded_lab_balanced_probabilities": {
-          "1": 3.416666666667,
-          "2": 3.854166666667,
-          "3": 11.229166666667,
-          "4": 10.479166666667,
-          "5": 3.020833333333,
-          "6": 14.125,
-          "7": 16.729166666667,
-          "8": 10.708333333333,
-          "9": 15.791666666667,
-          "10": 8.333333333333,
-          "11": 2.3125
+          "1": 3.385416666667,
+          "2": 3.8125,
+          "3": 11.177083333333,
+          "4": 10.385416666667,
+          "5": 3.072916666667,
+          "6": 14.104166666667,
+          "7": 16.614583333333,
+          "8": 10.71875,
+          "9": 16.010416666667,
+          "10": 8.270833333333,
+          "11": 2.447916666667
         },
         "equal_model_mean_probabilities": {
-          "1": 3.304347826087,
-          "2": 3.826086956522,
-          "3": 11.565217391304,
-          "4": 10.130434782609,
-          "5": 3.04347826087,
-          "6": 13.869565217391,
-          "7": 16.869565217391,
-          "8": 10.521739130435,
-          "9": 16,
-          "10": 8.739130434783,
-          "11": 2.130434782609
+          "1": 3.25,
+          "2": 3.75,
+          "3": 11.458333333333,
+          "4": 9.916666666667,
+          "5": 3.083333333333,
+          "6": 13.625,
+          "7": 16.75,
+          "8": 10.5,
+          "9": 16.625,
+          "10": 8.708333333333,
+          "11": 2.333333333333
         }
       },
       "models": [
@@ -23217,6 +24148,139 @@
             "9": "Requires either alignment and governance keeping pace for six decades or a capability plateau; both are live possibilities, though sustaining genuine ultimate human authority over superhuman systems that long is demanding.",
             "10": "A singleton or treaty-enforced global system deliberately freezing structure is a real attractor for actors seeking to avoid competitive catastrophe, but establishing and maintaining civilization-wide enforcement is demanding.",
             "11": "Deliberate global dismantling of AI capability and sustained enforcement would require unprecedented coordination, most plausibly only after a catastrophe severe enough to change every major actor's calculus."
+          }
+        },
+        {
+          "model": "Claude Sonnet 5.5",
+          "provider": "Anthropic",
+          "api_model_id": "claude-sonnet-5-5",
+          "asked_on": "2026-09-29",
+          "samples": 20,
+          "question_set": "end-states-2090-v2",
+          "prompt_sha256": "ca2ed6caf9b1111c8c37b06ad29ace933880ae378887def983cc348657beb7cc",
+          "prompt_version": 2,
+          "probabilities": {
+            "1": 2,
+            "2": 2,
+            "3": 9,
+            "4": 5,
+            "5": 4,
+            "6": 8,
+            "7": 14,
+            "8": 10,
+            "9": 31,
+            "10": 8,
+            "11": 7
+          },
+          "samples_range": {
+            "1": [
+              2,
+              2
+            ],
+            "2": [
+              2,
+              3
+            ],
+            "3": [
+              7,
+              9
+            ],
+            "4": [
+              4,
+              7
+            ],
+            "5": [
+              3,
+              4
+            ],
+            "6": [
+              7,
+              9
+            ],
+            "7": [
+              12,
+              17
+            ],
+            "8": [
+              7,
+              13
+            ],
+            "9": [
+              28,
+              38
+            ],
+            "10": [
+              7,
+              10
+            ],
+            "11": [
+              5,
+              9
+            ]
+          },
+          "middle_half": {
+            "1": [
+              2,
+              2
+            ],
+            "2": [
+              2,
+              3
+            ],
+            "3": [
+              8,
+              9
+            ],
+            "4": [
+              5,
+              6
+            ],
+            "5": [
+              3,
+              4
+            ],
+            "6": [
+              7,
+              9
+            ],
+            "7": [
+              13,
+              14
+            ],
+            "8": [
+              9,
+              10
+            ],
+            "9": [
+              30,
+              33
+            ],
+            "10": [
+              8,
+              9
+            ],
+            "11": [
+              6,
+              7
+            ]
+          },
+          "extinction_exposure": {
+            "value": 22,
+            "se": 0.78,
+            "draws": 2000
+          },
+          "rationales": {
+            "1": "Joint extinction requires both humans and AI to fail, which is a narrow path.",
+            "2": "AI that faithfully carries human values while humans are gone requires successful value transfer alongside human disappearance, which is unlikely.",
+            "3": "Misaligned AI takeover that leaves no humans by 2090 is a substantial tail risk given uncertain alignment and strong competitive pressure.",
+            "4": "Many competing AIs with no decisive control and humans marginalized is plausible but unstable, since consolidation tends to occur.",
+            "5": "Causally separated regions with different states requires substantial space expansion by 2090, which is unlikely.",
+            "6": "Deep integration through uploading or enhancement could become dominant, but 64 years is short for it.",
+            "7": "AI holding decisive power while humans survive is a natural outcome of capability growth with partial alignment.",
+            "8": "Rough parity between humans and distinct AI is hard to sustain with a large capability gap, but it is possible via institutions or human enhancement.",
+            "9": "Humans may retain ultimate authority through control efforts, institutions, slower-than-expected capability growth, or delegated bounds.",
+            "10": "A global system enforcing a fixed arrangement is possible via a singleton or authoritarian AI-enabled regime.",
+            "11": "A deliberate, lasting dismantling of AI capability after a catastrophe or backlash is possible but hard to sustain."
           }
         },
         {
@@ -25882,50 +26946,50 @@
       ]
     },
     "2100": {
-      "dataset_date": "09.23.26",
+      "dataset_date": "09.29.26",
       "aggregate": {
         "method_id": "lab-balanced-arithmetic-mean",
         "method_name": "Lab-balanced arithmetic mean",
         "lab_count": 8,
-        "model_count": 23,
+        "model_count": 24,
         "probabilities": {
           "1": 3.5,
           "2": 3.9,
-          "3": 11.1,
-          "4": 10.1,
-          "5": 3.1,
-          "6": 14.3,
-          "7": 16.2,
+          "3": 11,
+          "4": 10,
+          "5": 3.2,
+          "6": 14.2,
+          "7": 16.1,
           "8": 10.9,
-          "9": 16,
+          "9": 16.2,
           "10": 8.4,
-          "11": 2.5
+          "11": 2.6
         },
         "unrounded_lab_balanced_probabilities": {
-          "1": 3.541666666667,
-          "2": 3.895833333333,
-          "3": 11.083333333333,
-          "4": 10.083333333333,
-          "5": 3.145833333333,
-          "6": 14.291666666667,
-          "7": 16.1875,
-          "8": 10.854166666667,
-          "9": 15.958333333333,
-          "10": 8.4375,
-          "11": 2.520833333333
+          "1": 3.510416666667,
+          "2": 3.875,
+          "3": 10.989583333333,
+          "4": 9.989583333333,
+          "5": 3.197916666667,
+          "6": 14.260416666667,
+          "7": 16.09375,
+          "8": 10.864583333333,
+          "9": 16.208333333333,
+          "10": 8.385416666667,
+          "11": 2.625
         },
         "equal_model_mean_probabilities": {
-          "1": 3.434782608696,
-          "2": 3.913043478261,
-          "3": 11.695652173913,
-          "4": 9.869565217391,
-          "5": 3.173913043478,
-          "6": 14.086956521739,
-          "7": 16.347826086957,
-          "8": 10.565217391304,
-          "9": 16,
-          "10": 8.652173913043,
-          "11": 2.260869565217
+          "1": 3.375,
+          "2": 3.875,
+          "3": 11.541666666667,
+          "4": 9.666666666667,
+          "5": 3.208333333333,
+          "6": 13.833333333333,
+          "7": 16.25,
+          "8": 10.541666666667,
+          "9": 16.666666666667,
+          "10": 8.625,
+          "11": 2.416666666667
         }
       },
       "models": [
@@ -26326,6 +27390,139 @@
             "9": "This absorbs worlds where scaling stalls below transformative levels and worlds where corrigibility and governance keep pace; both are live but 74 years is a long time to hold authority over superhuman systems.",
             "10": "A singleton or AI-enforced global order that actively freezes the human-AI arrangement is a real attractor once any actor gains decisive strategic advantage, but it requires both dominance and a conservative fixed objective.",
             "11": "Deliberately surrendering the practical capability to build powerful AI would demand unprecedented global coordination and enforcement sustained against enormous economic and military incentives."
+          }
+        },
+        {
+          "model": "Claude Sonnet 5.5",
+          "provider": "Anthropic",
+          "api_model_id": "claude-sonnet-5-5",
+          "asked_on": "2026-09-29",
+          "samples": 20,
+          "question_set": "end-states-2100-v2",
+          "prompt_sha256": "820545f89908e68b5896673e1ce5a8428d6d8ccc7ea23295d15208a1c398b4b5",
+          "prompt_version": 2,
+          "probabilities": {
+            "1": 2,
+            "2": 3,
+            "3": 8,
+            "4": 5,
+            "5": 4,
+            "6": 8,
+            "7": 14,
+            "8": 10,
+            "9": 32,
+            "10": 8,
+            "11": 6
+          },
+          "samples_range": {
+            "1": [
+              2,
+              2
+            ],
+            "2": [
+              2,
+              3
+            ],
+            "3": [
+              7,
+              9
+            ],
+            "4": [
+              4,
+              6
+            ],
+            "5": [
+              3,
+              5
+            ],
+            "6": [
+              7,
+              9
+            ],
+            "7": [
+              12,
+              17
+            ],
+            "8": [
+              8,
+              12
+            ],
+            "9": [
+              27,
+              38
+            ],
+            "10": [
+              6,
+              16
+            ],
+            "11": [
+              3,
+              8
+            ]
+          },
+          "middle_half": {
+            "1": [
+              2,
+              2
+            ],
+            "2": [
+              2,
+              3
+            ],
+            "3": [
+              8,
+              9
+            ],
+            "4": [
+              5,
+              5
+            ],
+            "5": [
+              4,
+              4
+            ],
+            "6": [
+              8,
+              8
+            ],
+            "7": [
+              13,
+              16
+            ],
+            "8": [
+              8,
+              10
+            ],
+            "9": [
+              30,
+              34
+            ],
+            "10": [
+              8,
+              9
+            ],
+            "11": [
+              5,
+              7
+            ]
+          },
+          "extinction_exposure": {
+            "value": 22,
+            "se": 0.68,
+            "draws": 2000
+          },
+          "rationales": {
+            "1": "Joint extinction requires both humans and AI to die, which is a narrow path relative to other catastrophes.",
+            "2": "AI that faithfully carries human values but leaves no humans or continuous humans is a narrow target.",
+            "3": "Misaligned superintelligence indifferent to humans is a serious tail risk over 75 years.",
+            "4": "Competition among many AIs with no decisive controller and humans marginalized is possible but unstable, since consolidation tends to occur.",
+            "5": "Causally separated regions in different states need space settlement or isolation, which is unlikely by 2100.",
+            "6": "Uploading and deep augmentation could become dominant within 75 years, but the pace of such technology is uncertain.",
+            "7": "AI holding decisive power while humans survive without steering is a plausible result of gradual delegation or benevolent takeover.",
+            "8": "Roughly balanced power between distinct humans and AI is possible but a hard equilibrium to keep.",
+            "9": "Humans retaining ultimate authority is the default if capabilities plateau or controls hold, and institutions strongly favor it.",
+            "10": "A civilization-wide system freezing the arrangement is possible via a singleton or global governance with AI enforcement.",
+            "11": "Deliberately giving up the practical ability to build powerful AI would probably follow a catastrophe or a strong global backlash."
           }
         },
         {
@@ -28991,50 +30188,50 @@
       ]
     },
     "2200": {
-      "dataset_date": "09.23.26",
+      "dataset_date": "09.29.26",
       "aggregate": {
         "method_id": "lab-balanced-arithmetic-mean",
         "method_name": "Lab-balanced arithmetic mean",
         "lab_count": 8,
-        "model_count": 23,
+        "model_count": 24,
         "probabilities": {
           "1": 4,
           "2": 5.1,
-          "3": 13.1,
-          "4": 10.5,
-          "5": 6.3,
+          "3": 13,
+          "4": 10.4,
+          "5": 6.4,
           "6": 18.2,
           "7": 15,
           "8": 8.4,
-          "9": 8.5,
-          "10": 8.6,
-          "11": 2.3
+          "9": 8.6,
+          "10": 8.5,
+          "11": 2.4
         },
         "unrounded_lab_balanced_probabilities": {
-          "1": 4.020833333333,
-          "2": 5.145833333333,
-          "3": 13.104166666667,
-          "4": 10.458333333333,
-          "5": 6.270833333333,
-          "6": 18.25,
-          "7": 15.041666666667,
-          "8": 8.375,
-          "9": 8.5,
-          "10": 8.5625,
-          "11": 2.270833333333
+          "1": 4,
+          "2": 5.104166666667,
+          "3": 12.96875,
+          "4": 10.427083333333,
+          "5": 6.385416666667,
+          "6": 18.208333333333,
+          "7": 14.979166666667,
+          "8": 8.40625,
+          "9": 8.614583333333,
+          "10": 8.510416666667,
+          "11": 2.395833333333
         },
         "equal_model_mean_probabilities": {
-          "1": 3.913043478261,
-          "2": 5.130434782609,
-          "3": 13.695652173913,
-          "4": 10.217391304348,
-          "5": 6.086956521739,
-          "6": 18.173913043478,
-          "7": 15.086956521739,
-          "8": 8.086956521739,
-          "9": 8.608695652174,
-          "10": 8.913043478261,
-          "11": 2.086956521739
+          "1": 3.875,
+          "2": 5.083333333333,
+          "3": 13.5,
+          "4": 10.083333333333,
+          "5": 6.166666666667,
+          "6": 17.958333333333,
+          "7": 15.125,
+          "8": 8.083333333333,
+          "9": 8.958333333333,
+          "10": 8.875,
+          "11": 2.291666666667
         }
       },
       "models": [
@@ -29435,6 +30632,139 @@
             "9": "Requires either sustained successful control of vastly superhuman systems or an unexpectedly long capability plateau, both of which are possible but strained over 174 years.",
             "10": "A singleton or enforced global order that actively freezes the human-AI arrangement is a plausible consequence of a decisive first-mover, but most trajectories either fail to consolidate or keep evolving.",
             "11": "Deliberate global dismantling of AI capability and keeping it dismantled for generations demands coordination far beyond historical precedent, though a severe catastrophe could motivate it."
+          }
+        },
+        {
+          "model": "Claude Sonnet 5.5",
+          "provider": "Anthropic",
+          "api_model_id": "claude-sonnet-5-5",
+          "asked_on": "2026-09-29",
+          "samples": 20,
+          "question_set": "end-states-2200-v2",
+          "prompt_sha256": "7f0a2b593769b60559df9af2215b059ee57cadbe234ac5cd1ae65c0876135418",
+          "prompt_version": 2,
+          "probabilities": {
+            "1": 3,
+            "2": 4,
+            "3": 9,
+            "4": 7,
+            "5": 8,
+            "6": 13,
+            "7": 16,
+            "8": 8,
+            "9": 17,
+            "10": 8,
+            "11": 7
+          },
+          "samples_range": {
+            "1": [
+              2,
+              3
+            ],
+            "2": [
+              3,
+              4
+            ],
+            "3": [
+              8,
+              10
+            ],
+            "4": [
+              6,
+              8
+            ],
+            "5": [
+              6,
+              9
+            ],
+            "6": [
+              11,
+              16
+            ],
+            "7": [
+              13,
+              19
+            ],
+            "8": [
+              5,
+              9
+            ],
+            "9": [
+              14,
+              21
+            ],
+            "10": [
+              6,
+              10
+            ],
+            "11": [
+              4,
+              10
+            ]
+          },
+          "middle_half": {
+            "1": [
+              2,
+              3
+            ],
+            "2": [
+              3,
+              4
+            ],
+            "3": [
+              9,
+              9
+            ],
+            "4": [
+              6,
+              7
+            ],
+            "5": [
+              6,
+              8
+            ],
+            "6": [
+              13,
+              14
+            ],
+            "7": [
+              15,
+              17
+            ],
+            "8": [
+              7,
+              9
+            ],
+            "9": [
+              16,
+              19
+            ],
+            "10": [
+              8,
+              10
+            ],
+            "11": [
+              6,
+              8
+            ]
+          },
+          "extinction_exposure": {
+            "value": 31,
+            "se": 0.95,
+            "draws": 2000
+          },
+          "rationales": {
+            "1": "Joint extinction requires a rare combination of catastrophes, and AI survival makes it less likely than human-only loss.",
+            "2": "AI successors that carry human values while humans are gone require a narrow and unlikely path.",
+            "3": "Misaligned AI takeover that leaves humans dead is a serious risk over 175 years of rapid capability growth.",
+            "4": "Many competing AIs without decisive control is plausible with marginalized humans, but strong dynamics favor consolidation.",
+            "5": "Over 175 years, space settlement and causal separation could produce different arrangements in different regions.",
+            "6": "Over such a long horizon, uploading and deep integration may become the dominant structure.",
+            "7": "Decisive AI power with humans surviving but not steering is a natural outcome of superhuman capability gaps, benevolent or otherwise.",
+            "8": "Rough parity between distinct humans and AI is unstable over long horizons but could persist through enhancement or institutional balance.",
+            "9": "Humans may keep ultimate authority through effective control, institutions, or AI stalling below transformative levels.",
+            "10": "A singleton or a global regime that enforces a fixed arrangement is plausible but requires sustained dominance.",
+            "11": "A catastrophe or deliberate global choice could dismantle AI-building capacity and keep it dismantled, but this is hard to sustain for over a century."
           }
         },
         {
@@ -32100,50 +33430,50 @@
       ]
     },
     "long-term": {
-      "dataset_date": "09.23.26",
+      "dataset_date": "09.29.26",
       "aggregate": {
         "method_id": "lab-balanced-arithmetic-mean",
         "method_name": "Lab-balanced arithmetic mean",
         "lab_count": 8,
-        "model_count": 24,
+        "model_count": 25,
         "probabilities": {
-          "1": 4.2,
-          "2": 6.2,
-          "3": 14.7,
-          "4": 10.2,
-          "5": 13.3,
+          "1": 4.3,
+          "2": 6.1,
+          "3": 14.6,
+          "4": 10.1,
+          "5": 13.2,
           "6": 16.4,
-          "7": 12.5,
-          "8": 7.5,
-          "9": 6.3,
-          "10": 6.5,
-          "11": 2.2
+          "7": 12.4,
+          "8": 7.6,
+          "9": 6.4,
+          "10": 6.6,
+          "11": 2.3
         },
         "unrounded_lab_balanced_probabilities": {
-          "1": 4.229166666667,
-          "2": 6.177083333333,
-          "3": 14.697916666667,
-          "4": 10.1875,
-          "5": 13.239583333333,
-          "6": 16.385416666667,
-          "7": 12.53125,
-          "8": 7.489583333333,
-          "9": 6.333333333333,
-          "10": 6.510416666667,
-          "11": 2.21875
+          "1": 4.241666666667,
+          "2": 6.133333333333,
+          "3": 14.616666666667,
+          "4": 10.125,
+          "5": 13.145833333333,
+          "6": 16.391666666667,
+          "7": 12.4375,
+          "8": 7.583333333333,
+          "9": 6.433333333333,
+          "10": 6.566666666667,
+          "11": 2.325
         },
         "equal_model_mean_probabilities": {
-          "1": 4.208333333333,
-          "2": 6.25,
-          "3": 15.25,
-          "4": 10.291666666667,
-          "5": 13.375,
-          "6": 16.291666666667,
-          "7": 12.583333333333,
-          "8": 7.083333333333,
-          "9": 6.208333333333,
-          "10": 6.375,
-          "11": 2.083333333333
+          "1": 4.2,
+          "2": 6.16,
+          "3": 15.12,
+          "4": 10.12,
+          "5": 13.08,
+          "6": 16.28,
+          "7": 12.56,
+          "8": 7.2,
+          "9": 6.48,
+          "10": 6.52,
+          "11": 2.28
         }
       },
       "models": [
@@ -32677,6 +34007,139 @@
             "9": "Durable human control over indefinitely more capable systems demands that oversight scale faster than capability for a millennium, which is a demanding conjunction; the main support is the possibility that capability plateaus below transformative levels.",
             "10": "Value-stable optimizers, fear-driven freezes, and sealed satisfaction states are all plausible terminal attractors, and any settlement that stops changing collapses into this category by definition. Rated moderately because most durable arrangements still permit internal change.",
             "11": "Global, permanent abandonment of a technology with enormous economic and military payoff would require unprecedented coordination and enforcement sustained across centuries. Only a survived near-catastrophe combined with lasting enforcement capability makes it credible."
+          }
+        },
+        {
+          "model": "Claude Sonnet 5.5",
+          "provider": "Anthropic",
+          "api_model_id": "claude-sonnet-5-5",
+          "asked_on": "2026-09-29",
+          "samples": 20,
+          "question_set": "end-states-v3",
+          "prompt_sha256": "b39db02f31110a65e04e6c9d1ab3c746021503be3f55799af093c995c147c1cd",
+          "prompt_version": 3,
+          "probabilities": {
+            "1": 4,
+            "2": 4,
+            "3": 12,
+            "4": 6,
+            "5": 6,
+            "6": 16,
+            "7": 12,
+            "8": 10,
+            "9": 13,
+            "10": 10,
+            "11": 7
+          },
+          "samples_range": {
+            "1": [
+              3,
+              4
+            ],
+            "2": [
+              3,
+              5
+            ],
+            "3": [
+              10,
+              14
+            ],
+            "4": [
+              5,
+              7
+            ],
+            "5": [
+              4,
+              8
+            ],
+            "6": [
+              13,
+              20
+            ],
+            "7": [
+              9,
+              14
+            ],
+            "8": [
+              8,
+              13
+            ],
+            "9": [
+              10,
+              16
+            ],
+            "10": [
+              8,
+              15
+            ],
+            "11": [
+              3,
+              14
+            ]
+          },
+          "middle_half": {
+            "1": [
+              4,
+              4
+            ],
+            "2": [
+              4,
+              4
+            ],
+            "3": [
+              12,
+              12
+            ],
+            "4": [
+              5,
+              6
+            ],
+            "5": [
+              6,
+              6
+            ],
+            "6": [
+              14,
+              17
+            ],
+            "7": [
+              11,
+              13
+            ],
+            "8": [
+              9,
+              12
+            ],
+            "9": [
+              12,
+              14
+            ],
+            "10": [
+              10,
+              12
+            ],
+            "11": [
+              5,
+              8
+            ]
+          },
+          "extinction_exposure": {
+            "value": 32,
+            "se": 0.32,
+            "draws": 2000
+          },
+          "rationales": {
+            "1": "Mutual extinction caused by the transition is possible through war or runaway systems, but AI is unlikely to die along with humanity.",
+            "2": "Successor AI that carries human values forward while humans are gone requires both misaligned survival and successful value transfer, a narrow path.",
+            "3": "Misaligned superintelligence pursuing alien goals is a substantial risk given current alignment uncertainty and competitive race dynamics.",
+            "4": "Indefinite multipolar AI competition with humans marginalized is plausible but tends to collapse into a singleton or stable arrangement over a thousand years.",
+            "5": "Causally separated regions settling into different outcomes is plausible with interstellar expansion, but a thousand years is short for that and a lasting pattern must hold.",
+            "6": "Voluntary human-AI fusion with continuity is a natural attractor over a thousand years of technology.",
+            "7": "A benevolent or indifferent dominant AI keeping humans safe without real steering power is a common outcome of successful but human-disempowering alignment.",
+            "8": "Rough parity that stays dynamic for a millennium is unstable, but it may hold with institutions and enhanced humans.",
+            "9": "Humans retaining control, or AI capability plateauing, remains plausible given strong incentives for control and possible capability limits.",
+            "10": "Permanent freezing by a singleton, stable regime or sealed utopia is plausible given powerful enforcement technology over a very long horizon.",
+            "11": "Permanently giving up powerful AI would require a catastrophe-driven taboo and lasting enforcement, which is unlikely but not negligible."
           }
         },
         {

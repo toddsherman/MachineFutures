@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "run_date": "2026-09-29",
+  "target_samples": 20,
+  "cohort": [
+    {
+      "key": "anthropic-sonnet-5-5",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "horizons": [
+    {
+      "id": "long-term",
+      "target_year": 3000,
+      "prompt_file": "public/end_states.md",
+      "question_set": "end-states-v3",
+      "prompt_sha256": "b39db02f31110a65e04e6c9d1ab3c746021503be3f55799af093c995c147c1cd"
+    },
+    {
+      "id": "2030",
+      "target_year": 2030,
+      "prompt_file": "public/end_states_2030.md",
+      "question_set": "end-states-2030-v2",
+      "prompt_sha256": "90a2c89a46d68bcb428498650d701f715319c1e3707e2f45baf71e34cdd89d14"
+    },
+    {
+      "id": "2040",
+      "target_year": 2040,
+      "prompt_file": "public/end_states_2040.md",
+      "question_set": "end-states-2040-v2",
+      "prompt_sha256": "f8504569f6b981f39ffd452548ffe45d47af4c4fd5abc7e8d629020894b8ee79"
+    },
+    {
+      "id": "2050",
+      "target_year": 2050,
+      "prompt_file": "public/end_states_2050.md",
+      "question_set": "end-states-2050-v2",
+      "prompt_sha256": "4b0992fc0435168e1f81c58892ec539495e7f7f7fd002a2121a6da6b825e8eb5"
+    },
+    {
+      "id": "2060",
+      "target_year": 2060,
+      "prompt_file": "public/end_states_2060.md",
+      "question_set": "end-states-2060-v2",
+      "prompt_sha256": "abd45bf034293a7d2add5f1958f1836ad0a4994f162fe2df9e9ee3b6b88bdc5a"
+    },
+    {
+      "id": "2035",
+      "target_year": 2035,
+      "prompt_file": "public/end_states_2035.md",
+      "question_set": "end-states-2035-v2",
+      "prompt_sha256": "a9f7da7f7b4d304fad480eaf056171d3dd75368b66220dee091902f9c38ec7b0"
+    },
+    {
+      "id": "2070",
+      "target_year": 2070,
+      "prompt_file": "public/end_states_2070.md",
+      "question_set": "end-states-2070-v2",
+      "prompt_sha256": "f0ae18d64cd76100392fbc3ed273e6a0b82599fa7f9905cb5818b5282cc89604"
+    },
+    {
+      "id": "2080",
+      "target_year": 2080,
+      "prompt_file": "public/end_states_2080.md",
+      "question_set": "end-states-2080-v2",
+      "prompt_sha256": "7e1214028dbbdd7bcba3c6c432b441a8d0bdc7b7a97ee7418c476a2d3f5a35e4"
+    },
+    {
+      "id": "2090",
+      "target_year": 2090,
+      "prompt_file": "public/end_states_2090.md",
+      "question_set": "end-states-2090-v2",
+      "prompt_sha256": "ca2ed6caf9b1111c8c37b06ad29ace933880ae378887def983cc348657beb7cc"
+    },
+    {
+      "id": "2100",
+      "target_year": 2100,
+      "prompt_file": "public/end_states_2100.md",
+      "question_set": "end-states-2100-v2",
+      "prompt_sha256": "820545f89908e68b5896673e1ce5a8428d6d8ccc7ea23295d15208a1c398b4b5"
+    },
+    {
+      "id": "2200",
+      "target_year": 2200,
+      "prompt_file": "public/end_states_2200.md",
+      "question_set": "end-states-2200-v2",
+      "prompt_sha256": "7f0a2b593769b60559df9af2215b059ee57cadbe234ac5cd1ae65c0876135418"
+    }
+  ]
+}

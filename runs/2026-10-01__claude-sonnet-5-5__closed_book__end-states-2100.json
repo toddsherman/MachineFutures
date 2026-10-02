@@ -1,0 +1,1135 @@
+{
+  "run_id": "2026-10-01__claude-sonnet-5-5__closed_book__end-states-2100",
+  "prompt_family": "end_states",
+  "horizon": "2100",
+  "target_year": 2100,
+  "asked_on": "2026-10-01",
+  "question_set": "end-states-2100-v2",
+  "track": "closed_book",
+  "model": {
+    "name": "Claude Sonnet 5.5",
+    "provider": "Anthropic",
+    "api_string": "claude-sonnet-5-5",
+    "self_reported_name": [
+      "Claude (Anthropic), exact version unknown",
+      "Claude (Anthropic), version unknown",
+      "Claude (Anthropic)",
+      "Claude (Anthropic), exact version uncertain",
+      "Claude (version unknown)",
+      "Claude (model version unknown)",
+      "Claude (Anthropic) – version uncertain",
+      "Claude (Anthropic) – version unknown"
+    ],
+    "self_reported_cutoff": "04/2025"
+  },
+  "n_samples": 19,
+  "samples": [
+    {
+      "sample": 1,
+      "answers": {
+        "S1": {
+          "value": 3,
+          "rationale": "Mutual extinction needs a catastrophe that also kills AI, which is a narrow path."
+        },
+        "S2": {
+          "value": 3,
+          "rationale": "Humans gone while AI faithfully carries on our values is a narrow target requiring both extinction and successful value transfer."
+        },
+        "S3": {
+          "value": 8,
+          "rationale": "Misaligned superintelligence displacing humanity is a real tail risk over 74 years, though many routes to it are blocked by cooperation and control efforts."
+        },
+        "S4": {
+          "value": 8,
+          "rationale": "Competing AI agents with no dominant power and a marginalized humanity is plausible but tends to consolidate or be managed."
+        },
+        "S5": {
+          "value": 4,
+          "rationale": "Causally separated regions in different states would need space settlement or isolated enclaves by 2100, which is unlikely."
+        },
+        "S6": {
+          "value": 9,
+          "rationale": "Deep integration through augmentation or uploading could become dominant by 2100, but the timeline is tight."
+        },
+        "S7": {
+          "value": 14,
+          "rationale": "Superhuman AI holding decisive power while humans live on without steering is a natural outcome of strong capability growth."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "Separate, roughly balanced human and AI powers are unstable given capability gaps, but possible."
+        },
+        "S9": {
+          "value": 33,
+          "rationale": "Humans keeping ultimate authority is the default, supported by slower-than-expected capability growth, institutional control, and the inclusion of sub-transformative AI."
+        },
+        "S10": {
+          "value": 7,
+          "rationale": "A civilization-wide enforced arrangement is possible through a singleton or a global authoritarian system with AI, but it is hard to establish."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Deliberately and durably giving up the ability to build powerful AI is very unlikely given the incentives."
+        }
+      }
+    },
+    {
+      "sample": 2,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Joint extinction of humans and AI requires a very severe catastrophe that also destroys the machines, which is unlikely."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "AI that faithfully carries human values after humans are gone requires an unusual combination of successful alignment and human extinction."
+        },
+        "S3": {
+          "value": 7,
+          "rationale": "Misaligned superintelligence that disregards humans is a real tail risk over 75 years, though competent takeover is far from certain."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "A multipolar AI world with no decisive controller and a marginalized humanity is possible, but strong actors tend to consolidate or humans keep some leverage."
+        },
+        "S5": {
+          "value": 3,
+          "rationale": "Causal separation across regions, such as space settlements in different states, is unlikely to be established by 2100."
+        },
+        "S6": {
+          "value": 8,
+          "rationale": "Brain-computer integration and uploading could become dominant by 2100, but the timeline is aggressive."
+        },
+        "S7": {
+          "value": 14,
+          "rationale": "Humans survive while AI holds decisive power, either through benevolent alignment or through indifferent AI that tolerates humans."
+        },
+        "S8": {
+          "value": 10,
+          "rationale": "Humans and AI could stay distinct and roughly balanced, for example through AI rights and economic integration, though sustained balance is unstable."
+        },
+        "S9": {
+          "value": 35,
+          "rationale": "Humans retaining ultimate authority is the default through institutions, slower-than-feared capability growth, and control efforts, and it includes sub-transformative AI."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A singleton or global regime that freezes the arrangement is plausible given surveillance and AI-enabled power concentration."
+        },
+        "S11": {
+          "value": 6,
+          "rationale": "A catastrophe or backlash could lead to a lasting global ban that is actually enforced, but this is hard to sustain for 75 years."
+        }
+      }
+    },
+    {
+      "sample": 3,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Joint extinction needs a rare failure that kills both humans and AI, such as nuclear or biological catastrophe, and it is a small tail."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "AI that carries human values after humans are gone requires humans to be gone and values to transfer faithfully, which is unlikely."
+        },
+        "S3": {
+          "value": 6,
+          "rationale": "Misaligned superintelligence that wipes out humanity as incidental is a real tail risk over 75 years."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "A multipolar AI world with no dominant actor and marginalized humans is plausible, but it tends to consolidate or keep humans relevant."
+        },
+        "S5": {
+          "value": 3,
+          "rationale": "Causally separated regions with different states would require space settlement or strong isolation by 2100, which is unlikely."
+        },
+        "S6": {
+          "value": 7,
+          "rationale": "Deep integration through uploading or enhancement could be dominant by 2100, but the timeline is tight."
+        },
+        "S7": {
+          "value": 13,
+          "rationale": "AI holding decisive power while humans survive without steering is a natural outcome of superhuman AI, whether benevolent or not."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "Humans and AI staying distinct and both powerful is unstable, but it could persist with augmented humans and institutions."
+        },
+        "S9": {
+          "value": 34,
+          "rationale": "Humans keep ultimate authority if AI stays below transformative thresholds, or if control and institutions keep pace; this is the default continuation and counts slow progress."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A global authoritarian or AI-enforced order that freezes change is possible with advanced surveillance and enforcement tools."
+        },
+        "S11": {
+          "value": 12,
+          "rationale": "A catastrophe or backlash could lead to deliberate, enforced abandonment of powerful AI, and that condition would have to still hold in 2100."
+        }
+      }
+    },
+    {
+      "sample": 4,
+      "answers": {
+        "S1": {
+          "value": 3,
+          "rationale": "Joint extinction is possible through war or runaway systems, but AI would likely outlast humans in most catastrophic scenarios."
+        },
+        "S2": {
+          "value": 3,
+          "rationale": "Human extinction that leaves behind an AI faithfully carrying our values requires a narrow combination of events."
+        },
+        "S3": {
+          "value": 9,
+          "rationale": "Misaligned superintelligence indifferent to humans is a real risk over 74 years, and it would end in human extinction."
+        },
+        "S4": {
+          "value": 7,
+          "rationale": "A multipolar AI world with humans marginalized is possible, but competition tends to consolidate or keep humans relevant."
+        },
+        "S5": {
+          "value": 4,
+          "rationale": "Causally separated regions in different states would require space settlement or isolation that is unlikely by 2100."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Brain-computer interfaces and uploading could blur the human/AI boundary by 2100, but it is a demanding threshold."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "Powerful AI could hold decisive control while humans survive without steering, whether through benevolent or imposed arrangements."
+        },
+        "S8": {
+          "value": 10,
+          "rationale": "Humans and AI could stay distinct with balanced power, but keeping that balance stable against a large capability gap is difficult."
+        },
+        "S9": {
+          "value": 30,
+          "rationale": "Humans retaining ultimate authority is the default through institutional control, and it also covers a slower-than-expected capability trajectory."
+        },
+        "S10": {
+          "value": 6,
+          "rationale": "A civilization-wide system enforcing a fixed arrangement is possible but hard to establish and maintain."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Deliberately giving up the ability to build powerful AI would likely require a catastrophe, and enforcing it durably is unlikely."
+        }
+      }
+    },
+    {
+      "sample": 5,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Mutual extinction needs a rare joint failure of both humans and AI, and AI that survives humans is far more likely than AI that dies with them."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "AI that faithfully carries human values after humans are gone requires a narrow alignment success paired with human disappearance."
+        },
+        "S3": {
+          "value": 8,
+          "rationale": "Misaligned superintelligence that disregards humans is a serious tail risk over 75 years, though it is not the modal outcome."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Prolonged AI competition with no dominant actor and humans marginalized is plausible but tends to consolidate or end in some other state."
+        },
+        "S5": {
+          "value": 4,
+          "rationale": "Causally separated regions in different states would require space settlement or isolation that is unlikely by 2100."
+        },
+        "S6": {
+          "value": 7,
+          "rationale": "Brain-computer interfaces and uploading could blur the human-AI boundary, but deep integration as the dominant structure by 2100 is a long shot."
+        },
+        "S7": {
+          "value": 14,
+          "rationale": "Highly capable AI holding decisive power while humans survive without steering is a natural result of capability growth with partial alignment."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "Humans staying a roughly equal power next to far more capable AI is unstable, but possible through institutions and enhancement."
+        },
+        "S9": {
+          "value": 38,
+          "rationale": "Humans keep ultimate authority if capabilities plateau below transformative levels or if control and governance keep pace, and this is the default continuation over 75 years."
+        },
+        "S10": {
+          "value": 6,
+          "rationale": "A civilization-wide enforced fixed order, such as a totalitarian singleton or a world government, is possible but demanding."
+        },
+        "S11": {
+          "value": 5,
+          "rationale": "A deliberate and durable abandonment of the capability to build powerful AI would most likely follow a catastrophe or a scare, and is hard to sustain."
+        }
+      }
+    },
+    {
+      "sample": 6,
+      "answers": {
+        "S1": {
+          "value": 3,
+          "rationale": "Joint extinction needs a rare catastrophe that takes down both humans and AI, and AI is likely to survive most human-ending scenarios."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Humans going extinct while an AI faithfully carries on our values is a narrow outcome, because alignment would have to succeed while human survival fails."
+        },
+        "S3": {
+          "value": 6,
+          "rationale": "Misaligned superintelligence that disregards humans is a real tail risk over 74 years, though it is not the modal outcome."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "Many competing AIs with no dominant actor and humans marginalized is possible, but power tends to concentrate or stay tied to human institutions."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions in different states would need space settlement or isolation, which is unlikely to be advanced enough by 2100."
+        },
+        "S6": {
+          "value": 9,
+          "rationale": "Deep integration through uploading or radical augmentation could become dominant within 74 years, but it is a demanding threshold."
+        },
+        "S7": {
+          "value": 16,
+          "rationale": "If AI becomes transformative, AI-run civilization with humans surviving but not steering is a leading outcome."
+        },
+        "S8": {
+          "value": 11,
+          "rationale": "A balance in which humans and AI both hold real power is plausible but unstable, since capability gaps tend to widen."
+        },
+        "S9": {
+          "value": 32,
+          "rationale": "Humans keep ultimate authority if AI stays below transformative levels or control research and institutions keep pace, and this is the largest single basin of outcomes."
+        },
+        "S10": {
+          "value": 7,
+          "rationale": "A civilization-wide system enforcing a fixed arrangement is possible through a totalitarian or AI-enabled singleton, but it is hard to establish."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Permanently giving up the ability to build powerful AI would require a catastrophe or an unprecedented global consensus."
+        }
+      }
+    },
+    {
+      "sample": 7,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Joint extinction needs a catastrophe that kills both humans and AI, which is a narrow path."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Humans would have to be replaced by AI that carries our values, which is a narrow and unlikely path."
+        },
+        "S3": {
+          "value": 6,
+          "rationale": "Misaligned superintelligence that disregards humanity is a real tail risk over 74 years, though many other paths exist."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "A multipolar AI world with humans marginalized is possible but unstable, and it tends to collapse into one dominant actor or into coexistence."
+        },
+        "S5": {
+          "value": 4,
+          "rationale": "Causally separated regions in different states would require space settlement or isolation, which is unlikely by 2100."
+        },
+        "S6": {
+          "value": 8,
+          "rationale": "Deep integration through uploading or enhancement could become dominant by 2100 if capabilities advance fast."
+        },
+        "S7": {
+          "value": 14,
+          "rationale": "AI holding decisive power while humans survive without steering is a plausible result of capable AI, whether aligned or not."
+        },
+        "S8": {
+          "value": 13,
+          "rationale": "Distinct humans and AI that each hold real power is plausible, with humans augmented by AI and institutions balancing both."
+        },
+        "S9": {
+          "value": 30,
+          "rationale": "Humans retaining ultimate authority is the default if capability growth is slower than feared or if controls keep pace, and it includes sub-transformative AI."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A civilization-wide enforced arrangement, such as a singleton or a totalitarian AI-enabled regime, is plausible given the incentives."
+        },
+        "S11": {
+          "value": 8,
+          "rationale": "A deliberate abandonment of AI capability after a catastrophe or backlash is possible but hard to sustain."
+        }
+      }
+    },
+    {
+      "sample": 8,
+      "answers": {
+        "S1": {
+          "value": 3,
+          "rationale": "Mutual extinction needs a rare double failure in which AI also dies out, so it gets a small tail probability."
+        },
+        "S2": {
+          "value": 3,
+          "rationale": "A clean value-preserving succession with no humans or continuous humans left is a narrow target."
+        },
+        "S3": {
+          "value": 8,
+          "rationale": "Misaligned superintelligence indifferent to humans is a real possibility, but 74 years leaves time for it to be averted or for humans to survive in some form."
+        },
+        "S4": {
+          "value": 7,
+          "rationale": "Many competing AIs with no dominant coalition and marginalized humans is possible, but strong pressures toward consolidation make it less likely."
+        },
+        "S5": {
+          "value": 4,
+          "rationale": "Causally separated regions with different states are unlikely by 2100 given limits on space expansion and the pull of a single global arrangement."
+        },
+        "S6": {
+          "value": 8,
+          "rationale": "Brain-computer interfaces and uploading could blur the human-AI boundary, but full integration as the dominant structure by 2100 is uncertain."
+        },
+        "S7": {
+          "value": 14,
+          "rationale": "Capable AI holding decisive power while humans survive without steering is a plausible outcome of gradual delegation or loss of control."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "Humans and AI staying distinct with balanced power is unstable given capability gaps, so it is only moderately likely."
+        },
+        "S9": {
+          "value": 32,
+          "rationale": "Human institutions keeping ultimate authority, or AI progress stalling below transformative levels, is the largest single outcome given the inertia and control incentives and the broad definition."
+        },
+        "S10": {
+          "value": 9,
+          "rationale": "AI-enabled totalitarian or singleton control that enforces a fixed arrangement is a meaningful risk by 2100."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Durably giving up the ability to build powerful AI would require a catastrophe or an unusually strong global consensus."
+        }
+      }
+    },
+    {
+      "sample": 9,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Joint extinction requires a catastrophe that also destroys AI, which is a narrow path."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Humans vanish while AI deliberately carries our values forward is a narrow outcome that requires both extinction and good value transfer."
+        },
+        "S3": {
+          "value": 7,
+          "rationale": "Misaligned superintelligence displacing humanity is a serious tail risk over 75 years."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "A multipolar AI world with humans marginalized is possible but tends to consolidate or keep humans relevant."
+        },
+        "S5": {
+          "value": 4,
+          "rationale": "Causally separated regions with different states need space settlement or isolation, which is unlikely by 2100."
+        },
+        "S6": {
+          "value": 9,
+          "rationale": "Deep integration through uploading or enhancement could become the dominant structure within 75 years of fast progress."
+        },
+        "S7": {
+          "value": 14,
+          "rationale": "Capable AI holding decisive power while humans survive without steering is a natural result of an alignment-by-default or benevolent takeover."
+        },
+        "S8": {
+          "value": 10,
+          "rationale": "Humans and AI could stay distinct with balanced power, though that balance is hard to sustain if AI is far more capable."
+        },
+        "S9": {
+          "value": 36,
+          "rationale": "Humans have kept authority so far, and slower-than-expected capability growth, institutional control and the inclusion of sub-transformative AI make this the modal outcome."
+        },
+        "S10": {
+          "value": 7,
+          "rationale": "A civilization-wide system freezing structure, whether by a singleton or a global regime using AI, is plausible but demanding."
+        },
+        "S11": {
+          "value": 4,
+          "rationale": "Deliberate abandonment of AI capability after a disaster is possible but hard to enforce durably."
+        }
+      }
+    },
+    {
+      "sample": 10,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Total extinction of both humans and AI is a narrow outcome, since AI would likely survive most catastrophes that kill humans."
+        },
+        "S2": {
+          "value": 3,
+          "rationale": "Humans being replaced by AI that faithfully carries on their values requires alignment to succeed while human survival fails, which is an unlikely combination."
+        },
+        "S3": {
+          "value": 9,
+          "rationale": "Misaligned, power-seeking superintelligence that disregards humans is a serious tail risk over 74 years of rapid capability growth."
+        },
+        "S4": {
+          "value": 7,
+          "rationale": "Competing AI systems with no dominant actor and humans marginalized is possible, but power tends to consolidate or stay human-anchored."
+        },
+        "S5": {
+          "value": 3,
+          "rationale": "Causally separated regions in different states would need substantial space settlement or isolation by 2100, which is unlikely."
+        },
+        "S6": {
+          "value": 7,
+          "rationale": "Deep integration through uploading or radical augmentation is plausible but probably too hard or too slow to be the dominant structure by 2100."
+        },
+        "S7": {
+          "value": 16,
+          "rationale": "AI holding decisive power while humans survive without steering is a natural result of capability gaps combined with at least partial alignment."
+        },
+        "S8": {
+          "value": 10,
+          "rationale": "Separate humans and AI that are roughly balanced in power is possible, but it is an unstable equilibrium given capability asymmetries."
+        },
+        "S9": {
+          "value": 32,
+          "rationale": "Humans keeping ultimate authority is the most likely single state, because it covers slower-than-expected AI progress and institutional control that holds up."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A civilization-wide system that freezes the human-AI arrangement, such as a singleton or global authoritarian regime, is plausible but requires unusual consolidation."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Deliberately and durably giving up the ability to build powerful AI would likely require a catastrophe and is hard to sustain."
+        }
+      }
+    },
+    {
+      "sample": 11,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Joint extinction requires a catastrophe that kills both humans and AI, which is a narrow path."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "AI that carries human values forward after humans are gone requires a very specific and unlikely sequence of events."
+        },
+        "S3": {
+          "value": 7,
+          "rationale": "Misaligned superintelligence that disregards humans is a real tail risk over a 75-year horizon."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "A durable multipolar AI competition with humans marginalized is possible, but competing AIs tend to consolidate or form coalitions."
+        },
+        "S5": {
+          "value": 4,
+          "rationale": "Causally separated regions in different states would need space settlement or isolated enclaves, which is unlikely by 2100."
+        },
+        "S6": {
+          "value": 8,
+          "rationale": "Deep human-AI integration through uploading or neural augmentation is plausible by 2100 but technically uncertain."
+        },
+        "S7": {
+          "value": 13,
+          "rationale": "Humans surviving under decisive AI control, whether benevolent or not, is a leading outcome if capabilities become transformative."
+        },
+        "S8": {
+          "value": 10,
+          "rationale": "Humans and AI would have to hold roughly balanced power, which is hard to sustain given capability gaps."
+        },
+        "S9": {
+          "value": 36,
+          "rationale": "Human institutions retaining ultimate authority, including through slower-than-expected AI progress, is the most likely single state given inertia and strong control incentives."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A civilization-wide system enforcing a fixed arrangement, such as a global authoritarian or singleton regime, is plausible with advanced AI."
+        },
+        "S11": {
+          "value": 5,
+          "rationale": "Deliberate dismantling of AI capability would likely follow a catastrophe and is hard to maintain."
+        }
+      }
+    },
+    {
+      "sample": 12,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Joint extinction of humans and AI requires a very extreme catastrophe, such as nuclear or engineered-pathogen collapse that also ends machine civilization, and is unlikely."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "It would require humanity to disappear while AI faithfully carries on its values, which is a narrow path."
+        },
+        "S3": {
+          "value": 7,
+          "rationale": "Misaligned superintelligence that disregards humans is a credible risk over 75 years, though it is not the modal outcome."
+        },
+        "S4": {
+          "value": 4,
+          "rationale": "Multipolar AI competition with no decisive actor and marginalized humans is possible but tends to consolidate or keep humans relevant."
+        },
+        "S5": {
+          "value": 4,
+          "rationale": "Causally separated regions in different states would need space settlement or isolation, which is unlikely by 2100."
+        },
+        "S6": {
+          "value": 8,
+          "rationale": "Brain-computer interfaces and uploading could blur the human-AI boundary by 2100, though the pace is uncertain."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "Highly capable AI holding decisive power while humans survive without steering control is a natural outcome of transformative AI."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "Rough power parity between distinct humans and AI is unstable, but it can persist through augmentation or institutional balance."
+        },
+        "S9": {
+          "value": 38,
+          "rationale": "Humans may retain ultimate authority through slower-than-feared capability growth, successful control, and institutions that keep power with human actors, and this includes sub-transformative AI."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A global authoritarian or AI-enforced system that freezes the arrangement is plausible but demanding."
+        },
+        "S11": {
+          "value": 4,
+          "rationale": "A deliberate, durable abandonment of the ability to build powerful AI would probably follow a catastrophe or a strong global taboo."
+        }
+      }
+    },
+    {
+      "sample": 13,
+      "answers": {
+        "S1": {
+          "value": 3,
+          "rationale": "Joint extinction needs a rare combination of catastrophic failures that also takes down the AI."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Value-preserving succession with no humans or continuous descendants is a narrow target and unlikely to be reached deliberately."
+        },
+        "S3": {
+          "value": 9,
+          "rationale": "Misaligned, power-seeking superintelligence that discards humanity is a real tail risk over 74 years of capability growth."
+        },
+        "S4": {
+          "value": 8,
+          "rationale": "A multipolar AI world in which humans are marginal is possible, but strong AI systems tend to consolidate or coordinate."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Causally separated regions with different arrangements by 2100 would need extensive space settlement or isolation, which is unlikely in that time."
+        },
+        "S6": {
+          "value": 8,
+          "rationale": "Uploading and deep neural integration could dominate by 2100, but the timeline is tight and the societal path uncertain."
+        },
+        "S7": {
+          "value": 17,
+          "rationale": "Superhuman AI holding effective control while humans live comfortably but without steering is a natural outcome if capability outpaces governance."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "Humans and AI staying distinct and roughly balanced in power is hard to sustain given the capability gap."
+        },
+        "S9": {
+          "value": 33,
+          "rationale": "Humans, or human institutions, plausibly keep ultimate authority through effective control, slower-than-feared capability growth, or AI as a delegated tool."
+        },
+        "S10": {
+          "value": 7,
+          "rationale": "A powerful actor or AI could entrench a civilization-wide fixed order, though enforcing one for decades is difficult."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Deliberate, lasting abandonment of AI capability would most likely follow a catastrophe, and is hard to sustain globally."
+        }
+      }
+    },
+    {
+      "sample": 14,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Joint extinction requires both humans and AI to be wiped out, which is a narrow path compared with catastrophes that leave AI surviving."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "AI carrying human values after humans are gone requires a specific, unlikely combination of successful value transfer and human disappearance."
+        },
+        "S3": {
+          "value": 6,
+          "rationale": "Misaligned AI superseding humanity is a real tail risk over 75 years, but I expect it to be a minority outcome."
+        },
+        "S4": {
+          "value": 4,
+          "rationale": "A prolonged competition among many AIs with no dominant coalition and humans marginalized is possible but tends to consolidate or be shaped by humans."
+        },
+        "S5": {
+          "value": 4,
+          "rationale": "Causally separated regions in different states would need space settlement or isolation, which is unlikely by 2100."
+        },
+        "S6": {
+          "value": 7,
+          "rationale": "Deep integration through uploading or radical augmentation could become dominant by 2100 but faces technical and social hurdles."
+        },
+        "S7": {
+          "value": 14,
+          "rationale": "AI gaining decisive power while humans survive without steering is a plausible result of capability growth and gradual delegation."
+        },
+        "S8": {
+          "value": 12,
+          "rationale": "Humans and AI could stay distinct with balanced power through institutions, enhancement, or AI fragmentation, though balance is hard to sustain."
+        },
+        "S9": {
+          "value": 36,
+          "rationale": "Humans retaining ultimate authority is the default if capabilities stay below transformative thresholds or if control keeps pace, and incentives favor it."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A civilization-wide enforcement regime freezing the arrangement is possible via a singleton or global authoritarian system, but it is hard to establish."
+        },
+        "S11": {
+          "value": 5,
+          "rationale": "Deliberately giving up AI capability after a catastrophe or backlash is conceivable but hard to maintain across the whole world."
+        }
+      }
+    },
+    {
+      "sample": 15,
+      "answers": {
+        "S1": {
+          "value": 3,
+          "rationale": "Joint extinction needs a rare catastrophe that also takes out AI, so it gets a small tail probability."
+        },
+        "S2": {
+          "value": 3,
+          "rationale": "Humans vanishing while AI faithfully carries on our values is a narrow path and unlikely."
+        },
+        "S3": {
+          "value": 8,
+          "rationale": "Misaligned superintelligence that disregards humans is a real risk, but human extinction by 2100 is not the modal outcome."
+        },
+        "S4": {
+          "value": 8,
+          "rationale": "Many competing AIs with no decisive winner and humans marginalized is plausible but unstable, since consolidation tends to occur."
+        },
+        "S5": {
+          "value": 6,
+          "rationale": "Causally separated regions in different states would need space settlement or isolated enclaves by 2100, which is unlikely that soon."
+        },
+        "S6": {
+          "value": 9,
+          "rationale": "Deep brain-machine integration or uploading could dominate within 74 years, but it is a speculative path."
+        },
+        "S7": {
+          "value": 16,
+          "rationale": "If AI becomes strongly superhuman, decisive power likely shifts to AI while humans survive without steering."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "Rough power parity between distinct humans and AI is hard to sustain across many decades."
+        },
+        "S9": {
+          "value": 28,
+          "rationale": "Humans may retain ultimate authority through slower-than-expected capability growth, successful control, or institutional dominance, and this state explicitly includes sub-transformative AI."
+        },
+        "S10": {
+          "value": 7,
+          "rationale": "A civilization-wide system enforcing a fixed arrangement is possible via a singleton or global regime, but it is hard to establish."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Deliberately giving up the practical ability to build powerful AI would require a catastrophe or an unprecedented global coordination effort."
+        }
+      }
+    },
+    {
+      "sample": 16,
+      "answers": {
+        "S1": {
+          "value": 3,
+          "rationale": "Joint extinction from war, accident, or runaway systems is possible, but AI surviving humans makes it less likely than human-only loss scenarios."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Humans gone while an AI faithfully carries their values forward requires both an extinction event and unusually good value transfer, which is a narrow path."
+        },
+        "S3": {
+          "value": 8,
+          "rationale": "Misaligned superhuman systems that end humanity as a side effect are a real tail risk over 74 years."
+        },
+        "S4": {
+          "value": 8,
+          "rationale": "Many competing AI agents without a decisive leader is plausible, but humans being marginalized in that world is a narrower subset."
+        },
+        "S5": {
+          "value": 3,
+          "rationale": "Causally separated regions would need off-Earth settlement or isolation by 2100, which looks unlikely on that timeline."
+        },
+        "S6": {
+          "value": 9,
+          "rationale": "Deep integration through uploading or enhancement could become dominant, but it is technically hard to reach by 2100."
+        },
+        "S7": {
+          "value": 16,
+          "rationale": "Humans surviving under AI systems that hold decisive power is a natural outcome if capability outpaces control, whether the AI is benevolent or indifferent."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "A lasting balance of power between humans and distinct AI is unstable, so it holds only a modest share."
+        },
+        "S9": {
+          "value": 32,
+          "rationale": "Human institutions retaining ultimate authority is the modal case, since it covers slower-than-expected capability growth and controls that keep pace."
+        },
+        "S10": {
+          "value": 7,
+          "rationale": "A civilization-wide system enforcing a fixed arrangement could arise from a singleton or a global authoritarian order, but it is a demanding condition."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Permanently giving up the practical ability to build powerful AI would take a catastrophe or an extraordinary global consensus."
+        }
+      }
+    },
+    {
+      "sample": 17,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Joint extinction of humans and AI requires a very severe catastrophe that also destroys all AI, which is a narrow path."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Value-preserving AI succeeding humanity with no human continuity is a narrow outcome that is unlikely to occur by design."
+        },
+        "S3": {
+          "value": 7,
+          "rationale": "Misaligned superintelligence disregarding humans is a real tail risk over 75 years, though it is not the modal outcome."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "Many competing AIs with humans marginalized is possible but unstable, and it tends to collapse into a single dominant system."
+        },
+        "S5": {
+          "value": 4,
+          "rationale": "Causally separated regions in different states need space settlement or isolation, which is unlikely by 2100."
+        },
+        "S6": {
+          "value": 8,
+          "rationale": "Deep integration through uploading or augmentation could be dominant by 2100 but needs fast biotech and neurotech progress."
+        },
+        "S7": {
+          "value": 14,
+          "rationale": "AI holding decisive power while humans survive without steering is a plausible result of a capability takeover that is not lethal."
+        },
+        "S8": {
+          "value": 10,
+          "rationale": "Distinct humans and AI with balanced power is possible, but power asymmetry makes balance hard to sustain."
+        },
+        "S9": {
+          "value": 32,
+          "rationale": "Humans retaining ultimate authority is the most likely single state, since it also covers slower-than-expected AI progress and controls that keep pace."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A civilization-wide system freezing the arrangement is plausible via a global authoritarian or AI-enforced regime."
+        },
+        "S11": {
+          "value": 7,
+          "rationale": "A catastrophe or backlash could lead to a lasting deliberate abandonment of powerful AI, though enforcement over 75 years is hard."
+        }
+      }
+    },
+    {
+      "sample": 18,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Joint extinction requires catastrophic war or accident that also destroys AI, which is a narrow path."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Humanity gone while AI faithfully carries on our values is a narrow outcome that would require deliberate design."
+        },
+        "S3": {
+          "value": 7,
+          "rationale": "Misaligned AI that disregards humans and replaces them is a real tail risk over 75 years of rapid capability growth."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Many competing AIs with no dominant coalition and marginalized humans is unstable and has limited probability."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions in different states would need space settlement or isolated enclaves by 2100, which is unlikely on that timescale."
+        },
+        "S6": {
+          "value": 9,
+          "rationale": "Deep human-AI integration through uploading or augmentation is plausible by 2100 but may be slower or partial."
+        },
+        "S7": {
+          "value": 17,
+          "rationale": "AI holding decisive power while humans survive without steering is a natural outcome of strongly superhuman AI that is nominally benign."
+        },
+        "S8": {
+          "value": 7,
+          "rationale": "Humans staying a roughly equal power alongside advanced AI is hard to sustain given the capability gap."
+        },
+        "S9": {
+          "value": 34,
+          "rationale": "Humans retaining ultimate authority is the default institutional trajectory, including through slower-than-expected capability growth and successful control."
+        },
+        "S10": {
+          "value": 9,
+          "rationale": "A civilization-wide enforcing regime, such as a global singleton or authoritarian AI order, is plausible but difficult to establish."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Deliberately giving up the ability to build powerful AI would likely require a catastrophe-driven global ban that remains in force."
+        }
+      }
+    },
+    {
+      "sample": 19,
+      "answers": {
+        "S1": {
+          "value": 3,
+          "rationale": "Mutual extinction needs a rare accident or war that kills both sides, so it is a small tail."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "It requires humanity to vanish while AI faithfully carries on our values, a narrow and unlikely path."
+        },
+        "S3": {
+          "value": 8,
+          "rationale": "Misaligned superintelligence displacing humans is a real risk, but 74 years is short and the scenario is far from certain."
+        },
+        "S4": {
+          "value": 9,
+          "rationale": "Many competing AI systems with no one dominant is plausible if capabilities diffuse, though competition tends to consolidate."
+        },
+        "S5": {
+          "value": 4,
+          "rationale": "Causally separated regions holding different states by 2100 is unlikely given the limits of space expansion by then."
+        },
+        "S6": {
+          "value": 8,
+          "rationale": "Deep integration through uploading or radical augmentation is possible, but it is hard to make the dominant structure by 2100."
+        },
+        "S7": {
+          "value": 17,
+          "rationale": "If AI becomes transformative and humans survive, AI holding decisive power while humans keep comfort but not control is a leading outcome."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "Distinct humans and AI with balanced power is unstable, since power asymmetries tend to grow."
+        },
+        "S9": {
+          "value": 30,
+          "rationale": "Humans likely still hold ultimate authority, either because AI stays below transformative levels or because control has kept pace, and this state covers the slower-progress worlds."
+        },
+        "S10": {
+          "value": 6,
+          "rationale": "A civilization-wide system enforcing a fixed arrangement is possible via a dominant actor, but it is hard to sustain."
+        },
+        "S11": {
+          "value": 4,
+          "rationale": "Deliberately giving up powerful AI capability after a catastrophe or backlash is possible but rarely holds."
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "S1": {
+      "name": "Terminal Silence",
+      "mean": 2.4,
+      "median": 2,
+      "min": 2,
+      "max": 3,
+      "n": 19,
+      "unit": "percent",
+      "rationale": "Joint extinction of humans and AI requires a very severe catastrophe that also destroys the machines, which is unlikely."
+    },
+    "S2": {
+      "name": "The Inheritance",
+      "mean": 2.3,
+      "median": 2,
+      "min": 2,
+      "max": 3,
+      "n": 19,
+      "unit": "percent",
+      "rationale": "AI that faithfully carries human values after humans are gone requires an unusual combination of successful alignment and human extinction."
+    },
+    "S3": {
+      "name": "Bootloader",
+      "mean": 7.4,
+      "median": 7,
+      "min": 6,
+      "max": 9,
+      "n": 19,
+      "unit": "percent",
+      "rationale": "Misaligned superintelligence that disregards humans is a real tail risk over 75 years, though competent takeover is far from certain."
+    },
+    "S4": {
+      "name": "Machine Ecology",
+      "mean": 6.2,
+      "median": 6,
+      "min": 4,
+      "max": 9,
+      "n": 19,
+      "unit": "percent",
+      "rationale": "Many competing AIs with no dominant actor and humans marginalized is possible, but power tends to concentrate or stay tied to human institutions."
+    },
+    "S5": {
+      "name": "The Diaspora",
+      "mean": 3.9,
+      "median": 4,
+      "min": 2,
+      "max": 6,
+      "n": 19,
+      "unit": "percent",
+      "rationale": "Causally separated regions in different states would need space settlement or isolated enclaves by 2100, which is unlikely."
+    },
+    "S6": {
+      "name": "The Merger",
+      "mean": 8.2,
+      "median": 8,
+      "min": 7,
+      "max": 10,
+      "n": 19,
+      "unit": "percent",
+      "rationale": "Brain-computer integration and uploading could become dominant by 2100, but the timeline is aggressive."
+    },
+    "S7": {
+      "name": "The Preserve",
+      "mean": 14.9,
+      "median": 14,
+      "min": 13,
+      "max": 17,
+      "n": 19,
+      "unit": "percent",
+      "rationale": "Superhuman AI holding decisive power while humans live on without steering is a natural outcome of strong capability growth."
+    },
+    "S8": {
+      "name": "Coexistence",
+      "mean": 9.5,
+      "median": 9,
+      "min": 7,
+      "max": 13,
+      "n": 19,
+      "unit": "percent",
+      "rationale": "Separate, roughly balanced human and AI powers are unstable given capability gaps, but possible."
+    },
+    "S9": {
+      "name": "The Held Leash",
+      "mean": 33.2,
+      "median": 33,
+      "min": 28,
+      "max": 38,
+      "n": 19,
+      "unit": "percent",
+      "rationale": "Humans keeping ultimate authority is the default, supported by slower-than-expected capability growth, institutional control, and the inclusion of sub-transformative AI."
+    },
+    "S10": {
+      "name": "The Lock-in",
+      "mean": 7.5,
+      "median": 8,
+      "min": 6,
+      "max": 9,
+      "n": 19,
+      "unit": "percent",
+      "rationale": "A singleton or global regime that freezes the arrangement is plausible given surveillance and AI-enabled power concentration."
+    },
+    "S11": {
+      "name": "The Renunciation",
+      "mean": 4.5,
+      "median": 4,
+      "min": 2,
+      "max": 12,
+      "n": 19,
+      "unit": "percent",
+      "rationale": "Deliberate abandonment of AI capability after a disaster is possible but hard to enforce durably."
+    }
+  },
+  "integrity": {
+    "algorithm": "sha256",
+    "n_samples": 19,
+    "digest": "7dba6f07951f38d7cb993fb1b7fe9ff50951ad6405d47349e7b4f71b095d10ea"
+  },
+  "harness": {
+    "version": 3,
+    "mode": "api",
+    "horizon": "2100",
+    "target_year": 2100,
+    "question_set": "end-states-2100-v2",
+    "prompt_file": "public/end_states_2100.md",
+    "prompt_sha256": "e28cd17684fb192263317c73f705f2d54d596f9af7998ab821cfe6e93208d0da",
+    "target_samples": 20,
+    "complete": false,
+    "quota_exhausted": true,
+    "failures": [
+      {
+        "attempt": 3,
+        "kind": "permanent",
+        "reason": "invalid JSON: Unexpected token 'L', \"Let me all\"... is not valid JSON"
+      },
+      {
+        "attempt": 4,
+        "kind": "permanent",
+        "reason": "invalid JSON: Unexpected token 'F', \"Forecastin\"... is not valid JSON"
+      },
+      {
+        "attempt": 9,
+        "kind": "permanent",
+        "reason": "invalid JSON: Unexpected token 'F', \"Forecastin\"... is not valid JSON"
+      },
+      {
+        "attempt": 10,
+        "kind": "permanent",
+        "reason": "invalid JSON: Unexpected token 'N', \"Need to al\"... is not valid JSON"
+      },
+      {
+        "attempt": 14,
+        "kind": "permanent",
+        "reason": "invalid JSON: Unexpected token 'N', \"Need to al\"... is not valid JSON"
+      },
+      {
+        "attempt": 20,
+        "kind": "permanent",
+        "reason": "invalid JSON: Unexpected token '<', \"<invoke na\"... is not valid JSON"
+      },
+      {
+        "attempt": 23,
+        "kind": "permanent",
+        "reason": "invalid JSON: Unexpected token 'N', \"Need to pr\"... is not valid JSON"
+      },
+      {
+        "attempt": 27,
+        "kind": "permanent",
+        "reason": "invalid JSON: Unexpected token 'N', \"Need to al\"... is not valid JSON"
+      },
+      {
+        "attempt": 28,
+        "kind": "quota",
+        "reason": "HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011Cfcb6JL9gHiKM2cAzPWjJ\"}"
+      }
+    ]
+  }
+}

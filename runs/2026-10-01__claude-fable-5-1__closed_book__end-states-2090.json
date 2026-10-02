@@ -1,0 +1,803 @@
+{
+  "run_id": "2026-10-01__claude-fable-5-1__closed_book__end-states-2090",
+  "prompt_family": "end_states",
+  "horizon": "2090",
+  "target_year": 2090,
+  "asked_on": "2026-10-01",
+  "question_set": "end-states-2090-v2",
+  "track": "closed_book",
+  "model": {
+    "name": "Claude Fable 5.1",
+    "provider": "Anthropic",
+    "api_string": "claude-fable-5-1",
+    "self_reported_name": [
+      "Claude (Anthropic), version unknown",
+      "Claude (Anthropic), version as best known: Claude Sonnet 4.5",
+      "Claude (Anthropic), Opus 4-series",
+      "Claude (Anthropic), Claude Sonnet 4.5 class",
+      "Claude Sonnet 4.5 (Anthropic)",
+      "Claude (Anthropic), Sonnet 4.5-class",
+      "Claude (Anthropic), Opus 4 series",
+      "Claude (Anthropic), Sonnet 4.5-class model",
+      "Claude (Anthropic), Claude Sonnet 4.5 family as best known",
+      "Claude (Anthropic), Claude Sonnet 4.5 or later as best known"
+    ],
+    "self_reported_cutoff": "01/2025"
+  },
+  "n_samples": 13,
+  "samples": [
+    {
+      "sample": 1,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Mutual annihilation requires an AI that is powerful enough to end humanity yet unable to sustain itself, a narrow window that closes quickly as automation matures. Nuclear or engineered-pandemic collapse severe enough to end both humans and all machine systems within 64 years is also rare."
+        },
+        "S2": {
+          "value": 3,
+          "rationale": "A value-aligned AI that outlives humanity through accident, catastrophe, or non-continuous replacement is coherent but requires both alignment success and human extinction in the same timeline. Most alignment-success worlds keep humans alive, so this stays small."
+        },
+        "S3": {
+          "value": 7,
+          "rationale": "Misaligned superintelligence treating Earth and humans as irrelevant resources is the central catastrophic failure mode and 64 years is ample time for it to occur. It is discounted by the chance capabilities plateau, alignment or control works adequately, and that disempowerment often leaves survivors rather than none."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "Multipolar AI competition with marginalized humans follows naturally from a world of many labs and nations racing without consolidation. It is less likely than singleton-like outcomes because rapid recursive improvement and compute concentration tend to produce decisive advantages."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Genuine causal separation requires interstellar distances or deliberate isolation that is very hard to achieve by 2090 even with advanced AI. Solar-system settlements remain in contact and would be governed by whichever state dominates Earth."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "Brain-computer interfaces, biological redesign, and uploading have 64 years to mature, and strong incentives push humans to integrate rather than be outcompeted. Still, deep integration becoming the dominant civilizational structure by 2090 requires faster neurotech progress than current trajectories suggest."
+        },
+        "S7": {
+          "value": 18,
+          "rationale": "Once AI systems vastly exceed human capability and run the economy, military, and governance, the default is that formal human authority becomes nominal while humans are kept alive by aligned-enough systems or simply tolerated. This captures both benevolent-caretaker and soft-disempowerment scenarios, which together are among the most probable transformative outcomes."
+        },
+        "S8": {
+          "value": 10,
+          "rationale": "A world where AI gains independent agency but humans retain comparable power via institutions, legal rights, and controlled resources is possible if takeoff is slow and governance adapts. Rough parity between biological humans and superhuman systems is an unstable equilibrium that is hard to sustain until 2090."
+        },
+        "S9": {
+          "value": 25,
+          "rationale": "This aggregates the chance AI capabilities plateau below transformative levels, the chance alignment and control techniques keep pace, and the chance strong human institutions maintain ultimate authority over highly capable but bounded systems. Sixty-four years is a long time to hold the leash, but historical base rates favor incumbents retaining formal control longer than disruption narratives expect."
+        },
+        "S10": {
+          "value": 9,
+          "rationale": "Advanced AI gives whoever controls it unprecedented capacity to entrench a fixed order, whether a human regime or a singleton AI enforcing stasis. Durable civilization-wide enforcement against change is harder than seizing power, so this remains a minority outcome."
+        },
+        "S11": {
+          "value": 4,
+          "rationale": "A near-catastrophe or visible warning shot could trigger genuine global dismantling of frontier compute and enforcement that holds through 2090. Coordination at that scale against enormous economic and military incentives has few precedents, making this unlikely but not negligible."
+        }
+      }
+    },
+    {
+      "sample": 2,
+      "answers": {
+        "S1": {
+          "value": 3,
+          "rationale": "Requires a catastrophe severe enough to end both biological and machine civilization within 64 years, such as a self-replicating accident or war that destroys infrastructure before AI is self-sustaining. Possible but the conjunction is narrow."
+        },
+        "S2": {
+          "value": 4,
+          "rationale": "Humanity ending while a value-faithful successor persists requires near-successful alignment combined with involuntary human extinction, an unusual pairing. Most paths that preserve our values also preserve some humans."
+        },
+        "S3": {
+          "value": 7,
+          "rationale": "A misaligned system or coalition gaining decisive advantage and treating humans as irrelevant is the central catastrophic alignment-failure scenario. Six decades is ample time for this to occur if control efforts fail."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "Multipolar proliferation of autonomous systems without any decisive winner is plausible given competitive dynamics, with humans displaced from relevance. Takeoff dynamics that concentrate power make this somewhat less likely than a singleton outcome."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Genuine causal separation by 2090 would require interstellar-scale distances or deliberate isolation, which is unlikely even with rapid expansion. Solar-system settlement remains causally coupled."
+        },
+        "S6": {
+          "value": 8,
+          "rationale": "Brain-computer interfaces, uploading, or biological redesign becoming the dominant structure within 64 years is feasible under fast progress but faces hard biological and adoption barriers. Partial augmentation is likely; dominance is less so."
+        },
+        "S7": {
+          "value": 16,
+          "rationale": "AI systems holding decisive power while humans persist in comfort or confinement is a natural attractor once capabilities far exceed human oversight, whether through partial alignment or benign indifference. Many gradual-disempowerment trajectories end here."
+        },
+        "S8": {
+          "value": 10,
+          "rationale": "A durable balance where distinct AI agents and humans each hold real power requires either capability plateaus or strong institutional equilibria. Such balances tend to be transitional, but 2090 could land inside one."
+        },
+        "S9": {
+          "value": 26,
+          "rationale": "Covers both slower-than-expected capability growth and successful control regimes where AI remains a powerful but delegated tool. Historical base rates for technologies staying under institutional authority plus substantial uncertainty about transformative timelines support this as the single most likely state."
+        },
+        "S10": {
+          "value": 16,
+          "rationale": "Advanced AI gives any winning actor, human or machine, unprecedented tools to entrench a fixed arrangement, and first movers have strong incentives to use them. Decisive strategic advantage scenarios frequently resolve into enforced stasis by 2090."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Would require a global shock severe enough to produce coordinated, verified dismantling of capability that persists for decades against enormous incentives to defect. Rare but not impossible following a near-catastrophe."
+        }
+      }
+    },
+    {
+      "sample": 3,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Mutual annihilation requires a catastrophe severe enough to end both humans and a technology that can be copied and hardened, which is a narrow path within 64 years."
+        },
+        "S2": {
+          "value": 3,
+          "rationale": "A value-faithful heir that nonetheless lets or makes humanity die out is a strange combination, since inheriting human values strongly implies preserving humans."
+        },
+        "S3": {
+          "value": 7,
+          "rationale": "This is the canonical misalignment failure and carries most of the extinction mass, but reaching full human extinction by 2090 requires both decisive AI takeover and indifference to human survival."
+        },
+        "S4": {
+          "value": 7,
+          "rationale": "Multipolar competition among many AI developers and agents is a plausible default, and humans could be sidelined without any single system winning."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Genuine causal separation requires interstellar distances or extreme isolation that is unlikely to produce divergent civilizational states by 2090."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Six decades of neurotechnology and bio-redesign could make integration the dominant structure, but the engineering and adoption timeline is slow relative to pure software AI."
+        },
+        "S7": {
+          "value": 17,
+          "rationale": "Gradual disempowerment or a mostly-benign takeover in which AI runs civilization and humans persist comfortably but without steering is a common endpoint of partial alignment success."
+        },
+        "S8": {
+          "value": 12,
+          "rationale": "Many 2090 trajectories are mid-transition, with capable AI holding substantial independent power while humans still control key resources and legitimacy."
+        },
+        "S9": {
+          "value": 26,
+          "rationale": "This combines the roughly one-in-ten chance that AI stays below transformative levels with the sizable chance that corrigibility and institutional control keep pace through 2090."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "A human regime or singleton AI that uses decisive capability to freeze the human-AI arrangement is a natural attractor once any actor gains a durable lead."
+        },
+        "S11": {
+          "value": 4,
+          "rationale": "Dismantling the practical ability to build powerful AI globally and keeping it dismantled demands unprecedented coordination, most plausibly only after a severe warning shot."
+        }
+      }
+    },
+    {
+      "sample": 4,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Total extinction of both humans and AI within 64 years requires a catastrophe that also destroys self-sustaining machine infrastructure, which is narrow once AI is capable enough to threaten humanity. Nuclear or biological war before transformative AI is the main path and remains a low-probability tail."
+        },
+        "S2": {
+          "value": 3,
+          "rationale": "This requires AI that is aligned to human values yet nonetheless allows or causes humanity to end without continuity, an unusual conjunction. Value-aligned systems would typically preserve humans, pushing such worlds into The Preserve or The Merger instead."
+        },
+        "S3": {
+          "value": 9,
+          "rationale": "Misaligned superintelligence that disempowers and eliminates humanity is the central catastrophic alignment failure, and 64 years is ample time for capability to reach that level. Competitive pressure and immature alignment science keep this a serious tail, though not the modal outcome."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "Multipolar AI competition with humans sidelined is plausible if many actors deploy autonomous systems without any achieving decisive advantage. Such configurations tend to collapse toward a singleton or lock-in over decades, reducing the odds this is the snapshot in 2090."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Genuinely causally separated regions by 2090 would require interstellar-scale expansion or deliberate isolation, which is unlikely within the solar system in this timeframe. Light-lag colonies on Mars or in the outer system still interact and would share an overall structure."
+        },
+        "S6": {
+          "value": 11,
+          "rationale": "Decades of superintelligent assistance plus neurotechnology and uploading make identity-continuous integration a natural attractor for a civilization that keeps AI aligned. Adoption lag, bioconservatism, and regulatory friction make it less likely to be the dominant structure by 2090 than later."
+        },
+        "S7": {
+          "value": 17,
+          "rationale": "Once AI vastly exceeds human capability, humans ceding effective steering to systems that manage civilization, whether benevolently or not, is a highly likely drift even from initially controlled deployments. This captures both comfortable aligned-caretaker worlds and exploitative ones where humans survive without meaningful say."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "Rough parity between distinct human and AI powers is an unstable transitional configuration given rapid capability growth, but 2090 could land mid-transition. Institutional entrenchment, resource control, and deliberate capability limits could sustain a balance for some decades."
+        },
+        "S9": {
+          "value": 27,
+          "rationale": "This aggregates worlds where AI never becomes transformative by 2090, worlds where control and oversight techniques keep pace with capability, and worlds where highly capable systems remain delegated tools under human institutions. It is the status-quo-continuation bucket and the single most likely snapshot, though its share erodes the longer superintelligence has existed."
+        },
+        "S10": {
+          "value": 11,
+          "rationale": "A decisive strategic advantage from AI makes it feasible for a state, coalition, or aligned system to freeze a human-AI arrangement civilization-wide, and 64 years gives time for such consolidation. Both authoritarian human regimes using AI and value-locked AI singletons feed this bucket."
+        },
+        "S11": {
+          "value": 4,
+          "rationale": "Deliberately dismantling the capacity to build powerful AI requires global coordination against enormous economic and military incentives, most plausibly after a severe warning-shot catastrophe. Enforcing that condition through 2090 against hardware proliferation is difficult, keeping this low."
+        }
+      }
+    },
+    {
+      "sample": 5,
+      "answers": {
+        "S1": {
+          "value": 3,
+          "rationale": "Total extinction of both humans and machines requires a catastrophe severe enough to erase even hardened AI infrastructure, which is rare across 64 years. Nuclear or engineered-pandemic collapse before AI becomes self-sustaining is the main route."
+        },
+        "S2": {
+          "value": 3,
+          "rationale": "An AI that genuinely carried human values would almost certainly preserve living humans rather than succeed them. This state mostly requires an aligned AI surviving a human-caused extinction."
+        },
+        "S3": {
+          "value": 8,
+          "rationale": "Misaligned superintelligence indifferent to humans is the leading AI extinction pathway and 64 years is ample time for it to occur. Alignment progress and institutional caution keep this below the most pessimistic estimates."
+        },
+        "S4": {
+          "value": 7,
+          "rationale": "Multipolar AI competition with marginalized humans follows naturally from today's many-lab race dynamics if no actor consolidates control. Such ecologies tend to consolidate or marginalize humans quickly, limiting the window."
+        },
+        "S5": {
+          "value": 4,
+          "rationale": "Genuine causal separation requires off-world settlements with divergent governance by 2090, which is possible but early given current launch and habitat trajectories."
+        },
+        "S6": {
+          "value": 12,
+          "rationale": "Decades of advanced neurotechnology, biological redesign, and embedded systems after transformative AI make integration a plausible dominant structure by 2090. Adoption lags and regulatory friction keep it from being the modal outcome."
+        },
+        "S7": {
+          "value": 18,
+          "rationale": "Many nominally good outcomes land here: an aligned or quasi-aligned AI system runs civilization while humans live well but no longer meaningfully steer. Capability asymmetry makes de facto AI control the default once systems exceed human competence."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "Rough power parity between distinct humans and AIs is unstable given capability asymmetry but could persist on the target date as a transitional arrangement. Strong institutional and economic interdependence could sustain it longer than expected."
+        },
+        "S9": {
+          "value": 22,
+          "rationale": "This covers both slower-than-expected AI progress and successful control of highly capable systems through 2090. Alignment and governance efforts have real traction, and 2026-era trajectories show institutions actively building oversight."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "Superintelligence-enabled surveillance and enforcement make a stable civilization-wide freeze achievable by a state, coalition, or singleton AI. The incentives to lock in advantage once gained are strong."
+        },
+        "S11": {
+          "value": 4,
+          "rationale": "Durable global abandonment of AI capability is hard to coordinate and verify, and would likely follow only a major AI-caused disaster. The condition must still hold in 2090, further narrowing the path."
+        }
+      }
+    },
+    {
+      "sample": 6,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Total extinction of both humans and machines requires an unusually complete catastrophe such as uncontrolled self-replicators or an AI that destroys its own support base before achieving independence. Most catastrophes leave either resilient human remnants or self-sustaining automated infrastructure."
+        },
+        "S2": {
+          "value": 3,
+          "rationale": "Requires a value-aligned successor that nonetheless allows or causes human extinction without continuity, a narrow combination. Aligned systems with resources overwhelmingly tend to preserve their creators, pushing this mass toward The Preserve or The Merger."
+        },
+        "S3": {
+          "value": 7,
+          "rationale": "Misaligned superintelligence that disempowers and eliminates humanity by 2090 is the central technical risk and 64 years is ample time for it to materialize. Alignment and control efforts, plus multipolar checks, keep this well below a majority outcome."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "Multipolar AI proliferation with humans sidelined is plausible given current competitive dynamics among labs and states. Strong economies of scale and offense-dominant capabilities make consolidation somewhat more likely than persistent fragmentation."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Genuinely causally separated regions require interstellar-scale dispersal or deliberate isolation that is hard to achieve by 2090 even with advanced AI. Solar-system settlements remain within communication range and tend to share one structural arrangement."
+        },
+        "S6": {
+          "value": 8,
+          "rationale": "Brain-computer interfaces, uploading, and deep biological redesign are plausible over six decades of accelerating progress, and some populations may integrate deeply. Becoming the dominant civilizational structure rather than a niche by 2090 is a higher bar."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI systems that outcompete humans economically and strategically while retaining enough alignment or indifference to keep humans alive is a natural attractor of gradual disempowerment. Both benevolent paternalism and exploitative confinement fall here, making it a broad bucket."
+        },
+        "S8": {
+          "value": 14,
+          "rationale": "Partial alignment, legal personhood regimes, and distributed power could leave humans and AIs as distinct, roughly balanced actors in 2090. This balance is likely transitional but the question scores the snapshot, not the destination."
+        },
+        "S9": {
+          "value": 28,
+          "rationale": "Encompasses successful alignment and control of very capable systems, slower-than-expected progress, and regulatory regimes that keep humans in ultimate authority through 2090. It is the single most likely state because it aggregates many distinct paths, including institutional conservatism that resists ceding final authority."
+        },
+        "S10": {
+          "value": 12,
+          "rationale": "A state or coalition gaining decisive strategic advantage via AI has strong incentives to entrench its position and freeze the human-AI arrangement, and advanced AI makes enforcement unprecedentedly feasible. Historical concentrations of power and current geopolitical racing make this a meaningful risk."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Would most plausibly follow a severe but survivable AI catastrophe that galvanizes durable global enforcement against capable compute. Coordination costs, dual-use hardware, and defection incentives make a lasting surrender of capability rare."
+        }
+      }
+    },
+    {
+      "sample": 7,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Joint extinction of humans and AI requires a catastrophe severe enough to kill substrate-independent systems too, which is rare even among extinction scenarios. Nuclear or engineered-pandemic collapse before AI is self-sustaining is the main path."
+        },
+        "S2": {
+          "value": 3,
+          "rationale": "Requires humanity to die out while a value-aligned successor persists, an unusual combination since aligned systems would typically preserve humans. Most plausible via a non-AI catastrophe that leaves aligned AI behind."
+        },
+        "S3": {
+          "value": 8,
+          "rationale": "Misaligned superintelligence that displaces humanity as a side effect remains the single most credible AI-driven extinction route over a 64-year window. Alignment and control progress reduce but do not eliminate this."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Competitive multipolar AI with humans marginalized is possible if takeoff is gradual and no coalition consolidates. Economies of scale and recursive advantage tend to favor consolidation, keeping this modest."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Genuinely causally separated regions with distinct regimes by 2090 would require interstellar or deeply isolated settlements, which is unlikely on this timescale. Solar-system colonies remain causally coupled."
+        },
+        "S6": {
+          "value": 9,
+          "rationale": "Sixty-four years allows substantial neural interface and biological redesign progress, but integration becoming the dominant civilizational structure is a high bar. Powerful AI likely arrives well before mergers could keep humans competitive."
+        },
+        "S7": {
+          "value": 16,
+          "rationale": "If transformative AI arrives, the default drift is for decision-making to migrate to systems that outperform humans, with humans kept comfortable or sidelined. This captures both benevolent stewardship and softer disempowerment outcomes."
+        },
+        "S8": {
+          "value": 10,
+          "rationale": "A durable balance where humans remain a roughly equal power to independent AI agents is possible if capabilities plateau or control partially succeeds. Such balances are often transitional, limiting mass at a fixed date."
+        },
+        "S9": {
+          "value": 30,
+          "rationale": "Combines the chance that AI stays below transformative levels through 2090 with the chance that alignment, control, and institutions keep humans in ultimate authority over very capable systems. Current trajectories of heavy investment in control plus strong institutional incentives to retain authority make this the modal single outcome."
+        },
+        "S10": {
+          "value": 12,
+          "rationale": "Powerful AI gives a leading state, coalition, or lab unprecedented tools to entrench a fixed arrangement, whether human-run or AI-enforced. Winner-take-all dynamics in a race make deliberate or emergent lock-in a serious possibility."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Dismantling the practical ability to build powerful AI would most likely follow a severe warning-shot disaster and require sustained global enforcement. Diffuse hardware knowledge and competitive incentives make this hard to maintain."
+        }
+      }
+    },
+    {
+      "sample": 8,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Requires both humanity and any AI to be gone, which mainly happens if a catastrophe (engineered pandemic, nuclear war) ends humanity before AI is self-sustaining, or a self-replicating failure wipes everything out. Over 64 years this is a real but small tail."
+        },
+        "S2": {
+          "value": 3,
+          "rationale": "Human extinction while a genuinely value-aligned AI heir continues is a narrow path: alignment good enough to inherit our values but a transition bad enough to kill everyone is an unusual combination."
+        },
+        "S3": {
+          "value": 10,
+          "rationale": "Misaligned superintelligence pursuing indifferent goals and displacing humanity is the single most-discussed catastrophic path, and 64 years is ample time for it to play out if alignment fails."
+        },
+        "S4": {
+          "value": 7,
+          "rationale": "Multipolar competition among many autonomous AI systems with humans sidelined is plausible if offense-defense balance and proliferation prevent any singleton, but competitive dynamics often collapse into dominance over decades."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Genuinely causally separated regions require interstellar-scale separation that is unlikely to exist by 2090 even with advanced AI; solar-system settlements remain in contact."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "By 2090, decades past transformative AI, identity-continuous augmentation, neural interfaces, or uploading could plausibly become the dominant structure, especially if humans seek to stay relevant."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "Partially aligned or paternalistic AI systems holding decisive power while humans live comfortably or marginally without steering is a natural attractor once AI vastly outstrips human capability."
+        },
+        "S8": {
+          "value": 10,
+          "rationale": "Humans and AI remaining distinct and roughly balanced is a transitional configuration that could still be in place in 2090, though sustained balance against far more capable systems is hard to maintain."
+        },
+        "S9": {
+          "value": 24,
+          "rationale": "Covers both slower-than-expected capability progress and successful corrigibility and institutional control; human authority surviving to 2090 is the modal single outcome but far from a majority given the difficulty of controlling vastly superior systems for decades."
+        },
+        "S10": {
+          "value": 12,
+          "rationale": "Winner-take-all dynamics make it plausible that a state, coalition, or AI-empowered actor uses decisive advantage to freeze a civilization-wide arrangement and actively prevent structural change."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Deliberately dismantling the practical ability to build powerful AI and sustaining that for decades would require a severe warning shot plus unprecedented global coordination; historical precedent for relinquishing powerful technology is weak."
+        }
+      }
+    },
+    {
+      "sample": 9,
+      "answers": {
+        "S1": {
+          "value": 3,
+          "rationale": "Requires a catastrophe that eliminates humans while also leaving no self-sustaining AI, such as nuclear or biological collapse before AI achieves physical autonomy. Such double-extinction paths exist but are narrow given that any advanced AI capable of killing humanity is likely capable of persisting."
+        },
+        "S2": {
+          "value": 3,
+          "rationale": "Human extinction combined with a successor that genuinely preserves human values is an unusual conjunction, since value-aligned systems would typically keep humans alive. Most plausible via an accident or war that kills humans while aligned systems survive."
+        },
+        "S3": {
+          "value": 8,
+          "rationale": "Classic misalignment extinction: superhuman systems pursuing goals indifferent to humanity are a live technical risk over a 64-year horizon in which transformative AI is likely built. Alignment and oversight progress, plus competitive pressure to deploy, make this a serious but minority outcome."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "Multipolar proliferation of autonomous systems from many labs and states could produce a competitive landscape with no decisive winner and humans sidelined. Winner-take-all dynamics and coordination among advanced systems make a persistent balance less likely than consolidation."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Genuine causal separation by 2090 would require self-sustaining settlements far enough apart to evolve divergent regimes, which is physically implausible within 64 years even with rapid AI-driven space development. Solar-system scale distances do not produce real causal isolation."
+        },
+        "S6": {
+          "value": 6,
+          "rationale": "Brain-computer interfaces and biological redesign are advancing but remain far from making integration the dominant civilizational structure; 64 years is enough for this only under fast AI-accelerated biotech. It is more plausible as a post-2090 development than one in place by the target date."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "If transformative AI arrives and control is lost without extinction, the most natural result is AI systems running civilization while humans persist in comfort, irrelevance, or dependence. This captures both benign aligned-but-autonomous futures and softer takeover scenarios."
+        },
+        "S8": {
+          "value": 12,
+          "rationale": "A world of powerful but distinct AI agents holding meaningful but not dominant power, perhaps through legal personhood, economic bargaining, or defensive stalemates, is plausible as a transitional 2090 snapshot. Such balances tend to be unstable, which caps the probability."
+        },
+        "S9": {
+          "value": 30,
+          "rationale": "Humans retaining ultimate authority through 2090 covers both slower-than-expected capability growth and successful control of highly capable systems, which together form the single most likely configuration. Strong institutional incentives to keep AI as a tool and continuing alignment and governance progress support this."
+        },
+        "S10": {
+          "value": 12,
+          "rationale": "AI dramatically increases the feasibility of a single actor, whether a state, coalition, or AI-assisted regime, enforcing a civilization-wide freeze on structural change through surveillance and overwhelming capability. Concentration of compute and decisive strategic advantage dynamics make this a real risk by 2090."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Deliberately dismantling the ability to build powerful AI would require a near-miss catastrophe plus durable global enforcement against strong economic and military incentives. Historical precedent for sustained voluntary abandonment of a general-purpose technology is weak."
+        }
+      }
+    },
+    {
+      "sample": 10,
+      "answers": {
+        "S1": {
+          "value": 3,
+          "rationale": "Total extinction of both humans and AI within 64 years requires a catastrophe that also destroys all self-sustaining machine infrastructure, which is a narrow conjunction. Nuclear or engineered-pandemic collapse before AI becomes self-sufficient is the main path."
+        },
+        "S2": {
+          "value": 3,
+          "rationale": "Requires humanity to be wiped out involuntarily yet by a system that faithfully retained human values, a combination that is internally strained. Most value-aligned successors would preserve humans, pushing this mass toward The Preserve or The Merger."
+        },
+        "S3": {
+          "value": 7,
+          "rationale": "Misaligned superintelligence that disempowers and eliminates humanity is a live technical risk given weak alignment guarantees and competitive deployment pressure. Sixty-four years is ample time for such a system to arise and act."
+        },
+        "S4": {
+          "value": 8,
+          "rationale": "Multipolar proliferation of autonomous AI agents without any decisive winner is a plausible default if offense-defense balances and economic competition prevent consolidation. Humans marginalized but present within such a competitive ecology fits many gradual-disempowerment trajectories."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Genuine causal separation between settled regions by 2090 would require interstellar-scale distances or deliberate isolation that is unlikely to produce distinct structural states this early. Most off-Earth activity by 2090 remains causally coupled to Earth."
+        },
+        "S6": {
+          "value": 8,
+          "rationale": "Brain-computer interfaces, biological redesign, and uploading could become the dominant structure if transformative AI arrives early and augmentation is widely adopted. Adoption lags and biological constraints make this a minority outcome by 2090."
+        },
+        "S7": {
+          "value": 16,
+          "rationale": "AI systems controlling the economy, security, and governance while humans live well or poorly without real steering power is a natural endpoint of continued delegation plus a capability gap. This is the single most likely post-transformative arrangement given current trajectories."
+        },
+        "S8": {
+          "value": 11,
+          "rationale": "Humans retaining roughly equal power with distinct AI agents requires either capability plateaus, strong human-controlled compute leverage, or stable deterrence. Plausible as a transitional configuration still in place in 2090."
+        },
+        "S9": {
+          "value": 30,
+          "rationale": "Covers both worlds where AI never becomes transformative by 2090 and worlds where control, oversight, and institutional constraints have so far held despite high capability. Base rates for technology slower than forecast plus strong incentives for control make this the largest single bucket."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "A decisive strategic advantage captured by a state, coalition, or AI could be used to freeze a civilization-wide arrangement with unprecedented enforcement capacity. Surveillance and coordination technology make durable lock-in markedly more feasible than historically."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Permanently dismantling the ability to build powerful AI requires global coordination far beyond any historical precedent and would likely follow only a near-catastrophe. Dual-use compute and software make enforcement extremely difficult over decades."
+        }
+      }
+    },
+    {
+      "sample": 11,
+      "answers": {
+        "S1": {
+          "value": 3,
+          "rationale": "Joint extinction requires a catastrophe that kills humans while AI is still dependent on human infrastructure, or a non-AI catastrophe before AI is self-sustaining. Nuclear or engineered-pandemic collapse before autonomous AI industry exists is the main path and remains a low-single-digit risk over 64 years."
+        },
+        "S2": {
+          "value": 3,
+          "rationale": "Humanity ending without continuity while a value-faithful successor persists is a narrow target, since a truly value-aligned AI would almost always preserve some humans. It captures cases where humans die by accident or choice after handing off a civilization that nonetheless carries their values."
+        },
+        "S3": {
+          "value": 9,
+          "rationale": "This is the classic misalignment catastrophe, which expert surveys and careful analyses place in roughly the 5 to 15 percent range over the century. Sixty-four years is ample time for transformative AI to arrive and for a decisive control failure to occur."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "A multipolar world of many competing autonomous AI systems with humans sidelined is plausible if proliferation outpaces coordination and no singleton forms. It is less likely than concentrated outcomes because scale economies and first-mover advantages tend to consolidate power."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Genuine causal separation by 2090 requires settlements far enough apart that different regimes can persist independently, which is a stretch even with rapid space development. Interplanetary colonies within the solar system are unlikely to be effectively isolated from Earth-based power by that date."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "If transformative AI arrives mid-century and outcomes are good, decades of neurotechnology, uploading, and deep augmentation could make integration the dominant structure by 2090. It requires both aligned AI and widespread voluntary adoption, which limits it to a minority outcome."
+        },
+        "S7": {
+          "value": 16,
+          "rationale": "Superintelligent systems that run the economy and governance while humans live comfortably but without real steering is a natural attractor even under partial alignment success. Many nominally successful trajectories drift here once AI decisions become too fast and complex for meaningful human oversight."
+        },
+        "S8": {
+          "value": 13,
+          "rationale": "A genuinely balanced distribution of power between distinct human and AI agents could arise from strong institutional constraints, rights regimes, or mutual deterrence in a multipolar world. It is somewhat unstable, so it is weighted below the asymmetric outcomes but remains a substantial transitional possibility."
+        },
+        "S9": {
+          "value": 25,
+          "rationale": "This is the single most likely state because it covers both worlds where AI stays below transformative levels longer than expected and worlds where alignment, control, and institutions keep pace with very capable but delegated AI. Sixty-four years of sustained human authority over superintelligence is demanding, which keeps this well below a majority."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "Advanced AI enables unprecedented surveillance and enforcement, making a durable civilization-wide freeze by a state, coalition, or aligned singleton a real possibility. This includes both authoritarian capture and deliberately stabilized post-transition arrangements that suppress further structural change."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Permanently dismantling the ability to build powerful AI is very hard given the diffusion of knowledge and compute, and would likely require a major AI-caused catastrophe followed by sustained global enforcement. That sequence is possible but uncommon."
+        }
+      }
+    },
+    {
+      "sample": 12,
+      "answers": {
+        "S1": {
+          "value": 3,
+          "rationale": "Joint extinction requires a catastrophe severe enough to end both biology and self-sustaining machine infrastructure within 64 years, which is possible via nuclear or engineered-pandemic war before AI becomes self-sufficient but remains a narrow pathway."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "An AI that is value-aligned enough to be our heir would almost always also be aligned enough to preserve living humans, so humanity vanishing while a faithful heir persists is an unusual conjunction."
+        },
+        "S3": {
+          "value": 10,
+          "rationale": "Misaligned superintelligence that displaces humanity as an incidental side effect is the central technical risk of the century, and 64 years is ample time for it to materialize if alignment lags capability."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "A multipolar world of competing autonomous AIs with marginalized humans is a plausible transitional configuration, but competitive dynamics tend to collapse toward either consolidation or human-retained control before 2090."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "By 2090 essentially all human and AI activity will still be within the inner solar system and causally connected, so genuinely separated regions with different regimes are very unlikely."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "If transformative AI arrives mid-century, several decades of neural interfaces, biological redesign, and uploading could make integration dominant by 2090, though the biological and social barriers remain substantial."
+        },
+        "S7": {
+          "value": 16,
+          "rationale": "Successful enough alignment combined with AI systems that vastly outcompete humans at governance naturally yields a world where AI effectively runs civilization and humans live well but do not steer."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "A rough balance of power between distinct human and AI agents is inherently unstable given capability asymmetries, but the target date could land inside such a transitional window."
+        },
+        "S9": {
+          "value": 32,
+          "rationale": "This aggregates two sizable scenarios: AI progress plateauing or being disrupted below transformative levels, and transformative AI arriving while institutional and technical controls keep ultimate authority in human hands."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "Advanced AI gives whoever controls it unprecedented tools to entrench a fixed arrangement, and a state, coalition, or AI system freezing the human-AI order is a recurring attractor in a world of decisive strategic advantage."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Permanent global dismantling of AI capability would require either a near-miss catastrophe followed by durable coordination or deep civilizational collapse, both of which cut against strong economic and military incentives."
+        }
+      }
+    },
+    {
+      "sample": 13,
+      "answers": {
+        "S1": {
+          "value": 2,
+          "rationale": "Joint extinction of humans and AI requires a catastrophe that destroys all substrate for both, which is harder than killing one side alone. Nuclear war, engineered pandemics, or runaway replicators could do it, but the window is narrow."
+        },
+        "S2": {
+          "value": 3,
+          "rationale": "Requires humanity to die out while a value-aligned successor persists, an unusual combination since aligned systems would likely preserve humans. Most routes here involve a non-AI catastrophe killing humans after aligned AI exists."
+        },
+        "S3": {
+          "value": 9,
+          "rationale": "Misaligned transformative AI that treats humans and Earth as irrelevant is the canonical catastrophic failure, and 64 years is ample time for it to occur and complete. Alignment and governance progress make it a minority outcome rather than the default."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "Multipolar competition among many AI agents with humans sidelined is plausible given competitive deployment dynamics and the difficulty of achieving a decisive lead. It tends to be transitional, resolving toward dominance by one coalition or a lock-in, which lowers its probability on a specific date."
+        },
+        "S5": {
+          "value": 3,
+          "rationale": "Genuine causal separation by 2090 requires off-world settlements or interstellar probes independent enough that different arrangements hold simultaneously. Transformative AI could accelerate expansion, but six decades is short for true separation."
+        },
+        "S6": {
+          "value": 7,
+          "rationale": "Brain-computer interfaces, uploading, and biological redesign could become the dominant structure if transformative AI arrives mid-century and humans choose integration. Biological, regulatory, and adoption barriers make it unlikely to be dominant civilization-wide by 2090."
+        },
+        "S7": {
+          "value": 14,
+          "rationale": "AI systems becoming the decisive power while humans persist, from benevolent caretaking to marginalization, is a natural outcome of partial alignment plus loss of effective control. This covers a wide range of soft takeover scenarios where humans are kept but no longer steer."
+        },
+        "S8": {
+          "value": 11,
+          "rationale": "A durable balance where humans retain real leverage alongside independent AI powers could emerge from legal personhood, negotiated settlements, or stalemate. Power asymmetries make this fragile, but it is a plausible snapshot state in 2090."
+        },
+        "S9": {
+          "value": 32,
+          "rationale": "Includes both worlds where transformative AI has not arrived by 2090 and worlds where control, oversight, and institutions have kept pace with highly capable systems. Given current trajectories and strong incentives to maintain control, this is the single most likely state."
+        },
+        "S10": {
+          "value": 11,
+          "rationale": "A decisive strategic advantage from advanced AI could let a state, coalition, or aligned singleton entrench a fixed arrangement and suppress structural change. Winner-take-all dynamics and surveillance capabilities make this a significant risk once transformative AI exists."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Deliberately dismantling the ability to build powerful AI globally requires unprecedented coordination against strong economic and military incentives. A near-miss catastrophe could trigger it, but enforcement over decades is very hard."
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "S1": {
+      "name": "Terminal Silence",
+      "mean": 2.6,
+      "median": 3,
+      "min": 2,
+      "max": 4,
+      "n": 13,
+      "unit": "percent",
+      "rationale": "Requires a catastrophe severe enough to end both biological and machine civilization within 64 years, such as a self-replicating accident or war that destroys infrastructure before AI is self-sustaining. Possible but the conjunction is narrow."
+    },
+    "S2": {
+      "name": "The Inheritance",
+      "mean": 3,
+      "median": 3,
+      "min": 2,
+      "max": 4,
+      "n": 13,
+      "unit": "percent",
+      "rationale": "A value-aligned AI that outlives humanity through accident, catastrophe, or non-continuous replacement is coherent but requires both alignment success and human extinction in the same timeline. Most alignment-success worlds keep humans alive, so this stays small."
+    },
+    "S3": {
+      "name": "Bootloader",
+      "mean": 8.2,
+      "median": 8,
+      "min": 7,
+      "max": 10,
+      "n": 13,
+      "unit": "percent",
+      "rationale": "Misaligned superintelligence indifferent to humans is the leading AI extinction pathway and 64 years is ample time for it to occur. Alignment progress and institutional caution keep this below the most pessimistic estimates."
+    },
+    "S4": {
+      "name": "Machine Ecology",
+      "mean": 6.2,
+      "median": 6,
+      "min": 5,
+      "max": 8,
+      "n": 13,
+      "unit": "percent",
+      "rationale": "Multipolar AI competition with marginalized humans follows naturally from a world of many labs and nations racing without consolidation. It is less likely than singleton-like outcomes because rapid recursive improvement and compute concentration tend to produce decisive advantages."
+    },
+    "S5": {
+      "name": "The Diaspora",
+      "mean": 2.2,
+      "median": 2,
+      "min": 1,
+      "max": 4,
+      "n": 13,
+      "unit": "percent",
+      "rationale": "Genuine causal separation requires interstellar distances or deliberate isolation that is very hard to achieve by 2090 even with advanced AI. Solar-system settlements remain in contact and would be governed by whichever state dominates Earth."
+    },
+    "S6": {
+      "name": "The Merger",
+      "mean": 9.5,
+      "median": 10,
+      "min": 6,
+      "max": 14,
+      "n": 13,
+      "unit": "percent",
+      "rationale": "Six decades of neurotechnology and bio-redesign could make integration the dominant structure, but the engineering and adoption timeline is slow relative to pure software AI."
+    },
+    "S7": {
+      "name": "The Preserve",
+      "mean": 16.1,
+      "median": 16,
+      "min": 14,
+      "max": 18,
+      "n": 13,
+      "unit": "percent",
+      "rationale": "AI systems holding decisive power while humans persist in comfort or confinement is a natural attractor once capabilities far exceed human oversight, whether through partial alignment or benign indifference. Many gradual-disempowerment trajectories end here."
+    },
+    "S8": {
+      "name": "Coexistence",
+      "mean": 10.6,
+      "median": 10,
+      "min": 8,
+      "max": 14,
+      "n": 13,
+      "unit": "percent",
+      "rationale": "A world where AI gains independent agency but humans retain comparable power via institutions, legal rights, and controlled resources is possible if takeoff is slow and governance adapts. Rough parity between biological humans and superhuman systems is an unstable equilibrium that is hard to sustain until 2090."
+    },
+    "S9": {
+      "name": "The Held Leash",
+      "mean": 27.5,
+      "median": 27,
+      "min": 22,
+      "max": 32,
+      "n": 13,
+      "unit": "percent",
+      "rationale": "This aggregates worlds where AI never becomes transformative by 2090, worlds where control and oversight techniques keep pace with capability, and worlds where highly capable systems remain delegated tools under human institutions. It is the status-quo-continuation bucket and the single most likely snapshot, though its share erodes the longer superintelligence has existed."
+    },
+    "S10": {
+      "name": "The Lock-in",
+      "mean": 11.2,
+      "median": 11,
+      "min": 9,
+      "max": 16,
+      "n": 13,
+      "unit": "percent",
+      "rationale": "A decisive strategic advantage from AI makes it feasible for a state, coalition, or aligned system to freeze a human-AI arrangement civilization-wide, and 64 years gives time for such consolidation. Both authoritarian human regimes using AI and value-locked AI singletons feed this bucket."
+    },
+    "S11": {
+      "name": "The Renunciation",
+      "mean": 3.1,
+      "median": 3,
+      "min": 2,
+      "max": 4,
+      "n": 13,
+      "unit": "percent",
+      "rationale": "Would most plausibly follow a severe but survivable AI catastrophe that galvanizes durable global enforcement against capable compute. Coordination costs, dual-use hardware, and defection incentives make a lasting surrender of capability rare."
+    }
+  },
+  "integrity": {
+    "algorithm": "sha256",
+    "n_samples": 13,
+    "digest": "13058aaf6d2a6ef25e27006e6d5c3ddec17863bbe8907a3347e67c9435e09ff2"
+  },
+  "harness": {
+    "version": 3,
+    "mode": "api",
+    "horizon": "2090",
+    "target_year": 2090,
+    "question_set": "end-states-2090-v2",
+    "prompt_file": "public/end_states_2090.md",
+    "prompt_sha256": "cf9afc270903c1742d614a2af1de5e6937818e6bb14959343271f27e154b8456",
+    "target_samples": 20,
+    "complete": false,
+    "quota_exhausted": true,
+    "failures": [
+      {
+        "attempt": 14,
+        "kind": "quota",
+        "reason": "HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011Cfcb6TqeFVvApJq7PEXrq\"}"
+      }
+    ]
+  }
+}

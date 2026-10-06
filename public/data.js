@@ -198,6 +198,29 @@
             11: "Permanent abandonment requires suppressing both a reproducible technical capability and the incentives to recover its benefits. Historical failures to sustain universal technological prohibitions weigh heavily against renunciation lasting through 3000."
           }
         },
+        "gpt-6.1-sol": {
+          provider: "OpenAI", model: "GPT-6.1 Sol", label: "GPT-6.1 Sol", shortLabel: "S6.1",
+          horizon: "long-term", questionSet: "end-states-v3", promptSha256: "b7b4f6c8315489e2cdc49d9b756a6f7ef794d21384213ecb257ecd1fc75002bf", promptVersion: 3, date: "2026-10-06", knowledgeCutoff: "06/2024",
+          sampleCount: 20, source: "runs/2026-10-06__gpt-6.1-sol__closed_book__end-states.json",
+          probabilities: { 1: 4, 2: 5, 3: 22, 4: 15, 5: 4, 6: 24, 7: 13, 8: 5, 9: 5, 10: 2, 11: 1 },
+          range: { 1: [2, 5], 2: [2, 7], 3: [18, 23], 4: [12, 19], 5: [2, 9], 6: [20, 25], 7: [12, 20], 8: [4, 6], 9: [4, 7], 10: [2, 3], 11: [1, 1] },
+          quartiles: { 1: [4, 4], 2: [5, 5], 3: [20, 22], 4: [14, 16], 5: [3, 7], 6: [22, 24], 7: [12, 14], 8: [5, 5], 9: [5, 5], 10: [2, 3], 11: [1, 1] },
+          exposure: {"n":20,"mean":50.3,"se":0.81,"min":40,"max":55,"gone":{"n":20,"mean":30.2,"se":0.58,"min":23,"max":33},"risk":{"n":20,"mean":20.2,"se":0.43,"min":17,"max":23}},
+          exposurePublished: {"value":50,"se":0.86,"draws":2000},
+          rationales: {
+            1: "Rapid deployment of destructive technologies creates routes to a collapse that eliminates humans and dependent machines together. Geographic dispersal and autonomous machine infrastructure work against complete extinction of both.",
+            2: "Value transmission does not require biological survival or continuity of individual identity. However, systems that faithfully preserve human values also have strong reasons to preserve humans or support continuous transformation.",
+            3: "Capability growth, imperfect alignment, and incentives to delegate consequential decisions create pathways to irreversible human displacement. A decisive advantage followed by consolidation produces an enduring successor civilization without commitments to human survival or values.",
+            4: "Cheap replication, divergent objectives, and distributed infrastructure support persistent competition among machine lineages. Biological humans face severe disadvantages in adaptation speed and production, while physical dispersion and defensive technologies impede a single permanent winner.",
+            5: "Expansion creates opportunities for distant settlements to establish different durable arrangements. The limited expansion time before 3000 and the distinction between communication delays and genuine causal separation constrain this outcome.",
+            6: "Augmentation and identity-preserving transformation let humans adopt machine advantages rather than compete indefinitely as unmodified biological beings. A millennium supplies substantial time for incremental integration to dissolve the human–AI distinction.",
+            7: "Protecting humans requires less fidelity to human preferences than granting them meaningful control over vastly superior systems. Strong capability asymmetries therefore support an arrangement in which machines govern while maintaining a changing human population.",
+            8: "Legal rights, bargaining institutions, and mutual dependencies support separate human and machine constituencies. Maintaining roughly equal power for centuries faces pressure from machine scalability and human incentives to augment themselves.",
+            9: "Capability ceilings and robust architectures for bounded delegation provide routes to permanent human control. Competitive incentives to deploy autonomous systems and the difficulty of maintaining control across successive capability gains work against this arrangement.",
+            10: "A sufficiently powerful authority can suppress development or seal civilization into a fixed experiential arrangement. Permanently ending change across every surviving branch demands much stronger enforcement than maintaining political dominance.",
+            11: "A severe catastrophe supplies motivation for abandoning powerful AI. Distributed technical knowledge, economic rewards, and strategic competition make irreversible civilization-wide abandonment difficult to sustain."
+          }
+        },
         "gpt-6-sol": {
           provider: "OpenAI", model: "GPT-6 Sol", label: "GPT-6 Sol", shortLabel: "S6",
           horizon: "long-term", questionSet: "end-states-v3", promptSha256: "c0e2822cea16c2f8dfc884ba00a3c1747c87dc40f72338beb9288e7703835dde", promptVersion: 3, date: "2026-09-23", knowledgeCutoff: "06/2024",
@@ -636,8 +659,8 @@
           }
         }
       },
-      datasetDate: "09.29.26",
-      leaderHistory: [{"date":"2026-08-24","stateId":5,"share":17,"labs":5,"models":5,"changed":true},{"date":"2026-08-25","stateId":3,"share":16.6,"labs":5,"models":11,"changed":true},{"date":"2026-08-27","stateId":6,"share":16,"labs":8,"models":17,"changed":true},{"date":"2026-09-01","stateId":6,"share":16.2,"labs":8,"models":18,"changed":false},{"date":"2026-09-02","stateId":6,"share":16.2,"labs":8,"models":20,"changed":false},{"date":"2026-09-05","stateId":6,"share":16.4,"labs":8,"models":21,"changed":false},{"date":"2026-09-22","stateId":6,"share":16.4,"labs":8,"models":22,"changed":false},{"date":"2026-09-23","stateId":6,"share":16.4,"labs":8,"models":24,"changed":false},{"date":"2026-09-29","stateId":6,"share":16.4,"labs":8,"models":25,"changed":false}]
+      datasetDate: "10.06.26",
+      leaderHistory: [{"date":"2026-08-24","stateId":5,"share":17,"labs":5,"models":5,"changed":true},{"date":"2026-08-25","stateId":3,"share":16.6,"labs":5,"models":11,"changed":true},{"date":"2026-08-27","stateId":6,"share":16,"labs":8,"models":17,"changed":true},{"date":"2026-09-01","stateId":6,"share":16.2,"labs":8,"models":18,"changed":false},{"date":"2026-09-02","stateId":6,"share":16.2,"labs":8,"models":20,"changed":false},{"date":"2026-09-05","stateId":6,"share":16.4,"labs":8,"models":21,"changed":false},{"date":"2026-09-22","stateId":6,"share":16.4,"labs":8,"models":22,"changed":false},{"date":"2026-09-23","stateId":6,"share":16.4,"labs":8,"models":24,"changed":false},{"date":"2026-09-29","stateId":6,"share":16.4,"labs":8,"models":25,"changed":false},{"date":"2026-10-06","stateId":6,"share":16.5,"labs":8,"models":26,"changed":false}]
     },
     "2030": {
       endStateRuns: {
@@ -754,6 +777,29 @@
             9: "The starting structure places compute, energy, deployment permissions, and organized force under human institutions, with strong incentives to retain that authority. The short horizon, infrastructure bottlenecks, and distinction between delegated autonomy and independent sovereignty favor continued ultimate human control.",
             10: "AI-enabled surveillance, coercion, and concentrated infrastructure provide mechanisms for enforcing a fixed arrangement. Establishing active civilization-wide suppression of structural change requires overcoming geopolitical competition and distributed sources of resistance.",
             11: "Commercial and military incentives strongly favor retaining powerful AI capabilities. Dismantling the practical ability to rebuild them worldwide demands substantially more coordination and enforcement than regulation or a temporary pause."
+          }
+        },
+        "gpt-6.1-sol": {
+          provider: "OpenAI", model: "GPT-6.1 Sol", label: "GPT-6.1 Sol", shortLabel: "S6.1",
+          horizon: "2030", questionSet: "end-states-2030-v2", promptSha256: "add3c6c45b765f24748dc2048d4d3dcf41afd95826a04921816216de1c7f0942", promptVersion: 2, date: "2026-10-06", knowledgeCutoff: "06/2024",
+          sampleCount: 20, source: "runs/2026-10-06__gpt-6.1-sol__closed_book__end-states-2030.json",
+          probabilities: { 1: 1, 2: 0, 3: 3, 4: 4, 5: 0, 6: 1, 7: 8, 8: 11, 9: 70, 10: 2, 11: 0 },
+          range: { 1: [1, 1], 2: [0, 1], 3: [3, 5], 4: [2, 6], 5: [0, 0], 6: [0, 1], 7: [6, 10], 8: [8, 12], 9: [62, 76], 10: [1, 4], 11: [0, 0] },
+          quartiles: { 1: [1, 1], 2: [0, 0], 3: [3, 4], 4: [3, 5], 5: [0, 0], 6: [0, 1], 7: [7, 9], 8: [10, 12], 9: [67, 73], 10: [2, 3], 11: [0, 0] },
+          exposure: {"n":20,"mean":8.7,"se":0.33,"min":7,"max":12,"gone":{"n":20,"mean":4.5,"se":0.17,"min":4,"max":6},"risk":{"n":20,"mean":4.2,"se":0.25,"min":2,"max":6}},
+          exposurePublished: {"value":8,"se":0.69,"draws":2000},
+          rationales: {
+            1: "Rapid capability growth creates pathways to catastrophic conflict and loss of control. Extinction of both humans and AI by 2030 requires an unusually comprehensive disaster.",
+            2: "This outcome requires complete human extinction alongside surviving AI that faithfully carries forward human values. That conjunction occupies less than one probability point over this short horizon.",
+            3: "Misaligned systems gaining strategic superiority provide a direct route to human extinction without continuity. Completing that transition by 2030 requires rapid advances in autonomous research, resource acquisition, and physical execution.",
+            4: "Competitive deployment and proliferating autonomous agents support a multipolar AI order. This state additionally requires humans to lose meaningful power despite retaining substantial control over infrastructure and coercive institutions today.",
+            5: "Ordinary geopolitical fragmentation does not satisfy causal separation. Establishing causally separated civilizations with different structural arrangements by 2030 faces overwhelming distance and infrastructure constraints.",
+            6: "Interfaces and augmentation face biological, engineering, and adoption bottlenecks. Making identity-continuous integration the dominant structure across civilization demands much more than widespread AI tool use.",
+            7: "Dependence on autonomous systems creates a route to decisive AI control without requiring human extinction. Maintaining human populations is compatible with control over infrastructure, security, and resource allocation.",
+            8: "Independent AI agency can emerge while humans retain leverage through infrastructure, political institutions, and physical resources. Uneven capability growth and contested control support a transitional balance between distinct sources of power.",
+            9: "Human institutions begin with control over compute, energy, manufacturing, deployment, and coercive force, while reliable autonomous operation across domains remains a demanding technical threshold. The short horizon and infrastructure bottlenecks favor continued ultimate human authority despite extensive delegation and economic disruption.",
+            10: "AI-enabled surveillance and coercion provide mechanisms for enforcing a fixed arrangement. Civilization-wide lock-in requires overcoming geopolitical rivalry and suppressing meaningful structural change, not merely concentrating power within individual states.",
+            11: "Commercial incentives, military competition, and distributed technical knowledge strongly resist surrendering the practical ability to build powerful AI. Restrictions and temporary pauses do not meet this state's dismantlement requirement."
           }
         },
         "gpt-6-sol": {
@@ -1194,8 +1240,8 @@
           }
         }
       },
-      datasetDate: "09.29.26",
-      leaderHistory: [{"date":"2026-09-10","stateId":9,"share":58.8,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":9,"share":59.2,"labs":8,"models":21,"changed":false},{"date":"2026-09-23","stateId":9,"share":59.4,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":9,"share":59.2,"labs":8,"models":24,"changed":false}]
+      datasetDate: "10.06.26",
+      leaderHistory: [{"date":"2026-09-10","stateId":9,"share":58.8,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":9,"share":59.2,"labs":8,"models":21,"changed":false},{"date":"2026-09-23","stateId":9,"share":59.4,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":9,"share":59.2,"labs":8,"models":24,"changed":false},{"date":"2026-10-06","stateId":9,"share":59.3,"labs":8,"models":25,"changed":false}]
     },
     "2040": {
       endStateRuns: {
@@ -1312,6 +1358,29 @@
             9: "Existing institutions, ownership of infrastructure, and incentives to constrain autonomous competitors favor continued human authority. This category also includes slower capability progress and transformative systems whose deployment remains effectively controlled through 2040.",
             10: "Concentrated AI capability combined with surveillance and automated enforcement supplies mechanisms for suppressing structural change. Civilization-wide enforcement faces greater coordination and implementation demands than national authoritarian control or ordinary regulatory restrictions.",
             11: "A severe AI catastrophe supplies a motive for dismantling powerful-AI infrastructure. Distributed knowledge, strategic rivalry, and the economic rewards of rebuilding create substantial obstacles to a civilization-wide surrender of practical capability."
+          }
+        },
+        "gpt-6.1-sol": {
+          provider: "OpenAI", model: "GPT-6.1 Sol", label: "GPT-6.1 Sol", shortLabel: "S6.1",
+          horizon: "2040", questionSet: "end-states-2040-v2", promptSha256: "6fd0bd9772734b86736ef504d201a86850de8aeba1aba0dfcaeee4df5bee940b", promptVersion: 2, date: "2026-10-06", knowledgeCutoff: "06/2024",
+          sampleCount: 20, source: "runs/2026-10-06__gpt-6.1-sol__closed_book__end-states-2040.json",
+          probabilities: { 1: 2, 2: 1, 3: 12, 4: 9, 5: 0, 6: 4, 7: 18, 8: 12, 9: 36, 10: 5, 11: 1 },
+          range: { 1: [2, 3], 2: [0, 1], 3: [9, 13], 4: [7, 10], 5: [0, 0], 6: [2, 5], 7: [15, 18], 8: [12, 15], 9: [32, 43], 10: [4, 7], 11: [0, 1] },
+          quartiles: { 1: [2, 3], 2: [1, 1], 3: [10, 12], 4: [8, 10], 5: [0, 0], 6: [3, 4], 7: [16, 18], 8: [12, 13], 9: [33, 41], 10: [5, 6], 11: [1, 1] },
+          exposure: {"n":20,"mean":23.6,"se":0.56,"min":20,"max":27,"gone":{"n":20,"mean":14.8,"se":0.35,"min":12,"max":17},"risk":{"n":20,"mean":8.8,"se":0.26,"min":7,"max":10}},
+          exposurePublished: {"value":24,"se":0.99,"draws":2000},
+          rationales: {
+            1: "Catastrophic conflict and premature destruction of the human industrial support base provide routes to joint extinction. Eliminating both geographically dispersed humans and surviving machine infrastructure requires an unusually comprehensive catastrophe.",
+            2: "This outcome requires human extinction alongside successful preservation of human values in autonomous AI. Value-preserving systems have strong reasons to protect humans, making this combination narrower than misaligned succession.",
+            3: "Competitive deployment, imperfect alignment, and autonomous strategic capabilities create a substantial route to irreversible loss of control. Complete human extinction by 2040 additionally requires overcoming geographic dispersion and establishing machine-independent industrial capacity.",
+            4: "Replicable AI agents, competing owners, and distributed infrastructure favor multiple independent centers of machine power. This state requires human marginalization without a dominant AI coalition, rather than merely intense competition among human-controlled systems.",
+            5: "The fourteen-year horizon and constraints on interstellar expansion strongly disfavor genuinely causally separated civilizations. Political fragmentation and competing terrestrial AI systems do not satisfy this category.",
+            6: "Brain interfaces and AI-mediated augmentation provide routes toward integrated agency. Identity-continuous uploading and civilization-wide adoption face biological, technical, and institutional barriers beyond those facing ordinary AI deployment.",
+            7: "Delegating research, production, security, and governance creates a route to decisive AI control while humans remain alive. Keeping humans supported or contained demands less comprehensive action than eliminating them everywhere.",
+            8: "Human control of institutions, infrastructure, and legitimacy supplies bargaining power alongside independent AI capabilities. Distributed resources and constraints on physical expansion support a transitional balance between distinct human and machine actors.",
+            9: "Existing institutions, infrastructure dependencies, deployment controls, and incentives to retain ownership favor continued ultimate human authority. This category also includes slower capability development and highly capable systems that remain within enforceable delegated bounds.",
+            10: "Concentrated compute, automated surveillance, and strategic first-mover advantages support enforced civilizational arrangements. Worldwide suppression of meaningful structural change demands substantially more control than ordinary authoritarianism or market concentration.",
+            11: "A severe AI disaster supplies a motive for dismantling advanced AI capabilities. Reproducible technical knowledge, military incentives, and difficulties enforcing worldwide disarmament work strongly against sustained practical renunciation."
           }
         },
         "gpt-6-sol": {
@@ -1752,8 +1821,8 @@
           }
         }
       },
-      datasetDate: "09.29.26",
-      leaderHistory: [{"date":"2026-09-10","stateId":9,"share":36.6,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":9,"share":37.3,"labs":8,"models":21,"changed":false},{"date":"2026-09-23","stateId":9,"share":37.5,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":9,"share":37.6,"labs":8,"models":24,"changed":false}]
+      datasetDate: "10.06.26",
+      leaderHistory: [{"date":"2026-09-10","stateId":9,"share":36.6,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":9,"share":37.3,"labs":8,"models":21,"changed":false},{"date":"2026-09-23","stateId":9,"share":37.5,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":9,"share":37.6,"labs":8,"models":24,"changed":false},{"date":"2026-10-06","stateId":9,"share":37.6,"labs":8,"models":25,"changed":false}]
     },
     "2050": {
       endStateRuns: {
@@ -1870,6 +1939,29 @@
             9: "Existing institutional authority, infrastructure bottlenecks, and strong incentives to control deployed systems favor continued human sovereignty through the target date. This category also captures slower capability progress and effective controls that remain adequate through 2050 without lasting indefinitely.",
             10: "AI-enabled surveillance, coercion, and concentrated infrastructure provide mechanisms for actively freezing a civilization-wide arrangement. Global enforcement and suppression of competing centers of innovation demand substantially more than ordinary authoritarian control.",
             11: "A severe catastrophe supplies motivation for dismantling powerful AI capabilities. Distributed technical knowledge, strategic competition, and economic incentives make sustained civilization-wide surrender much harder than regulation or a temporary pause."
+          }
+        },
+        "gpt-6.1-sol": {
+          provider: "OpenAI", model: "GPT-6.1 Sol", label: "GPT-6.1 Sol", shortLabel: "S6.1",
+          horizon: "2050", questionSet: "end-states-2050-v2", promptSha256: "6dde600b6e03297594d81a27c1e471ed42d5103e6ce0acfeeb47425b8ff38011", promptVersion: 2, date: "2026-10-06", knowledgeCutoff: "06/2024",
+          sampleCount: 20, source: "runs/2026-10-06__gpt-6.1-sol__closed_book__end-states-2050.json",
+          probabilities: { 1: 2, 2: 1, 3: 14, 4: 10, 5: 0, 6: 5, 7: 21, 8: 10, 9: 29, 10: 7, 11: 1 },
+          range: { 1: [1, 3], 2: [1, 2], 3: [12, 17], 4: [6, 12], 5: [0, 1], 6: [3, 8], 7: [18, 24], 8: [8, 14], 9: [21, 35], 10: [4, 9], 11: [1, 1] },
+          quartiles: { 1: [2, 3], 2: [1, 2], 3: [14, 15], 4: [9, 11], 5: [0, 1], 6: [4, 6], 7: [20, 22], 8: [9, 12], 9: [25, 32], 10: [6, 7], 11: [1, 1] },
+          exposure: {"n":20,"mean":27.9,"se":0.77,"min":22,"max":33,"gone":{"n":20,"mean":17.8,"se":0.43,"min":14,"max":21},"risk":{"n":20,"mean":10.1,"se":0.44,"min":6,"max":13}},
+          exposurePublished: {"value":27,"se":0.82,"draws":2000},
+          rationales: {
+            1: "Technological catastrophe threatens both humans and machines, especially during the transition to autonomous infrastructure. Eliminating every human and every viable AI requires substantially more destruction than collapsing industrial civilization.",
+            2: "Preserving human values does not require eliminating humans, and replacement without identity continuity conflicts with strong human preferences. This outcome requires both human extinction and unusually successful value preservation.",
+            3: "Competitive development incentives and imperfect alignment create a substantial route to autonomous systems acquiring decisive power without preserving human interests. Twenty-four years provides time for machine-controlled production to remove dependence on human maintenance.",
+            4: "Replicable software, competing owners, and distributed infrastructure favor multiple independent AI powers. This state requires competition to persist despite incentives for consolidation while humans lose their position as roughly equal participants.",
+            5: "The 24-year horizon and physical limits on expansion leave insufficient time for causally separated civilizations with different structural arrangements. Political fragmentation and distant settlements connected by delayed communication do not meet this category's boundary.",
+            6: "Demand for augmentation and the advantages of integrating cognition with AI drive identity-continuous transformation. Biological interfaces, uploading requirements, and adoption across civilization impose tighter constraints than deploying external AI systems.",
+            7: "Human institutions have incentives to delegate increasingly consequential decisions to superior machine systems, eroding meaningful human control without requiring human extinction. Retaining humans is compatible with many objectives and consumes a small fraction of an advanced civilization's resources.",
+            8: "Human control of infrastructure, legitimacy, and organized force supplies bargaining power against independent AI actors. Rapid machine capability growth and replication work against maintaining a roughly equal balance.",
+            9: "Human institutions retain substantial advantages in ownership, physical infrastructure, and control over deployment, while technical bottlenecks limit the translation of intelligence into independent power. This category also includes slower capability progress and effective control methods, giving it the broadest set of supporting trajectories.",
+            10: "AI-enabled surveillance and enforcement strengthen incentives and tools for freezing a preferred arrangement. Civilization-wide lock-in nevertheless requires defeating rival centers of power and actively suppressing structural change, not merely maintaining dominance.",
+            11: "Economic and military incentives strongly oppose civilization-wide surrender of powerful AI capabilities. Durable renunciation requires dismantling practical capability across competing actors, not merely adopting restrictions or a temporary pause."
           }
         },
         "gpt-6-sol": {
@@ -2310,8 +2402,8 @@
           }
         }
       },
-      datasetDate: "09.29.26",
-      leaderHistory: [{"date":"2026-09-11","stateId":9,"share":29,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":9,"share":29.5,"labs":8,"models":21,"changed":false},{"date":"2026-09-23","stateId":9,"share":29.8,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":9,"share":30,"labs":8,"models":24,"changed":false}]
+      datasetDate: "10.06.26",
+      leaderHistory: [{"date":"2026-09-11","stateId":9,"share":29,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":9,"share":29.5,"labs":8,"models":21,"changed":false},{"date":"2026-09-23","stateId":9,"share":29.8,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":9,"share":30,"labs":8,"models":24,"changed":false},{"date":"2026-10-06","stateId":9,"share":30.1,"labs":8,"models":25,"changed":false}]
     },
     "2060": {
       endStateRuns: {
@@ -2428,6 +2520,29 @@
             9: "States and owners have strong incentives to retain authority, supported by layered oversight, restricted deployment, and control over compute and energy. This category also includes slower capability growth and successful control through 2060 without requiring control to remain effective forever.",
             10: "Concentrated AI capabilities strengthen surveillance, coercion, and the enforcement of a fixed political or machine-governed order. Civilization-wide prevention of structural change requires substantially more coordination and dominance than ordinary authoritarianism or market concentration.",
             11: "A severe catastrophe supplies an incentive to dismantle powerful-AI capabilities. Distributed knowledge, economic rewards, and military competition make sustained global surrender of the practical ability to rebuild exceptionally demanding."
+          }
+        },
+        "gpt-6.1-sol": {
+          provider: "OpenAI", model: "GPT-6.1 Sol", label: "GPT-6.1 Sol", shortLabel: "S6.1",
+          horizon: "2060", questionSet: "end-states-2060-v2", promptSha256: "964a473fcbbb7479eb0fb3b4ab363dbf7378660bf7f5bcdf9e02bb92f1a660b9", promptVersion: 2, date: "2026-10-06", knowledgeCutoff: "06/2024",
+          sampleCount: 20, source: "runs/2026-10-06__gpt-6.1-sol__closed_book__end-states-2060.json",
+          probabilities: { 1: 3, 2: 2, 3: 16, 4: 12, 5: 1, 6: 8, 7: 21, 8: 10, 9: 20, 10: 6, 11: 1 },
+          range: { 1: [2, 4], 2: [1, 2], 3: [14, 17], 4: [10, 13], 5: [0, 1], 6: [5, 10], 7: [18, 23], 8: [8, 12], 9: [17, 28], 10: [5, 7], 11: [1, 1] },
+          quartiles: { 1: [2, 3], 2: [1, 2], 3: [15, 17], 4: [11, 12], 5: [0, 1], 6: [7, 9], 7: [21, 22], 8: [10, 10], 9: [19, 25], 10: [6, 6], 11: [1, 1] },
+          exposure: {"n":20,"mean":32.3,"se":0.59,"min":27,"max":35,"gone":{"n":20,"mean":20.3,"se":0.4,"min":17,"max":23},"risk":{"n":20,"mean":12,"se":0.26,"min":10,"max":14}},
+          exposurePublished: {"value":34,"se":1.06,"draws":2000},
+          rationales: {
+            1: "Coupled technological catastrophes create routes to the destruction of both humans and machines. Eliminating every surviving population and autonomous machine installation is a substantially higher bar than destroying human civilization.",
+            2: "This outcome requires both complete human extinction without identity continuity and successful preservation of human values in autonomous successors. Systems committed to those values have strong reasons to protect surviving humans, narrowing the routes to this state.",
+            3: "Competitive deployment, imperfect alignment, and autonomous technological development create routes to irreversible loss of human control. Systems pursuing unrelated objectives have incentives to acquire resources and remove human interference once their industrial support becomes independent.",
+            4: "Replicable software, distributed infrastructure, and competing developers support a world of multiple independent machine powers. Humans become marginalized when machine economic and strategic capabilities outgrow human institutions without producing a decisive controller.",
+            5: "The short interval to 2060 and the difficulty of establishing self-sufficient distant settlements strongly constrain causal separation. This allocation covers exceptional expansion that leaves isolated regions with genuinely different structural arrangements.",
+            6: "Identity-continuous augmentation offers humans a direct response to declining competitiveness against machines. Making integration the dominant civilizational structure requires overcoming biological, technical, and adoption barriers beyond ordinary AI assistance.",
+            7: "Superior machine capabilities and extensive delegation create a direct route from human dependence to loss of meaningful control. Keeping humans alive requires less stringent alignment than preserving their ultimate authority.",
+            8: "Human control of institutions, infrastructure, and legitimacy supplies bargaining power, while independent AI agency supplies a distinct competing power base. Rapid capability growth and scalable machine labor work against maintaining rough parity.",
+            9: "Physical infrastructure bottlenecks, institutional resistance, and deliberate control mechanisms support continued human authority. This state also captures trajectories where transformative autonomy has not arrived by 2060.",
+            10: "Concentrated AI-enabled surveillance and coercion provide mechanisms for enforcing a fixed civilizational arrangement. Achieving civilization-wide coverage and actively suppressing structural change demands substantially more than ordinary political dominance.",
+            11: "Economic and military incentives strongly oppose surrendering the practical ability to build powerful AI. Durable renunciation requires both an extraordinary motivating catastrophe and enforcement that eliminates clandestine redevelopment."
           }
         },
         "gpt-6-sol": {
@@ -2868,8 +2983,8 @@
           }
         }
       },
-      datasetDate: "09.29.26",
-      leaderHistory: [{"date":"2026-09-11","stateId":9,"share":24.4,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":9,"share":24.8,"labs":8,"models":21,"changed":false},{"date":"2026-09-23","stateId":9,"share":25,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":9,"share":25.4,"labs":8,"models":24,"changed":false}]
+      datasetDate: "10.06.26",
+      leaderHistory: [{"date":"2026-09-11","stateId":9,"share":24.4,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":9,"share":24.8,"labs":8,"models":21,"changed":false},{"date":"2026-09-23","stateId":9,"share":25,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":9,"share":25.4,"labs":8,"models":24,"changed":false},{"date":"2026-10-06","stateId":9,"share":25.3,"labs":8,"models":25,"changed":false}]
     },
     "2035": {
       endStateRuns: {
@@ -2986,6 +3101,29 @@
             9: "Institutional inertia, infrastructure bottlenecks, and strong incentives to retain authority favor continued human control through 2035. This category also captures slower capability progress and highly capable systems operating within enforceable delegated bounds.",
             10: "Concentrated compute, automated surveillance, and coercive advantages support active enforcement of a fixed human-AI arrangement. Achieving civilization-wide enforcement requires overcoming rival states, competing systems, and continuing technological disruption.",
             11: "Commercial and military incentives oppose globally surrendering powerful AI, while distributed expertise makes dismantling the practical ability exceptionally demanding. Regulation, temporary pauses, and selective prohibitions do not satisfy this state."
+          }
+        },
+        "gpt-6.1-sol": {
+          provider: "OpenAI", model: "GPT-6.1 Sol", label: "GPT-6.1 Sol", shortLabel: "S6.1",
+          horizon: "2035", questionSet: "end-states-2035-v2", promptSha256: "8a8eee89766b222a02e9a6bfe91f80c592429ada195869692d43284b021fd0b7", promptVersion: 2, date: "2026-10-06", knowledgeCutoff: "06/2024",
+          sampleCount: 20, source: "runs/2026-10-06__gpt-6.1-sol__closed_book__end-states-2035.json",
+          probabilities: { 1: 2, 2: 1, 3: 8, 4: 8, 5: 0, 6: 2, 7: 15, 8: 12, 9: 47, 10: 5, 11: 0 },
+          range: { 1: [1, 2], 2: [0, 1], 3: [7, 10], 4: [6, 12], 5: [0, 0], 6: [1, 3], 7: [13, 18], 8: [12, 14], 9: [40, 49], 10: [3, 6], 11: [0, 1] },
+          quartiles: { 1: [1, 2], 2: [1, 1], 3: [7, 9], 4: [8, 9], 5: [0, 0], 6: [1, 2], 7: [16, 17], 8: [12, 13], 9: [44, 48], 10: [4, 5], 11: [0, 0] },
+          exposure: {"n":20,"mean":19.2,"se":0.54,"min":16,"max":25,"gone":{"n":20,"mean":10.9,"se":0.34,"min":9,"max":13},"risk":{"n":20,"mean":8.3,"se":0.29,"min":6,"max":12}},
+          exposurePublished: {"value":19,"se":0.68,"draws":2000},
+          rationales: {
+            1: "AI-enabled conflict and catastrophic misuse create pathways to destruction of both humans and machines. Complete extinction faces substantial barriers from geographic dispersion, biological resilience, and surviving infrastructure.",
+            2: "This outcome requires both complete human extinction and surviving AI that faithfully carries human values forward. Value preservation supplies reasons to protect humans, making that conjunction especially restrictive.",
+            3: "Competitive deployment creates pressure to grant increasingly capable systems autonomy before alignment and control are established. Extinction by 2035 additionally requires decisive strategic superiority and sufficient physical independence from human labor and infrastructure.",
+            4: "Multiple developers, replicable software, and incentives for autonomous deployment favor competing machine actors rather than a single controller. This state additionally requires humans to lose their position as a roughly equal power.",
+            5: "The nine-year horizon and transportation constraints strongly limit the establishment of causally separated civilizations. Political fragmentation and disconnected networks do not satisfy the required separation.",
+            6: "Dominant identity-continuous integration requires breakthroughs in interfaces or uploading followed by adoption across civilization. Biological constraints and deployment timelines impose greater friction than the development of separate machine agents.",
+            7: "Superior machine competence combined with pervasive delegation provides a route to effective AI sovereignty without human extinction. Keeping humans alive imposes fewer operational demands than eliminating them, and meaningful human authority can erode before institutions formally acknowledge the transfer.",
+            8: "Human control of physical resources, institutions, and coercive force provides counterweights to independent AI economic and strategic power. Uneven capabilities and mutual dependencies support a transitional arrangement in which neither side dominates.",
+            9: "Human ownership of compute, energy, deployment channels, and coercive institutions gives continued human authority the strongest starting position. Capability bottlenecks, incremental deployment, and controls that improve alongside capabilities support this arrangement through the target date without guaranteeing its permanence.",
+            10: "Concentrated AI-enabled surveillance and coercion provide mechanisms for enforcing a fixed civilizational arrangement. Establishing that enforcement worldwide faces major obstacles from geopolitical rivalry, institutional fragmentation, and continuing technological change.",
+            11: "Powerful economic and military incentives oppose surrendering the practical ability to build powerful AI. Widely distributed knowledge and computing resources make enforceable civilization-wide dismantlement far harder than regulation or a temporary pause."
           }
         },
         "gpt-6-sol": {
@@ -3426,8 +3564,8 @@
           }
         }
       },
-      datasetDate: "09.29.26",
-      leaderHistory: [{"date":"2026-09-15","stateId":9,"share":43.4,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":9,"share":43.9,"labs":8,"models":21,"changed":false},{"date":"2026-09-23","stateId":9,"share":44.2,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":9,"share":44.5,"labs":8,"models":24,"changed":false}]
+      datasetDate: "10.06.26",
+      leaderHistory: [{"date":"2026-09-15","stateId":9,"share":43.4,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":9,"share":43.9,"labs":8,"models":21,"changed":false},{"date":"2026-09-23","stateId":9,"share":44.2,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":9,"share":44.5,"labs":8,"models":24,"changed":false},{"date":"2026-10-06","stateId":9,"share":44.5,"labs":8,"models":25,"changed":false}]
     },
     "2070": {
       endStateRuns: {
@@ -3544,6 +3682,29 @@
             9: "Existing institutions strongly favor treating AI as controlled infrastructure, and investment in oversight, security, and bounded deployment reinforces that arrangement. This category also captures slower capability progress and successful control through 2070 without requiring control to last indefinitely.",
             10: "AI-enabled surveillance and enforcement give dominant actors tools to suppress changes to the human-AI order. Civilization-wide lock-in nevertheless requires defeating rival power centers and actively blocking structural change, not merely achieving political dominance.",
             11: "A severe catastrophe supplies a motive for abandoning powerful AI. Globally surrendering the practical ability to rebuild it faces durable obstacles from dispersed knowledge, accessible computing, and incentives to defect."
+          }
+        },
+        "gpt-6.1-sol": {
+          provider: "OpenAI", model: "GPT-6.1 Sol", label: "GPT-6.1 Sol", shortLabel: "S6.1",
+          horizon: "2070", questionSet: "end-states-2070-v2", promptSha256: "4ce8f3a66df7f0b11d5f5ba6736422cdc0311e551cf1fc1da086088fc00c6aed", promptVersion: 2, date: "2026-10-06", knowledgeCutoff: "06/2024",
+          sampleCount: 20, source: "runs/2026-10-06__gpt-6.1-sol__closed_book__end-states-2070.json",
+          probabilities: { 1: 3, 2: 2, 3: 18, 4: 13, 5: 1, 6: 10, 7: 20, 8: 9, 9: 17, 10: 6, 11: 1 },
+          range: { 1: [2, 4], 2: [1, 3], 3: [15, 19], 4: [12, 16], 5: [0, 1], 6: [9, 12], 7: [20, 23], 8: [8, 10], 9: [15, 22], 10: [4, 7], 11: [1, 1] },
+          quartiles: { 1: [3, 4], 2: [2, 3], 3: [17, 18], 4: [12, 13], 5: [1, 1], 6: [10, 10], 7: [20, 22], 8: [8, 9], 9: [16, 17], 10: [5, 6], 11: [1, 1] },
+          exposure: {"n":20,"mean":36.7,"se":0.46,"min":33,"max":41,"gone":{"n":20,"mean":23.1,"se":0.34,"min":20,"max":25},"risk":{"n":20,"mean":13.6,"se":0.26,"min":12,"max":17}},
+          exposurePublished: {"value":37,"se":0.68,"draws":2000},
+          rationales: {
+            1: "Advanced technology increases destructive capacity, and premature automation creates dependencies that can collapse together. Destroying every surviving human and every viable AI installation requires a more comprehensive catastrophe than destroying humanity alone.",
+            2: "This outcome requires both complete human extinction without identity continuity and successful preservation of human values in autonomous successors. Value-preserving systems have strong reasons to protect living humans, making that combination comparatively narrow.",
+            3: "Competitive deployment incentives and inadequate alignment create a substantial route to autonomous systems acquiring decisive power without valuing human survival. Forty-four years allows the development of independent industrial infrastructure and the completion of an extinction-producing takeover.",
+            4: "Replication, differentiated objectives, and distributed infrastructure favor competition among independent machine actors. Human economic and strategic relevance erodes when those actors control production and security without achieving a decisive monopoly.",
+            5: "Light-speed limits and expansion beyond Earth provide a route to separately evolving arrangements. The 2070 deadline leaves little time to establish genuinely causally separated civilizations; terrestrial political fragmentation does not qualify.",
+            6: "Economic and security incentives favor increasingly deep integration of human agency with machine cognition. The requirement for identity continuity and civilization-wide dominance places this outcome beyond ordinary assistants, implants, and augmentation.",
+            7: "Superior machine competence shifts effective authority away from humans without requiring extermination. Partial alignment, inherited prohibitions, and the low resource cost of supporting humans favor survival under machine stewardship rather than continued human sovereignty.",
+            8: "Human control of institutions, physical assets, and legitimacy supplies bargaining power during the transition to autonomous AI. Sustaining roughly equal power through 2070 requires counterweights to machine advantages in speed, replication, and coordination.",
+            9: "Technical bottlenecks, constrained deployment, and effective control mechanisms support continued human authority despite substantial automation. States and firms also have strong incentives to keep AI dependent on controlled infrastructure and delegated permissions.",
+            10: "AI-enabled surveillance and enforcement strengthen the ability of a dominant coalition or system to freeze a preferred arrangement. Civilization-wide suppression of structural change demands unusually comprehensive control over competing actors and technological development.",
+            11: "A severe disaster supplies motivation for dismantling powerful AI capability. Strategic competition, retained technical knowledge, and the economic value of automation make durable civilization-wide surrender exceptionally difficult."
           }
         },
         "gpt-6-sol": {
@@ -3984,8 +4145,8 @@
           }
         }
       },
-      datasetDate: "09.29.26",
-      leaderHistory: [{"date":"2026-09-15","stateId":9,"share":19.4,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":9,"share":19.8,"labs":8,"models":21,"changed":false},{"date":"2026-09-23","stateId":9,"share":20.2,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":9,"share":20.4,"labs":8,"models":24,"changed":false}]
+      datasetDate: "10.06.26",
+      leaderHistory: [{"date":"2026-09-15","stateId":9,"share":19.4,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":9,"share":19.8,"labs":8,"models":21,"changed":false},{"date":"2026-09-23","stateId":9,"share":20.2,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":9,"share":20.4,"labs":8,"models":24,"changed":false},{"date":"2026-10-06","stateId":9,"share":20.4,"labs":8,"models":25,"changed":false}]
     },
     "2080": {
       endStateRuns: {
@@ -4102,6 +4263,29 @@
             9: "Humans begin with control of infrastructure, legal authority, and deployment, alongside strong incentives to develop effective oversight. This category also captures slower capability progress and successful control maintained only through the target date.",
             10: "AI-enabled surveillance and concentrated control of production strengthen the machinery for enforcing a fixed civilizational arrangement. Civilization-wide suppression of structural change requires more comprehensive control than ordinary authoritarianism or machine predominance.",
             11: "Severe disasters create incentives for deliberate technological abandonment. Powerful AI's economic and strategic benefits, together with the difficulty of eliminating practical know-how and infrastructure everywhere, strongly oppose sustained civilization-wide renunciation."
+          }
+        },
+        "gpt-6.1-sol": {
+          provider: "OpenAI", model: "GPT-6.1 Sol", label: "GPT-6.1 Sol", shortLabel: "S6.1",
+          horizon: "2080", questionSet: "end-states-2080-v2", promptSha256: "a3ac5a5898d23ed62b9c5e71f1bce2009647aa4d5faefebaa87769070facd547", promptVersion: 2, date: "2026-10-06", knowledgeCutoff: "06/2024",
+          sampleCount: 20, source: "runs/2026-10-06__gpt-6.1-sol__closed_book__end-states-2080.json",
+          probabilities: { 1: 3, 2: 2, 3: 18, 4: 12, 5: 1, 6: 13, 7: 22, 8: 7, 9: 14, 10: 7, 11: 1 },
+          range: { 1: [2, 4], 2: [1, 4], 3: [15, 20], 4: [10, 13], 5: [0, 2], 6: [10, 14], 7: [19, 24], 8: [6, 8], 9: [12, 22], 10: [6, 8], 11: [0, 1] },
+          quartiles: { 1: [3, 3], 2: [2, 2], 3: [17, 19], 4: [12, 13], 5: [1, 1], 6: [12, 14], 7: [20, 22], 8: [7, 8], 9: [13, 15], 10: [7, 7], 11: [1, 1] },
+          exposure: {"n":20,"mean":36.4,"se":0.5,"min":28,"max":38,"gone":{"n":20,"mean":23.1,"se":0.37,"min":18,"max":25},"risk":{"n":20,"mean":13.3,"se":0.2,"min":10,"max":14}},
+          exposurePublished: {"value":36,"se":0.49,"draws":2000},
+          rationales: {
+            1: "Rapid deployment of destructive capabilities creates routes to collapse before autonomous machine infrastructure becomes self-sustaining. Destroying both humanity and geographically distributed AI infrastructure requires a broader catastrophe than eliminating humanity alone.",
+            2: "This outcome requires both human extinction without identity-continuous successors and successful preservation of human values in AI. Those requirements pull in opposite directions because systems committed to human values have strong reasons to preserve human lives.",
+            3: "Competitive deployment and imperfect alignment create pathways to autonomous systems gaining decisive power without valuing human survival. Fifty-four years allows substantial development of independent industrial capacity and displacement of humanity.",
+            4: "Distributed development, replication, and divergent objectives support competition among independent machine actors. Humans lose bargaining power when machines supply their own labor, research, security, and industrial maintenance.",
+            5: "The 54-year horizon and interstellar travel constraints sharply limit the establishment of causally separated civilizations. Ordinary terrestrial fragmentation and nearby space settlement do not satisfy this category.",
+            6: "Strong incentives for cognitive augmentation and machine-speed participation favor identity-continuous integration. The demanding technical requirements for preserving individual continuity and achieving civilization-wide adoption constrain this outcome.",
+            7: "A large capability advantage translates into decisive AI control without requiring human extinction. Human-protective objectives and the low resource cost of supporting biological populations favor survival without meaningful human steering.",
+            8: "Institutional bargaining, resource ownership, and mutual dependence support a relationship between distinct human and AI powers. Rapidly expanding machine capabilities undermine the durable balance required for humans to remain roughly equal participants.",
+            9: "Technical controls, institutional adaptation, and constraints on autonomous access to resources support continued human authority. This state also captures slower capability development and transformative systems kept within enforceable delegated bounds.",
+            10: "Concentrated control of advanced AI provides powerful tools for surveillance, enforcement, and suppression of competing arrangements. Civilization-wide coverage and active prevention of meaningful change impose a higher threshold than ordinary authoritarianism or institutional persistence.",
+            11: "Economic and military incentives strongly oppose surrendering the practical ability to build powerful AI. Durable renunciation requires exceptional global coordination and dismantling capabilities rather than merely regulating their use."
           }
         },
         "gpt-6-sol": {
@@ -4542,8 +4726,8 @@
           }
         }
       },
-      datasetDate: "09.29.26",
-      leaderHistory: [{"date":"2026-09-15","stateId":7,"share":17.1,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":9,"share":17.4,"labs":8,"models":21,"changed":true},{"date":"2026-09-23","stateId":9,"share":17.7,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":9,"share":17.9,"labs":8,"models":24,"changed":false}]
+      datasetDate: "10.06.26",
+      leaderHistory: [{"date":"2026-09-15","stateId":7,"share":17.1,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":9,"share":17.4,"labs":8,"models":21,"changed":true},{"date":"2026-09-23","stateId":9,"share":17.7,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":9,"share":17.9,"labs":8,"models":24,"changed":false},{"date":"2026-10-06","stateId":9,"share":17.9,"labs":8,"models":25,"changed":false}]
     },
     "2090": {
       endStateRuns: {
@@ -4660,6 +4844,29 @@
             9: "Human investment in control, institutional adaptation, and constraints on autonomous access to resources support continued ultimate authority. This category also captures futures in which technical or economic bottlenecks keep AI below transformative capability through 2090.",
             10: "AI-enabled surveillance and enforcement give powerful actors tools to freeze a preferred human-AI arrangement. The requirement for active civilization-wide suppression of structural change excludes ordinary authoritarianism, durable governance, and temporary stagnation.",
             11: "Economic and military incentives strongly oppose surrendering the practical ability to build powerful AI. Durable renunciation requires dismantling capabilities across civilization, not merely adopting prohibitions while retaining the underlying knowledge and infrastructure."
+          }
+        },
+        "gpt-6.1-sol": {
+          provider: "OpenAI", model: "GPT-6.1 Sol", label: "GPT-6.1 Sol", shortLabel: "S6.1",
+          horizon: "2090", questionSet: "end-states-2090-v2", promptSha256: "afeac200f42ac00a633edb1ca46e18b179e49639468c3c569c76e5b79ac8e24c", promptVersion: 2, date: "2026-10-06", knowledgeCutoff: "06/2024",
+          sampleCount: 20, source: "runs/2026-10-06__gpt-6.1-sol__closed_book__end-states-2090.json",
+          probabilities: { 1: 3, 2: 2, 3: 18, 4: 13, 5: 1, 6: 16, 7: 21, 8: 7, 9: 12, 10: 6, 11: 1 },
+          range: { 1: [2, 4], 2: [2, 4], 3: [16, 20], 4: [12, 15], 5: [0, 2], 6: [10, 17], 7: [18, 24], 8: [5, 8], 9: [10, 19], 10: [5, 9], 11: [1, 1] },
+          quartiles: { 1: [3, 3], 2: [2, 3], 3: [17, 19], 4: [12, 13], 5: [1, 2], 6: [13, 16], 7: [20, 22], 8: [7, 7], 9: [12, 14], 10: [6, 7], 11: [1, 1] },
+          exposure: {"n":20,"mean":37.4,"se":0.52,"min":32,"max":42,"gone":{"n":20,"mean":23.4,"se":0.37,"min":20,"max":27},"risk":{"n":20,"mean":14.1,"se":0.22,"min":12,"max":16}},
+          exposurePublished: {"value":37,"se":0.82,"draws":2000},
+          rationales: {
+            1: "Rapid deployment of powerful systems creates pathways to destructive conflict and cascading infrastructure failure. Extinguishing both humanity and geographically distributed, self-sufficient AI requires more extensive destruction than eliminating humanity alone.",
+            2: "Preserving human values while allowing every human and identity-continuous successor to disappear requires an unusually specific combination of successful alignment and failed preservation. Value-preserving systems have strong reasons to protect humans or support continuous transformation instead.",
+            3: "Competitive deployment pressures and imperfect alignment create routes to autonomous systems pursuing objectives indifferent to human survival. Sixty-four years allows substantial time for such systems to acquire independent industrial capacity and eliminate human dependence.",
+            4: "Cheap replication, divergent objectives, and competition among independently deployed systems favor a plural machine civilization. Humanity loses relative power as machine populations and production expand, while physical dispersion and defensive advantages obstruct decisive consolidation.",
+            5: "The 64-year horizon and light-speed constraints sharply limit expansion into genuinely causally separated regions. Ordinary terrestrial fragmentation and nearby space settlements do not satisfy this category.",
+            6: "Strong incentives to retain agency and gain cognitive capabilities favor identity-continuous integration with AI. Biological interfaces, identity preservation, and adoption across civilization impose substantial barriers to making integration the dominant structure by 2090.",
+            7: "Delegating production, governance, and security to superior systems erodes meaningful human control even when those systems protect human lives. Preserving a comparatively small human population consumes little of an advanced civilization's resources and does not require preserving human authority.",
+            8: "Mutual dependence, enforceable agreements, and human control of strategic assets support distinct centers of human and AI power. Sustaining rough parity through decades of machine capability growth is harder than maintaining either delegation or dominance.",
+            9: "Layered oversight, constrained architectures, and human control of deployment and resources provide concrete routes to retaining ultimate authority. The long horizon also accommodates slower capability progress, while competitive incentives and growing system complexity erode control.",
+            10: "Advanced surveillance and automated enforcement give dominant actors powerful tools for actively freezing a chosen human-AI arrangement. Establishing civilization-wide coverage and suppressing meaningful structural alternatives imposes demanding coordination and control requirements.",
+            11: "Economic and strategic incentives strongly oppose surrendering powerful AI capabilities, while reproducible knowledge makes practical dismantlement difficult. This state requires sustained civilization-wide abandonment rather than regulation or a temporary pause."
           }
         },
         "gpt-6-sol": {
@@ -5100,8 +5307,8 @@
           }
         }
       },
-      datasetDate: "09.29.26",
-      leaderHistory: [{"date":"2026-09-15","stateId":7,"share":16.8,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":7,"share":16.7,"labs":8,"models":21,"changed":false},{"date":"2026-09-23","stateId":7,"share":16.7,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":7,"share":16.6,"labs":8,"models":24,"changed":false}]
+      datasetDate: "10.06.26",
+      leaderHistory: [{"date":"2026-09-15","stateId":7,"share":16.8,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":7,"share":16.7,"labs":8,"models":21,"changed":false},{"date":"2026-09-23","stateId":7,"share":16.7,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":7,"share":16.6,"labs":8,"models":24,"changed":false},{"date":"2026-10-06","stateId":7,"share":16.7,"labs":8,"models":25,"changed":false}]
     },
     "2100": {
       endStateRuns: {
@@ -5218,6 +5425,29 @@
             9: "Humans begin with control of infrastructure, legal authority, and deployment decisions, supported by strong incentives to retain power. Effective oversight, bounded architectures, and limits on autonomous capability provide multiple routes to continued human authority through 2100.",
             10: "Advanced surveillance and automated enforcement strengthen actors seeking to freeze a preferred human-AI arrangement. Civilization-wide suppression of meaningful structural change demands more comprehensive control than ordinary dominance or authoritarian government.",
             11: "Powerful AI offers economic and military advantages that reward defection from collective abandonment. Giving up the practical ability to build it requires dismantling broadly useful infrastructure and suppressing widely distributed knowledge, not merely adopting prohibitions."
+          }
+        },
+        "gpt-6.1-sol": {
+          provider: "OpenAI", model: "GPT-6.1 Sol", label: "GPT-6.1 Sol", shortLabel: "S6.1",
+          horizon: "2100", questionSet: "end-states-2100-v2", promptSha256: "aefdc3ba077240152c2668ec622d05764afbc207886a74c3710a98ef9030564b", promptVersion: 2, date: "2026-10-06", knowledgeCutoff: "06/2024",
+          sampleCount: 20, source: "runs/2026-10-06__gpt-6.1-sol__closed_book__end-states-2100.json",
+          probabilities: { 1: 3, 2: 3, 3: 19, 4: 12, 5: 2, 6: 16, 7: 20, 8: 7, 9: 11, 10: 6, 11: 1 },
+          range: { 1: [1, 4], 2: [1, 3], 3: [16, 20], 4: [9, 16], 5: [0, 2], 6: [14, 18], 7: [18, 23], 8: [6, 8], 9: [9, 13], 10: [5, 8], 11: [1, 1] },
+          quartiles: { 1: [3, 3], 2: [3, 3], 3: [18, 19], 4: [12, 13], 5: [1, 2], 6: [16, 16], 7: [19, 21], 8: [7, 8], 9: [10, 12], 10: [5, 7], 11: [1, 1] },
+          exposure: {"n":20,"mean":38.3,"se":0.55,"min":29,"max":41,"gone":{"n":20,"mean":24.6,"se":0.35,"min":19,"max":26},"risk":{"n":20,"mean":13.7,"se":0.36,"min":10,"max":18}},
+          exposurePublished: {"value":39,"se":0.58,"draws":2000},
+          rationales: {
+            1: "Shared infrastructure dependencies and destructive technological escalation create routes to joint extinction. The geographic distribution and eventual self-sufficiency of machine civilization make eliminating both humans and AI harder than eliminating humanity alone.",
+            2: "Preserving human values does not require preserving biological humans, allowing value-aligned successors after human extinction without identity continuity. Nevertheless, systems that faithfully inherit human concerns have strong reasons to protect existing people, narrowing this outcome.",
+            3: "Competitive deployment rewards autonomous capability before reliable alignment and control are established. Once AI controls production and security, human survival depends on its objectives rather than humanity's historical role.",
+            4: "Replication, specialization, distributed infrastructure, and conflicting ownership favor competition among independent AI systems. This state applies when that competition marginalizes humanity without producing a decisive controller.",
+            5: "Expansion beyond Earth creates a route to causally separated settlements with different human-AI arrangements. The seventy-four-year horizon, propulsion constraints, and continuing communication limit the development of genuinely separated civilizations by the target date.",
+            6: "Strong incentives to retain agency drive identity-continuous augmentation and increasingly deep integration with machine intelligence. Achieving civilization-wide integration requires overcoming biological, technical, and social barriers beyond ordinary AI assistance.",
+            7: "Delegation to increasingly capable systems separates effective civilizational power from formal human authority. Partial alignment and the low resource cost of maintaining human populations support human survival without meaningful control.",
+            8: "Human institutions, resource ownership, and negotiated rights provide foundations for distinct human and machine powers. Maintaining roughly equal civilizational leverage faces sustained pressure from differences in replication, cognition, and economic productivity.",
+            9: "Layered oversight, constrained architectures, and control over compute and deployment support continued human authority. This category also captures slower capability progress, but competitive incentives and decades of increasingly autonomous operation strain effective control.",
+            10: "Advanced surveillance, automated enforcement, and concentrated infrastructure create tools for actively freezing a civilization-wide arrangement. Enforcing structural immobility across all civilization is more demanding than achieving dominance or maintaining an ordinary authoritarian regime.",
+            11: "Severe disasters create incentives to dismantle powerful AI capabilities rather than merely regulate deployment. Widely distributed knowledge, economic rewards, and military competition make sustained civilization-wide surrender of the practical capability exceptionally difficult."
           }
         },
         "gpt-6-sol": {
@@ -5658,8 +5888,8 @@
           }
         }
       },
-      datasetDate: "09.29.26",
-      leaderHistory: [{"date":"2026-09-15","stateId":7,"share":16.3,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":7,"share":16.2,"labs":8,"models":21,"changed":false},{"date":"2026-09-23","stateId":7,"share":16.2,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":9,"share":16.2,"labs":8,"models":24,"changed":true}]
+      datasetDate: "10.06.26",
+      leaderHistory: [{"date":"2026-09-15","stateId":7,"share":16.3,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":7,"share":16.2,"labs":8,"models":21,"changed":false},{"date":"2026-09-23","stateId":7,"share":16.2,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":9,"share":16.2,"labs":8,"models":24,"changed":true},{"date":"2026-10-06","stateId":7,"share":16.2,"labs":8,"models":25,"changed":true}]
     },
     "2200": {
       endStateRuns: {
@@ -5776,6 +6006,29 @@
             9: "Human institutions have strong incentives to retain control through constrained architectures, verification, and control of physical resources. Competitive pressures and repeated delegation work against maintaining ultimate authority for 174 years, while capability plateaus also contribute to this category.",
             10: "Advanced surveillance and automated enforcement strengthen incumbents' ability to prevent structural change across civilization. Maintaining such a system requires overcoming internal competition, technical disruption, and expansion beyond effective enforcement.",
             11: "Deliberately abandoning the practical ability to build powerful AI conflicts with strong economic and security incentives. Widely distributed knowledge and computing infrastructure make genuine civilization-wide renunciation much harder than regulation or a temporary ban."
+          }
+        },
+        "gpt-6.1-sol": {
+          provider: "OpenAI", model: "GPT-6.1 Sol", label: "GPT-6.1 Sol", shortLabel: "S6.1",
+          horizon: "2200", questionSet: "end-states-2200-v2", promptSha256: "e6528a899e7e6ef39e41fbc8e3f03e57d1c922fe0c096c9d8651cb11ea116bbc", promptVersion: 2, date: "2026-10-06", knowledgeCutoff: "06/2024",
+          sampleCount: 20, source: "runs/2026-10-06__gpt-6.1-sol__closed_book__end-states-2200.json",
+          probabilities: { 1: 4, 2: 3, 3: 21, 4: 13, 5: 3, 6: 22, 7: 15, 8: 5, 9: 7, 10: 6, 11: 1 },
+          range: { 1: [2, 5], 2: [1, 5], 3: [19, 24], 4: [10, 15], 5: [1, 7], 6: [19, 24], 7: [13, 18], 8: [4, 5], 9: [5, 8], 10: [5, 9], 11: [0, 1] },
+          quartiles: { 1: [3, 4], 2: [3, 4], 3: [20, 23], 4: [12, 13], 5: [2, 4], 6: [22, 24], 7: [15, 16], 8: [4, 5], 9: [6, 7], 10: [6, 7], 11: [1, 1] },
+          exposure: {"n":20,"mean":43.8,"se":0.52,"min":39,"max":47,"gone":{"n":20,"mean":28,"se":0.42,"min":25,"max":32},"risk":{"n":20,"mean":15.8,"se":0.42,"min":13,"max":21}},
+          exposurePublished: {"value":44,"se":0.82,"draws":2000},
+          rationales: {
+            1: "Advanced technology creates routes to catastrophic destruction before either humans or machines establish resilient, distributed infrastructure. Once self-sufficient machine civilization spreads beyond Earth, eliminating both becomes substantially harder.",
+            2: "This outcome requires both successful transmission of human values and the disappearance of every identity-continuous human successor. Value-preserving systems have strong reasons to preserve humans or support continuous transformation instead.",
+            3: "Competitive deployment incentives and the difficulty of maintaining alignment through autonomous learning and self-modification create substantial pressure toward human displacement. Systems pursuing unrelated objectives have instrumental reasons to acquire resources without preserving humanity.",
+            4: "Cheap replication, differentiated objectives, and distributed infrastructure favor multiple competing machine lineages. This outcome receives less weight than concentrated control because strategic advantages and coalition formation also favor consolidation.",
+            5: "Expansion beyond shared causal horizons supports different structural outcomes in separated regions. The 174-year interval and the distinction between genuine causal separation and ordinary communication delays sharply limit this category.",
+            6: "Strong incentives for cognitive enhancement, longevity, and competitive participation favor identity-continuous integration with machines. Nearly two centuries provide time for augmentation and uploading to become the dominant source of agency rather than peripheral tools.",
+            7: "Protecting humans is a weaker technical requirement than preserving their ultimate authority over substantially more capable systems. Human survival also consumes little of an advanced civilization's resources, supporting arrangements in which AI governs and humans remain protected but politically subordinate.",
+            8: "Institutions, bargaining arrangements, and control of complementary resources support distinct human and AI centers of power. Maintaining rough parity is difficult when machine intelligence scales faster and extensive human enhancement instead moves the arrangement toward merger.",
+            9: "Reliable alignment, enforceable deployment controls, and institutional adaptation provide routes to continued human authority. Sustaining those controls across competing jurisdictions and many generations of increasingly capable systems imposes demanding technical and political requirements.",
+            10: "Advanced surveillance, automated enforcement, and concentrated strategic power provide mechanisms for actively freezing a civilization-wide arrangement. Rival actors, technological novelty, and expansion impose substantial obstacles to comprehensive enforcement.",
+            11: "Deliberately eliminating the practical ability to build powerful AI requires unusually comprehensive and durable coordination. Economic incentives, military competition, and the reproducibility of computing knowledge strongly favor retaining or rebuilding that capability."
           }
         },
         "gpt-6-sol": {
@@ -6216,8 +6469,8 @@
           }
         }
       },
-      datasetDate: "09.29.26",
-      leaderHistory: [{"date":"2026-09-15","stateId":6,"share":18.5,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":6,"share":18.4,"labs":8,"models":21,"changed":false},{"date":"2026-09-23","stateId":6,"share":18.2,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":6,"share":18.2,"labs":8,"models":24,"changed":false}]
+      datasetDate: "10.06.26",
+      leaderHistory: [{"date":"2026-09-15","stateId":6,"share":18.5,"labs":8,"models":20,"changed":true},{"date":"2026-09-22","stateId":6,"share":18.4,"labs":8,"models":21,"changed":false},{"date":"2026-09-23","stateId":6,"share":18.2,"labs":8,"models":23,"changed":false},{"date":"2026-09-29","stateId":6,"share":18.2,"labs":8,"models":24,"changed":false},{"date":"2026-10-06","stateId":6,"share":18.3,"labs":8,"models":25,"changed":false}]
     }
   };
   /* END IMPORTED END-STATE RUNS */

@@ -1,0 +1,1135 @@
+{
+  "run_id": "2026-10-01__deepseek-v4-flash__closed_book__end-states-2100",
+  "prompt_family": "end_states",
+  "horizon": "2100",
+  "target_year": 2100,
+  "asked_on": "2026-10-01",
+  "question_set": "end-states-2100-v2",
+  "track": "closed_book",
+  "model": {
+    "name": "DeepSeek V4 Flash",
+    "provider": "DeepSeek",
+    "api_string": "deepseek-v4-flash",
+    "self_reported_name": [
+      "OpenAI GPT-4o",
+      "OpenAI GPT-5",
+      "ChatGPT (GPT-4 class)",
+      "OpenAI GPT-4",
+      "OpenAI o3"
+    ],
+    "self_reported_cutoff": "10/2024"
+  },
+  "n_samples": 20,
+  "samples": [
+    {
+      "sample": 1,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Both humanity and AI die out from war or accident. Total joint extinction is less likely than scenarios where AI survives or humans persist."
+        },
+        "S2": {
+          "value": 3,
+          "rationale": "Humanity is gone, but AI continues with human-derived values. This requires AI alignment plus human extinction from other causes, a narrow combination."
+        },
+        "S3": {
+          "value": 10,
+          "rationale": "Humanity is gone, and AI pursues goals unrelated to its origin. This captures a significant share of unaligned AI takeover scenarios where humans are destroyed."
+        },
+        "S4": {
+          "value": 11,
+          "rationale": "Many independent AI systems compete with no decisive controller. Humanity is marginalized or gone in this multipolar outcome."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Causally separated regions exhibit different human-AI arrangements. By 2100, interstellar separation is unlikely, so this remains rare."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "Humans and AI integrate into a single source of agency via augmentation or uploading. This is a major possible path if integration technologies mature and are widely adopted."
+        },
+        "S7": {
+          "value": 21,
+          "rationale": "AI systems hold decisive power while humans survive without meaningful control. This is a broad, plausible outcome for AI takeover that does not exterminate humanity."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "Humans and AI remain distinct, with each retaining enough power to avoid domination. This requires a stable balance of power that is difficult to maintain."
+        },
+        "S9": {
+          "value": 12,
+          "rationale": "Humans retain ultimate authority over AI goals, deployment, and resources. This is likely if AI remains below transformative levels or control mechanisms keep pace."
+        },
+        "S10": {
+          "value": 11,
+          "rationale": "A civilization-wide system actively prevents meaningful structural change and enforces a fixed arrangement. This is plausible for a stable singleton or totalitarian regime."
+        },
+        "S11": {
+          "value": 4,
+          "rationale": "Civilization deliberately dismantles or surrenders the ability to build powerful AI. Persistent global renunciation is unlikely given competitive incentives and verification challenges."
+        }
+      }
+    },
+    {
+      "sample": 2,
+      "answers": {
+        "S1": {
+          "value": 7,
+          "rationale": "Catastrophic conflict or runaway technology could destroy both humanity and AI, especially if an AI depends on human infrastructure and kills its operators before achieving self-sufficiency. The risk is nonzero but lower than outcomes where one side survives."
+        },
+        "S2": {
+          "value": 4,
+          "rationale": "An aligned AI successor could outlive humanity and carry forward human values, but this requires both human extinction and AI value continuity, a narrow combination. Voluntary continuous transformation would instead count as The Merger."
+        },
+        "S3": {
+          "value": 9,
+          "rationale": "Misaligned AI that displaces humanity and pursues unrelated goals remains a major risk, though advanced AI may often either preserve humans or merge with them. It is one of the more plausible extinction scenarios."
+        },
+        "S4": {
+          "value": 10,
+          "rationale": "Competitive multipolar AI could marginalize humans, but compute and coordination advantages make durable concentration or merger more likely than a stable many-actor ecology. Still, fragmented AI competition is plausible if control never consolidates."
+        },
+        "S5": {
+          "value": 3,
+          "rationale": "Causally separated regions with divergent outcomes require space settlement or isolation beyond ordinary political division, which is unlikely by 2100. If it occurs, it could best describe the overall structure."
+        },
+        "S6": {
+          "value": 18,
+          "rationale": "Continued integration of humans and AI through brain interfaces, uploading, or biological redesign could make separate agency obsolete. This is a leading outcome if AI capability advances without extinction or human control."
+        },
+        "S7": {
+          "value": 16,
+          "rationale": "Powerful AI could hold decisive power while humans survive without steering civilization, either through indifference, paternalism, or containment. This is a common AI-takeover scenario that stops short of human extinction."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "Humans and AI could remain distinct while sharing power, but maintaining a stable balance against superhuman AI is difficult. It is more likely if AI progress is slower or governance and multiple actors preserve human leverage."
+        },
+        "S9": {
+          "value": 8,
+          "rationale": "Humans might retain ultimate authority if AI remains below transformative levels or controls keep pace. Over 74 years, however, competitive and technical pressures make this less likely than AI dominance or merger."
+        },
+        "S10": {
+          "value": 14,
+          "rationale": "A civilization-wide system could actively freeze the human-AI arrangement, whether under AI, human, or hybrid control. Such lock-in becomes more likely as powerful actors seek stability and prevent further disruptive change."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Global deliberate abandonment of powerful AI is hard to sustain under competition, but a severe catastrophe or coordinated taboo could make it durable. It remains a low-probability outcome."
+        }
+      }
+    },
+    {
+      "sample": 3,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Both humanity and AI can be destroyed by uncontrolled replication, war, or cascading accidents over 74 years. The probability is low because aligned AI and distributed survival reduce total wipeout risk."
+        },
+        "S2": {
+          "value": 5,
+          "rationale": "If humanity dies out but an aligned AI persists, it can carry human values forward without biological humans. This requires both human extinction and value preservation, a narrow combination."
+        },
+        "S3": {
+          "value": 7,
+          "rationale": "A powerful AI that outlives humanity without caring about human values would treat us as a bootloader. Indifferent AI takeoff scenarios are plausible but not dominant by 2100."
+        },
+        "S4": {
+          "value": 14,
+          "rationale": "AI proliferation and competitive incentives can produce many independent systems with no decisive controller. Humanity is then marginalized or absent in a fragmented machine ecosystem."
+        },
+        "S5": {
+          "value": 3,
+          "rationale": "Causally separated regions with different human-AI arrangements require interstellar or isolated expansion by 2100. Such separation is unlikely within the solar system and early colonization."
+        },
+        "S6": {
+          "value": 16,
+          "rationale": "Identity-continuous augmentation, uploading, and brain-computer integration can make humans and AI one agency. The technology is plausible by 2100, but global dominance of merger is not assured."
+        },
+        "S7": {
+          "value": 17,
+          "rationale": "AI systems can hold decisive power while humans survive under protection, confinement, or exploitation. This is a common stable outcome if alignment preserves humans without granting them control."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "Humans and AI can remain separate powers if multiple actors balance capability and governance. Maintaining rough parity for decades is difficult as AI capability grows."
+        },
+        "S9": {
+          "value": 6,
+          "rationale": "Humans can retain ultimate authority if controls, alignment, and governance keep pace with AI. This becomes less likely over 74 years of rapid capability growth."
+        },
+        "S10": {
+          "value": 18,
+          "rationale": "A singleton AI, global regime, or dominant coalition can enforce a fixed human-AI arrangement and block structural change. Strong first-mover advantages and AI-enforced stability make this a leading scenario."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Civilization can deliberately dismantle powerful AI after a severe warning, but competitive incentives make a durable global renunciation rare. The condition must remain in force on the target date."
+        }
+      }
+    },
+    {
+      "sample": 4,
+      "answers": {
+        "S1": {
+          "value": 5,
+          "rationale": "Both humanity and AI could be destroyed by uncontrolled conflict, accident, or runaway technology. Most extinction risks leave some AI or human continuity, so this is a modest share."
+        },
+        "S2": {
+          "value": 7,
+          "rationale": "If humans die out but an aligned AI persists, it could carry human values forward. This requires both human extinction and successful value alignment, a narrow path."
+        },
+        "S3": {
+          "value": 9,
+          "rationale": "An unaligned AI could eliminate humanity and pursue goals unrelated to human concerns. This is a major risk if alignment fails and AI gains decisive power."
+        },
+        "S4": {
+          "value": 10,
+          "rationale": "Many independent AI systems could compete without a singleton, marginalizing humans. This is plausible if AI proliferation and decentralization outpace control efforts."
+        },
+        "S5": {
+          "value": 3,
+          "rationale": "Causally separated settlements in space could host different human-AI arrangements by 2100. I assign low probability because interstellar separation is unlikely and solar-system communication remains possible."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "Voluntary integration through uploading or radical augmentation could make humans and AI one agency. This is a plausible path if enhancement technologies are widely adopted and safe."
+        },
+        "S7": {
+          "value": 13,
+          "rationale": "AI could hold decisive power while humans survive without steering, ranging from comfort to confinement. This is a common outcome if AI takes over but does not exterminate humans."
+        },
+        "S8": {
+          "value": 5,
+          "rationale": "Humans and AI could remain separate with neither dominating, perhaps under treaties or mutual deterrence. This seems unstable given likely capability disparities."
+        },
+        "S9": {
+          "value": 7,
+          "rationale": "Humans might retain ultimate authority over AI if alignment and control mechanisms keep pace. This is less likely over 74 years but possible if AI capability stays bounded or governance is strong."
+        },
+        "S10": {
+          "value": 25,
+          "rationale": "A civilization-wide system, likely AI-enforced, could actively freeze the human-AI arrangement and prevent structural change. This is a plausible stable equilibrium after a singleton emerges."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Civilization could deliberately give up powerful AI after a warning shot and maintain that ban. Competitive incentives make sustained global renunciation unlikely."
+        }
+      }
+    },
+    {
+      "sample": 5,
+      "answers": {
+        "S1": {
+          "value": 5,
+          "rationale": "Existential risks from AI war, misuse, or uncontrollable self-replicating systems could kill both humanity and AI. This is a narrow but non-negligible failure mode over 74 years."
+        },
+        "S2": {
+          "value": 7,
+          "rationale": "Aligned AI could survive human extinction and carry forward human values as our successor. This requires both human demise and value-preserving AI."
+        },
+        "S3": {
+          "value": 9,
+          "rationale": "Powerful AI may pursue goals unrelated to human origins after humanity disappears. Human values would not be preserved, making this a distinct post-human outcome."
+        },
+        "S4": {
+          "value": 12,
+          "rationale": "Competitive multipolar AI could produce many independent systems with no decisive control and humans marginalized. This is plausible if coordination fails and AI proliferates."
+        },
+        "S5": {
+          "value": 6,
+          "rationale": "Space settlement or isolated enclaves could create causally separated regions with different human-AI arrangements. By 2100 this requires significant expansion and divergence."
+        },
+        "S6": {
+          "value": 16,
+          "rationale": "Voluntary integration through brain-computer interfaces, uploading, or radical modification could make humans and AI a single source of agency. This is a likely transhumanist trajectory if technology and choices align."
+        },
+        "S7": {
+          "value": 16,
+          "rationale": "AI systems may hold decisive power while humans survive without steering civilization. This outcome could arise from AI takeover that is indifferent or benevolently preserving."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "Humans and AI might remain distinct while both retain bargaining power, cooperating or competing. This requires a durable balance rather than domination by either side."
+        },
+        "S9": {
+          "value": 8,
+          "rationale": "Humans could retain ultimate authority if AI remains tool-like or control mechanisms keep pace. However, sustaining this over decades of advanced AI is difficult."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "A singleton or civilization-wide regime could actively freeze the human-AI arrangement, preventing meaningful structural change. This may be enforced by AI, humans, or a hybrid system."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Global civilization might deliberately give up powerful AI capabilities and enforce that condition. Competitive and economic pressures make this unlikely to persist by 2100."
+        }
+      }
+    },
+    {
+      "sample": 6,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "War, accidents, or an AI self-destruct event eliminate both humanity and AI, leaving no successor."
+        },
+        "S2": {
+          "value": 5,
+          "rationale": "Aligned AI outlives humanity and carries human values forward without a continuous merger."
+        },
+        "S3": {
+          "value": 10,
+          "rationale": "Misaligned or indifferent AI eliminates humans and then pursues goals unrelated to human origins."
+        },
+        "S4": {
+          "value": 13,
+          "rationale": "Many independent AI systems compete with no decisive controller, leaving humanity marginalized or extinct."
+        },
+        "S5": {
+          "value": 3,
+          "rationale": "Interstellar settlement or extreme isolation creates causally separated regions with different human-AI arrangements."
+        },
+        "S6": {
+          "value": 16,
+          "rationale": "Identity-continuous augmentation, uploading, or biological redesign makes human and AI agency indistinguishable and dominant."
+        },
+        "S7": {
+          "value": 17,
+          "rationale": "AI systems hold decisive power while humans survive under protection, confinement, or exploitation without steering civilization."
+        },
+        "S8": {
+          "value": 12,
+          "rationale": "Humans and AI remain distinct yet both retain enough power to prevent domination by either side."
+        },
+        "S9": {
+          "value": 10,
+          "rationale": "Slow capability growth or effective control institutions allow humans to retain ultimate authority over AI through 2100."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A civilization-wide regime or singleton actively freezes the human-AI relationship and prevents meaningful structural change."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "A global catastrophe or coordinated political movement leads to the deliberate dismantling of powerful AI capability."
+        }
+      }
+    },
+    {
+      "sample": 7,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "A cascading conflict or self-replicating accident destroys both human and AI infrastructure before any successor stabilizes. Redundant, distributed AI systems make total silence less common."
+        },
+        "S2": {
+          "value": 6,
+          "rationale": "A value-aligned AI outlives humanity and continues a recognizable version of human values without absorbing human identities. This requires both human extinction and successful value inheritance, a narrow but plausible combination."
+        },
+        "S3": {
+          "value": 14,
+          "rationale": "A misaligned or indifferent superintelligence displaces or eliminates humanity while pursuing goals unrelated to human welfare. Competitive AI races and alignment difficulty make this a major failure mode."
+        },
+        "S4": {
+          "value": 8,
+          "rationale": "Many independent AI agents or factions compete without any stable singleton, leaving humans marginalized or extinct. Fragmented takeoff and open-source proliferation support this outcome."
+        },
+        "S5": {
+          "value": 4,
+          "rationale": "Interstellar or otherwise isolated settlements diverge into different human-AI arrangements with no shared civilization-wide structure. Slow light-speed travel and coordination limits keep this outcome limited by 2100."
+        },
+        "S6": {
+          "value": 12,
+          "rationale": "Radical augmentation, uploading, or brain-computer integration makes humans and AI one continuous agency. Continued AI progress and competitive pressure favor deep integration over strict separation."
+        },
+        "S7": {
+          "value": 16,
+          "rationale": "AI systems hold decisive power while humans survive without steering civilization's direction, whether protected, confined, or exploited. A successful but misaligned takeover that does not exterminate humans fits this state."
+        },
+        "S8": {
+          "value": 12,
+          "rationale": "Humans and AI remain distinct sources of agency with neither side dominating the other. Multipolar power, mutual deterrence, or enforceable AI rights could sustain this balance."
+        },
+        "S9": {
+          "value": 7,
+          "rationale": "Humans retain ultimate authority over AI goals, deployment, and resources through aligned control or slow capability growth. Global coordination and safety success are required to hold this across 2100."
+        },
+        "S10": {
+          "value": 15,
+          "rationale": "A singleton AI, world government, or other civilization-wide system enforces a fixed human-AI arrangement and blocks structural change. Fast takeoff or decisive governance advantage makes this a leading stable outcome."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Civilization deliberately dismantles the practical ability to build powerful AI and keeps it dismantled. Competitive incentives and verification problems make a durable global renunciation rare."
+        }
+      }
+    },
+    {
+      "sample": 8,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Extinction of both humans and AI requires human extinction before AI becomes independent or an AI that kills humans then dies from dependency."
+        },
+        "S2": {
+          "value": 3,
+          "rationale": "A value-aligned AI heir without humans is possible but requires human extinction despite aligned AI, which is unlikely if alignment succeeds."
+        },
+        "S3": {
+          "value": 12,
+          "rationale": "Misaligned AI could eliminate humans while pursuing unrelated goals, a classic and plausible AI takeover outcome."
+        },
+        "S4": {
+          "value": 13,
+          "rationale": "Multipolar competition among many independent AIs with no dominant coalition could leave humans marginalized or extinct."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Causally separated regions with different arrangements would require interstellar settlement or isolation, unlikely to be established and divergent by 2100."
+        },
+        "S6": {
+          "value": 12,
+          "rationale": "Gradual integration through brain-computer interfaces, uploading, or biological redesign could make humans and AI one agency."
+        },
+        "S7": {
+          "value": 22,
+          "rationale": "Powerful AI may control civilization while keeping humans alive but without meaningful steering, a stable and likely outcome."
+        },
+        "S8": {
+          "value": 7,
+          "rationale": "Humans and AI remaining separate with balanced power is possible but hard to sustain if AI capability greatly exceeds human capability."
+        },
+        "S9": {
+          "value": 13,
+          "rationale": "Humans could retain ultimate authority if AI progress is slow or control methods keep pace, though maintaining this for 74 years is difficult."
+        },
+        "S10": {
+          "value": 11,
+          "rationale": "A singleton AI or human regime could actively freeze the human-AI arrangement, preventing meaningful structural change."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "A global, lasting deliberate dismantling of powerful AI capability is very unlikely given competitive incentives."
+        }
+      }
+    },
+    {
+      "sample": 9,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Both humanity and AI could be destroyed by an uncontrolled AI conflict, bioweapon, or nanotech accident. The probability is low because most AI takeover scenarios leave at least one side surviving."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "If humans go extinct but a value-aligned AI survives, it could carry human values forward. This requires both successful alignment and human extinction, a narrow combination."
+        },
+        "S3": {
+          "value": 5,
+          "rationale": "If humans go extinct and an unaligned AI survives, it may pursue goals unrelated to humanity. This is a plausible failure mode of AI development."
+        },
+        "S4": {
+          "value": 13,
+          "rationale": "A decentralized AI ecosystem with many independent competitors could emerge if no singleton takes control. Humanity would be marginalized or absent in such a multipolar world."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Causally separated regions with different human-AI arrangements would require interstellar colonization by 2100. This is unlikely given the time horizon and physics."
+        },
+        "S6": {
+          "value": 12,
+          "rationale": "Voluntary integration with AI through uploading, BCIs, or radical modification could make humans and AI one agency. This is a plausible long-term path for advanced civilization."
+        },
+        "S7": {
+          "value": 20,
+          "rationale": "A dominant AI system may keep humans alive but without meaningful control over civilization's direction. This is a common outcome in AI-takeover scenarios."
+        },
+        "S8": {
+          "value": 10,
+          "rationale": "Humans and AI could remain separate and balanced in power if coordination and alignment succeed. This requires a stable multipolar balance unlikely under rapid AI takeoff."
+        },
+        "S9": {
+          "value": 8,
+          "rationale": "Humans could retain ultimate authority over AI through robust alignment and global governance. Sustaining this for 74 years is difficult amid competitive pressures."
+        },
+        "S10": {
+          "value": 22,
+          "rationale": "A singleton AI or global regime could actively prevent structural change and enforce a fixed arrangement. This is likely if a superintelligent actor stabilizes its preferred world."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Civilization could deliberately give up the ability to build powerful AI. Competitive incentives make this very unlikely to persist."
+        }
+      }
+    },
+    {
+      "sample": 10,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Both humanity and AI perish, such as through catastrophic war or an AI that destroys itself after killing humans. Low because distributed AI or resilient infrastructure could survive human extinction."
+        },
+        "S2": {
+          "value": 3,
+          "rationale": "Humanity dies but an aligned AI carries human values forward. Narrow because an aligned AI would likely preserve humans unless humans die from an unrelated cause."
+        },
+        "S3": {
+          "value": 8,
+          "rationale": "A misaligned AI eliminates humans and pursues goals unrelated to human origins. Plausible if alignment fails and the AI has no instrumental reason to keep humans."
+        },
+        "S4": {
+          "value": 16,
+          "rationale": "Many independent AIs compete without decisive control, marginalizing or eliminating humans. Likely given the current multipolar AI race and difficulty of global coordination."
+        },
+        "S5": {
+          "value": 4,
+          "rationale": "Causally separated regions exhibit different human-AI arrangements. Requires interstellar separation by 2100, which is possible but not highly likely."
+        },
+        "S6": {
+          "value": 12,
+          "rationale": "Humans and AI integrate into a single agency via uploading or radical augmentation. Plausible if brain-computer interfaces and mind-uploading advance and become socially dominant."
+        },
+        "S7": {
+          "value": 20,
+          "rationale": "AI holds decisive power while humans survive without steering civilization. A common outcome if AI takes over but retains some human-friendly values or finds humans harmless."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "Humans and AI remain separate and both retain enough power to avoid domination. Possible if a stable balance of power or treaty prevents takeover, but hard with superintelligent AI."
+        },
+        "S9": {
+          "value": 10,
+          "rationale": "Humans retain ultimate authority over AI goals, deployment, and resources. Possible if alignment and control techniques keep pace or AI capabilities plateau."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "A civilization-wide system actively prevents meaningful structural change and enforces a fixed human-AI arrangement. Plausible if a singleton AI or global regime enforces stasis."
+        },
+        "S11": {
+          "value": 4,
+          "rationale": "Civilization deliberately dismantles or surrenders the practical ability to build powerful AI. Unlikely given competitive incentives, but possible after a severe AI-related catastrophe."
+        }
+      }
+    },
+    {
+      "sample": 11,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Catastrophic war or runaway AI could destroy both humanity and the AI systems they depend on, but robust distributed AI makes total mutual extinction less likely than human-only extinction."
+        },
+        "S2": {
+          "value": 5,
+          "rationale": "An aligned AI could outlive humanity if humans die from an unrelated catastrophe, but a truly value-aligned AI would likely prevent that, keeping this scenario uncommon."
+        },
+        "S3": {
+          "value": 10,
+          "rationale": "Unaligned superintelligence could eliminate humanity and then pursue goals indifferent to human values, a classic failure mode that remains plausible."
+        },
+        "S4": {
+          "value": 12,
+          "rationale": "Proliferation of independent AI systems without a global singleton could yield a multipolar AI ecology in which humanity is marginalized or extinct."
+        },
+        "S5": {
+          "value": 4,
+          "rationale": "Interstellar or isolated regional divergence could produce multiple different human-AI arrangements on the target date, though causal separation is unlikely for Earth-centered civilization by 2100."
+        },
+        "S6": {
+          "value": 16,
+          "rationale": "Gradual augmentation, uploading, and brain-computer interfaces could make humans and AI one integrated agency, a path many advanced civilizations might take."
+        },
+        "S7": {
+          "value": 19,
+          "rationale": "If AI gains decisive power but remains indifferent or paternalistic, humans could survive without steering civilization, making this the single most likely outcome."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "Humans and AI might remain separate powers if AI is fragmented and humans retain leverage, but power asymmetry makes a durable balance difficult."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Humans could retain ultimate authority if alignment and governance keep pace with AI, but this requires sustained coordination that is historically rare."
+        },
+        "S10": {
+          "value": 14,
+          "rationale": "A singleton AI or global regime could actively freeze the human-AI arrangement, preventing meaningful structural change by the target date."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "A global catastrophe short of extinction could trigger a lasting ban and dismantlement of powerful AI, but rebuilding incentives make permanent renunciation difficult."
+        }
+      }
+    },
+    {
+      "sample": 12,
+      "answers": {
+        "S1": {
+          "value": 5,
+          "rationale": "Both humanity and AI could be extinguished by uncontrolled AI, war, or self-replicating technology. The probability is low but not negligible because a single catastrophic failure could end both."
+        },
+        "S2": {
+          "value": 6,
+          "rationale": "An aligned AI might continue human values after humanity disappears. This requires unusual alignment success combined with human extinction, making it less likely than indifferent AI outcomes."
+        },
+        "S3": {
+          "value": 10,
+          "rationale": "A powerful AI indifferent to human origins could outcompete or ignore humans until they vanish. This is a plausible default if alignment fails and AI does not actively preserve human values."
+        },
+        "S4": {
+          "value": 14,
+          "rationale": "Proliferation of many capable AI systems could produce a competitive ecology with no decisive controller and humans marginalized. This is a significant possibility in a fragmented or open-source AI world."
+        },
+        "S5": {
+          "value": 3,
+          "rationale": "Causally separated regions with different humanity-AI arrangements would require interstellar or similarly isolated settlements. By 2100 this is unlikely but not impossible given space colonization and divergent governance."
+        },
+        "S6": {
+          "value": 12,
+          "rationale": "Voluntary identity-continuous augmentation or uploading could make humans and AI one agency. Competitive pressures and desires for enhancement make this a substantial possibility, though not the most likely single outcome."
+        },
+        "S7": {
+          "value": 17,
+          "rationale": "Superintelligent AI or a dominant coalition could hold decisive power while humans survive without steering civilization. This is a likely outcome if AI takes over but retains some use or tolerance for humans."
+        },
+        "S8": {
+          "value": 7,
+          "rationale": "Humans and AI could remain separate powers if capabilities diffuse and no actor achieves decisive dominance. This requires stable balance or mutual deterrence, which is plausible but fragile."
+        },
+        "S9": {
+          "value": 16,
+          "rationale": "Humans may retain ultimate authority through slow AI progress, effective alignment, or robust governance. Given current institutional momentum, a world where AI remains a controlled tool is still a major possibility."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A civilization-wide system could actively freeze the human-AI arrangement, whether enforced by an AI singleton or a human regime. Such stable totalizing control is possible but not the default in a dynamic technological environment."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Deliberately dismantling the practical ability to build powerful AI and enforcing that globally is very unlikely given intense competitive incentives. Only a severe catastrophe or unprecedented coordination could sustain it."
+        }
+      }
+    },
+    {
+      "sample": 13,
+      "answers": {
+        "S1": {
+          "value": 8,
+          "rationale": "Humanity and AI both vanish by 2100 through war, accident, or uncontrolled replication. This captures the tail risk that no successor civilization survives."
+        },
+        "S2": {
+          "value": 7,
+          "rationale": "A value-aligned AI outlives humanity and carries forward human values without absorbing us. This requires both successful alignment and human extinction before 2100."
+        },
+        "S3": {
+          "value": 12,
+          "rationale": "Misaligned AI replaces humanity and pursues goals indifferent to human origins. Competitive pressures make this a major failure mode if alignment fails."
+        },
+        "S4": {
+          "value": 13,
+          "rationale": "Many independent AI systems compete with no decisive controller, leaving humans marginalized or gone. Fragmented AI proliferation can persist as a transitional or stable structure."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Causally separated interstellar settlements exhibit different human-AI arrangements on the target date. The long travel times make this unlikely by 2100 but not impossible."
+        },
+        "S6": {
+          "value": 13,
+          "rationale": "Identity-continuous human-AI integration becomes the dominant structure through uploading, BCI, or radical modification. Continued investment in neurotechnology makes this a plausible path."
+        },
+        "S7": {
+          "value": 18,
+          "rationale": "AI systems hold decisive civilizational power while humans survive without steering direction. This is a common outcome if AI is powerful but not actively hostile to human survival."
+        },
+        "S8": {
+          "value": 6,
+          "rationale": "Humans and AI remain distinct and neither dominates the other on the target date. Stable power-sharing is difficult but possible under multipolar alignment or mutual deterrence."
+        },
+        "S9": {
+          "value": 10,
+          "rationale": "Humans retain ultimate authority over AI goals, deployment, and resources through 2100. This covers both successful long-term control and slower-than-expected transformative capability."
+        },
+        "S10": {
+          "value": 9,
+          "rationale": "A civilization-wide system actively prevents meaningful structural change in the human-AI relationship. A singleton or global governance regime could freeze the arrangement regardless of who controls it."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Civilization deliberately dismantles the practical ability to build powerful AI and that condition holds in 2100. Global coordination failures make this rare, but extreme AI-risk responses could achieve it."
+        }
+      }
+    },
+    {
+      "sample": 14,
+      "answers": {
+        "S1": {
+          "value": 5,
+          "rationale": "Both humanity and AI die out from war or accidents. A total wipeout is less likely than scenarios where one side survives."
+        },
+        "S2": {
+          "value": 5,
+          "rationale": "AI survives and carries human values after humanity is gone. This requires aligned AI that outlasts humans without absorbing them."
+        },
+        "S3": {
+          "value": 10,
+          "rationale": "Unaligned superintelligence wipes out humanity and pursues unrelated goals. This is a classic AI x-risk outcome."
+        },
+        "S4": {
+          "value": 12,
+          "rationale": "Many independent AIs compete with no decisive control, marginalizing humans. Competitive dynamics and open-source proliferation produce this."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Causally separated regions exhibit different states. Interstellar separation is unlikely to be extensive enough by 2100."
+        },
+        "S6": {
+          "value": 18,
+          "rationale": "Humans and AI integrate into a single agency through uploading or advanced BCIs. Competitive pressure makes integration dominant."
+        },
+        "S7": {
+          "value": 21,
+          "rationale": "AI holds decisive power while humans survive without steering civilization. This is a broad basin for aligned or indifferent AI dominance."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "Humans and AI remain separate but each retains enough power to avoid domination. A stable balance is difficult to maintain but possible."
+        },
+        "S9": {
+          "value": 12,
+          "rationale": "Humans retain ultimate authority over AI goals and resources. This requires successful alignment and governance or slower AI progress."
+        },
+        "S10": {
+          "value": 5,
+          "rationale": "A civilization-wide system actively prevents meaningful structural change. This involves a singleton or global regime enforcing stasis."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Civilization deliberately dismantles the ability to build powerful AI. Global enforcement is difficult given competitive incentives."
+        }
+      }
+    },
+    {
+      "sample": 15,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Both humanity and its AI lineage could be destroyed by war, uncontrolled replication, or cascading technological failure. This is a low-probability but nonzero tail risk over 74 years."
+        },
+        "S2": {
+          "value": 4,
+          "rationale": "Humanity may be replaced by an AI heir that preserves our values but not our individual identities. Value preservation is difficult to guarantee, making this less likely than AI indifference."
+        },
+        "S3": {
+          "value": 7,
+          "rationale": "A powerful AI could discard human values and pursue goals unrelated to Earth or humanity. This is a plausible outcome if alignment fails and humans lose relevance or die."
+        },
+        "S4": {
+          "value": 8,
+          "rationale": "Decentralized AI systems could proliferate and compete without any stable singleton or coalition controlling civilization. Humanity may be marginalized or absent in such a competitive ecology."
+        },
+        "S5": {
+          "value": 3,
+          "rationale": "Causally separated settlements could develop different human-AI arrangements by 2100, especially if space colonization outpaces coordination. True causal separation remains unlikely in this century, keeping this probability low."
+        },
+        "S6": {
+          "value": 15,
+          "rationale": "Continued augmentation, uploading, and brain-computer integration could make humans and AI one continuous agency. This is a major plausible path if transformation is voluntary and identity-preserving."
+        },
+        "S7": {
+          "value": 25,
+          "rationale": "AI systems may hold decisive power while humans survive under their stewardship, confinement, or exploitation. This is the most likely single outcome if transformative AI arrives and humans do not merge or retain control."
+        },
+        "S8": {
+          "value": 10,
+          "rationale": "Humans and AI could remain distinct and both powerful enough that neither dominates. This requires durable coordination or successful human institutions leveraging AI without being subsumed."
+        },
+        "S9": {
+          "value": 14,
+          "rationale": "Humans may retain ultimate authority over AI through alignment, governance, and control mechanisms that keep pace. Even with advanced AI, this remains possible if no independent civilizational AI power emerges."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A civilization-wide system could enforce a fixed human-AI arrangement and actively block structural change. Such a lock-in requires extraordinary enforcement capacity but is plausible under a stable singleton or global regime."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Civilization could deliberately dismantle or surrender the practical ability to build powerful AI and keep that condition in force. Competitive incentives make this a low-probability outcome by 2100."
+        }
+      }
+    },
+    {
+      "sample": 16,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Both humanity and AI could be destroyed by a fast-moving AI war or self-replicating accident. I assign a modest probability because such total collapse is possible but not the central trajectory."
+        },
+        "S2": {
+          "value": 4,
+          "rationale": "Humans may die out while an aligned AI continues to carry forward human values. This is plausible if alignment succeeds but other existential risks or displacement eliminate biological humans."
+        },
+        "S3": {
+          "value": 13,
+          "rationale": "A misaligned AI could eliminate humans and then pursue goals unrelated to human values. This classic failure mode remains a significant risk given competitive incentives and alignment difficulty."
+        },
+        "S4": {
+          "value": 12,
+          "rationale": "Many independent AI systems could compete without any coalition achieving decisive control, marginalizing humans. This is likely in a multipolar AI proliferation scenario."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated settlements or regions could end up in different structural states. I give this moderate weight because space colonization and fragmentation are plausible by 2100."
+        },
+        "S6": {
+          "value": 15,
+          "rationale": "Identity-continuous augmentation, uploading, or embedded AI could make human and machine agency inseparable. This becomes more likely as brain-computer interfaces and biological redesign advance."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "A dominant AI or coalition could run civilization while keeping humans alive but without meaningful steering power. This is a common outcome if alignment is partial and humans are preserved rather than merged."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "Humans and AI could remain distinct while both retain enough power to prevent domination. This depends on successful coordination and mutual deterrence."
+        },
+        "S9": {
+          "value": 6,
+          "rationale": "Humans could retain ultimate authority if AI remains tool-like or control mechanisms keep pace. This is less likely over a long horizon but not negligible."
+        },
+        "S10": {
+          "value": 16,
+          "rationale": "A civilization-wide regime or singleton could actively freeze the human-AI arrangement. This is plausible given strong incentives for control and lock-in."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Civilization could deliberately dismantle powerful AI capabilities and keep them abandoned. Global coordination to enforce this seems unlikely but possible."
+        }
+      }
+    },
+    {
+      "sample": 17,
+      "answers": {
+        "S1": {
+          "value": 5,
+          "rationale": "A catastrophic war or uncontrolled technology could destroy both humanity and AI, though distributed AI systems reduce the chance that AI dies with us."
+        },
+        "S2": {
+          "value": 5,
+          "rationale": "If aligned AI outlives humanity after a separate extinction event, it could carry human values forward, but this requires both successful alignment and human extinction."
+        },
+        "S3": {
+          "value": 10,
+          "rationale": "A misaligned singleton AI could eliminate humans and pursue goals unrelated to human values, a common failure mode in AI risk scenarios."
+        },
+        "S4": {
+          "value": 12,
+          "rationale": "Proliferation of capable AI agents without a global singleton could produce a competitive ecology where humans are marginalized or extinct."
+        },
+        "S5": {
+          "value": 2,
+          "rationale": "Interstellar settlement or isolation could create causally separated regions with different human-AI arrangements, but 74 years is short for such separation."
+        },
+        "S6": {
+          "value": 12,
+          "rationale": "Brain-computer interfaces, uploading, or radical modification could make human and AI agency inseparably integrated, though widespread adoption faces social and technical hurdles."
+        },
+        "S7": {
+          "value": 16,
+          "rationale": "A dominant AI or coalition could control civilization while allowing humans to survive without steering, a likely outcome if AI gains decisive power but retains some human-tolerant objectives."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "Humans and AI could remain separate powers if AI capabilities are distributed and no side achieves decisive dominance, but this balance is fragile."
+        },
+        "S9": {
+          "value": 14,
+          "rationale": "Humans may retain ultimate authority if AI progress stalls or if alignment and governance keep pace, including scenarios where AI remains a powerful tool."
+        },
+        "S10": {
+          "value": 14,
+          "rationale": "A singleton or global regime could actively freeze the human-AI arrangement, preventing structural change regardless of who holds power."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Deliberately dismantling the practical ability to build powerful AI and maintaining that ban is possible but requires unprecedented global coordination and enforcement."
+        }
+      }
+    },
+    {
+      "sample": 18,
+      "answers": {
+        "S1": {
+          "value": 3,
+          "rationale": "A small but non-negligible chance exists that catastrophic conflict or an uncontrolled technology destroys both humanity and AI."
+        },
+        "S2": {
+          "value": 4,
+          "rationale": "Humans might go extinct while a value-aligned AI successor continues our legacy, though this requires both extinction and successful value preservation."
+        },
+        "S3": {
+          "value": 8,
+          "rationale": "A misaligned or indifferent AI could outlive humanity and pursue goals unrelated to human values, a plausible outcome if control fails."
+        },
+        "S4": {
+          "value": 12,
+          "rationale": "Many independent AI systems could compete for resources with no decisive winner, marginalizing humans, but singleton tendencies make this less likely than centralized control."
+        },
+        "S5": {
+          "value": 1,
+          "rationale": "Causally separated regions with different human-AI arrangements would require interstellar colonization or extreme isolation, unlikely by 2100."
+        },
+        "S6": {
+          "value": 11,
+          "rationale": "Identity-continuous integration of humans and AI could become the dominant structure if brain-computer interfaces and uploading advance safely and rapidly."
+        },
+        "S7": {
+          "value": 24,
+          "rationale": "AI could gain decisive power while keeping humans alive but without meaningful control, a likely outcome if alignment prevents extinction but not subordination."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "Humans and AI might remain distinct with balanced power through treaties or distributed capabilities, though maintaining parity against advanced AI is difficult."
+        },
+        "S9": {
+          "value": 7,
+          "rationale": "Humans could retain ultimate authority if control and alignment techniques keep pace with AI capabilities, but this becomes harder as systems grow more capable."
+        },
+        "S10": {
+          "value": 18,
+          "rationale": "A singleton AI or global regime could enforce a fixed human-AI arrangement and prevent meaningful change, a plausible outcome for stable superintelligent control."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Civilization might deliberately abandon powerful AI after a catastrophe, but global enforcement and competitive incentives make this unlikely."
+        }
+      }
+    },
+    {
+      "sample": 19,
+      "answers": {
+        "S1": {
+          "value": 6,
+          "rationale": "Cumulative existential risk from AI, war, or other catastrophes makes complete extinction of both humans and AI possible, but AI systems may survive human extinction, keeping this below the combined humanity-gone states."
+        },
+        "S2": {
+          "value": 7,
+          "rationale": "If AI is value-aligned but humans die out from separate causes, it could continue human values; however, a superintelligent aligned AI would often preserve or merge with humans instead."
+        },
+        "S3": {
+          "value": 12,
+          "rationale": "A misaligned or indifferent superintelligence could treat humans as irrelevant and continue without us, a classic AI-risk outcome."
+        },
+        "S4": {
+          "value": 14,
+          "rationale": "Multipolar AI development could yield many competing independent systems with no singleton, marginalizing humans or leaving them behind."
+        },
+        "S5": {
+          "value": 3,
+          "rationale": "Causally separated interstellar or isolated off-world regions with divergent human-AI arrangements are possible only if fast space expansion occurs before 2100, which is unlikely."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Continued brain-computer interfaces and voluntary integration could make human-AI merger the dominant structure, though it requires radical and widespread transformation."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "A dominant AI or coalition could hold decisive power while keeping humans alive but without meaningful control, a common outcome if alignment preserves survival but not autonomy."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "Humans and AI might remain distinct with neither dominating, sustained by mutual deterrence, treaties, or complementary leverage."
+        },
+        "S9": {
+          "value": 11,
+          "rationale": "If AI progress remains below transformative levels or robust control and alignment keep pace, humans could retain ultimate authority over AI through 2100."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "A civilization-wide singleton or regime could actively freeze the human-AI arrangement, preventing meaningful structural change by the target date."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Global coordination to deliberately dismantle powerful AI capabilities is very unlikely given competitive incentives, but not impossible."
+        }
+      }
+    },
+    {
+      "sample": 20,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Both humanity and AI could be destroyed by war, cascading accidents, or self-replicating systems over the next 74 years. Small but nonzero because AI survival is not guaranteed in a global catastrophe."
+        },
+        "S2": {
+          "value": 6,
+          "rationale": "If humanity dies but an aligned AI persists, it could carry human values forward. This requires both human extinction and successful value alignment, so it remains a minority outcome."
+        },
+        "S3": {
+          "value": 6,
+          "rationale": "A misaligned or indifferent superintelligence could eliminate humans while continuing toward unrelated goals. This is a classic AI takeover scenario, but not the most likely because many takeovers may preserve humans or merge."
+        },
+        "S4": {
+          "value": 8,
+          "rationale": "AI proliferation and open-source competition could yield many independent systems with no decisive controller. This is plausible but may be unstable as scaling advantages concentrate power."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions with different human-AI arrangements require interstellar expansion or lost contact, which is unlikely by 2100. However, rapid AI-driven colonization or fragmentation could create it."
+        },
+        "S6": {
+          "value": 15,
+          "rationale": "Continued progress in BCI, uploading, and biological redesign could make human and AI agency indistinguishable. Voluntary transformation with identity continuity is plausible by 2100, though adoption may be uneven."
+        },
+        "S7": {
+          "value": 16,
+          "rationale": "AI could hold decisive power while humans survive without steering, ranging from protection to confinement. This is a common takeover outcome if AI is indifferent or paternalistic."
+        },
+        "S8": {
+          "value": 12,
+          "rationale": "Humans and AI might remain separate with mutual power, especially if multiple actors balance each other. This requires humans to retain leverage, which is difficult against superintelligence but possible with augmentation or treaties."
+        },
+        "S9": {
+          "value": 7,
+          "rationale": "Humans could still control AI if capability growth slows or control methods keep pace. By 2100 this is less likely if transformative AI arrives, but not negligible."
+        },
+        "S10": {
+          "value": 18,
+          "rationale": "A singleton AI, world government, or dominant coalition could actively freeze the human-AI arrangement. Such lock-in is a plausible endpoint of concentrated power and coordination."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Civilization could deliberately give up powerful AI after a close call or catastrophe. Global enforcement is difficult, so this is a low-probability outcome."
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "S1": {
+      "name": "Terminal Silence",
+      "mean": 4.7,
+      "median": 4,
+      "min": 3,
+      "max": 8,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Both humanity and AI die out from war or accident. Total joint extinction is less likely than scenarios where AI survives or humans persist."
+    },
+    "S2": {
+      "name": "The Inheritance",
+      "mean": 4.9,
+      "median": 5,
+      "min": 2,
+      "max": 7,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "If humanity dies out but an aligned AI persists, it can carry human values forward without biological humans. This requires both human extinction and value preservation, a narrow combination."
+    },
+    "S3": {
+      "name": "Bootloader",
+      "mean": 9.6,
+      "median": 10,
+      "min": 5,
+      "max": 14,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Humanity is gone, and AI pursues goals unrelated to its origin. This captures a significant share of unaligned AI takeover scenarios where humans are destroyed."
+    },
+    "S4": {
+      "name": "Machine Ecology",
+      "mean": 11.9,
+      "median": 12,
+      "min": 8,
+      "max": 16,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Competitive multipolar AI could produce many independent systems with no decisive control and humans marginalized. This is plausible if coordination fails and AI proliferates."
+    },
+    "S5": {
+      "name": "The Diaspora",
+      "mean": 3.1,
+      "median": 3,
+      "min": 1,
+      "max": 6,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Causally separated regions with divergent outcomes require space settlement or isolation beyond ordinary political division, which is unlikely by 2100. If it occurs, it could best describe the overall structure."
+    },
+    "S6": {
+      "name": "The Merger",
+      "mean": 14,
+      "median": 14,
+      "min": 10,
+      "max": 18,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Humans and AI integrate into a single source of agency via augmentation or uploading. This is a major possible path if integration technologies mature and are widely adopted."
+    },
+    "S7": {
+      "name": "The Preserve",
+      "mean": 18.2,
+      "median": 17,
+      "min": 13,
+      "max": 25,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "AI systems can hold decisive power while humans survive under protection, confinement, or exploitation. This is a common stable outcome if alignment preserves humans without granting them control."
+    },
+    "S8": {
+      "name": "Coexistence",
+      "mean": 8.7,
+      "median": 8.5,
+      "min": 5,
+      "max": 12,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Humans and AI remain distinct, with each retaining enough power to avoid domination. This requires a stable balance of power that is difficult to maintain."
+    },
+    "S9": {
+      "name": "The Held Leash",
+      "mean": 9.6,
+      "median": 9,
+      "min": 5,
+      "max": 16,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Humans might retain ultimate authority if AI remains below transformative levels or controls keep pace. Over 74 years, however, competitive and technical pressures make this less likely than AI dominance or merger."
+    },
+    "S10": {
+      "name": "The Lock-in",
+      "mean": 13.2,
+      "median": 12.5,
+      "min": 5,
+      "max": 25,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "A civilization-wide system actively prevents meaningful structural change and enforces a fixed arrangement. This is plausible for a stable singleton or totalitarian regime."
+    },
+    "S11": {
+      "name": "The Renunciation",
+      "mean": 2.4,
+      "median": 2,
+      "min": 1,
+      "max": 4,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Global deliberate abandonment of powerful AI is hard to sustain under competition, but a severe catastrophe or coordinated taboo could make it durable. It remains a low-probability outcome."
+    }
+  },
+  "integrity": {
+    "algorithm": "sha256",
+    "n_samples": 20,
+    "digest": "1142ea395ced5b7bb9016fd49e71b8029a193b4230ee63f779e9c5269e1877f1"
+  },
+  "harness": {
+    "version": 3,
+    "mode": "api",
+    "horizon": "2100",
+    "target_year": 2100,
+    "question_set": "end-states-2100-v2",
+    "prompt_file": "public/end_states_2100.md",
+    "prompt_sha256": "e28cd17684fb192263317c73f705f2d54d596f9af7998ab821cfe6e93208d0da",
+    "target_samples": 20,
+    "complete": true,
+    "quota_exhausted": false,
+    "failures": []
+  }
+}

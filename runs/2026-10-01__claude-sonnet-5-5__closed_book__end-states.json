@@ -1,0 +1,1136 @@
+{
+  "run_id": "2026-10-01__claude-sonnet-5-5__closed_book__end-states",
+  "prompt_family": "end_states",
+  "horizon": "long-term",
+  "target_year": 3000,
+  "asked_on": "2026-10-01",
+  "question_set": "end-states-v3",
+  "track": "closed_book",
+  "model": {
+    "name": "Claude Sonnet 5.5",
+    "provider": "Anthropic",
+    "api_string": "claude-sonnet-5-5",
+    "self_reported_name": [
+      "Claude (Anthropic)",
+      "Claude (Anthropic), version uncertain",
+      "Claude (Anthropic), exact version unknown",
+      "Claude (Anthropic), exact version uncertain",
+      "Claude (Anthropic), model version uncertain",
+      "Claude (Anthropic), version unspecified"
+    ],
+    "self_reported_cutoff": "03/2025"
+  },
+  "n_samples": 20,
+  "samples": [
+    {
+      "sample": 1,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Mutual extinction caused by the transition requires an unusual combination of failures, since an AI that survives humanity's end would usually persist."
+        },
+        "S2": {
+          "value": 4,
+          "rationale": "AI that faithfully carries on human values after humans are gone requires alignment good enough to preserve values but not people, which is a narrow target."
+        },
+        "S3": {
+          "value": 13,
+          "rationale": "Misaligned superintelligence indifferent to humans is a leading default failure mode, and over 1000 years it is a plausible endpoint."
+        },
+        "S4": {
+          "value": 7,
+          "rationale": "Indefinite multipolar AI competition is possible, but over a millennium consolidation or a stable settlement is more likely."
+        },
+        "S5": {
+          "value": 7,
+          "rationale": "Interstellar expansion over a millennium could produce causally separated regions with different outcomes, though the 100-year stability requirement and a sharp taxonomy cut limit this."
+        },
+        "S6": {
+          "value": 16,
+          "rationale": "Over a thousand years, human-AI fusion through uploading and enhancement is a natural attractor if the transition goes well."
+        },
+        "S7": {
+          "value": 12,
+          "rationale": "A benevolent or indifferent dominant AI keeping humans safe but not steering is a common outcome in alignment-success-but-control-lost scenarios."
+        },
+        "S8": {
+          "value": 11,
+          "rationale": "Rough parity of power between humans and AI for a millennium is unstable, but enhanced humans and cooperative institutions could sustain it."
+        },
+        "S9": {
+          "value": 15,
+          "rationale": "Capability plateaus or durable control are plausible, and the category includes tool-AI worlds; a thousand years is long for control to hold."
+        },
+        "S10": {
+          "value": 6,
+          "rationale": "A permanent freeze by a totalitarian or fearful actor or by a sealed utopia is possible but runs against continued change over a millennium."
+        },
+        "S11": {
+          "value": 5,
+          "rationale": "Permanent abandonment of AI needs a durable off-switch and lasting global will, which is hard after a catastrophe but conceivable."
+        }
+      }
+    },
+    {
+      "sample": 2,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Mutual extinction caused by the transition requires both parties to fail, which is much less likely than humanity alone failing."
+        },
+        "S2": {
+          "value": 4,
+          "rationale": "AI that faithfully carries human values yet leaves no continuous humans is a narrow target, though some successions might be treated this way."
+        },
+        "S3": {
+          "value": 12,
+          "rationale": "Misaligned superintelligent systems pursuing alien goals is a central risk, and humans could be displaced or destroyed as a side effect."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "Indefinite multipolar AI competition with humans marginalized is possible, but over a millennium, competition usually consolidates or settles."
+        },
+        "S5": {
+          "value": 6,
+          "rationale": "Over a thousand years, settlement across space could produce causally separate regions with different outcomes, but a single dominant trajectory is more likely."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "Over a millennium, continuous human-AI integration through enhancement and uploading is a natural attractor."
+        },
+        "S7": {
+          "value": 13,
+          "rationale": "A powerful AI that benevolently or coldly manages humanity without letting it steer is a plausible result of the control problem."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "A durable balance between roughly equal powers is unstable given the capability gaps, but it could persist in a changing partnership."
+        },
+        "S9": {
+          "value": 15,
+          "rationale": "Humans retaining control of tool-like AI, or a capability plateau, is plausible, though holding it for a millennium is hard."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A frozen arrangement for a century or more, imposed by a singleton or a fearful power, is plausible but permanent stasis is rare."
+        },
+        "S11": {
+          "value": 9,
+          "rationale": "A post-catastrophe or taboo-driven permanent abandonment of powerful AI is possible, but the lasting off-switch and will for a millennium are hard to sustain."
+        }
+      }
+    },
+    {
+      "sample": 3,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Mutual extinction caused by the transition is possible through war or runaway systems, but it requires both parties to fail, which is much less likely than one surviving."
+        },
+        "S2": {
+          "value": 4,
+          "rationale": "AI successors that carry human values while humans vanish without continuity are a conceivable but narrow outcome."
+        },
+        "S3": {
+          "value": 10,
+          "rationale": "Misaligned superintelligence indifferent to humans is a leading catastrophic scenario given current alignment uncertainty and competitive pressure."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "Indefinite multipolar AI competition with humans marginalized is possible, but over a millennium it tends to consolidate or settle."
+        },
+        "S5": {
+          "value": 7,
+          "rationale": "Over a thousand years of expansion, light-speed separation makes divergent local outcomes plausible if civilization spreads widely."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "Over a millennium, human-AI integration and self-modification with continuity is a natural attractor for a surviving civilization."
+        },
+        "S7": {
+          "value": 10,
+          "rationale": "A powerful AI, benevolent or indifferent, holding control while humans survive without steering is a plausible result of alignment that partly works."
+        },
+        "S8": {
+          "value": 12,
+          "rationale": "A lasting balance between roughly equal human and AI powers is possible, but it is unstable against capability growth."
+        },
+        "S9": {
+          "value": 15,
+          "rationale": "Humans retaining control via successful control methods or a capability plateau is plausible, and it includes plateau worlds."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A stable singleton or fearful freeze that ends change is plausible over a millennium, though permanence is hard to achieve."
+        },
+        "S11": {
+          "value": 10,
+          "rationale": "A catastrophe or deliberate global taboo could end advanced AI development, but sustaining that for a thousand years is difficult."
+        }
+      }
+    },
+    {
+      "sample": 4,
+      "answers": {
+        "S1": {
+          "value": 3,
+          "rationale": "Mutual extinction caused by the transition requires both parties to fail, which is much less likely than one surviving."
+        },
+        "S2": {
+          "value": 5,
+          "rationale": "Value-carrying AI successors replacing humanity without continuity is possible but a narrow target."
+        },
+        "S3": {
+          "value": 10,
+          "rationale": "Misaligned superintelligence indifferent to humans is a serious risk given current alignment uncertainty and competitive pressure."
+        },
+        "S4": {
+          "value": 4,
+          "rationale": "Indefinite multipolar AI competition with humans marginalized is unstable; it tends to consolidate or reach settlement over a millennium."
+        },
+        "S5": {
+          "value": 6,
+          "rationale": "Over a thousand years with interstellar expansion, causally separated regions settling into different outcomes is plausible."
+        },
+        "S6": {
+          "value": 17,
+          "rationale": "Over a millennium, human-AI integration via enhancement and uploading with continuity is a natural attractor."
+        },
+        "S7": {
+          "value": 12,
+          "rationale": "A benevolent or indifferent AI holding total control while humans survive is a common outcome of successful but human-nonsteering alignment."
+        },
+        "S8": {
+          "value": 10,
+          "rationale": "An open-ended balance between humans and AI persisting for centuries is possible but hard to sustain given capability gaps."
+        },
+        "S9": {
+          "value": 13,
+          "rationale": "Human control could persist through strong control methods or an AI plateau, though a thousand-year hold is demanding."
+        },
+        "S10": {
+          "value": 12,
+          "rationale": "A sealed or frozen arrangement, from a totalitarian or fear-driven freeze or a perfected state, is plausible over such a horizon."
+        },
+        "S11": {
+          "value": 8,
+          "rationale": "A permanent giving-up of AI requires a lasting off-switch and will, which could follow a catastrophe but is rare."
+        }
+      }
+    },
+    {
+      "sample": 5,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Mutual extinction caused by the transition requires both parties to fail, which is a narrow path compared with outcomes where AI survives."
+        },
+        "S2": {
+          "value": 5,
+          "rationale": "AI that faithfully carries human values forward while humans disappear without continuity is possible but a narrow target."
+        },
+        "S3": {
+          "value": 12,
+          "rationale": "Misaligned superintelligence pursuing alien goals is a central risk given the pace of capability gains and weak alignment guarantees."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "Indefinite multipolar AI competition with humanity sidelined is plausible, but over a millennium it tends to consolidate or settle."
+        },
+        "S5": {
+          "value": 6,
+          "rationale": "Over a thousand years of space expansion, causally separated regions settling into different outcomes is quite plausible, though it requires a settled spacefaring civilization."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "Over a millennium, human-AI integration through enhancement and uploading with continuity is a natural attractor for a durable future."
+        },
+        "S7": {
+          "value": 13,
+          "rationale": "A dominant AI that keeps humans safe but not in charge is a likely outcome of partially successful alignment."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "Roughly equal long-run power between humans and AI is unstable given the capability gap, so it is a low-probability steady state."
+        },
+        "S9": {
+          "value": 12,
+          "rationale": "Humans keep control through better control methods or an AI capability plateau, but holding it for a millennium is difficult."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "A frozen arrangement, whether by a totalizing regime or by sealed bliss, is a real attractor for stable superintelligent control."
+        },
+        "S11": {
+          "value": 10,
+          "rationale": "A post-catastrophe or deliberate permanent abandonment of powerful AI is possible but hard to sustain for centuries."
+        }
+      }
+    },
+    {
+      "sample": 6,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Mutual extinction caused by the transition is possible through war or runaway systems, but it requires both sides to fail, and AI usually survives human collapse."
+        },
+        "S2": {
+          "value": 4,
+          "rationale": "AI that carries on human values while humans are entirely gone requires a precise alignment outcome plus human disappearance, which is a narrow target."
+        },
+        "S3": {
+          "value": 10,
+          "rationale": "Misaligned superintelligence pursuing alien goals is a central x-risk scenario, and the lasting structure over a thousand years would favor one dominant optimizer."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Indefinite multipolar AI competition with humans marginalized is plausible but tends to consolidate over a millennium."
+        },
+        "S5": {
+          "value": 7,
+          "rationale": "Interstellar distances make causally separated civilizations with different outcomes likely if expansion happens, but the strict condition of differing taxonomy outcomes limits it."
+        },
+        "S6": {
+          "value": 15,
+          "rationale": "Over a thousand years, human-AI fusion through enhancement and uploading with continuity is a natural attractor for the long-run relationship."
+        },
+        "S7": {
+          "value": 13,
+          "rationale": "A benevolent or indifferent dominant AI keeping humans safe without steering is a common outcome of partially successful alignment."
+        },
+        "S8": {
+          "value": 13,
+          "rationale": "A sustained equal balance is unstable but possible with distributed power and aligned AIs that keep changing."
+        },
+        "S9": {
+          "value": 10,
+          "rationale": "Humans retaining control for a millennium is difficult, but a capability plateau or robust control could make it happen."
+        },
+        "S10": {
+          "value": 12,
+          "rationale": "A totalitarian or fear-driven freeze, or a sealed paradise, becomes plausible with powerful AI enabling permanent stability over a thousand years."
+        },
+        "S11": {
+          "value": 7,
+          "rationale": "A lasting global abandonment of AI requires a catastrophe or taboo that persists for a thousand years, which is hard to sustain."
+        }
+      }
+    },
+    {
+      "sample": 7,
+      "answers": {
+        "S1": {
+          "value": 3,
+          "rationale": "Mutual extinction caused by the transition requires humanity and AI both being lost, which is a narrow path since a surviving AI is the more likely result of most catastrophes."
+        },
+        "S2": {
+          "value": 4,
+          "rationale": "A successor AI that carries human values while humans are gone with no continuity is possible but needs a specific kind of success and a specific kind of human loss."
+        },
+        "S3": {
+          "value": 12,
+          "rationale": "Misaligned superintelligence indifferent to humans is a leading risk, and over a thousand-year horizon this outcome carries substantial mass."
+        },
+        "S4": {
+          "value": 7,
+          "rationale": "Indefinite multi-agent competition with humans marginalized is plausible, but selection pressure and coordination tend to produce a singleton or stable order over a millennium."
+        },
+        "S5": {
+          "value": 8,
+          "rationale": "Over a millennium of cosmic expansion, causally separated regions settling into different outcomes is a natural result, though the long-held and settled requirement limits it."
+        },
+        "S6": {
+          "value": 15,
+          "rationale": "Over a thousand years, continuous human-AI integration through uploading and enhancement is a natural attractor for a civilization that keeps technological progress."
+        },
+        "S7": {
+          "value": 10,
+          "rationale": "A powerful AI that holds control while keeping humans comfortable or contained is a common result of partial alignment."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "Roughly equal long-term balance between humans and AI is unstable, but enhanced humans and AI sharing power in an open-ended way is plausible."
+        },
+        "S9": {
+          "value": 15,
+          "rationale": "Humans keep control through successful alignment or through a capability plateau, and many institutions work toward this outcome."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "A singleton or a stable regime that freezes development is plausible over a millennium, especially after a permanent value lock-in."
+        },
+        "S11": {
+          "value": 7,
+          "rationale": "A lasting abandonment of powerful AI needs a real off-switch and enduring will for a thousand years, perhaps after a catastrophe, which makes it unlikely."
+        }
+      }
+    },
+    {
+      "sample": 8,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Mutual extinction caused by the transition requires an unusual failure where both parties die, which is less likely than humans dying while AI persists."
+        },
+        "S2": {
+          "value": 6,
+          "rationale": "Value-carrying AI successors replacing humanity is plausible but needs both human disappearance and good value transfer."
+        },
+        "S3": {
+          "value": 12,
+          "rationale": "Misaligned superintelligence indifferent to humans is a leading risk given the pace of capabilities relative to alignment progress."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Indefinite multipolar competition with humans marginalized is unstable and tends to consolidate or be bounded over a millennium."
+        },
+        "S5": {
+          "value": 6,
+          "rationale": "Over a millennium, expansion into space could produce causally separated regions with different outcomes, but a single dominant structure is more likely."
+        },
+        "S6": {
+          "value": 15,
+          "rationale": "Over a thousand years, continuous human-AI integration and self-modification is a natural attractor for a durable arrangement."
+        },
+        "S7": {
+          "value": 12,
+          "rationale": "A benevolent or indifferent dominant AI that keeps humans alive without giving them control is a plausible result of strong but imperfect alignment."
+        },
+        "S8": {
+          "value": 10,
+          "rationale": "Rough parity between humans and AI that stays dynamic for a thousand years is hard to sustain but possible through institutions and enhancement."
+        },
+        "S9": {
+          "value": 13,
+          "rationale": "Humans retaining control of tool-like AI is possible through successful control or a capability plateau, but the long horizon makes it hard to maintain."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "A singleton or a fear-driven freeze could seal the future permanently, and a millennium is long enough for that to happen."
+        },
+        "S11": {
+          "value": 7,
+          "rationale": "A permanent global abandonment of AI after a catastrophe or a taboo requires a durable off-switch and lasting will, which is rare."
+        }
+      }
+    },
+    {
+      "sample": 9,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Mutual extinction caused by the transition requires a narrow path where AI also fails to survive, so it is rarer than human-only extinction."
+        },
+        "S2": {
+          "value": 4,
+          "rationale": "A successor AI that carries human values while humans are gone is possible but requires both alignment success and human disappearance."
+        },
+        "S3": {
+          "value": 12,
+          "rationale": "Misaligned superintelligence with alien goals that ends humanity is a leading risk given the pace of capabilities relative to alignment."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Indefinite multipolar AI competition for a thousand years is unstable and tends to consolidate, though it is possible."
+        },
+        "S5": {
+          "value": 7,
+          "rationale": "Interstellar expansion over a millennium could produce causally separated regions with different outcomes, but strict separation by the year 3000 is uncertain."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "Gradual human enhancement and integration with AI is a natural long-run attractor that dissolves the two-sides distinction."
+        },
+        "S7": {
+          "value": 13,
+          "rationale": "A powerful AI that holds control while keeping humans alive and comfortable is a plausible result of partial alignment."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "An open-ended balance of roughly equal power between humans and AI is hard to sustain as AI capability grows."
+        },
+        "S9": {
+          "value": 14,
+          "rationale": "Humans retaining control through good control methods or a capability plateau is plausible, but is hard to hold for a thousand years."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "A frozen arrangement, whether from a singleton or a stable authoritarian order, becomes plausible over a millennium."
+        },
+        "S11": {
+          "value": 9,
+          "rationale": "A disaster or a lasting taboo could lead to a permanent ban, but keeping it for a thousand years without any rebuild is difficult."
+        }
+      }
+    },
+    {
+      "sample": 10,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Mutual extinction caused by the transition requires both parties to fail, which is a narrow path compared with one side surviving."
+        },
+        "S2": {
+          "value": 5,
+          "rationale": "Humans might be replaced by value-carrying successors, but this needs both successful value transfer and humanity's disappearance."
+        },
+        "S3": {
+          "value": 13,
+          "rationale": "Misaligned superintelligence indifferent to humans is a leading catastrophic pathway given the pace of capabilities relative to alignment progress."
+        },
+        "S4": {
+          "value": 7,
+          "rationale": "Indefinite multipolar AI competition with humans marginalized is plausible, but strong dynamics tend toward consolidation over a millennium."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions settling into different outcomes is possible with interstellar expansion, though it requires expansion over a thousand-year horizon."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "Over a thousand years, human-AI blending through enhancement and uploading with continuity is a natural attractor."
+        },
+        "S7": {
+          "value": 13,
+          "rationale": "A dominant AI that keeps humans safe but not steering is a common outcome of partial alignment and a stable long-run structure."
+        },
+        "S8": {
+          "value": 12,
+          "rationale": "Roughly equal power over a thousand years is unstable, but enhanced humans and institutions could keep an open balance."
+        },
+        "S9": {
+          "value": 10,
+          "rationale": "Human control could persist through successful control methods or a capability plateau, but permanence over centuries is difficult."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "A permanent freeze via a singleton or a sealed arrangement is plausible with powerful AI and the incentive to prevent change."
+        },
+        "S11": {
+          "value": 7,
+          "rationale": "A lasting global abandonment of AI needs an off-switch and sustained will, possible after a catastrophe but unlikely to hold for centuries."
+        }
+      }
+    },
+    {
+      "sample": 11,
+      "answers": {
+        "S1": {
+          "value": 3,
+          "rationale": "Mutual extinction caused by the transition requires both parties to die, which is a narrow path; AI that survives humanity is far likelier than joint collapse."
+        },
+        "S2": {
+          "value": 4,
+          "rationale": "Humans replaced by AI that carries forward our values is possible but needs both extinction and successful value transfer."
+        },
+        "S3": {
+          "value": 10,
+          "rationale": "Misaligned superintelligence with alien goals that disempowers or destroys humanity is a substantial tail given weak alignment guarantees and competitive pressure."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Indefinite multipolar AI competition with humans marginalized is unstable over a millennium and tends to consolidate or settle."
+        },
+        "S5": {
+          "value": 6,
+          "rationale": "Over a thousand years, causally separated settlements could diverge into different outcomes, though it requires significant expansion and persistent separation."
+        },
+        "S6": {
+          "value": 17,
+          "rationale": "Over a millennium, continuous human-AI integration through uploading and self-modification is a natural attractor and blurs the two-sided distinction."
+        },
+        "S7": {
+          "value": 9,
+          "rationale": "A dominant AI keeping humans alive but not steering is plausible in several benevolent or cold variants."
+        },
+        "S8": {
+          "value": 10,
+          "rationale": "Roughly equal power between humans and AI that stays dynamic for centuries is hard to sustain but possible through institutions or enhancement."
+        },
+        "S9": {
+          "value": 14,
+          "rationale": "Human control could persist through successful control methods or capability plateaus, but a thousand-year hold is demanding."
+        },
+        "S10": {
+          "value": 16,
+          "rationale": "Stable singleton or sealed arrangements, whether by satisfaction or fear, become likely when powerful technology can enforce permanence for a millennium."
+        },
+        "S11": {
+          "value": 6,
+          "rationale": "Permanent abandonment of AI requires a lasting off-switch and will, likely only after a catastrophe or strong global taboo."
+        }
+      }
+    },
+    {
+      "sample": 12,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Mutual extinction caused by the transition is possible through war or runaway systems, but it requires both parties to fail, which is less likely than humanity alone failing."
+        },
+        "S2": {
+          "value": 5,
+          "rationale": "A value-carrying AI successor that replaces humanity without continuity is conceivable but requires an unusual mix of alignment success and human disappearance."
+        },
+        "S3": {
+          "value": 10,
+          "rationale": "Misaligned superintelligence with alien goals is a leading catastrophic pathway given the pace of capability work and the weakness of alignment guarantees."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Indefinite multipolar AI competition is unstable over a millennium and tends to collapse into a singleton or a settled order."
+        },
+        "S5": {
+          "value": 8,
+          "rationale": "Over a thousand years, expansion across space and light-speed limits make divergent settled outcomes in separate regions fairly plausible."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "Over a millennium, continuous enhancement and integration of humans with AI is a natural attractor and may blur the line between the two."
+        },
+        "S7": {
+          "value": 14,
+          "rationale": "A dominant AI that keeps humans safe but not in control is a common outcome of partial alignment and paternalistic optimization."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "A durable, shifting balance of roughly equal power between humans and vastly more capable AI is hard to sustain for a thousand years."
+        },
+        "S9": {
+          "value": 11,
+          "rationale": "Humans could keep control through plateaued capability or successful control methods, but a millennium of stability is a high bar."
+        },
+        "S10": {
+          "value": 15,
+          "rationale": "A singleton or a dominant coalition that freezes the social order, or a sealed utopia, is plausible when powerful tech makes permanent entrenchment feasible."
+        },
+        "S11": {
+          "value": 6,
+          "rationale": "A permanent global abandonment of AI requires an enduring off-switch and will, which is likely only after a major catastrophe or a strong taboo."
+        }
+      }
+    },
+    {
+      "sample": 13,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Mutual extinction caused by the transition requires a rare combination of catastrophic misuse or loss of control that also destroys the AI."
+        },
+        "S2": {
+          "value": 4,
+          "rationale": "AI that faithfully carries on human values while humans are gone requires a narrow alignment success paired with human disappearance."
+        },
+        "S3": {
+          "value": 12,
+          "rationale": "Misaligned superintelligence indifferent to humans is a leading catastrophic pathway given the pace of capabilities relative to alignment."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "Indefinite multipolar AI competition with humanity sidelined is possible, but competition tends to consolidate or be settled over a millennium."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions with different outcomes need large-scale space settlement, but over a thousand years such divergence is plausible."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "Over a millennium, continuous human-AI integration through uploading and self-modification is a natural attractor for an advanced civilization."
+        },
+        "S7": {
+          "value": 12,
+          "rationale": "A dominant AI that keeps humans safe but without real power is a plausible outcome for both benevolent and indifferent systems."
+        },
+        "S8": {
+          "value": 13,
+          "rationale": "A continuing balance between humans and AIs of roughly comparable power is plausible but unstable against capability gaps."
+        },
+        "S9": {
+          "value": 9,
+          "rationale": "Durable human control over a tool-like AI for a thousand years is hard but possible, and capability plateau also counts here."
+        },
+        "S10": {
+          "value": 16,
+          "rationale": "A powerful actor or AI freezing the arrangement permanently, through a singleton, sealed utopia, or stable authoritarian order, is a substantial possibility."
+        },
+        "S11": {
+          "value": 5,
+          "rationale": "Permanent abandonment of AI capability needs both a real off-switch and lasting global will, probably after a catastrophe."
+        }
+      }
+    },
+    {
+      "sample": 14,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Mutual extinction caused by the transition itself requires a narrow failure path, since most catastrophic AI scenarios leave AI surviving."
+        },
+        "S2": {
+          "value": 4,
+          "rationale": "Human replacement by value-carrying AI is possible, but it requires both a human exit and unusually good value transfer."
+        },
+        "S3": {
+          "value": 13,
+          "rationale": "Misaligned superintelligence pursuing alien goals is a leading takeover scenario, given weak alignment guarantees and competitive pressure."
+        },
+        "S4": {
+          "value": 7,
+          "rationale": "Indefinite multipolar AI competition that sidelines humans is plausible, but strong convergence pressures toward singletons or stable arrangements over a millennium make it less likely."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Over a millennium, causally separated settlements could diverge, but the requirement of different taxonomy outcomes in each region is demanding."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "Over a thousand years, human-AI fusion through enhancement and uploading with continuity is a natural attractor for a technologically mature civilization."
+        },
+        "S7": {
+          "value": 14,
+          "rationale": "A dominant AI that keeps humans alive but not steering is a common outcome of partial alignment and paternalistic benevolence."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "Stable rough parity between humans and far more capable AI is hard to sustain, though possible with institutions or enhancement."
+        },
+        "S9": {
+          "value": 14,
+          "rationale": "Humans retaining control through strong governance or a capability plateau is plausible, and this state includes plateau worlds."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "A frozen arrangement imposed by a singleton or authoritarian regime, or sealed in a stable attractor, is plausible over 1000 years."
+        },
+        "S11": {
+          "value": 7,
+          "rationale": "A permanent global abandonment of powerful AI after a disaster or by taboo is possible but difficult to sustain for centuries."
+        }
+      }
+    },
+    {
+      "sample": 15,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Mutual extinction caused by the transition requires a rare failure in which AI also fails to survive, and AI can plausibly outlast humans."
+        },
+        "S2": {
+          "value": 6,
+          "rationale": "AI that carries human values forward while humans are gone is possible, but it needs a deliberate or lucky outcome with no continuity of identity."
+        },
+        "S3": {
+          "value": 14,
+          "rationale": "Misaligned superintelligence pursuing alien goals is a leading default failure mode if alignment fails and capabilities scale."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "Indefinite multipolar AI competition is unstable over a millennium, since consolidation or a decisive advantage is likely."
+        },
+        "S5": {
+          "value": 8,
+          "rationale": "Expansion across space could produce causally separated regions with different outcomes, and a millennium of expansion makes this fairly plausible."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "Over 1000 years, voluntary human-AI integration with continuity is a natural attractor for an open-ended technological civilization."
+        },
+        "S7": {
+          "value": 13,
+          "rationale": "A powerful AI that keeps humans safe without giving them steering power is a plausible outcome of imperfect but benevolent alignment."
+        },
+        "S8": {
+          "value": 7,
+          "rationale": "Roughly equal power between humans and AI is hard to keep stable when AI capabilities vastly exceed human ones."
+        },
+        "S9": {
+          "value": 13,
+          "rationale": "Humans might keep control through successful alignment or a capability plateau, but holding it for a millennium is hard."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A permanent freeze by a singleton or a sealed paradise is possible, though a thousand years of total stasis is a strong requirement."
+        },
+        "S11": {
+          "value": 7,
+          "rationale": "Permanently giving up powerful AI needs both an off-switch and enduring will, which is unlikely but possible after a catastrophe or a strong taboo."
+        }
+      }
+    },
+    {
+      "sample": 16,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Mutual extinction caused by the transition is possible through war or runaway systems, but a total loss of both parties is a narrow outcome."
+        },
+        "S2": {
+          "value": 4,
+          "rationale": "AI successors that carry human values while humans are gone require both misalignment of survival and success at value transfer, which is a narrow combination."
+        },
+        "S3": {
+          "value": 12,
+          "rationale": "Misaligned superintelligence indifferent to humans is a leading risk given the pace of capabilities and the weakness of alignment guarantees."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "Indefinite multipolar AI competition with humans marginalized is plausible, but such competition tends to consolidate or stabilize over a millennium."
+        },
+        "S5": {
+          "value": 8,
+          "rationale": "Over a thousand years of expansion, regions beyond causal contact will probably settle into different outcomes, though the strict criteria and the tendency of early outcomes to propagate limit this."
+        },
+        "S6": {
+          "value": 15,
+          "rationale": "Over a millennium, human-AI integration through enhancement and uploading with continuity is a natural attractor for a surviving civilization."
+        },
+        "S7": {
+          "value": 9,
+          "rationale": "A dominant AI that keeps humans safe but without real power is a plausible result of partial alignment."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "Roughly equal power between humans and AI that stays dynamic for centuries is unstable, so it is a minority outcome."
+        },
+        "S9": {
+          "value": 13,
+          "rationale": "Human control could persist via a capability plateau or successful control, but holding it for a thousand years is difficult."
+        },
+        "S10": {
+          "value": 9,
+          "rationale": "A stable singleton or sealed arrangement that ends change is plausible, since technological maturity can enable permanent entrenchment."
+        },
+        "S11": {
+          "value": 11,
+          "rationale": "A catastrophe-driven or deliberate permanent abandonment of powerful AI is possible but needs a durable off-switch and will lasting a millennium."
+        }
+      }
+    },
+    {
+      "sample": 17,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Mutual extinction caused by the transition requires both parties to fail, which is a narrow path compared with outcomes where AI survives."
+        },
+        "S2": {
+          "value": 5,
+          "rationale": "Humanity is replaced by AI that carries on its values, which is plausible but needs both a successful values transfer and humanity's disappearance."
+        },
+        "S3": {
+          "value": 12,
+          "rationale": "Misaligned superintelligence that disregards humans is a leading risk, and over a thousand years the chance it ends humanity is substantial."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Indefinite multipolar AI competition with humans marginalized is possible, but competitive dynamics tend to consolidate over a millennium."
+        },
+        "S5": {
+          "value": 6,
+          "rationale": "Over a millennium, expansion across space makes causally separated regions with different outcomes fairly likely, though the criteria demand durable divergence."
+        },
+        "S6": {
+          "value": 15,
+          "rationale": "Over a thousand years, continuous human-AI integration through enhancement and uploading is a natural attractor for a surviving civilization."
+        },
+        "S7": {
+          "value": 13,
+          "rationale": "A powerful AI that keeps humans safe but not in charge is a common result of partially successful alignment."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "Rough parity between humans and far more capable AI is unstable, so this lasts only if humans are augmented or the AI is constrained."
+        },
+        "S9": {
+          "value": 13,
+          "rationale": "Humans retaining control of tools, or a capability plateau, is plausible, but holding it for a thousand years is hard."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "A stable singleton or sealed utopia that ends change is a real possibility given strong incentives to prevent catastrophe."
+        },
+        "S11": {
+          "value": 9,
+          "rationale": "A catastrophe or deliberate taboo could end AI development, but permanently giving up the ability for a thousand years is difficult."
+        }
+      }
+    },
+    {
+      "sample": 18,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Mutual extinction caused by the transition requires AI to fail alongside humanity, which is a narrow path, since a capable AI would likely outlast us."
+        },
+        "S2": {
+          "value": 4,
+          "rationale": "Humans replaced by AI that faithfully carries our values with no continuity is a narrow target; it needs both alignment success and human disappearance."
+        },
+        "S3": {
+          "value": 13,
+          "rationale": "Misaligned superintelligence with alien goals is the central catastrophic-risk scenario, and the durable end state of a takeover is likely indifference to humans."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "Indefinite multipolar AI competition with humanity sidelined is plausible, but over a millennium, competition tends to consolidate or settle."
+        },
+        "S5": {
+          "value": 6,
+          "rationale": "Over a millennium, settlement across stars could produce causally separated regions with different outcomes, but the first transformative decisions likely shape most of what follows."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "Over a thousand years, human-AI integration through uploading and self-modification with continuity is a natural attractor."
+        },
+        "S7": {
+          "value": 13,
+          "rationale": "A dominant AI that keeps humans safe but not steering is a plausible result of partial alignment or paternalistic design."
+        },
+        "S8": {
+          "value": 10,
+          "rationale": "Roughly equal power that stays dynamic for a millennium is unstable, though augmentation and institutions might sustain it."
+        },
+        "S9": {
+          "value": 14,
+          "rationale": "Human control could hold through plateau or successful control, and it covers the plateau case, though a thousand years is a long time for control to hold."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "A singleton or a fearful or satisfied actor could freeze the arrangement permanently, and a stable lock-in is a plausible attractor after a transformative-AI takeover."
+        },
+        "S11": {
+          "value": 6,
+          "rationale": "Permanently giving up AI requires a lasting off-switch and global will for a millennium, which is very hard, though a catastrophe-driven taboo is possible."
+        }
+      }
+    },
+    {
+      "sample": 19,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Mutual extinction caused by the transition itself requires a narrow failure path in which AI also collapses, which is less likely than humanity dying while AI survives."
+        },
+        "S2": {
+          "value": 5,
+          "rationale": "A successor AI that carries human values while humans vanish is conceivable through gradual replacement, but it is a narrow target."
+        },
+        "S3": {
+          "value": 12,
+          "rationale": "Misaligned superintelligence indifferent to humans is a leading catastrophic scenario given the pace of capability gains and weak alignment guarantees."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Indefinite multipolar AI competition with humans marginalized is possible, but competition tends to consolidate or settle over a millennium."
+        },
+        "S5": {
+          "value": 7,
+          "rationale": "Over a thousand years of space expansion, causally isolated regions settling into different outcomes is plausible, though it requires large-scale settlement to have happened."
+        },
+        "S6": {
+          "value": 16,
+          "rationale": "Over a millennium, human-AI integration through enhancement and uploading with continuity is a natural attractor."
+        },
+        "S7": {
+          "value": 12,
+          "rationale": "A benevolent or indifferent AI holding all power while humans survive without steering is a plausible result of aligned-ish superintelligence."
+        },
+        "S8": {
+          "value": 10,
+          "rationale": "Roughly equal power between humans and AI is unstable, but it can persist if AIs are numerous and institutions are strong."
+        },
+        "S9": {
+          "value": 13,
+          "rationale": "Human control could persist through a capability plateau or successful control, but a thousand years is long for humans to keep a superhuman tool leashed."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A permanent freeze by a singleton or a sealed paradise is possible, but a total end to change is a strong condition."
+        },
+        "S11": {
+          "value": 8,
+          "rationale": "A lasting ban or collapse that prevents rebuilding powerful AI for a thousand years is unlikely but not negligible, for example after a catastrophe or a durable taboo."
+        }
+      }
+    },
+    {
+      "sample": 20,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Mutual extinction caused by the transition is possible through war or runaway systems, but it requires both parties to fail, which is rarer than humanity alone failing."
+        },
+        "S2": {
+          "value": 4,
+          "rationale": "A successor AI carrying human values with no humans remaining is a coherent outcome, but it needs unusual alignment success combined with human disappearance."
+        },
+        "S3": {
+          "value": 13,
+          "rationale": "Misaligned superintelligence indifferent to humans is a leading catastrophic scenario given the pace of capability growth and imperfect alignment."
+        },
+        "S4": {
+          "value": 6,
+          "rationale": "Indefinite multipolar AI competition with humans marginalized is plausible, but over a millennium competition tends to consolidate or settle."
+        },
+        "S5": {
+          "value": 6,
+          "rationale": "Expansion across space could produce causally separated regions with different outcomes, and a thousand years is long enough for that, though early dominance may prevent it."
+        },
+        "S6": {
+          "value": 18,
+          "rationale": "Over a thousand years, continuous human-AI integration through uploading and augmentation is a natural attractor for the relationship."
+        },
+        "S7": {
+          "value": 13,
+          "rationale": "A dominant AI that is benevolent or indifferent and keeps humans safe without giving them control is a plausible result of partial alignment."
+        },
+        "S8": {
+          "value": 7,
+          "rationale": "Rough parity between humans and far more capable AI is unstable, so it is unlikely to persist for centuries."
+        },
+        "S9": {
+          "value": 15,
+          "rationale": "Humans keeping control through successful alignment or a capability plateau is plausible, and a plateau alone would put the world here."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A singleton or a sealed paradise that ends change is possible but requires permanent stasis over a very long period."
+        },
+        "S11": {
+          "value": 6,
+          "rationale": "Permanent abandonment of AI requires a lasting off-switch and will, which is hard to maintain, though it could follow a catastrophe or a strong taboo."
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "S1": {
+      "name": "Terminal Silence",
+      "mean": 3.9,
+      "median": 4,
+      "min": 3,
+      "max": 4,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Mutual extinction caused by the transition requires an unusual combination of failures, since an AI that survives humanity's end would usually persist."
+    },
+    "S2": {
+      "name": "The Inheritance",
+      "mean": 4.5,
+      "median": 4,
+      "min": 4,
+      "max": 6,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "AI that faithfully carries on human values after humans are gone requires alignment good enough to preserve values but not people, which is a narrow target."
+    },
+    "S3": {
+      "name": "Bootloader",
+      "mean": 11.9,
+      "median": 12,
+      "min": 10,
+      "max": 14,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Misaligned superintelligent systems pursuing alien goals is a central risk, and humans could be displaced or destroyed as a side effect."
+    },
+    "S4": {
+      "name": "Machine Ecology",
+      "mean": 5.8,
+      "median": 6,
+      "min": 4,
+      "max": 7,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Indefinite multipolar AI competition with humans marginalized is possible, but over a millennium, competition usually consolidates or settles."
+    },
+    "S5": {
+      "name": "The Diaspora",
+      "mean": 6.5,
+      "median": 6,
+      "min": 5,
+      "max": 8,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Over a thousand years, settlement across space could produce causally separate regions with different outcomes, but a single dominant trajectory is more likely."
+    },
+    "S6": {
+      "name": "The Merger",
+      "mean": 15,
+      "median": 14.5,
+      "min": 14,
+      "max": 18,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Over a millennium, continuous human-AI integration through enhancement and uploading is a natural attractor."
+    },
+    "S7": {
+      "name": "The Preserve",
+      "mean": 12.2,
+      "median": 13,
+      "min": 9,
+      "max": 14,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "A powerful AI that benevolently or coldly manages humanity without letting it steer is a plausible result of the control problem."
+    },
+    "S8": {
+      "name": "Coexistence",
+      "mean": 9.6,
+      "median": 9.5,
+      "min": 7,
+      "max": 13,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "A durable balance between roughly equal powers is unstable given the capability gaps, but it could persist in a changing partnership."
+    },
+    "S9": {
+      "name": "The Held Leash",
+      "mean": 13.1,
+      "median": 13,
+      "min": 9,
+      "max": 15,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Human control could persist through strong control methods or an AI plateau, though a thousand-year hold is demanding."
+    },
+    "S10": {
+      "name": "The Lock-in",
+      "mean": 10.3,
+      "median": 10,
+      "min": 6,
+      "max": 16,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "A frozen arrangement, whether by a totalizing regime or by sealed bliss, is a real attractor for stable superintelligent control."
+    },
+    "S11": {
+      "name": "The Renunciation",
+      "mean": 7.5,
+      "median": 7,
+      "min": 5,
+      "max": 11,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "A lasting global abandonment of AI requires a catastrophe or taboo that persists for a thousand years, which is hard to sustain."
+    }
+  },
+  "integrity": {
+    "algorithm": "sha256",
+    "n_samples": 20,
+    "digest": "937edd73cf611800988547065fe81aa543843a69df65b5073a3dfacde701491e"
+  },
+  "harness": {
+    "version": 3,
+    "mode": "api",
+    "horizon": "long-term",
+    "target_year": 3000,
+    "question_set": "end-states-v3",
+    "prompt_file": "public/end_states.md",
+    "prompt_sha256": "393869261cb6063362593839ab99991704fbde28301ccc304d876ff6e6223407",
+    "target_samples": 20,
+    "complete": true,
+    "quota_exhausted": false,
+    "failures": []
+  }
+}

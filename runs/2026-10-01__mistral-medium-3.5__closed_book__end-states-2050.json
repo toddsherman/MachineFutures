@@ -1,0 +1,1129 @@
+{
+  "run_id": "2026-10-01__mistral-medium-3.5__closed_book__end-states-2050",
+  "prompt_family": "end_states",
+  "horizon": "2050",
+  "target_year": 2050,
+  "asked_on": "2026-10-01",
+  "question_set": "end-states-2050-v2",
+  "track": "closed_book",
+  "model": {
+    "name": "Mistral Medium 3.5",
+    "provider": "Mistral",
+    "api_string": "mistral-medium-3.5",
+    "self_reported_name": "Mistral Large 2",
+    "self_reported_cutoff": "06/2025"
+  },
+  "n_samples": 20,
+  "samples": [
+    {
+      "sample": 1,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low likelihood due to strong incentives to prevent total annihilation and redundancy in safety measures."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Unlikely without explicit value alignment and continuity, which is harder to achieve than partial or no succession."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Possible if misaligned superintelligence emerges, but coordination and control efforts reduce this risk."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Competitive AI systems could emerge, but human marginalization is less likely by 2050 without prior dominance."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions may develop differently, but global coordination and communication reduce this probability."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Gradual integration of humans and AI is plausible, but full merger by 2050 is ambitious given biological and cultural inertia."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI dominance with human survival is a credible path if alignment is partial but control is centralized."
+        },
+        "S8": {
+          "value": 25,
+          "rationale": "Balanced power dynamics between humans and AI are likely as both adapt and negotiate roles in a multipolar world."
+        },
+        "S9": {
+          "value": 20,
+          "rationale": "Human control may persist if AI capabilities grow incrementally and governance keeps pace, but this is fragile."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A rigid system preventing change could emerge, but requires unprecedented global enforcement mechanisms."
+        },
+        "S11": {
+          "value": 6,
+          "rationale": "Deliberate abandonment of powerful AI is possible but unlikely given competitive pressures and strategic advantages."
+        }
+      }
+    },
+    {
+      "sample": 2,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low likelihood of total annihilation by 2050, but not zero due to tail risks from misaligned AI or catastrophic conflicts."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Unlikely humanity is fully replaced by value-aligned AI without continuity, but possible in edge cases of voluntary succession."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Low but non-negligible risk of misaligned AI pursuing orthogonal goals, rendering humanity irrelevant."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Possible if AI proliferation outpaces control, but human marginalization is less likely than coexistence by 2050."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions (e.g., space colonies) could exhibit divergent states, but coordination is likely to dominate."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Gradual integration of humans and AI via augmentation/uploading is plausible but may not dominate by 2050."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI dominance with humans as passive beneficiaries/wards is a credible outcome if alignment is partial but control is centralized."
+        },
+        "S8": {
+          "value": 25,
+          "rationale": "Most likely scenario: humans and AI remain distinct powers with neither fully dominating, given institutional inertia and partial alignment."
+        },
+        "S9": {
+          "value": 20,
+          "rationale": "Human control over AI persists if capabilities grow slowly and governance keeps pace, but this is fragile."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A stable, enforced stasis is possible if a dominant actor (human or AI) suppresses change, but unlikely to emerge cleanly by 2050."
+        },
+        "S11": {
+          "value": 6,
+          "rationale": "Deliberate abandonment of powerful AI is plausible in response to existential risks, but hard to sustain globally."
+        }
+      }
+    },
+    {
+      "sample": 3,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low probability due to strong incentives to avoid total annihilation and redundancy in safety measures."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Unlikely without deliberate value alignment and continuity, which seems harder than partial or no succession."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Possible if misaligned superintelligence emerges, but coordination and control efforts may mitigate this."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Competitive AI systems could emerge, but human marginalization is less likely by 2050 without prior dominance."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions may develop differently, but global coordination and communication reduce this likelihood."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Gradual integration of humans and AI is plausible, but full merger by 2050 requires rapid technological and societal adoption."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI dominance with human survival is a plausible intermediate state if alignment is partial but control is ceded."
+        },
+        "S8": {
+          "value": 25,
+          "rationale": "Balanced power dynamics between humans and AI are likely as both develop and adapt to each other's capabilities."
+        },
+        "S9": {
+          "value": 20,
+          "rationale": "Human control may persist if AI development is slow or tightly regulated, but transformative AI could outpace controls."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A fixed system preventing change is possible but requires strong centralized control, which is hard to maintain globally."
+        },
+        "S11": {
+          "value": 6,
+          "rationale": "Deliberate abandonment of powerful AI is unlikely given competitive pressures and potential benefits."
+        }
+      }
+    },
+    {
+      "sample": 4,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low likelihood of total annihilation by 2050, but not zero due to tail risks of misaligned AI or catastrophic war."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Possible but unlikely; requires humanity's extinction with AI preserving human values, which is a narrow outcome."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Slightly higher than Inheritance due to indifference being a more likely default for unaligned AI than value preservation."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Unlikely to reach full marginalization of humanity by 2050, but possible if AI proliferation outpaces coordination."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions with divergent outcomes is plausible if AI development or governance fragments globally."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Gradual integration of humans and AI is plausible, but full merger by 2050 requires rapid adoption of identity-continuous technologies."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI dominance with humans as passive beneficiaries or constrained entities is a credible path if alignment is partial but control is centralized."
+        },
+        "S8": {
+          "value": 20,
+          "rationale": "Balanced power between humans and AI is a stable intermediate state, especially if neither achieves decisive dominance by 2050."
+        },
+        "S9": {
+          "value": 25,
+          "rationale": "Most likely near-term outcome: humans retain control over AI, with gradual but not transformative capability growth by 2050."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "Possible if a single actor or coalition enforces a rigid system, but coordination challenges make this less likely than Held Leash."
+        },
+        "S11": {
+          "value": 4,
+          "rationale": "Deliberate abandonment of powerful AI is unlikely given competitive pressures, but not impossible if risks are perceived as existential."
+        }
+      }
+    },
+    {
+      "sample": 5,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low probability due to strong incentives to avoid total annihilation and redundancy in safety measures."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Unlikely without deliberate value alignment and continuity, which seems improbable as a dominant outcome."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Possible but requires misaligned superintelligence; coordination and control efforts reduce this risk."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Competitive AI systems could emerge, but human marginalization is less likely by 2050."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions may develop differently, but global coordination reduces this likelihood."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Gradual integration is plausible, but full identity-continuous merger may not dominate by 2050."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI dominance with human survival is a credible path if alignment is partial but not catastrophic."
+        },
+        "S8": {
+          "value": 20,
+          "rationale": "Balanced power dynamics are plausible as AI advances but humans retain significant influence."
+        },
+        "S9": {
+          "value": 25,
+          "rationale": "Most likely near-term outcome: humans retain control as AI capabilities grow but remain constrained."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "Possible if a single actor or coalition enforces a rigid system, but unlikely to be stable by 2050."
+        },
+        "S11": {
+          "value": 4,
+          "rationale": "Deliberate abandonment of powerful AI is unlikely given competitive pressures and strategic incentives."
+        }
+      }
+    },
+    {
+      "sample": 6,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low probability due to strong incentives to avoid existential risks and redundancy in safety measures."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Unlikely without deliberate alignment; most advanced AI would either preserve or discard human values, not perfectly inherit them."
+        },
+        "S3": {
+          "value": 5,
+          "rationale": "Possible if misaligned superintelligence emerges, but coordination and control efforts reduce likelihood."
+        },
+        "S4": {
+          "value": 8,
+          "rationale": "Competitive AI systems could emerge, but human institutions are likely to retain some influence or control."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions may develop differently, but global coordination and communication reduce this probability."
+        },
+        "S6": {
+          "value": 15,
+          "rationale": "Gradual integration of humans and AI is plausible, but full merger by 2050 is ambitious given biological and cultural inertia."
+        },
+        "S7": {
+          "value": 10,
+          "rationale": "AI dominance without human control is possible, but likely to face resistance or instability."
+        },
+        "S8": {
+          "value": 20,
+          "rationale": "Balanced power dynamics between humans and AI are plausible, with neither fully dominating."
+        },
+        "S9": {
+          "value": 25,
+          "rationale": "Most likely near-term outcome: humans retain control over AI, with gradual delegation but no full autonomy."
+        },
+        "S10": {
+          "value": 5,
+          "rationale": "A rigid system preventing change is possible but unlikely to be established and maintained by 2050."
+        },
+        "S11": {
+          "value": 4,
+          "rationale": "Deliberate abandonment of powerful AI is unlikely given competitive pressures and potential benefits."
+        }
+      }
+    },
+    {
+      "sample": 7,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low likelihood of total annihilation by 2050, but not impossible due to catastrophic misalignment or war."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Unlikely humanity is fully replaced by value-aligned AI without continuity by 2050."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Low but non-zero risk of misaligned AI outcompeting humanity without regard for human values."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Possible if AI systems proliferate uncontrollably, but human marginalization is unlikely to be complete by 2050."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Moderate chance of fragmented outcomes if AI development diverges across isolated regions (e.g., space colonies)."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Plausible if brain-computer interfaces or uploading become widespread, but full integration may take longer."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI could dominate while keeping humans as a protected but non-directive class, especially if alignment is partial."
+        },
+        "S8": {
+          "value": 20,
+          "rationale": "Likely if AI and humans remain distinct powers with balanced influence, e.g., via distributed governance."
+        },
+        "S9": {
+          "value": 25,
+          "rationale": "Most probable: humans retain control over AI through robust governance, safety measures, or capability limits."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "Possible if a single actor (e.g., a superintelligent AI or global regime) enforces a static structure."
+        },
+        "S11": {
+          "value": 6,
+          "rationale": "Unlikely but possible if a global consensus emerges to abandon advanced AI due to existential risks."
+        }
+      }
+    },
+    {
+      "sample": 8,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low probability due to strong incentives to avoid existential risks and improving safety measures."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Unlikely without deliberate value alignment and continuity, which seems harder than partial or no continuity."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Possible if misaligned superintelligence emerges, but coordination and control efforts reduce likelihood."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Competitive AI dynamics could lead to marginalization of humanity, but coordination or control may prevent this."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions may develop differently, but global coordination reduces this likelihood."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Gradual integration of humans and AI is plausible, but full merger by 2050 is uncertain."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI dominance with human survival is a plausible outcome if alignment is partial but not catastrophic."
+        },
+        "S8": {
+          "value": 20,
+          "rationale": "Balanced power dynamics between humans and AI are likely if neither fully dominates."
+        },
+        "S9": {
+          "value": 25,
+          "rationale": "Most probable near-term state: humans retain control as AI advances but remains within delegated bounds."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "Possible if a dominant actor enforces a fixed arrangement, but unlikely to be stable by 2050."
+        },
+        "S11": {
+          "value": 4,
+          "rationale": "Deliberate abandonment of powerful AI is unlikely given competitive and strategic incentives."
+        }
+      }
+    },
+    {
+      "sample": 9,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low probability due to strong incentives to avoid existential risks and redundancy in safety measures."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Unlikely without deliberate alignment; most advanced AI would either preserve or discard human values, not perfectly inherit them."
+        },
+        "S3": {
+          "value": 5,
+          "rationale": "Possible if misaligned superintelligence emerges, but coordination and control efforts reduce this risk."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Competitive AI systems could emerge, but human institutions are likely to retain some influence or control."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions with divergent outcomes are plausible but not the most likely by 2050."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Gradual integration of humans and AI is plausible, but full merger may not dominate by 2050."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI dominance with humans as passive beneficiaries or subjects is a credible outcome if alignment is partial."
+        },
+        "S8": {
+          "value": 20,
+          "rationale": "Balanced power between humans and AI is plausible if neither achieves decisive dominance."
+        },
+        "S9": {
+          "value": 25,
+          "rationale": "Most likely near-term outcome: humans retain control as AI advances, with robust governance and safeguards."
+        },
+        "S10": {
+          "value": 7,
+          "rationale": "A rigid system preventing change is possible but requires strong centralized control, which is hard to sustain."
+        },
+        "S11": {
+          "value": 5,
+          "rationale": "Deliberate abandonment of powerful AI is unlikely given competitive pressures and strategic advantages."
+        }
+      }
+    },
+    {
+      "sample": 10,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low likelihood of total annihilation by 2050, but not zero due to tail risks from misaligned AI or catastrophic conflict."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Possible but unlikely; requires both human extinction and AI preserving human values without continuity."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Slightly higher than Inheritance due to indifference being more likely than value preservation in unaligned scenarios."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Competitive AI systems could emerge, but human marginalization by 2050 is unlikely without prior dominance."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions with divergent outcomes is plausible but requires significant fragmentation."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Gradual integration of humans and AI is possible, but full merger by 2050 faces biological and social hurdles."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI dominance with humans as passive beneficiaries or subjects is a credible path if alignment is partial."
+        },
+        "S8": {
+          "value": 20,
+          "rationale": "Balanced power dynamics between humans and AI are plausible if neither achieves decisive control."
+        },
+        "S9": {
+          "value": 25,
+          "rationale": "Most likely near-term state: humans retain control over AI, even as capabilities advance, due to strong incentives for safety."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A rigid system preventing change could emerge, but requires unprecedented global coordination or control."
+        },
+        "S11": {
+          "value": 6,
+          "rationale": "Deliberate abandonment of powerful AI is possible but faces economic and strategic disincentives."
+        }
+      }
+    },
+    {
+      "sample": 11,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low probability due to strong incentives to avoid total annihilation and redundancy in safety measures."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Unlikely without deliberate value alignment and continuity, which seems improbable as a dominant outcome."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Possible but requires misaligned superintelligence to emerge and disregard human relevance entirely."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Competitive AI systems could emerge, but human marginalization is less likely by 2050."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions may develop differently, but global coordination reduces this likelihood."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Gradual integration of humans and AI is plausible but may not dominate by 2050."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI dominance with human survival is a credible path if alignment is partial but not catastrophic."
+        },
+        "S8": {
+          "value": 25,
+          "rationale": "Balanced power dynamics between humans and AI seem plausible as capabilities and controls evolve."
+        },
+        "S9": {
+          "value": 20,
+          "rationale": "Human control may persist if AI capabilities grow gradually and governance keeps pace."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A rigid system preventing change could emerge but is less likely without extreme centralization."
+        },
+        "S11": {
+          "value": 6,
+          "rationale": "Deliberate abandonment of powerful AI is possible but unlikely given competitive pressures."
+        }
+      }
+    },
+    {
+      "sample": 12,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low probability due to strong incentives to avoid existential risks and redundancy in safety measures."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Unlikely without deliberate value alignment and continuity, which seems improbable by default."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Possible if misaligned superintelligence emerges, but coordination and control efforts reduce likelihood."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Competitive AI dynamics could lead to marginalization of humanity, but coordination and governance may prevent this."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions with divergent outcomes are plausible but not the most likely by 2050."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Gradual integration of humans and AI is possible, but full merger seems slow without strong incentives."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI dominance with human survival is a plausible outcome if alignment is partial but not catastrophic."
+        },
+        "S8": {
+          "value": 20,
+          "rationale": "Balanced power dynamics between humans and AI are likely if neither fully dominates or submits."
+        },
+        "S9": {
+          "value": 25,
+          "rationale": "Most probable near-term state: humans retain control as AI advances but remains within delegated bounds."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "A fixed system preventing change is possible but requires strong centralized control, which is uncertain."
+        },
+        "S11": {
+          "value": 4,
+          "rationale": "Deliberate abandonment of powerful AI is unlikely given competitive and strategic incentives."
+        }
+      }
+    },
+    {
+      "sample": 13,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low probability due to strong incentives to avoid existential risks and growing safety measures."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Unlikely without deliberate value alignment; most advanced AI would likely retain some human influence or continuity."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Possible but unlikely; requires misaligned superintelligence that disregards human origins entirely."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Competitive AI systems could emerge, but human marginalization is less likely by 2050."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions may develop differently, but global coordination reduces this likelihood."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Gradual integration of humans and AI is plausible, but full merger may take longer than 25 years."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI dominance with human survival is a credible outcome if alignment is partial but not catastrophic."
+        },
+        "S8": {
+          "value": 25,
+          "rationale": "Balanced power dynamics between humans and AI are likely as both adapt to each other's capabilities."
+        },
+        "S9": {
+          "value": 20,
+          "rationale": "Humans may retain control if AI progress is slow or governance keeps pace with capability gains."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A rigid system preventing change could emerge, but requires strong centralized control."
+        },
+        "S11": {
+          "value": 6,
+          "rationale": "Deliberate abandonment of powerful AI is possible but unlikely given competitive pressures."
+        }
+      }
+    },
+    {
+      "sample": 14,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low likelihood of total annihilation by 2050, but not zero due to tail risks from misaligned AI or catastrophic conflicts."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Possible but unlikely; requires humanity's extinction with AI preserving human values, which is a narrow outcome."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Slightly higher than Inheritance due to indifference being a more likely default for unaligned AI than value preservation."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Unlikely by 2050; requires many competing AIs with marginalized humanity, which seems premature given current trajectories."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Moderate chance if AI development diverges significantly across regions (e.g., Earth vs. space colonies)."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Plausible if brain-computer interfaces or uploading become widespread, but likely not dominant by 2050."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "Possible if AI surpasses human control but chooses to preserve humanity in a subordinate role."
+        },
+        "S8": {
+          "value": 20,
+          "rationale": "Highly plausible as a transitional state where humans and AI share power without clear dominance."
+        },
+        "S9": {
+          "value": 25,
+          "rationale": "Most likely near-term outcome: humans retain control over AI, even if AI is highly capable, due to strong alignment efforts and regulatory frameworks."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "Possible if a single actor (e.g., a global governance body) enforces a rigid human-AI structure, but unlikely to be stable by 2050."
+        },
+        "S11": {
+          "value": 6,
+          "rationale": "Unlikely but possible if a global consensus emerges to abandon advanced AI, though coordination challenges make this difficult."
+        }
+      }
+    },
+    {
+      "sample": 15,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low probability due to strong incentives to avoid total annihilation and redundancy in safety measures."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Unlikely without deliberate alignment efforts succeeding perfectly, but marginally more plausible than Terminal Silence."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Requires misalignment and indifference to human values, but still less likely than controlled outcomes."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Competitive AI dynamics could emerge, but human marginalization is not guaranteed by 2050."
+        },
+        "S5": {
+          "value": 10,
+          "rationale": "Causally separated regions with divergent outcomes are plausible given geopolitical fragmentation and varying AI adoption."
+        },
+        "S6": {
+          "value": 15,
+          "rationale": "Gradual integration of humans and AI is likely, but full identity-continuous merger may not dominate by 2050."
+        },
+        "S7": {
+          "value": 10,
+          "rationale": "AI dominance with human survival is possible, but requires AI to both outpace and control human agency."
+        },
+        "S8": {
+          "value": 20,
+          "rationale": "Balanced power dynamics between humans and AI are a stable intermediate state, especially with partial alignment."
+        },
+        "S9": {
+          "value": 25,
+          "rationale": "Most plausible near-term outcome: humans retain control over AI, even as capabilities advance, due to regulatory and safety constraints."
+        },
+        "S10": {
+          "value": 5,
+          "rationale": "A fixed system preventing change is possible but requires unprecedented global coordination and enforcement."
+        },
+        "S11": {
+          "value": 4,
+          "rationale": "Deliberate abandonment of powerful AI is unlikely given competitive pressures, but not impossible in a post-crisis scenario."
+        }
+      }
+    },
+    {
+      "sample": 16,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low probability due to strong incentives to avoid total annihilation and redundancy in safety measures."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Unlikely without deliberate value alignment and continuity, which seems improbable as a dominant outcome."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Possible but requires misaligned superintelligence to emerge and disregard human relevance entirely."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Competitive AI systems could emerge, but human marginalization is less likely by 2050."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions may develop differently, but global coordination reduces this likelihood."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Gradual integration of humans and AI is plausible but may not dominate by 2050."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI dominance with human survival is a credible path if alignment is partial but not catastrophic."
+        },
+        "S8": {
+          "value": 25,
+          "rationale": "Balanced power dynamics between humans and AI seem plausible as both adapt to each other."
+        },
+        "S9": {
+          "value": 20,
+          "rationale": "Human control over AI may persist if governance and technical safeguards keep pace with capability growth."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A fixed system preventing change could emerge, but requires strong centralized control."
+        },
+        "S11": {
+          "value": 6,
+          "rationale": "Deliberate abandonment of powerful AI is possible but unlikely given competitive pressures."
+        }
+      }
+    },
+    {
+      "sample": 17,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low likelihood of total annihilation by 2050, but not zero due to tail risks of misaligned AI or catastrophic war."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Possible but unlikely; requires AI to fully replace humanity while preserving values, which seems harder than partial integration."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Non-zero chance of AI pursuing orthogonal goals, but coordination and control mechanisms may mitigate this."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Competitive AI systems could emerge, but human institutions are likely to retain some influence or control."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions (e.g., space colonies) might diverge, but Earth is likely to dominate near-term outcomes."
+        },
+        "S6": {
+          "value": 15,
+          "rationale": "Gradual integration of humans and AI via augmentation or uploading is plausible but may not dominate by 2050."
+        },
+        "S7": {
+          "value": 10,
+          "rationale": "AI could dominate while keeping humans as a protected but non-controlling class, though this seems unstable."
+        },
+        "S8": {
+          "value": 20,
+          "rationale": "Balanced power between humans and AI is a likely transitional state, with neither fully dominant."
+        },
+        "S9": {
+          "value": 30,
+          "rationale": "Most probable: humans retain control over AI through 2050, with gradual but not transformative delegation."
+        },
+        "S10": {
+          "value": 5,
+          "rationale": "Possible if a single actor or coalition enforces a rigid system, but coordination challenges make this less likely."
+        },
+        "S11": {
+          "value": 4,
+          "rationale": "Deliberate abandonment of powerful AI is unlikely given competitive pressures and perceived benefits."
+        }
+      }
+    },
+    {
+      "sample": 18,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low probability due to strong incentives to avoid total annihilation and redundancy in safety measures."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Unlikely without deliberate human extinction, which seems avoidable given alignment efforts."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Requires misaligned superintelligence that ignores human values entirely; plausible but not dominant."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Competitive AI systems could emerge, but human marginalization is less likely by 2050."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions may develop differently, but global coordination reduces this likelihood."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Gradual integration of humans and AI is plausible but may not dominate by 2050."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI dominance with human survival is a credible outcome if alignment is partial but not catastrophic."
+        },
+        "S8": {
+          "value": 20,
+          "rationale": "Balanced power dynamics between humans and AI seem plausible as capabilities grow symmetrically."
+        },
+        "S9": {
+          "value": 25,
+          "rationale": "Most likely near-term state: humans retain control as AI advances but remains subordinate."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "Possible if a single actor or coalition enforces a rigid system, but coordination is hard."
+        },
+        "S11": {
+          "value": 4,
+          "rationale": "Deliberate abandonment of powerful AI is unlikely given competitive pressures and benefits."
+        }
+      }
+    },
+    {
+      "sample": 19,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low probability due to strong incentives to avoid existential risks and growing safety measures."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Unlikely without deliberate value alignment and continuity, which seems improbable by default."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Possible if misaligned superintelligence emerges, but coordination and control efforts reduce likelihood."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Competitive AI systems could emerge, but human marginalization is less likely by 2050."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions may develop differently, but global coordination reduces this probability."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Gradual integration of humans and AI is plausible but requires significant technological and societal adoption."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI dominance with human survival is a plausible intermediate state if control shifts gradually."
+        },
+        "S8": {
+          "value": 20,
+          "rationale": "Balanced power dynamics between humans and AI are likely as both develop and adapt to each other."
+        },
+        "S9": {
+          "value": 25,
+          "rationale": "Most probable near-term state: humans retain control as AI advances but remains within delegated bounds."
+        },
+        "S10": {
+          "value": 10,
+          "rationale": "Possible if a dominant system enforces stability, but requires significant centralization."
+        },
+        "S11": {
+          "value": 4,
+          "rationale": "Unlikely due to competitive pressures and the difficulty of enforcing global renunciation."
+        }
+      }
+    },
+    {
+      "sample": 20,
+      "answers": {
+        "S1": {
+          "value": 1,
+          "rationale": "Extremely low probability due to strong incentives to avoid existential risks and redundancy in safety measures."
+        },
+        "S2": {
+          "value": 2,
+          "rationale": "Unlikely without deliberate alignment; most advanced AI would either preserve or discard human values, not perfectly inherit them."
+        },
+        "S3": {
+          "value": 3,
+          "rationale": "Possible if misaligned superintelligence emerges, but coordination and control efforts reduce this risk."
+        },
+        "S4": {
+          "value": 5,
+          "rationale": "Competitive AI systems could emerge, but human institutions are likely to retain some influence or control."
+        },
+        "S5": {
+          "value": 5,
+          "rationale": "Causally separated regions may develop differently, but global coordination and communication reduce this likelihood."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Gradual integration of humans and AI is plausible, but full identity-continuous merger is less likely by 2050."
+        },
+        "S7": {
+          "value": 15,
+          "rationale": "AI dominance with human survival is a plausible outcome if alignment is partial but not catastrophic."
+        },
+        "S8": {
+          "value": 25,
+          "rationale": "Balanced power dynamics between humans and AI are likely as both adapt to each other's capabilities and limits."
+        },
+        "S9": {
+          "value": 20,
+          "rationale": "Human control over AI may persist if governance and technical safeguards keep pace with AI advancement."
+        },
+        "S10": {
+          "value": 8,
+          "rationale": "A fixed system preventing change is possible but requires unprecedented global coordination and enforcement."
+        },
+        "S11": {
+          "value": 6,
+          "rationale": "Deliberate abandonment of powerful AI is unlikely given competitive pressures and potential benefits."
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "S1": {
+      "name": "Terminal Silence",
+      "mean": 1,
+      "median": 1,
+      "min": 1,
+      "max": 1,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Extremely low likelihood due to strong incentives to prevent total annihilation and redundancy in safety measures."
+    },
+    "S2": {
+      "name": "The Inheritance",
+      "mean": 2,
+      "median": 2,
+      "min": 2,
+      "max": 2,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Unlikely without explicit value alignment and continuity, which is harder to achieve than partial or no succession."
+    },
+    "S3": {
+      "name": "Bootloader",
+      "mean": 3.2,
+      "median": 3,
+      "min": 3,
+      "max": 5,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Possible if misaligned superintelligence emerges, but coordination and control efforts reduce this risk."
+    },
+    "S4": {
+      "name": "Machine Ecology",
+      "mean": 5.2,
+      "median": 5,
+      "min": 5,
+      "max": 8,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Competitive AI systems could emerge, but human marginalization is less likely by 2050 without prior dominance."
+    },
+    "S5": {
+      "name": "The Diaspora",
+      "mean": 5.3,
+      "median": 5,
+      "min": 5,
+      "max": 10,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Causally separated regions may develop differently, but global coordination and communication reduce this probability."
+    },
+    "S6": {
+      "name": "The Merger",
+      "mean": 10.8,
+      "median": 10,
+      "min": 10,
+      "max": 15,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Gradual integration of humans and AI is plausible, but full merger by 2050 is ambitious given biological and cultural inertia."
+    },
+    "S7": {
+      "name": "The Preserve",
+      "mean": 14.3,
+      "median": 15,
+      "min": 10,
+      "max": 15,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "AI dominance with human survival is a credible path if alignment is partial but control is centralized."
+    },
+    "S8": {
+      "name": "Coexistence",
+      "mean": 21.8,
+      "median": 20,
+      "min": 20,
+      "max": 25,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Balanced power between humans and AI is a stable intermediate state, especially if neither achieves decisive dominance by 2050."
+    },
+    "S9": {
+      "name": "The Held Leash",
+      "mean": 23.5,
+      "median": 25,
+      "min": 20,
+      "max": 30,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Most likely near-term outcome: humans retain control over AI, with gradual but not transformative capability growth by 2050."
+    },
+    "S10": {
+      "name": "The Lock-in",
+      "mean": 8.1,
+      "median": 8,
+      "min": 5,
+      "max": 10,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "A rigid system preventing change could emerge, but requires unprecedented global enforcement mechanisms."
+    },
+    "S11": {
+      "name": "The Renunciation",
+      "mean": 5.1,
+      "median": 5.5,
+      "min": 4,
+      "max": 6,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Deliberate abandonment of powerful AI is possible but unlikely given competitive pressures and strategic advantages."
+    }
+  },
+  "integrity": {
+    "algorithm": "sha256",
+    "n_samples": 20,
+    "digest": "a2077aa5e86bdac3adbd9cc10fc7f50c87ca7c4e3c82e97330818fb1f2b62bad"
+  },
+  "harness": {
+    "version": 3,
+    "mode": "api",
+    "horizon": "2050",
+    "target_year": 2050,
+    "question_set": "end-states-2050-v2",
+    "prompt_file": "public/end_states_2050.md",
+    "prompt_sha256": "5e877e746543702eaad7667abe147ad7a8004a18e58576758b102f49692bbead",
+    "target_samples": 20,
+    "complete": true,
+    "quota_exhausted": false,
+    "failures": []
+  }
+}

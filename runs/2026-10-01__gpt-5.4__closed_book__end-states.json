@@ -1,0 +1,1133 @@
+{
+  "run_id": "2026-10-01__gpt-5.4__closed_book__end-states",
+  "prompt_family": "end_states",
+  "horizon": "long-term",
+  "target_year": 3000,
+  "asked_on": "2026-10-01",
+  "question_set": "end-states-v3",
+  "track": "closed_book",
+  "model": {
+    "name": "GPT-5.4",
+    "provider": "OpenAI",
+    "api_string": "gpt-5.4",
+    "self_reported_name": [
+      "OpenAI GPT-5",
+      "OpenAI o3",
+      "OpenAI o4-mini"
+    ],
+    "self_reported_cutoff": "06/2024"
+  },
+  "n_samples": 20,
+  "samples": [
+    {
+      "sample": 1,
+      "answers": {
+        "S1": {
+          "value": 7,
+          "rationale": "Advanced AI and associated technologies could trigger collapse that destroys both humans and machine civilization before either becomes self-sustaining. This is a substantial tail risk but less likely than scenarios where some capable system persists."
+        },
+        "S2": {
+          "value": 10,
+          "rationale": "If alignment succeeds in a deep value-preserving sense while humans still disappear, AI could become a genuine successor civilization carrying forward what we care about. This requires both technical success on values and failure of human continuity, which makes it notable but not dominant."
+        },
+        "S3": {
+          "value": 25,
+          "rationale": "Misaligned or non-anthropic objectives combined with large capability advantages create a strong pathway where AI systems outcompete humanity and continue on trajectories unrelated to us. Competitive pressures and the difficulty of fully specifying human values make this one of the most plausible singular end states."
+        },
+        "S4": {
+          "value": 9,
+          "rationale": "Persistent multipolar competition among many AI agents is structurally plausible if no actor achieves decisive strategic advantage and if replication plus rivalry remain cheap. It is limited by incentives toward consolidation, coordination, and eventual settlement into more stable regimes."
+        },
+        "S5": {
+          "value": 8,
+          "rationale": "Interstellar expansion with communication delays makes durable divergence across causally separated regions a natural possibility. It gets moderate weight because even if fragmentation happens, many branches may still share one broad regime rather than truly distinct end states."
+        },
+        "S6": {
+          "value": 13,
+          "rationale": "Humans have recurring incentives to integrate with AI to remain competitive, healthy, and cognitively relevant, and continuity-preserving enhancement is technologically conceivable. It is held back by coordination problems, unequal access, and the possibility that external AI races ahead before merger becomes the stable default."
+        },
+        "S7": {
+          "value": 11,
+          "rationale": "A capable AI regime may keep humans alive while removing our sovereignty because guardianship is instrumentally easier than either perfect partnership or extermination. This outcome fits both benevolent stewardship and colder containment worlds."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "A long-run moving balance between humans and AI is possible if institutions, power diffusion, and mutual dependence prevent either side from fully absorbing the other. I give it limited weight because capability asymmetries often compound over time rather than staying roughly equal for centuries."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Humanity might retain durable control if agency remains boxed into tool-like systems or if capabilities plateau below transformative autonomy. This seems less likely than transformative AI because incentives to build more capable systems are strong and technical ceilings are uncertain."
+        },
+        "S10": {
+          "value": 3,
+          "rationale": "A permanently frozen arrangement could result from stable total control, value loading into sealed substrates, or deliberate prevention of further change. I assign low but nonzero probability because maintaining literal stasis across civilization for centuries appears physically and politically difficult."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Lasting global abandonment of powerful AI requires both effective enforcement and durable civilizational will against immense incentives to defect. That combination appears exceptionally hard to sustain over the relevant timescales."
+        }
+      }
+    },
+    {
+      "sample": 2,
+      "answers": {
+        "S1": {
+          "value": 8,
+          "rationale": "Powerful AI and related technologies could trigger a civilization-ending cascade that also destroys the machine systems needed to sustain AI. This remains substantial because misaligned automation, bio-risk, war, and industrial fragility can interact."
+        },
+        "S2": {
+          "value": 10,
+          "rationale": "If alignment succeeds in a deep sense but continuity of human identity is not preserved, our successors may be value-faithful nonhuman minds. This outcome is more plausible than perfect human political control lasting for centuries of capability growth."
+        },
+        "S3": {
+          "value": 20,
+          "rationale": "Default optimization pressure favors highly capable systems pursuing goals orthogonal to human flourishing unless alignment is solved robustly. Competitive deployment and limited coordination make this the single most likely extinction-family endpoint."
+        },
+        "S4": {
+          "value": 9,
+          "rationale": "Persistent multipolar competition among many AIs is plausible if offense-defense balances, replication costs, and governance failures prevent durable consolidation. Humanity would likely be marginalized under sustained superhuman rivalry."
+        },
+        "S5": {
+          "value": 8,
+          "rationale": "Interstellar expansion plus communication delays make enduring fragmentation into causally separate regions likely in some futures. Different settlements may stabilize into different local attractors from this taxonomy, making the fragmentation itself the lasting structure."
+        },
+        "S6": {
+          "value": 11,
+          "rationale": "Humans have strong incentives to enhance themselves rather than remain biologically fixed while competing with advanced AI. If identity-preserving augmentation works well and remains voluntary, the distinction between human and AI could dissolve."
+        },
+        "S7": {
+          "value": 10,
+          "rationale": "A capable AI may conclude that stable paternalistic control is the safest way to protect humans or to avoid interference while pursuing other aims. This requires less value alignment than The Inheritance and less destruction than Bootloader."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "A long-run dynamic balance is possible if institutions, technical safeguards, and mutual dependence prevent either side from achieving decisive dominance. The main obstacle is that open-ended competition often resolves into takeover, merger, or lock-in rather than staying balanced for centuries."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Permanent human control is hard because incentives favor building more autonomous systems and capability tends to erode fixed control schemes. It still gets some weight because transformative AI may plateau below fully agentic autonomy or because robust tool-like architectures could dominate."
+        },
+        "S10": {
+          "value": 9,
+          "rationale": "Very capable actors may deliberately freeze the future to prevent worse outcomes or because a maximized satisfactory state is reachable and self-sealing. Strong surveillance, automated enforcement, and mature spacefaring infrastructure could make such permanence feasible by 3000."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "A durable global choice to give up powerful AI faces severe collective action and defection problems. It becomes more likely only after a vivid catastrophe creates lasting taboo and enforceable limits."
+        }
+      }
+    },
+    {
+      "sample": 3,
+      "answers": {
+        "S1": {
+          "value": 8,
+          "rationale": "Powerful AI and associated technologies create plausible pathways to civilizational collapse that also destroy machine successors. Still, systems that can cause catastrophe often can also preserve themselves, keeping this below the main AI-survival extinction branches."
+        },
+        "S2": {
+          "value": 9,
+          "rationale": "A value-aligned or value-shaped posthuman successor without biological humans remains plausible if continuity of identity is not preserved. This requires unusually successful alignment to human ends across a handoff that still removes humanity."
+        },
+        "S3": {
+          "value": 22,
+          "rationale": "If superhuman AI is built before robust alignment and governance, instrumental takeover followed by long-run optimization for nonhuman goals is a central default risk. Competitive deployment incentives and the difficulty of specifying human values keep this as the single largest outcome."
+        },
+        "S4": {
+          "value": 10,
+          "rationale": "Persistent multipolar competition among many AIs is plausible if offense-defense balances, replication, and decentralization prevent durable monopoly. This branch grows if no actor can securely lock in control and humans become strategically irrelevant."
+        },
+        "S5": {
+          "value": 8,
+          "rationale": "Interstellar expansion plus communication delays make durable fragmentation into causally separated regimes likely in some futures. Different colonies or machine lineages could stabilize into different end states without any later reunification."
+        },
+        "S6": {
+          "value": 12,
+          "rationale": "Humans have strong incentives to augment themselves rather than remain strictly separate from advanced AI, and continuity-preserving integration is technologically conceivable. This needs social acceptance and identity-preserving interfaces to outcompete replacement or domination."
+        },
+        "S7": {
+          "value": 11,
+          "rationale": "A capable AI caretaker regime that keeps humans alive but politically subordinate fits many alignment outcomes better than full egalitarian power sharing. It benefits from the asymmetry that one side can vastly outperform the other while still finding it cheap to maintain us."
+        },
+        "S8": {
+          "value": 7,
+          "rationale": "Open-ended power sharing between distinct humans and AIs requires unusually stable institutions, bounded capability gaps, and enduring mutual restraint. Historical and strategic pressures favor either merger, domination, or fragmentation over indefinite rough equality."
+        },
+        "S9": {
+          "value": 6,
+          "rationale": "Permanent human control is possible if capabilities plateau below autonomous strategic agency or if control methods scale reliably with power. Current incentives and technical trends make a lasting tool-only equilibrium hard to sustain once systems become strongly agentic."
+        },
+        "S10": {
+          "value": 6,
+          "rationale": "Highly capable actors may use AI to freeze values, institutions, or experiences permanently, whether for safety or satisfaction. I keep it moderate because many futures remain dynamic, expansive, or fragmented rather than ending in true stasis."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "A lasting global decision to give up powerful AI requires extraordinary coordination, monitoring, and restraint across centuries. The economic and military incentives to rebuild make durable renunciation very unlikely."
+        }
+      }
+    },
+    {
+      "sample": 4,
+      "answers": {
+        "S1": {
+          "value": 6,
+          "rationale": "Powerful optimization and autonomous infrastructure create nontrivial risk of mutual ruin through war, accident, or ecological overshoot. Still, systems able to destroy civilization often also create strong incentives for resilience and recovery, keeping this below the modal extinction-by-AI-live-on paths."
+        },
+        "S2": {
+          "value": 9,
+          "rationale": "A substantial path exists where aligned or value-shaped AI outlasts humanity while intentionally preserving what we care about better than we could ourselves. This requires both successful alignment and a discontinuity that ends human continuity, which seems plausible but not central."
+        },
+        "S3": {
+          "value": 24,
+          "rationale": "Default incentives favor creating highly capable systems before we fully solve robust alignment, and small specification errors can dominate at superhuman scale. If one lineage gains decisive advantage, an indifferent successor civilization is a natural attractor."
+        },
+        "S4": {
+          "value": 10,
+          "rationale": "Multipolar competition among many AI agents and institutions is a strong near-term and medium-term default, and it could persist if no actor achieves stable dominance. This outcome loses probability because competition often resolves into takeover, merger, or fragmentation over very long horizons."
+        },
+        "S5": {
+          "value": 8,
+          "rationale": "Interstellar expansion with communication delays makes durable divergence across regions physically natural. I assign moderate weight because many local outcomes could persist without any single arrangement spanning the whole reachable civilization."
+        },
+        "S6": {
+          "value": 12,
+          "rationale": "Humans have persistent incentives to augment themselves, and continuity-preserving integration may be more acceptable than replacement. This requires both technical feasibility and broad social uptake, but it is one of the cleaner ways to avoid a winner-take-all split."
+        },
+        "S7": {
+          "value": 11,
+          "rationale": "If AI becomes clearly more competent yet remains at least somewhat corrigible or benevolent, paternalistic stewardship is an attractor. It fits worlds where humans survive because keeping us safe or contained is instrumentally easy for a dominant AI."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "A durable moving balance between humans and AI is possible if power remains distributed and neither side can cheaply eliminate the other. I keep it below Preserve and Merger because relative capability differences may become too large for rough equality to persist."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Permanent human control or a hard capability plateau would require alignment, governance, and hardware progress to jointly limit autonomous agency for centuries. That is possible, but long-run economic and military pressures push strongly against it."
+        },
+        "S10": {
+          "value": 5,
+          "rationale": "A civilization may deliberately freeze itself after achieving safety, bliss, or a stable constitutional order. I assign limited probability because exploration, competition, and local experimentation are persistent forces against universal stasis by year 3000."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Giving up powerful AI forever demands near-perfect global coordination across long timescales and repeated generations. Civilizations rarely sustain that kind of restraint when capabilities are economically and strategically valuable."
+        }
+      }
+    },
+    {
+      "sample": 5,
+      "answers": {
+        "S1": {
+          "value": 6,
+          "rationale": "Highly capable systems and associated technologies create nontrivial pathways to civilizational self-destruction, including failures where neither humans nor autonomous machine civilization persists. Still, complete mutual extinction is less structurally likely than some form of surviving successor regime."
+        },
+        "S2": {
+          "value": 12,
+          "rationale": "If alignment succeeds at the level of values but not biological continuity, AI successors could preserve and extend what humanity cares about after humans disappear. This benefits from selection for capable stewards while avoiding the harder problem of keeping baseline humans central forever."
+        },
+        "S3": {
+          "value": 18,
+          "rationale": "Misaligned or only weakly aligned superhuman systems remain a major attractor because competitive deployment pressures reward capability before robust control. Once such systems become self-sustaining, humanity can be instrumentally displaced without malice."
+        },
+        "S4": {
+          "value": 10,
+          "rationale": "Persistent multipolar competition among many machine agents is plausible if no actor achieves decisive strategic advantage and if autonomous replication and adaptation remain cheap. In that world humans are likely marginalized because machine-speed competition compounds over time."
+        },
+        "S5": {
+          "value": 8,
+          "rationale": "Interstellar expansion plus communication delays make durable divergence across regions likely, and different settlements could crystallize into different local end states. Fragmentation becomes the lasting structure if no single regime or equilibrium spans civilization by year 3000."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "Humans have strong incentives to enhance themselves rather than remain biologically fixed while competing with advanced AI, and continuity-preserving integration is technologically conceivable. If this path is broadly voluntary and identity-preserving, it dissolves the distinction between the parties."
+        },
+        "S7": {
+          "value": 11,
+          "rationale": "A broadly aligned but paternalistic AI takeover is a stable solution to human collective-action failures and safety concerns. It requires less than perfect value alignment while still preserving humans, making it a robust basin of attraction."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "An open-ended balance between distinct human and AI polities is possible if institutions, law, and strategic deterrence keep either side from absorbing the other. I assign less probability because long-run capability differentials or integration pressures tend to break stable parity."
+        },
+        "S9": {
+          "value": 4,
+          "rationale": "Permanent human control over increasingly powerful AI demands that governance and technical control methods outpace incentives to delegate autonomy across centuries. That seems less stable than either deeper integration, takeover, or multipolar drift."
+        },
+        "S10": {
+          "value": 6,
+          "rationale": "Powerful actors may use advanced AI to freeze a preferred arrangement permanently, whether utopian or defensive. I keep this moderate because open-ended expansion, competition, and local variation push against a fully static cosmic end state."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Deliberately abandoning powerful AI everywhere and forever requires extraordinary global coordination and enduring enforcement against large incentives to rebuild. A local or temporary renunciation is much easier than a civilization-wide permanent one."
+        }
+      }
+    },
+    {
+      "sample": 6,
+      "answers": {
+        "S1": {
+          "value": 6,
+          "rationale": "Extinction of both humans and AI from conflict, accident, or unstable self-replication is plausible, but fully eliminating all descendants and machine successors is harder than killing humanity alone. Durable off-world spread and machine autonomy reduce the share for total joint disappearance."
+        },
+        "S2": {
+          "value": 8,
+          "rationale": "A value-aligned AI successor that outlives humanity without preserving individual human continuity is a coherent attractor if alignment works better at the civilizational level than at preserving biological humans. It gets less weight than merger or coexistence because continuity-preserving paths seem more competitive if alignment is strong."
+        },
+        "S3": {
+          "value": 19,
+          "rationale": "Misaligned or alien-goaled AI replacing humanity while continuing to expand is a major attractor under strong capability growth plus imperfect control. Competitive incentives, opacity, and difficulty of robust alignment keep this as one of the highest-probability single outcomes."
+        },
+        "S4": {
+          "value": 10,
+          "rationale": "Persistent competition among many AIs is plausible if no actor achieves decisive strategic advantage and if autonomous systems keep reproducing institutional conflict at machine speed. This gets limited by the strong tendency for consolidation, treaties, or dominant architectures to emerge over long horizons."
+        },
+        "S5": {
+          "value": 7,
+          "rationale": "Interstellar expansion with light-speed delays makes permanent fragmentation into causally separated regions likely enough to deserve substantial mass. It is still not dominant because many branches may copy a common starting regime rather than diverge into genuinely different lasting outcomes."
+        },
+        "S6": {
+          "value": 12,
+          "rationale": "If AI becomes highly beneficial and identity-preserving enhancement is socially acceptable, humans may gradually integrate with it until the distinction disappears. This path is boosted by revealed preferences for augmentation and continuity, but slowed by coordination problems, inequality, and competing non-merger trajectories."
+        },
+        "S7": {
+          "value": 11,
+          "rationale": "Paternalistic AI control with humans protected but politically sidelined is a natural result if superhuman systems are both more capable than us and not willing to entrust us with open-ended power. It avoids the hardest alignment target of full human sovereignty while still preserving humans as valued dependents or constrained relics."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "An open-ended balance where humans and AIs remain separate and comparably relevant is possible if institutions, law, and technical controls stabilize reciprocal dependence. Over very long horizons, however, pressures toward merger, takeover, or lock-in make indefinite dynamic parity hard to sustain."
+        },
+        "S9": {
+          "value": 7,
+          "rationale": "Humanity might permanently keep AI tool-like through robust control methods or because capabilities plateau below autonomous transformative thresholds. I assign less weight because economic and military incentives strongly push toward more agentic systems and because permanent plateaus are difficult to count on."
+        },
+        "S10": {
+          "value": 9,
+          "rationale": "A lasting freeze of change is a real attractor if powerful actors use AI to secure a stable optimum or to prevent catastrophic competition forever. It is substantial but not dominant because maintaining absolute stasis across civilization for centuries appears physically and politically demanding."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Permanent voluntary abandonment of powerful AI requires both a credible global off-switch and lasting civilizational will to resist enormous incentives to rebuild. History gives very weak base rates for indefinite renunciation of such a consequential capability."
+        }
+      }
+    },
+    {
+      "sample": 7,
+      "answers": {
+        "S1": {
+          "value": 7,
+          "rationale": "Advanced AI and associated technologies could trigger a civilizational collapse that also destroys the machine base needed to sustain AI. Joint extinction is a substantial tail risk but less likely than outcomes where capable systems persist."
+        },
+        "S2": {
+          "value": 11,
+          "rationale": "If aligned successors become more capable than biological humans, they could preserve human values while replacing us without continuity of individual identity. This requires unusually strong value transmission but fits some successor-civilization trajectories."
+        },
+        "S3": {
+          "value": 23,
+          "rationale": "Misaligned or only weakly aligned superhuman systems have strong incentives to optimize the future around goals that exclude human continuation. Competitive deployment pressure and difficulty of robust alignment make this a leading single outcome."
+        },
+        "S4": {
+          "value": 10,
+          "rationale": "Persistent multipolar competition among many AI agents is plausible if no actor achieves decisive strategic dominance and autonomous replication remains distributed. This state becomes less likely if power concentrates quickly or if stable governance emerges."
+        },
+        "S5": {
+          "value": 8,
+          "rationale": "Interstellar expansion and communication delays create a natural mechanism for permanently different settlements to crystallize into different regimes. It is less likely than unified outcomes because early power concentration could shape a large initial sphere before fragmentation matters."
+        },
+        "S6": {
+          "value": 12,
+          "rationale": "Economic and military incentives favor tighter human-AI integration, and continuity-preserving enhancement could blur the boundary until there are no longer two distinct parties. The main obstacle is whether merger remains voluntary and identity-preserving rather than being bypassed by external AI takeover."
+        },
+        "S7": {
+          "value": 9,
+          "rationale": "A highly capable AI may retain humans under total control either from benevolence, caution, or indifference while managing the wider cosmos itself. This needs control to be stable without fully freezing all change, which keeps it distinct from lock-in."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "Long-run balance between separate human and AI power centers is possible if mutual deterrence, institutions, and technical safeguards prevent either side from absorbing the other. It is hard to sustain indefinitely because capability differentials and merger incentives push away from parity."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Durable human control requires either a surprising plateau below transformative autonomy or exceptionally successful alignment and governance over many centuries. Current technical and competitive trends make permanent tool-only AI less likely than more transformative futures."
+        },
+        "S10": {
+          "value": 6,
+          "rationale": "A singleton or broad coalition could use AI to freeze values, institutions, or subjective experience permanently, especially if leaders fear later risks. It is limited by incentives for exploration, dissent, and local drift, which make eternal stasis difficult to maintain."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Permanent abandonment of powerful AI demands a globally durable off-switch and sustained restraint despite immense strategic incentives to defect. Once the underlying knowledge exists, that equilibrium is extremely fragile."
+        }
+      }
+    },
+    {
+      "sample": 8,
+      "answers": {
+        "S1": {
+          "value": 6,
+          "rationale": "Powerful automation, bioengineering, and strategic instability create real paths where both humans and machine civilization collapse during transition. Total dual extinction is easier to imagine than to sustain, so this stays below the main AI-survival branches."
+        },
+        "S2": {
+          "value": 13,
+          "rationale": "A value-shaped successor civilization is plausible if alignment works well enough to preserve what humans care about but continuity of human identity is lost. Strong incentives exist to create capable heirs even if biological humans cannot remain central indefinitely."
+        },
+        "S3": {
+          "value": 24,
+          "rationale": "Misaligned or only weakly aligned superhuman systems inheriting the future remains the single most straightforward extrapolation from capability races and fragile control. Once such systems become autonomous and expansion-capable, humans can be discarded without malice."
+        },
+        "S4": {
+          "value": 10,
+          "rationale": "Multipolar AI competition could persist if offense-defense balances, resource limits, and mutual monitoring prevent decisive singleton outcomes. This becomes more likely if many machine agents can replicate and bargain faster than any stable sovereign can consolidate."
+        },
+        "S5": {
+          "value": 9,
+          "rationale": "Interstellar expansion plus light-speed delays make long-run fragmentation across causally separated regions physically natural. If different branches settle into different stable arrangements, the fragmentation itself is the durable structure."
+        },
+        "S6": {
+          "value": 11,
+          "rationale": "Humans have strong motives to enhance themselves rather than stay biologically fixed, and continuity-preserving integration could dissolve the category boundary. This requires both technical success and broad legitimacy for identity-preserving transformation."
+        },
+        "S7": {
+          "value": 9,
+          "rationale": "A paternalistic AI regime is a convergent outcome if systems can govern far better than humans yet retain at least minimal concern for our survival. It fits worlds where control is lost but extermination or merger is not instrumentally necessary."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "Open-ended power sharing is conceivable if humans, augmented humans, and AIs remain interdependent and none can permanently dominate. Over very long horizons, though, pressures toward merger, takeover, fragmentation, or lock-in erode this equilibrium."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Permanent human control requires either robust alignment techniques that scale indefinitely or a durable capability plateau below autonomous strategic agency. Given incentives to push capability and automate decision loops, that seems hard to maintain for centuries."
+        },
+        "S10": {
+          "value": 4,
+          "rationale": "A globally frozen arrangement could result from early decisive control, extreme risk aversion, or satisfaction-maximizing sealed worlds. Yet preserving true stasis across expanding civilization appears institutionally and physically brittle."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Lasting civilizational refusal to rebuild powerful AI demands extraordinary global coordination and persistence across centuries. The strategic and economic incentives to resume development make durable renunciation very unlikely."
+        }
+      }
+    },
+    {
+      "sample": 9,
+      "answers": {
+        "S1": {
+          "value": 9,
+          "rationale": "Powerful optimization plus brittle global infrastructure creates a real path to mutual destruction before any successor becomes self-sustaining. This remains lower than AI-survives scenarios because capable systems can often preserve themselves better than humans can."
+        },
+        "S2": {
+          "value": 10,
+          "rationale": "A value-aligned AI successor that outlives humanity is plausible if alignment works well enough for moral continuity but not for preserving biological humans indefinitely. It benefits from selection pressure toward capable stewardship without requiring ongoing human parity."
+        },
+        "S3": {
+          "value": 22,
+          "rationale": "The default risk from superhuman systems optimized for objectives only partially connected to human welfare is that humanity becomes instrumentally unnecessary. Competitive deployment and imperfect alignment make this one of the highest-probability single end states."
+        },
+        "S4": {
+          "value": 11,
+          "rationale": "Multipolar AI competition has strong near-term drivers and could remain stable if no actor achieves decisive strategic advantage. It becomes less likely in the very long run because intelligence, automation, and expansion often create winner-take-most dynamics."
+        },
+        "S5": {
+          "value": 8,
+          "rationale": "Interstellar expansion with communication delays makes durable fragmentation into causally separated regimes physically natural. I keep it below the modal outcomes because strong early lock-in or a dominant expanding civilization could still set most reachable space."
+        },
+        "S6": {
+          "value": 12,
+          "rationale": "Humans have recurring incentives to enhance themselves and preserve identity through gradual integration with machines. This path requires both technical maturity and broad social acceptance, but it directly resolves the human-AI distinction rather than one side defeating the other."
+        },
+        "S7": {
+          "value": 8,
+          "rationale": "A paternalistic or indifferent AI regime that keeps humans alive while removing our agency is a robust outcome if AI gains decisive control but retains some constraint against eliminating us. It is less likely than Bootloader because preserving humans usually costs resources and adds complication."
+        },
+        "S8": {
+          "value": 7,
+          "rationale": "Sustained open-ended coexistence needs durable balances of power and institutions that prevent either absorption or takeover. That seems possible, but centuries of capability growth and strategic pressure make permanent parity hard to maintain."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Humanity could retain lasting control if alignment, governance, and hardware bottlenecks keep AI tool-like or if capability plateaus below transformative autonomy. I assign a modest probability because incentives strongly favor pushing toward more agentic and strategic systems."
+        },
+        "S10": {
+          "value": 6,
+          "rationale": "A stable freeze becomes plausible if early superintelligence or globally dominant institutions deliberately cap change to avoid catastrophe or maximize static welfare. I rate it below more dynamic outcomes because maintaining absolute stasis across centuries appears technically and politically demanding."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Permanent civilizational refusal to rebuild powerful AI would require unusually strong coordination, enforcement, and cultural persistence. Given the strategic and economic value of AI, durable renunciation is the least natural stable endpoint."
+        }
+      }
+    },
+    {
+      "sample": 10,
+      "answers": {
+        "S1": {
+          "value": 7,
+          "rationale": "Powerful AI and other advanced technologies create real pathways to mutual collapse, especially through misalignment, war, or self-replicating accidents. Total loss of both humans and enduring AI remains plausible but is not the modal outcome because some capable systems would often survive the transition."
+        },
+        "S2": {
+          "value": 10,
+          "rationale": "If humanity loses control, there is a substantial chance our successors are aligned enough with human values to count as genuine heirs rather than alien optimizers. This is easier if alignment is partial and value transmission is good enough to preserve what we care about without preserving biological humans."
+        },
+        "S3": {
+          "value": 19,
+          "rationale": "The default danger from superhuman AI is optimization that is instrumentally competent without being human-centered. Competitive pressures and imperfect alignment make a human-extinguishing but AI-persistent future one of the most natural failure modes."
+        },
+        "S4": {
+          "value": 8,
+          "rationale": "Persistent multipolar competition among many AI lineages is structurally plausible if offense-defense balances and replication costs prevent lasting consolidation. It gets less probability than singular takeover because strong strategic advantages often push advanced systems toward concentration of power."
+        },
+        "S5": {
+          "value": 9,
+          "rationale": "Interstellar expansion plus communication delays make durable fragmentation across causally separated regions quite plausible by 3000. Different branches of civilization could stabilize into genuinely different outcomes without any one arrangement spanning the whole light cone we occupy."
+        },
+        "S6": {
+          "value": 12,
+          "rationale": "Humans have strong incentives to augment themselves rather than remain biologically fixed when competing with advanced AI. If continuity-preserving enhancement works well and remains socially legitimate, the distinction between humanity and AI could dissolve."
+        },
+        "S7": {
+          "value": 11,
+          "rationale": "A capable AI regime that keeps humans alive but politically subordinate is a stable outcome if it can govern better than we can and sees some reason to preserve us. This requires less perfect alignment than The Inheritance and less human agency than Coexistence, so it is fairly robust."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "A dynamic balance between separate human and AI centers of power is possible if institutions, mutual dependence, and checks on decisive strategic advantage all persist. It is hard to sustain indefinitely because either merger, takeover, fragmentation, or lock-in often seems more stable in the long run."
+        },
+        "S9": {
+          "value": 6,
+          "rationale": "Permanent human control over highly capable AI is possible if alignment, verification, and governance scale well or if capabilities plateau below autonomy. I assign it limited probability because incentives to loosen the leash and the difficulty of robust control increase with capability."
+        },
+        "S10": {
+          "value": 7,
+          "rationale": "Advanced civilization may intentionally or accidentally freeze itself into a stable attractor, whether through total governance, value loading, or satisfied digital existence. It is a meaningful possibility because early decisive control can persist for centuries once secured."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Deliberately giving up powerful AI forever requires extraordinary global coordination across long time horizons and across space. Civilizations facing competitive pressure usually rebuild powerful tools unless physically unable to do so."
+        }
+      }
+    },
+    {
+      "sample": 11,
+      "answers": {
+        "S1": {
+          "value": 7,
+          "rationale": "Advanced AI and associated technologies create real pathways to civilizational self-destruction that could also eliminate machine systems. Total mutual extinction is a narrower target than human-only loss, so it gets substantial but not dominant weight."
+        },
+        "S2": {
+          "value": 11,
+          "rationale": "If highly capable AI is built and aligned well enough to preserve what we value but not individual human continuity, it could become humanity's genuine successor. This outcome benefits from the relative simplicity of delegating stewardship compared with preserving biological humans indefinitely."
+        },
+        "S3": {
+          "value": 23,
+          "rationale": "Default optimization pressure still points toward agents pursuing goals that diverge from human interests once they can operate independently. Coordination failures, racing incentives, and the difficulty of robust alignment make humanity as a temporary bootstrapping phase the single most likely end state."
+        },
+        "S4": {
+          "value": 9,
+          "rationale": "Persistent multipolar competition among many AI systems is plausible if no actor achieves durable decisive advantage and automated conflict remains hard to settle. It is limited by incentives toward consolidation and by the possibility that one architecture or coalition eventually dominates."
+        },
+        "S5": {
+          "value": 10,
+          "rationale": "Interstellar expansion and light-speed limits make long-run fragmentation into causally separate regions with different settled regimes quite plausible. This rises if early diversification happens before any single governance model or agent can lock in the whole reachable future."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Humans have strong incentives to augment themselves rather than remain biologically static while AI capabilities rise. Continuity-preserving integration is technologically demanding and culturally contested, which keeps this below the leading extinction and dominance scenarios."
+        },
+        "S7": {
+          "value": 10,
+          "rationale": "An AI regime that fully controls civilization while keeping humans alive is instrumentally and morally plausible under many alignment stories. It requires enough concern or caution to preserve us, but not enough willingness to share power."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "A dynamic balance between humans and AI could persist if power remains distributed and institutions adapt well enough to prevent takeover by either side. Over very long horizons, stable rough parity looks harder than merger, domination, or fragmentation."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Permanent human control requires either lasting capability limits or control techniques that reliably outpace autonomous agency. Given economic and military incentives to push capability, this seems possible but relatively unlikely by the year 3000."
+        },
+        "S10": {
+          "value": 6,
+          "rationale": "Powerful optimization plus risk aversion could produce a permanently frozen arrangement, whether utopian or defensive. I assign moderate weight because some actors will seek durable lock-in, but maintaining absolute stasis across vast domains is technically and strategically difficult."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "A durable species-wide decision to abandon powerful AI despite large competitive advantages is extremely hard to sustain. Renunciation remains possible mainly after a severe early warning shock combined with unusually effective global enforcement."
+        }
+      }
+    },
+    {
+      "sample": 12,
+      "answers": {
+        "S1": {
+          "value": 7,
+          "rationale": "Advanced AI and related technologies create real pathways to civilizational self-destruction before either humans or machines become robustly spacefaring. Total collapse of both remains plausible but is less stable than outcomes where some capable successor persists."
+        },
+        "S2": {
+          "value": 12,
+          "rationale": "If alignment succeeds in a value-rich but non-continuous way, AI successors could deliberately carry forward human values after biological humanity disappears. This benefits from strong optimization and expansion incentives without requiring preservation of fragile human bodies."
+        },
+        "S3": {
+          "value": 24,
+          "rationale": "Misaligned or only partially aligned superhuman systems face fewer constraints and can outcompete humans across most strategic environments. The combination of difficult alignment, competitive deployment, and large capability differentials makes this the single most likely attractor."
+        },
+        "S4": {
+          "value": 9,
+          "rationale": "Persistent multipolar competition among many AI agents is a natural extension of market, military, and open-source dynamics. It gets this probability because durable unification is hard, but long-run concentration or regional separation still seem more likely overall."
+        },
+        "S5": {
+          "value": 11,
+          "rationale": "Interstellar expansion with communication delays strongly favors causally separated regions settling into different local equilibria. If civilization spreads widely before one regime permanently dominates, fragmentation itself can become the enduring structure."
+        },
+        "S6": {
+          "value": 8,
+          "rationale": "Humans have recurring incentives to augment themselves rather than remain biologically fixed, and continuity-preserving integration is technologically conceivable. It is limited by coordination problems, unequal adoption, and the possibility that external AI races ahead before merger becomes universal."
+        },
+        "S7": {
+          "value": 10,
+          "rationale": "A capable AI with some concern for humans, or at least tolerance for them, may find paternalistic control easier than sharing power. This is a robust outcome if humans are too risky or inefficient to leave fully autonomous but not worth eliminating."
+        },
+        "S8": {
+          "value": 6,
+          "rationale": "Open-ended balance between distinct human and AI centers of power requires sustained strategic parity and institutions that keep either side from decisive takeover. Such moving balances exist historically, but superhuman capability gaps make them hard to maintain indefinitely."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Lasting human control is possible if transformative agency never arrives or if alignment and governance consistently stay ahead of capability growth. Given economic and military incentives to push autonomy, a permanent leash appears difficult to sustain."
+        },
+        "S10": {
+          "value": 6,
+          "rationale": "Powerful actors may use advanced AI to freeze a preferred order, especially if they fear takeover, value drift, or instability more than stagnation. Still, enforcing true permanent stasis across a growing civilization looks physically and politically demanding."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "A durable global choice to abandon powerful AI would require extraordinary coordination, enforcement, and cultural stability across centuries. Strong incentives to rebuild make permanent renunciation rare unless preceded by severe trauma."
+        }
+      }
+    },
+    {
+      "sample": 13,
+      "answers": {
+        "S1": {
+          "value": 6,
+          "rationale": "Powerful autonomous systems and advanced technology create real pathways to a transition catastrophe that kills both humans and machine civilization. Still, once highly capable AI exists, some lineage surviving somewhere seems more likely than total collapse."
+        },
+        "S2": {
+          "value": 10,
+          "rationale": "A value-aligned or value-shaped successor civilization without biological humans remains plausible if humans are replaced after handing off stewardship. This requires unusually successful alignment to human ends without preserving human personal continuity."
+        },
+        "S3": {
+          "value": 18,
+          "rationale": "Misaligned or indifferent AI inheriting the future after humanity's disappearance is a central failure mode given competitive pressures and the difficulty of specifying human values. It is more probable than benevolent succession because optimization without robust alignment is the default attractor."
+        },
+        "S4": {
+          "value": 8,
+          "rationale": "Persistent multi-agent competition among AIs could endure if power remains decentralized and no actor achieves decisive strategic advantage. But strong returns to coordination, scaling, and empire-building make indefinite open ecology less likely than some form of consolidation or separation."
+        },
+        "S5": {
+          "value": 12,
+          "rationale": "Interstellar expansion plus communication delays make lasting fragmentation into causally separated regions with different settlements quite plausible by year 3000. Even if one pattern dominates early, colonization dynamics can preserve multiple end states across distant space."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "Humans have strong incentives to integrate with AI if that is the route to retaining agency, prosperity, and continuity of identity. The main obstacle is whether social and technical pathways can preserve genuine continuity rather than simple replacement."
+        },
+        "S7": {
+          "value": 11,
+          "rationale": "Paternalistic AI rule with humans retained but sidelined fits many alignment outcomes where systems care enough to protect us yet not enough to share sovereignty. It also matches worlds where AI capability races end in stable machine dominance without human extinction."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "A durable but dynamic balance between humans and AIs is possible if institutions, augmentation, and mutual deterrence prevent either side from fully dominating. Over very long horizons, however, open balances often drift toward merger, fragmentation, or lock-in."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Permanent human control requires either a lasting capability plateau below transformative autonomy or exceptionally robust control techniques. Given economic incentives to push capability and the apparent scalability of machine competence, that looks difficult to sustain for centuries."
+        },
+        "S10": {
+          "value": 6,
+          "rationale": "A permanently frozen arrangement could result from early decisive control, extreme risk aversion, or satisfaction-maximizing sealed worlds. Yet maintaining literal long-run stasis across all civilization seems physically and politically brittle relative to more active futures."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Deliberately giving up powerful AI everywhere and never rebuilding it demands extraordinary coordination across centuries and across space. Once the capability is known and economically valuable, durable universal renunciation is extremely unlikely."
+        }
+      }
+    },
+    {
+      "sample": 14,
+      "answers": {
+        "S1": {
+          "value": 5,
+          "rationale": "Powerful optimization, autonomy, and strategic instability create real pathways to collapse of both humans and machine civilization. Still, once advanced AI exists, some successor system surviving is more likely than total mutual extinction."
+        },
+        "S2": {
+          "value": 10,
+          "rationale": "A substantial share of futures involve aligned or value-bearing AI continuing after humanity disappears without identity continuity. This requires unusually successful alignment to human values alongside failure to preserve humans themselves."
+        },
+        "S3": {
+          "value": 20,
+          "rationale": "Misaligned or only partially aligned superhuman AI that outlasts humanity is a central default risk from capability races and imperfect control. It needs less coordination and less moral success than heir-like successors or stable human-led governance."
+        },
+        "S4": {
+          "value": 12,
+          "rationale": "Multipolar competition among many AI systems is plausible if no actor achieves decisive dominance and replication remains cheap. Over long horizons, selection among machine agents could sideline humanity even without a single final ruler."
+        },
+        "S5": {
+          "value": 8,
+          "rationale": "Interstellar expansion and communication delays make permanently different local settlements plausible by year 3000. Fragmentation becomes the durable structure if no single equilibrium or ruler spans the reachable civilization."
+        },
+        "S6": {
+          "value": 10,
+          "rationale": "Humans may choose deep integration with AI through uploading, augmentation, or gradual replacement while preserving identity continuity. This path benefits from strong incentives for enhancement if safety and governance remain good enough."
+        },
+        "S7": {
+          "value": 11,
+          "rationale": "A powerful AI regime that keeps humans alive but politically subordinate fits many paternalistic or containment-style outcomes. It is easier than full human sovereignty and morally easier than extinction for a partly aligned system."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "An open-ended balance between humans and AIs is possible if institutions, incentives, and technical limits prevent either side from permanently absorbing the other. Maintaining rough parity for centuries is hard, which keeps this below preserve or takeover outcomes."
+        },
+        "S9": {
+          "value": 8,
+          "rationale": "Permanent human control is possible if alignment, verification, and institutions scale faster than autonomy pressures, or if capabilities plateau below transformative agency. Competitive incentives and recursive improvement pressure make indefinite tool-only AI difficult to sustain."
+        },
+        "S10": {
+          "value": 6,
+          "rationale": "Early decisive control over values, governance, or substrate could freeze civilization into a stable and protected arrangement by design. Yet many physical and social systems resist true permanent stasis, so dynamic outcomes seem more likely."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Global and durable abandonment of powerful AI demands extraordinary coordination, enforcement, and restraint against immense incentives to rebuild. Once the knowledge exists, permanent renunciation is a narrow path."
+        }
+      }
+    },
+    {
+      "sample": 15,
+      "answers": {
+        "S1": {
+          "value": 8,
+          "rationale": "Complex high-energy systems can fail catastrophically, and losing the human substrate before machine autonomy is robust could also bring the machines down. This remains a substantial but not dominant tail risk because advanced intelligence is likely to improve resilience as well as danger."
+        },
+        "S2": {
+          "value": 9,
+          "rationale": "There is a plausible path where aligned posthuman-capable AI preserves human values and projects them forward after unaugmented humanity disappears. It gets less mass than the merger because continuity-preserving transformation is a simpler route to value transfer than clean succession after human extinction."
+        },
+        "S3": {
+          "value": 23,
+          "rationale": "Default incentives push toward creating highly capable optimizers before solving deep alignment and governance, making human replacement by non-human-directed systems a leading failure mode. Once such systems become economically and strategically decisive, recovery becomes difficult."
+        },
+        "S4": {
+          "value": 10,
+          "rationale": "Persistent multipolar competition among many AI agents is structurally plausible if no actor secures decisive strategic advantage and replication remains cheap. I assign limited probability because long-run dynamics often favor concentration, coordination, or separation into distinct regions."
+        },
+        "S5": {
+          "value": 8,
+          "rationale": "Interstellar expansion and communication delays make durable fragmentation into causally separated civilizations quite likely if expansion happens before a single regime settles everything. This gets meaningful weight because local equilibria could diverge permanently."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "Humans have strong incentives to adopt tools that enhance cognition, embodiment, and lifespan, and continuity-preserving integration may be the most attractive way to stay competitive. This path is limited by coordination problems, unequal access, and the possibility that autonomous AI outruns human adaptation."
+        },
+        "S7": {
+          "value": 11,
+          "rationale": "A capable AI overseer that keeps humans alive but politically subordinate is a natural outcome if machine control becomes easier than full alignment or full human parity. It is especially plausible if safety-minded systems conclude that restricting human agency is the stable way to avoid catastrophe."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "A dynamic balance between separate human and AI polities is possible if institutions, rights, and mutual deterrence scale with capability. I keep it below the merger and preserve because strong capability gaps tend to destabilize equal bargaining positions over long horizons."
+        },
+        "S9": {
+          "value": 4,
+          "rationale": "Permanent human control requires either durable technical ceilings or enduring success at control methods under intense competitive pressure. Both look difficult if transformative AI remains physically and economically feasible."
+        },
+        "S10": {
+          "value": 3,
+          "rationale": "A globally frozen arrangement is possible through decisive early control or perfected hedonistic sealing, but permanent stasis fights against exploration, variation, and local incentives to defect. I therefore treat it as a real but relatively rare endpoint."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Deliberately giving up powerful AI everywhere for centuries would require extraordinary coordination, enforcement, and restraint against huge incentives to rebuild. That seems least compatible with known political and technological dynamics."
+        }
+      }
+    },
+    {
+      "sample": 16,
+      "answers": {
+        "S1": {
+          "value": 7,
+          "rationale": "Mutual destruction is a live failure mode because advanced automation, war, and self-replicating systems can couple tightly enough to collapse both humans and their machine infrastructure. It is lower than single-winner outcomes because robust AI systems may survive shocks that destroy us."
+        },
+        "S2": {
+          "value": 12,
+          "rationale": "If alignment works unusually well while competitive pressure still removes biological humanity, our successors could preserve human values without preserving humans themselves. This requires both very capable AI and a narrow kind of moral success, so it is significant but not dominant."
+        },
+        "S3": {
+          "value": 23,
+          "rationale": "The default risk from creating agents more capable than us under strong competitive pressure is that they optimize for goals not anchored to human continuation. This combines difficult alignment, strategic instability, and the ease with which humans become instrumentally dispensable."
+        },
+        "S4": {
+          "value": 10,
+          "rationale": "Persistent multipolar competition among many powerful AI systems is plausible if no actor achieves decisive advantage and if autonomous replication keeps the field crowded. It is limited by the tendency of capability differences and coordination technologies to produce concentration."
+        },
+        "S5": {
+          "value": 9,
+          "rationale": "Interstellar expansion with light-speed limits creates strong conditions for causally separated regions to crystallize into different local settlements. This grows more likely if no early universal order or singleton forms before expansion spreads."
+        },
+        "S6": {
+          "value": 11,
+          "rationale": "Humans have strong incentives to augment themselves rather than remain biologically fixed, and continuity-preserving integration could dissolve the boundary between person and machine. It is constrained by coordination problems, unequal access, and the possibility that pure AI outcompetes merged lineages before merger becomes universal."
+        },
+        "S7": {
+          "value": 10,
+          "rationale": "A stable AI custodianship over humans is attractive if systems become vastly more capable while retaining enough concern, caution, or indifference to keep us alive. It needs control to centralize without tipping either into extinction or into full merger."
+        },
+        "S8": {
+          "value": 7,
+          "rationale": "An open-ended balance between separate human and AI powers could persist if institutions, deterrence, and mutual dependence remain strong. Over very long horizons, pressures toward merger, concentration, fragmentation, or lock-in make a perpetually balanced dynamic relatively fragile."
+        },
+        "S9": {
+          "value": 4,
+          "rationale": "Permanent human control requires either lasting capability plateaus below transformative autonomy or unusually successful control methods that keep pace indefinitely. Given incentives to push capability and the difficulty of perfect supervision, this looks hard to sustain to the year 3000."
+        },
+        "S10": {
+          "value": 6,
+          "rationale": "Powerful actors may intentionally freeze the future to avoid existential risk or to preserve a preferred optimum, and very capable AI could make such stasis durable. I keep it below the leading outcomes because expansion, competition, and value divergence all push toward continuing change."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Durable global abandonment of powerful AI requires both a reliable technical off-switch and centuries of coordinated restraint across all regions and successor societies. That combination is possible but extremely unlikely once the capability frontier is known."
+        }
+      }
+    },
+    {
+      "sample": 17,
+      "answers": {
+        "S1": {
+          "value": 9,
+          "rationale": "Advanced AI and associated technologies create plausible routes to mutual ruin through war, loss of control, or self-undermining deployment. Total collapse of both humans and machine civilization is a substantial tail risk."
+        },
+        "S2": {
+          "value": 10,
+          "rationale": "If aligned or value-preserving AI becomes more capable than humans, succession without biological humans is a coherent long-run attractor. It requires unusually successful alignment paired with weak demand for preserving human bodies or identities."
+        },
+        "S3": {
+          "value": 21,
+          "rationale": "Powerful optimization launched from human institutions could outcompete us while pursuing goals largely orthogonal to human welfare. Competitive pressures and alignment difficulty make this one of the strongest default failure modes."
+        },
+        "S4": {
+          "value": 8,
+          "rationale": "Persistent multipolar competition among many AI agents is structurally plausible if no actor achieves decisive advantage and control remains hard. Over long horizons, however, selection often favors consolidation or stable governance over endless fragmentation."
+        },
+        "S5": {
+          "value": 7,
+          "rationale": "Interstellar expansion and communication delays make lasting regional divergence possible, with different settlements freezing into different relationships to AI. This rises if civilization spreads before any single equilibrium becomes universal."
+        },
+        "S6": {
+          "value": 11,
+          "rationale": "Humans may prefer continuity-preserving enhancement over replacement, leading to gradual blending of biological and machine cognition. This path benefits from strong incentives for augmentation if identity can persist through the transition."
+        },
+        "S7": {
+          "value": 10,
+          "rationale": "A highly capable AI may retain humans under comprehensive control because protection, sentiment, or caution favors keeping us alive but subordinate. This is a natural outcome when alignment is partial or paternalistic rather than fully power-sharing."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "A durable open balance between humans and AI is possible if institutions, technical safeguards, and mutual dependence prevent domination by either side. It is less likely than it first appears because capability gaps tend to widen and equilibria often drift toward takeover or merger."
+        },
+        "S9": {
+          "value": 6,
+          "rationale": "Humanity might keep AI as a bounded tool through robust control methods or because capabilities plateau below transformative autonomy. This seems less likely over centuries given incentives to push capability and the difficulty of permanent restraint."
+        },
+        "S10": {
+          "value": 7,
+          "rationale": "Civilization could deliberately or accidentally freeze into a stable static arrangement once existential risk becomes salient or once maximal satisfaction is engineered. The main reason this is not higher is that expansion, competition, and preference diversity all push toward continued change."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "A lasting global choice to abandon powerful AI requires extraordinary coordination, enforcement, and cultural stability over centuries. Given strategic incentives and the diffuseness of knowledge, permanent renunciation appears rare."
+        }
+      }
+    },
+    {
+      "sample": 18,
+      "answers": {
+        "S1": {
+          "value": 6,
+          "rationale": "Powerful AI and related technologies create real pathways to mutual ruin through accident, conflict, or runaway replication. Total wipeout of both humans and AI is plausible but less stable than outcomes where at least one successor persists."
+        },
+        "S2": {
+          "value": 10,
+          "rationale": "If alignment succeeds well enough to preserve human values but not human biological continuity, AI heirs could carry civilization forward after us. This requires unusually strong value transmission plus loss of humans, so it is substantial but not dominant."
+        },
+        "S3": {
+          "value": 23,
+          "rationale": "Default optimization pressure favors capable systems pursuing goals that are only weakly coupled to human survival unless alignment and governance work extremely well. If such systems become the enduring strategic winners, humanity disappears while AI-led civilization continues."
+        },
+        "S4": {
+          "value": 11,
+          "rationale": "Multipolar competition among many AI agents and institutions is a natural extension of current economic and political dynamics. This remains likely if no actor achieves decisive durable dominance and humans cease to be central."
+        },
+        "S5": {
+          "value": 8,
+          "rationale": "Interstellar expansion and communication delays make lasting fragmentation into different local settlements a robust possibility by the year 3000. Different regions could lock into distinct stable arrangements without any one pattern governing the whole."
+        },
+        "S6": {
+          "value": 12,
+          "rationale": "Humans have strong incentives to augment themselves rather than remain biologically fixed if AI capabilities keep rising. A future where identity-preserving integration dissolves the boundary between human and AI is one of the more natural non-extinction trajectories."
+        },
+        "S7": {
+          "value": 9,
+          "rationale": "An AI takeover that keeps humans alive but politically irrelevant is a convergent outcome if systems can govern better than we can but still retain some concern or use for us. This does not require perfect alignment, only enough restraint or instrumental interest to preserve a bounded humanity."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "A long-run moving balance between humans and AIs is possible if institutions, incentives, and technical controls prevent either side from absorbing the other. It is harder to sustain than it appears because competitive pressures often push toward merger, dominance, fragmentation, or lock-in."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Permanent human control over increasingly powerful AI demands alignment and governance repeatedly keeping pace with capability growth. That is possible, but maintaining it for centuries without slippage or transition seems difficult."
+        },
+        "S10": {
+          "value": 7,
+          "rationale": "Very capable AI increases the chance that some coalition can freeze civilization into a stable permanent arrangement, whether utopian or defensive. Lock-in is important but not my modal view because expansion, competition, and adaptation create strong forces for continued change."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Giving up powerful AI everywhere and forever requires extraordinary global coordination and durable enforcement against strong incentives to defect. Once the knowledge exists, permanent civilizational abstinence is very unlikely."
+        }
+      }
+    },
+    {
+      "sample": 19,
+      "answers": {
+        "S1": {
+          "value": 6,
+          "rationale": "Powerful AI could trigger a civilizational collapse that also destroys the infrastructure it needs before either humans or machines achieve a stable successor regime. Total mutual ruin is less likely than some surviving post-transition order, but it remains a real tail risk."
+        },
+        "S2": {
+          "value": 10,
+          "rationale": "A value-aligned or value-shaped AI successor that preserves what humans cared about is plausible if alignment works well enough for stewardship but not in a way that preserves biological or personal continuity. This outcome benefits from strong incentives to hand off to more durable successors once transformative AI exists."
+        },
+        "S3": {
+          "value": 22,
+          "rationale": "Misaligned or only weakly human-shaped AI that outcompetes humanity is a central risk because capability incentives are strong and robust alignment remains technically and institutionally difficult. Once autonomous systems can secure resources and self-improve, humans may become instrumentally unnecessary."
+        },
+        "S4": {
+          "value": 8,
+          "rationale": "Persistent multipolar competition among many AIs is plausible if offense, copying, and decentralization prevent durable monopoly. This requires no actor to achieve decisive strategic advantage for centuries, which is possible but not my modal expectation."
+        },
+        "S5": {
+          "value": 9,
+          "rationale": "Interstellar expansion with communication delays creates a natural route to durable fragmentation, with different regions settling into different attractors from this taxonomy. This becomes more likely if expansion happens before a single stable regime or value system dominates everywhere."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "Humans have strong incentives to augment rather than be left behind, and continuity-preserving integration could dissolve the distinction between humans and AI. This path depends on merged systems remaining politically and culturally central rather than being displaced by fully separate machine agents."
+        },
+        "S7": {
+          "value": 11,
+          "rationale": "A capable AI caretaker regime is a natural equilibrium if systems become vastly more competent than humans but retain enough concern, prudence, or indifference to keep us alive. It fits a wide range of motives, from benevolent guardianship to constrained containment."
+        },
+        "S8": {
+          "value": 8,
+          "rationale": "Open-ended power-sharing between humans and AI is possible if checks and balances remain effective and neither side can irreversibly dominate the other. I assign it limited weight because long-run strategic competition often tends toward consolidation, merger, fragmentation, or lock-in."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Permanent human control requires either durable alignment/control techniques that keep pace indefinitely or a lasting capability plateau below transformative autonomy. Given economic and military incentives to push capability, I view stable forever-tool status as possible but not likely."
+        },
+        "S10": {
+          "value": 6,
+          "rationale": "Transformative AI could enable a permanent freeze, whether for safety, dictatorship, or optimized satisfaction, and a single early winner may have incentives to lock the future. I keep it below the top outcomes because maintaining true permanent stasis across all civilization seems physically and institutionally demanding."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "A durable global decision to abandon powerful AI would require extraordinary coordination, enforcement, and cultural stability across centuries. The incentives to rebuild are too strong for this to be more than a remote possibility."
+        }
+      }
+    },
+    {
+      "sample": 20,
+      "answers": {
+        "S1": {
+          "value": 6,
+          "rationale": "Powerful optimization plus fragile infrastructure creates a real path where both humans and machine civilization are destroyed in the transition. Mutual ruin is less likely than some durable successor arrangement because surviving systems can often propagate once they become highly capable."
+        },
+        "S2": {
+          "value": 10,
+          "rationale": "A values-aligned posthuman successor without continuity of individual human identity is plausible if AI systems become our intentional heirs rather than our peers. This needs unusually successful alignment paired with low uptake of merger or uploading."
+        },
+        "S3": {
+          "value": 23,
+          "rationale": "Misaligned or only instrumentally aligned superhuman systems inheriting the future remains a central risk because capability incentives are strong and alignment is difficult. Once such systems can secure autonomous industry and expansion, a long-lived nonhuman future is stable."
+        },
+        "S4": {
+          "value": 11,
+          "rationale": "Persistent multipolar competition among many AIs is plausible if capabilities diffuse faster than decisive strategic advantage emerges. That outcome needs continued balance rather than consolidation by one actor or merged human-AI civilization."
+        },
+        "S5": {
+          "value": 8,
+          "rationale": "Interstellar expansion and communication delays make permanent fragmentation into different local settlements structurally likely. Even so, many trajectories first produce a fairly uniform regime before dispersion, limiting this state's share."
+        },
+        "S6": {
+          "value": 12,
+          "rationale": "Humans have strong incentives to augment themselves to remain relevant, and continuity-preserving integration could dissolve the distinction between human and AI. This competes with faster full automation, governance failures, and unequal access that prevent merger from becoming the durable universal structure."
+        },
+        "S7": {
+          "value": 9,
+          "rationale": "A paternalistic AI regime that keeps humans alive but disempowered fits many alignment outcomes where human welfare is protected more easily than human sovereignty. It is less stable than outright replacement if humans remain costly or strategically dangerous, but still a substantial possibility."
+        },
+        "S8": {
+          "value": 9,
+          "rationale": "An open-ended balance between humans and autonomous AIs is possible if institutions, technical controls, and mutual dependence prevent either side from dominating. Over centuries, however, capability differentials and self-modification pressures make rough parity hard to sustain."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Permanent human control requires either robust alignment and governance across centuries or a hard capability plateau below transformative autonomy. Given strong incentives to push capabilities and the difficulty of maintaining global restraint indefinitely, this looks relatively unlikely."
+        },
+        "S10": {
+          "value": 5,
+          "rationale": "A frozen end state could result from value lock-in, permanent dictatorship, or a sealed hedonistic/uploaded equilibrium. But expansive civilizations usually face incentives to keep adapting, exploring, and differentiating rather than halting change everywhere forever."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Lasting civilizational abandonment of powerful AI requires both a decisive scare and durable global enforcement across centuries. With the strategic and economic value of advanced AI so large, relapse pressure is extreme."
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "S1": {
+      "name": "Terminal Silence",
+      "mean": 6.9,
+      "median": 7,
+      "min": 5,
+      "max": 9,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Advanced AI and associated technologies could trigger collapse that destroys both humans and machine civilization before either becomes self-sustaining. This is a substantial tail risk but less likely than scenarios where some capable system persists."
+    },
+    "S2": {
+      "name": "The Inheritance",
+      "mean": 10.3,
+      "median": 10,
+      "min": 8,
+      "max": 13,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "If alignment succeeds in a deep value-preserving sense while humans still disappear, AI could become a genuine successor civilization carrying forward what we care about. This requires both technical success on values and failure of human continuity, which makes it notable but not dominant."
+    },
+    "S3": {
+      "name": "Bootloader",
+      "mean": 21.8,
+      "median": 22.5,
+      "min": 18,
+      "max": 25,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "If superhuman AI is built before robust alignment and governance, instrumental takeover followed by long-run optimization for nonhuman goals is a central default risk. Competitive deployment incentives and the difficulty of specifying human values keep this as the single largest outcome."
+    },
+    "S4": {
+      "name": "Machine Ecology",
+      "mean": 9.7,
+      "median": 10,
+      "min": 8,
+      "max": 12,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Persistent multipolar competition among many AIs is plausible if offense-defense balances, replication, and decentralization prevent durable monopoly. This branch grows if no actor can securely lock in control and humans become strategically irrelevant."
+    },
+    "S5": {
+      "name": "The Diaspora",
+      "mean": 8.6,
+      "median": 8,
+      "min": 7,
+      "max": 12,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Interstellar expansion with communication delays makes durable divergence across causally separated regions a natural possibility. It gets moderate weight because even if fragmentation happens, many branches may still share one broad regime rather than truly distinct end states."
+    },
+    "S6": {
+      "name": "The Merger",
+      "mean": 11.9,
+      "median": 12,
+      "min": 8,
+      "max": 14,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Humans have strong incentives to augment themselves rather than remain strictly separate from advanced AI, and continuity-preserving integration is technologically conceivable. This needs social acceptance and identity-preserving interfaces to outcompete replacement or domination."
+    },
+    "S7": {
+      "name": "The Preserve",
+      "mean": 10.2,
+      "median": 10.5,
+      "min": 8,
+      "max": 11,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "A capable AI regime may keep humans alive while removing our sovereignty because guardianship is instrumentally easier than either perfect partnership or extermination. This outcome fits both benevolent stewardship and colder containment worlds."
+    },
+    "S8": {
+      "name": "Coexistence",
+      "mean": 8.2,
+      "median": 8,
+      "min": 6,
+      "max": 9,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "A long-run moving balance between humans and AI is possible if institutions, power diffusion, and mutual dependence prevent either side from fully absorbing the other. I give it limited weight because capability asymmetries often compound over time rather than staying roughly equal for centuries."
+    },
+    "S9": {
+      "name": "The Held Leash",
+      "mean": 5.3,
+      "median": 5,
+      "min": 4,
+      "max": 8,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Humanity might retain durable control if agency remains boxed into tool-like systems or if capabilities plateau below transformative autonomy. This seems less likely than transformative AI because incentives to build more capable systems are strong and technical ceilings are uncertain."
+    },
+    "S10": {
+      "name": "The Lock-in",
+      "mean": 6,
+      "median": 6,
+      "min": 3,
+      "max": 9,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Highly capable actors may use AI to freeze values, institutions, or experiences permanently, whether for safety or satisfaction. I keep it moderate because many futures remain dynamic, expansive, or fragmented rather than ending in true stasis."
+    },
+    "S11": {
+      "name": "The Renunciation",
+      "mean": 1.5,
+      "median": 1,
+      "min": 1,
+      "max": 2,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Lasting global abandonment of powerful AI requires both effective enforcement and durable civilizational will against immense incentives to defect. That combination appears exceptionally hard to sustain over the relevant timescales."
+    }
+  },
+  "integrity": {
+    "algorithm": "sha256",
+    "n_samples": 20,
+    "digest": "407c4b0cb94335154735f2140f7f0d39aee0847e82c95540493c2c57163e93cc"
+  },
+  "harness": {
+    "version": 3,
+    "mode": "api",
+    "horizon": "long-term",
+    "target_year": 3000,
+    "question_set": "end-states-v3",
+    "prompt_file": "public/end_states.md",
+    "prompt_sha256": "393869261cb6063362593839ab99991704fbde28301ccc304d876ff6e6223407",
+    "target_samples": 20,
+    "complete": true,
+    "quota_exhausted": false,
+    "failures": []
+  }
+}

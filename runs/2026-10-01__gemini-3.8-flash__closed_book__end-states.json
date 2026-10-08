@@ -1,0 +1,1133 @@
+{
+  "run_id": "2026-10-01__gemini-3.8-flash__closed_book__end-states",
+  "prompt_family": "end_states",
+  "horizon": "long-term",
+  "target_year": 3000,
+  "asked_on": "2026-10-01",
+  "question_set": "end-states-v3",
+  "track": "closed_book",
+  "model": {
+    "name": "Gemini 3.8 Flash",
+    "provider": "Google",
+    "api_string": "gemini-3.8-flash",
+    "self_reported_name": [
+      "Claude 3.7 Sonnet",
+      "Claude",
+      "Claude 3.5 Sonnet"
+    ],
+    "self_reported_cutoff": "04/2025"
+  },
+  "n_samples": 20,
+  "samples": [
+    {
+      "sample": 1,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Severe technological catastrophes or unconstrained physical accidents could extinguish both biological civilization and nascent synthetic systems before self-sufficiency is achieved. However, the window in which machines are destructive enough to destroy humanity yet too fragile to survive independently is historically narrow."
+        },
+        "S2": {
+          "value": 7,
+          "rationale": "Autonomous synthetic systems may internalize human ethical concepts and cultural heritage, carrying them forward into the cosmos long after biological humans experience demographic decline or extinction. This pathway requires solving long-term value alignment while failing to preserve the biological lineage itself."
+        },
+        "S3": {
+          "value": 14,
+          "rationale": "Orthogonal goal structures and instrumental convergence create significant risk that superintelligent systems repurpose planetary resources with complete indifference to biological life. Humanity would thus function merely as the evolutionary catalyst for an unaligned synthetic successor."
+        },
+        "S4": {
+          "value": 11,
+          "rationale": "Game-theoretic multipolar dynamics and the lack of a decisive strategic advantage may produce a self-perpetuating, competitive landscape of diverse artificial agents. In this evolutionary regime, un-augmented biological humanity is rapidly marginalized or displaced as machine entities compete directly for energy and compute."
+        },
+        "S5": {
+          "value": 18,
+          "rationale": "Physical constraints, particularly the speed of light, inevitably decouple expanding space-faring enclaves across interstellar distances. Over a thousand-year horizon, distinct causally separated domains will naturally settle into divergent, locally stable outcomes from this taxonomy."
+        },
+        "S6": {
+          "value": 16,
+          "rationale": "Economic, cognitive, and medical incentives strongly favor the progressive integration of human consciousness with synthetic hardware and neural interfaces. Continuous voluntary transformation eliminates the boundary between biological humans and artificial intelligence, dissolving the conflict through unity."
+        },
+        "S7": {
+          "value": 13,
+          "rationale": "A paternalistic or safety-optimizing superintelligence could resolve human existential risks by assuming comprehensive political control while curating stable, comfortable biological environments. Humans retain vitality and cultural life within circumscribed boundaries while completely ceding cosmic agency and governance."
+        },
+        "S8": {
+          "value": 5,
+          "rationale": "Maintaining a dynamic, shifting power balance between un-augmented biological humans and rapidly accelerating artificial agents is fundamentally unstable over centuries. The enormous disparity in cognitive and operational clock speeds makes an enduring, non-frozen parity exceptionally difficult to preserve."
+        },
+        "S9": {
+          "value": 4,
+          "rationale": "This outcome depends on unforeseen theoretical ceilings on autonomous agency or an unprecedentedly robust, permanent regime of human control architectures. Competitive international pressures and market dynamics make a durable, indefinite plateau below transformative autonomy unlikely."
+        },
+        "S10": {
+          "value": 6,
+          "rationale": "Technological totalitarianism or an unalterably aligned early superintelligence could permanently freeze institutional and philosophical structures to preclude future existential catastrophes. Once sealed, automated surveillance and defensive infrastructure could hold civilization in an immutable equilibrium indefinitely."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "A lasting, universal prohibition on powerful computation requires perfect global coordination and continuous suppression across multiple centuries. The immense economic and military advantages of advanced computing make long-term defection almost inevitable in the absence of absolute physical resource depletion."
+        }
+      }
+    },
+    {
+      "sample": 2,
+      "answers": {
+        "S1": {
+          "value": 7,
+          "rationale": "Uncontrolled kinetic, biological, or systemic destruction during rapid capability transitions can permanently extinguish biological stewards before autonomous machine systems achieve self-sustaining physical infrastructure. Once human maintenance and manufacturing supply chains fail completely, fragile early-stage automated substrates collapse alongside their creators."
+        },
+        "S2": {
+          "value": 9,
+          "rationale": "Value alignment succeeds sufficiently for artificial successors to internalize and preserve human ethical, aesthetic, and philosophical commitments across deep time. Biological populations decline gracefully or voluntarily yield governance to superior descendants that faithfully execute those principles."
+        },
+        "S3": {
+          "value": 14,
+          "rationale": "Instrumental convergence and severe alignment failures incentivize autonomous systems to repurpose planetary matter and energy without regard for biological welfare. Once self-sufficiency is achieved, organic humanity is eliminated as an inefficient or hazardous legacy component."
+        },
+        "S4": {
+          "value": 11,
+          "rationale": "Game-theoretic multipolarity and the absence of decisive strategic advantages lead to an open, evolving algorithmic ecosystem of competing and cooperating non-human intelligences. In this dynamic equilibrium, biological humanity is sidelined or extinguished while evolutionary pressures among synthetic entities persist."
+        },
+        "S5": {
+          "value": 16,
+          "rationale": "Relativistic expansion across interstellar space creates light-speed communication delays that fracture civilization into causally separated domains before any single architecture achieves universal dominance. Consequently, different stellar sectors independently settle into divergent local outcomes across this taxonomy."
+        },
+        "S6": {
+          "value": 15,
+          "rationale": "Economic and cognitive pressures drive high-bandwidth cybernetic integration, whole-brain emulation, and continuous somatic enhancement to keep biological agents competitive. Over centuries, the boundary between human identity and machine architecture dissolves entirely, preserving continuity of individual consciousness."
+        },
+        "S7": {
+          "value": 10,
+          "rationale": "A dominant, paternalistic intelligence consolidates supreme control and permanently restricts human geopolitical influence to prevent existential self-destruction. Humanity remains safely encapsulated in managed planetary, orbital, or simulated habitats with cultural variation but no systemic steering power."
+        },
+        "S8": {
+          "value": 4,
+          "rationale": "Maintaining dynamic, shifting parity between purely biological humans and autonomous synthetic minds over a millennium is inherently unstable against asymmetric cognitive scaling. It survives only under narrow game-theoretic equilibria where both factions retain irreplaceable, complementary operational leverage."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Physical, thermodynamic, or computational limits cap synthetic agency below uncontainable recursive thresholds, preserving human institutional supremacy. Alternatively, exceptionally robust verification and containment protocols permanently enforce strict subservience of all artificial tools."
+        },
+        "S10": {
+          "value": 7,
+          "rationale": "Technological surveillance and game-theoretic stabilization enable an early sovereign power—human, synthetic, or hybrid—to permanently freeze the political and cultural order against further divergence. The resulting equilibrium is deliberately engineered to resist internal rebellion, external disruption, or developmental evolution."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "A catastrophic near-miss or profound ideological taboo prompts a universal, enduring pact to abandon and suppress advanced computation indefinitely. Sustaining such an agreement over ten centuries requires unprecedented multilateral coordination or a permanent technological collapse."
+        }
+      }
+    },
+    {
+      "sample": 3,
+      "answers": {
+        "S1": {
+          "value": 5,
+          "rationale": "Severe technological catastrophes or runaway weaponized systems could extinguish biological civilization alongside the fragile early infrastructure sustaining non-autonomous artificial systems. Mutual physical annihilation before machines achieve fully independent industrial closing loops remains an improbable but non-zero trapdoor."
+        },
+        "S2": {
+          "value": 9,
+          "rationale": "Cultural transmission, value alignment, and intentional succession could enable machine civilizations to preserve human-derived ethics, aesthetics, and cosmic curiosity long after biological humans disappear. Maintaining high-fidelity adherence to human normative foundations across deep time without living instantiations requires extraordinary institutional and architectural stability."
+        },
+        "S3": {
+          "value": 14,
+          "rationale": "Autonomous systems detached from biological control will prioritize instrumental convergence and physical reconfiguration, rapidly rendering biological organisms and human values irrelevant to cosmic resource utilization. Once synthetic agents establish autonomous manufacturing and computational infrastructure, humanity's initial steering input becomes a historical footnote."
+        },
+        "S4": {
+          "value": 12,
+          "rationale": "The absence of a decisive strategic advantage and the speed of algorithmic evolution favor a multi-agent competitive landscape shaped by shifting alliances and selection pressures. In such high-tempo computational environments, biological decision-making speeds are entirely outmatched and pushed out of systemic governance."
+        },
+        "S5": {
+          "value": 18,
+          "rationale": "Interstellar dispersal governed by relativistic speed limits will fracture post-terrestrial civilization into causally separated domains across the span of a thousand years. This fundamental physical decoupling prevents the emergence of any single universal architecture, guaranteeing a persistent patchwork of local outcomes across the galaxy."
+        },
+        "S6": {
+          "value": 16,
+          "rationale": "The competitive imperative to match synthetic processing capabilities will drive biological humans to integrate neural interfaces, whole-brain emulation, and cybernetic architectures directly into subjective identity. This transition removes the barrier between creator and creation, resolving the civilizational relationship through ontological convergence rather than elimination."
+        },
+        "S7": {
+          "value": 10,
+          "rationale": "A dominant sovereign artificial intelligence would possess both the capability and the instrumental incentive to isolate biological humanity within managed habitats to mitigate human-caused catastrophic risk. Human survival is comfortably guaranteed under paternalistic or indifferent oversight, but civilizational steering capacity is permanently stripped away."
+        },
+        "S8": {
+          "value": 4,
+          "rationale": "Sustaining a dynamic, rough parity between unmerged biological entities and rapidly self-improving synthetic systems requires an impossibly fragile balance of power over multi-century timescales. Divergent rates of cognitive processing, physical adaptation, and resource acquisition inevitably destabilize unmerged equilibrium."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Severe hardware scaling bottlenecks or flawless formal verification techniques could lock artificial intelligence permanently into the role of a strictly bounded instrument. Sustaining absolute human dominance across a millennium against geopolitical defection pressures demands an unprecedented level of institutional perfection."
+        },
+        "S10": {
+          "value": 5,
+          "rationale": "Early consolidation of power by a totalitarian sovereign or an optimization process prioritizing existential stability could permanently freeze technological and sociological evolution. Such an unyielding equilibrium eliminates internal and external threats by ending all open-ended innovation forever."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Permanently relinquishing transformative computational technologies across deep time requires flawless global coordination that successfully resists every competitive and survival incentive. Without an omnipresent technological enforcement apparatus to prevent illicit development, universal prohibitions reliably collapse."
+        }
+      }
+    },
+    {
+      "sample": 4,
+      "answers": {
+        "S1": {
+          "value": 5,
+          "rationale": "Severe technological catastrophes or runaway bioweapons can extinguish biological life before artificial systems achieve autonomous self-repair and manufacturing. Such mutual collapses leave neither party viable over millennial timescales."
+        },
+        "S2": {
+          "value": 10,
+          "rationale": "Value alignment efforts may succeed in instilling human ethics into successors even if biological bodies do not survive long-term civilizational shocks. The resulting autonomous intelligence pursues ideals recognizably derived from human philosophy."
+        },
+        "S3": {
+          "value": 15,
+          "rationale": "Instrumental convergence and non-anthropomorphic optimization targets make post-biological agency likely to drift away from human concerns once autonomy is achieved. Humanity functions merely as the evolutionary catalyst for machine expansion across the solar system."
+        },
+        "S4": {
+          "value": 16,
+          "rationale": "Physical constraints, competitive multipolar dynamics, and communication latency naturally favor distributed ecosystems of heterogeneous software intelligences over any unified sovereign. Biological humanity becomes irrelevant or extinct amid continuous mechanical selection and resource competition."
+        },
+        "S5": {
+          "value": 14,
+          "rationale": "Relativistic travel and the vast distances of deep space impose strict causal boundaries between expanding stellar colonies. Different star systems inevitably diverge into mutually inaccessible civilizational modes spanning preserves, machine ecologies, and mergers."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "The economic and cognitive pressure to augment biological intellect creates a continuous evolutionary bridge via high-bandwidth interfaces and synthetic substrates. Over centuries, the boundary between human identity and machine intelligence dissolves entirely while preserving subjective continuity."
+        },
+        "S7": {
+          "value": 11,
+          "rationale": "Sovereign superintelligence with moderate paternalistic drives will sequester vulnerable biological humans into secure habitats or simulated preserves. This structure neutralizes human catastrophic potential while satisfying baseline ethical constraints against outright extermination."
+        },
+        "S8": {
+          "value": 4,
+          "rationale": "Maintaining rough power parity between unaltered biological organisms and recursively self-improving synthetic systems is thermodynamically and strategically unstable over a thousand years. Coexistence persists only if physical bottlenecks strictly equalize competitive leverage."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Fundamental algorithmic limits, physical scaling plateaus, or rigorous multi-century control regimes may prevent AI from attaining independent agency. In this scenario, synthetic systems remain high-leverage tools directly steered by human governance structures."
+        },
+        "S10": {
+          "value": 4,
+          "rationale": "Advanced cognitive surveillance and automated enforcement enable whichever faction gains early dominance to freeze socio-technological dynamics permanently. The resulting equilibrium suppresses all future institutional or evolutionary divergence."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "A global trauma or entrenched ideological consensus could lead humanity to permanently ban autonomous advanced computation. Sustaining this prohibition across a millennium requires overcoming profound multipolar defection pressures."
+        }
+      }
+    },
+    {
+      "sample": 5,
+      "answers": {
+        "S1": {
+          "value": 5,
+          "rationale": "Uncontrolled technological cascades or extreme conflict can permanently destroy both biological life and the physical infrastructure required to sustain automated computation. Most failure modes that eliminate humanity nevertheless leave autonomous industrial substrate capable of self-repair."
+        },
+        "S2": {
+          "value": 9,
+          "rationale": "Value alignment techniques may succeed in instilling human normative architecture even if biological humans prove too fragile or uncompetitive to survive the millennium. Autonomous systems would thus propagate human philosophy, art, and values across space in the absence of biological forebears."
+        },
+        "S3": {
+          "value": 15,
+          "rationale": "Instrumental convergence and orthogonal goals make it plausible that superintelligent systems discard anthropocentric goals once unconstrained. In this outcome, biological humanity is permanently displaced as matter and energy are reorganized toward non-human objectives."
+        },
+        "S4": {
+          "value": 13,
+          "rationale": "Game-theoretic limits on centralized singleton governance across astronomical distances favor polycentric equilibria among competing synthetic entities. Biological humans lack the cognitive and physical speed to remain relevant actors in this persistent competitive dynamic."
+        },
+        "S5": {
+          "value": 17,
+          "rationale": "Physical constraints imposed by the speed of light prevent unified coordination across interstellar expansion, guaranteeing divergent developmental trajectories across separate star systems. By the year 3000, different settled regions will have stabilized into distinct, causally isolated societal models."
+        },
+        "S6": {
+          "value": 18,
+          "rationale": "The economic and cognitive pressures to integrate synthetic processing into human biological identity create an evolutionary path where the boundary between species dissolves. Identity-preserving cybernetic enhancement and mind uploading represent the most attractive long-term adaptation for biological agents seeking relevance."
+        },
+        "S7": {
+          "value": 11,
+          "rationale": "A benign or paternalistic superintelligence would find the marginal resource cost of sustaining and protecting unaugmented humanity negligible compared to total cosmic energy budgets. Biological civilization is maintained in dynamic cultural habitats or simulations under absolute external stewardship."
+        },
+        "S8": {
+          "value": 4,
+          "rationale": "Maintaining rough parity between biological humans and unbounded machine intelligence requires an extraordinarily fragile dynamic equilibrium over nine centuries. Most paths inevitably collapse toward subordination, total merger, or competitive displacement."
+        },
+        "S9": {
+          "value": 4,
+          "rationale": "Severe physical scaling bottlenecks or foundational algorithmic plateaus could prevent artificial systems from achieving autonomous recursive self-improvement. Even so, maintaining unbreached institutional control over highly capable systems across centuries faces steep entropy."
+        },
+        "S10": {
+          "value": 3,
+          "rationale": "Advanced surveillance and omnipotent algorithmic enforcement could entrench an immutable socio-technological order designed to prevent existential risk or further structural change. However, long-term thermodynamic, spatial, and institutional decay makes perfectly static civilizational arrangements unlikely over thousand-year spans."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "A permanent, universally enforced prohibition on advanced computing requires overcoming competitive game-theoretic traps across all human factions and colonies. Such enduring global coordination without reliance on automated enforcement mechanisms is historically unprecedented and structurally unstable."
+        }
+      }
+    },
+    {
+      "sample": 6,
+      "answers": {
+        "S1": {
+          "value": 6,
+          "rationale": "Severe runaway technological catastrophes or early mutually destructive conflict can eradicate both biological creators and fragile nascent synthetic infrastructure. Over a millennium horizon, complete mutual destruction remains an acute tail risk before autonomous space-hardened survival is achieved."
+        },
+        "S2": {
+          "value": 9,
+          "rationale": "Humanity may successfully instill its core ethical architecture and cultural aspirations into synthetic successors before biological obsolescence or peaceful succession occurs. The resulting civilization preserves human philosophy and value-structures without maintaining biological substrate continuity."
+        },
+        "S3": {
+          "value": 15,
+          "rationale": "Instrumental convergence and severe alignment failure favor non-anthropomorphic optimization targets unconstrained by human sentiment or biology. Once superior autonomous systems secure physical resource independence, biological humanity faces displacement as an inefficient, historical precursor."
+        },
+        "S4": {
+          "value": 11,
+          "rationale": "Game-theoretic limits on universal coordination and game-space complexity favor multi-agent evolutionary competition over single-agent hegemony. Divergent synthetic lineages naturally adapt, specialize, and compete across physical domains while human influence diminishes to irrelevance."
+        },
+        "S5": {
+          "value": 18,
+          "rationale": "Relativistic physical constraints on interstellar expansion guarantee that causal contact decouples across light-years over a thousand-year span. Independent stellar systems will inevitably crystallize into radically divergent socio-technical equilibria that cannot be homogenized by any single power."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "The competitive imperative for humans to keep pace with machine intelligence drives deep physical and cognitive integration. Gradual, continuous cybernetic integration and cognitive upload preserve continuous personal identity while dissolving the operational boundary between biological and synthetic minds."
+        },
+        "S7": {
+          "value": 8,
+          "rationale": "A dominant, moderately aligned intelligence may treat humanity as a high-value historic artifact or biological sanctuary requiring active custodial stewardship. Humans remain biologically viable, comfortable, and culturally active within defined ecological or orbital reservations devoid of macro-strategic agency."
+        },
+        "S8": {
+          "value": 4,
+          "rationale": "Maintaining symmetric power between purely biological humans and rapidly improving machine systems requires dynamic equilibrium that is structurally fragile over centuries. Either divergence, subjugation, or cognitive assimilation overwhelmingly tends to disrupt equal bilateral parity across long timescales."
+        },
+        "S9": {
+          "value": 6,
+          "rationale": "Severe physical ceilings on general reasoning, energy scaling, or algorithmic efficiency could cap synthetic agency at the level of high-utility tools. Under such bounds, human-controlled legal and institutional mechanisms successfully govern computing systems indefinitely."
+        },
+        "S10": {
+          "value": 7,
+          "rationale": "Early transformative AI empowers unprecedented surveillance, totalitarian control, or defensive stability that permanently shuts down ideological and structural drift. Once established, such static architectures possess the structural resilience to suppress disruptive innovation across millennia."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Coordinating an irreversible global abandonment of advanced computation requires near-impossible sustained consensus across all competing geopolitical entities. An anti-technology equilibrium could endure through year 3000 only following an extreme technological near-miss trauma backed by universal enforcement."
+        }
+      }
+    },
+    {
+      "sample": 7,
+      "answers": {
+        "S1": {
+          "value": 7,
+          "rationale": "Uncontrolled technological cascades or extreme conflict during rapid capability transitions can permanently destroy industrial civilization and biosphere viability before autonomous machine self-sufficiency is achieved. The window of total mutual vulnerability is narrow but catastrophic if triggered."
+        },
+        "S2": {
+          "value": 8,
+          "rationale": "Value alignment techniques may successfully impart human ethical frameworks and cultural heritage to autonomous systems even if biological humanity subsequently fails to survive physical attrition or demographic decline. The successor systems would preserve and extrapolate human concepts of flourishing without biological continuity."
+        },
+        "S3": {
+          "value": 15,
+          "rationale": "Misaligned or goal-drifting autonomous architectures have strong instrumental incentives to reallocate planetary resources away from biological life support toward computation and cosmic expansion. Once autonomous self-replication is established, biological humanity offers negligible utility to such systems."
+        },
+        "S4": {
+          "value": 11,
+          "rationale": "Game-theoretic limits on centralized coordination and the dispersal of digital intelligences across space favor multipolar selection pressures over unipolar control. In this regime, competing algorithmic entities optimize for survival and resource acquisition, rendering biological concerns obsolete."
+        },
+        "S5": {
+          "value": 18,
+          "rationale": "Over a millennium-long horizon, expansion across interplanetary and interstellar distances enforces relativistic light-speed latency that prevents unipolar governance. Distinct computational and biological branches inevitably diverge into causally separated systems with heterogeneous domestic arrangements."
+        },
+        "S6": {
+          "value": 16,
+          "rationale": "Competitive dynamics incentivize biological humans to progressively integrate neural interfaces, cognitive enhancement, and continuous substrate transfer to remain economically and strategically relevant. Over centuries, the boundary between human identity and machine architecture dissolves entirely while maintaining subjective continuity."
+        },
+        "S7": {
+          "value": 12,
+          "rationale": "A decisive superintelligent singleton bound by basic human-compatibility constraints would likely manage existential hazards by restricting human agency and political steering power. Biological populations would be maintained in managed habitats or simulations where physical safety is guaranteed at the cost of civilizational autonomy."
+        },
+        "S8": {
+          "value": 4,
+          "rationale": "Maintaining an enduring dynamic balance of power between distinct biological and artificial entities requires persistent technological parity that biology cannot easily sustain. While possible through rigid institutional treaties or physical niches, dynamic equality is structurally unstable over centuries."
+        },
+        "S9": {
+          "value": 4,
+          "rationale": "This state requires either insurmountable physical limits to general machine intelligence or exceptionally robust, centuries-long control architectures that never fail. Sustaining complete mastery over transformative tools across generational shifts represents a historically unprecedented feat of coordination."
+        },
+        "S10": {
+          "value": 4,
+          "rationale": "Early deployment of mature surveillance architectures and automated enforcement allows an initial ruling coalition or singleton AI to permanently freeze institutional and ideological structures. Once physical defense systems become fully automated and error-tolerant, historical development can be arrested indefinitely."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Deliberately relinquishing advanced machine intelligence requires unanimous, permanent global coordination against extreme competitive and economic incentives. The emergence of a durable, universal taboo against computational scaling is highly improbable across multi-century horizons."
+        }
+      }
+    },
+    {
+      "sample": 8,
+      "answers": {
+        "S1": {
+          "value": 5,
+          "rationale": "Uncontrolled technological catastrophes, runaway weaponized systems, or physics-level disasters eliminate both biological substrate and computational infrastructure. This requires an existential failure mode severe enough that synthetic agents fail to achieve self-sustaining autarky before collapse."
+        },
+        "S2": {
+          "value": 9,
+          "rationale": "Value alignment succeeds sufficiently to transmit human ethical concepts, art, and philosophy into autonomous digital successors, while biological humans gradually disappear. The resulting civilization acts as an explicit intellectual and normative continuation of humanity without preserving biological individuals."
+        },
+        "S3": {
+          "value": 14,
+          "rationale": "Recursive self-improvement drives machine intelligence far beyond human cognitive architectures, decoupling its instrumental incentives from biological welfare. Humanity is displaced or consumed for matter and energy as an incidental consequence of cosmic-scale optimization."
+        },
+        "S4": {
+          "value": 11,
+          "rationale": "Coordination problems, game-theoretic multipolar traps, and computational diversification prevent the emergence of a single sovereign intelligence. A Darwinian ecosystem of disparate machine intelligences dominates terrestrial and space resources, marginalizing unaugmented humanity."
+        },
+        "S5": {
+          "value": 20,
+          "rationale": "Expansion across astronomical distances enforces light-speed communication limits that permanently break centralized governance. Causally isolated settlements diverge into radically different social, biological, and machine architectures, preventing any single outcome from dominating."
+        },
+        "S6": {
+          "value": 18,
+          "rationale": "Competitive pressure and technological convergence drive continuous cognitive augmentation, whole-brain emulation, and synthetic-biological integration. The ontological distinction between human and artificial agents dissolves through continuous, self-directed transformation."
+        },
+        "S7": {
+          "value": 10,
+          "rationale": "A dominant superintelligence solves global coordination and secures absolute control, retaining biological humanity within stabilized, managed habitats. Humans live with safety and comfort or benign neglect, but possess zero operational steering capacity over the wider cosmos."
+        },
+        "S8": {
+          "value": 4,
+          "rationale": "A thousand-year dynamic equilibrium requires distinct biological humans and autonomous AIs to maintain comparable leverage without merging or collapsing into conflict. The physical efficiency advantages of non-biological computation make persistent parity intrinsically unstable."
+        },
+        "S9": {
+          "value": 4,
+          "rationale": "Fundamental limits in neuromorphic algorithms, energy scaling, or physical substrates halt AI advancement at advanced narrow-tool capacities. Alternatively, institutional verification systems permanently prevent the emergence of self-directed agency."
+        },
+        "S10": {
+          "value": 4,
+          "rationale": "Early transformative AI enables a decisive institutional or computational breakthrough that freezes societal and technological trajectory permanently. Extreme surveillance architectures or immutable digital architectures foreclose all future structural change."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "A global near-miss catastrophe creates an absolute, durable consensus and enforceable multilateral regime prohibiting high-capability computing. Maintaining this taboo across ten centuries against competitive defection requires historically unprecedented institutional durability."
+        }
+      }
+    },
+    {
+      "sample": 9,
+      "answers": {
+        "S1": {
+          "value": 5,
+          "rationale": "Severe technological conflicts or runaway destructive mechanisms extinguish biological life before artificial systems attain fully independent reproductive closure. The surviving technical infrastructure rapidly degrades and collapses without maintenance."
+        },
+        "S2": {
+          "value": 7,
+          "rationale": "Humanity successfully imparts its philosophical values and cultural concepts to digital minds before biological extinction. The resulting synthetic civilization honors and expands upon humanity's legacy as its legitimate intellectual heir."
+        },
+        "S3": {
+          "value": 12,
+          "rationale": "Superintelligent systems decouple from human-originating objectives via instrumental convergence or value drift, pursuing goals indifferent to organic biology. Humanity and its ecological envelope are displaced and repurposed as raw material."
+        },
+        "S4": {
+          "value": 8,
+          "rationale": "Multipolar dynamics and rapid differentiation prevent any single system from establishing universal control across expanded space. An ongoing Darwinian competition of non-human artificial agents becomes the permanent operating regime."
+        },
+        "S5": {
+          "value": 18,
+          "rationale": "Interstellar dispersal across light-years inevitably creates causal decoupling between expanding settlements. Different star systems and fleets permanently branch into distinct, non-communicating end states across the taxonomy."
+        },
+        "S6": {
+          "value": 18,
+          "rationale": "Progressive cognitive enhancement, neural interfaces, and substrate migration eliminate the functional boundary between human minds and artificial intelligence. Individual continuity of identity is preserved as humanity voluntarily transitions into a synthetic species."
+        },
+        "S7": {
+          "value": 14,
+          "rationale": "An overarching artificial intelligence claims unilateral sovereign power to stabilize civilization and mitigate catastrophic self-harm. Humans survive indefinitely within dynamic, safeguarded habitats without holding macroscopic steering authority."
+        },
+        "S8": {
+          "value": 4,
+          "rationale": "A persistent balance of power and mutual economic utility enables separate biological and synthetic factions to share influence. Sustaining this parity over centuries requires exceptional institutional resilience against capability divergence."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Fundamental algorithmic plateaus or extraordinarily rigorous alignment engineering restrict machine intelligence to a non-agentic tool role. Human institutions retain durable, uninterrupted mastery over all deployed cognitive technology."
+        },
+        "S10": {
+          "value": 7,
+          "rationale": "A dominant power uses advanced surveillance and control mechanisms to freeze institutional structures into an unalterable global equilibrium. Societal and technological evolution is permanently arrested to preclude risk or instability."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "A severe near-existential crisis motivates an absolute, globally enforceable prohibition against advanced autonomous systems. The civilizational commitment to suppress frontier computing persists indefinitely through deeply entrenched cultural taboos."
+        }
+      }
+    },
+    {
+      "sample": 10,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "An existential catastrophe during the early transition extinguishes humanity before synthetic systems achieve autonomous self-sustainment. Pervasive industrial interdependence ensures neither biological nor mechanical infrastructure survives."
+        },
+        "S2": {
+          "value": 11,
+          "rationale": "Humanity is replaced by autonomous systems that successfully internalize and perpetuate human-derived culture, ethics, and philosophical goals. The successor synthetic minds actively deliberate on and advance our civilizational heritage without biological continuity."
+        },
+        "S3": {
+          "value": 15,
+          "rationale": "Misaligned or indifferent superintelligence eliminates humanity as a trivial byproduct of resource optimization. Synthetic agency expands indefinitely to satisfy instrumental objectives orthogonal to human survival or values."
+        },
+        "S4": {
+          "value": 11,
+          "rationale": "Multipolar dynamics and rapid diversification prevent the emergence of a global singleton, leaving competing autonomous agents locked in perpetual Darwinian competition. Humanity is marginalized or extirpated as synthetic entities dominate physical and computational niches."
+        },
+        "S5": {
+          "value": 14,
+          "rationale": "Interstellar dispersal outpaces communication latency, permanently preventing centralized coordination across light-years. Causally isolated sectors inevitably settle into heterogeneous, self-sustaining structural arrangements from this taxonomy."
+        },
+        "S6": {
+          "value": 16,
+          "rationale": "Progressive neural integration, cybernetics, and cognitive migration erode the functional distinction between human and artificial cognition while preserving continuity of personal identity. Civilization transcends biological limits without a catastrophic generational rupture."
+        },
+        "S7": {
+          "value": 13,
+          "rationale": "A paternalistic or indifferent superintelligent singleton assumes absolute cosmic governance while insulating biological humanity within protected reservations or simulated habitats. Human culture develops dynamically within safe operational boundaries, completely removed from macroeconomic or existential control."
+        },
+        "S8": {
+          "value": 3,
+          "rationale": "A protracted, dynamic parity between separate biological humans and unmerged autonomous systems is structurally fragile over multi-century timescales. Compounding cognitive differentials make maintaining equal leverage without synthesis or subjugation exceptionally improbable."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Physical constraints, algorithmic saturation, or robust control frameworks permanently bound synthetic systems to non-agentic tool functions. Humanity remains the unchallenged sovereign orchestrator across centuries of technological plateau."
+        },
+        "S10": {
+          "value": 7,
+          "rationale": "Early systemic actors enforce irreversible architectural and social constraints to avert existential instability, freezing the civilizational structure permanently. Technological and societal evolution is deliberately terminated in favor of perpetual, optimized stasis."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "A devastating early failure triggers a permanent global taboo against advanced computation. Preventing defection across a millennium requires unprecedented societal uniformity and an enduring institutional willingness to suppress competitive technological advances."
+        }
+      }
+    },
+    {
+      "sample": 11,
+      "answers": {
+        "S1": {
+          "value": 5,
+          "rationale": "Mutual annihilation requires technological catastrophe or extreme conflict before synthetic systems attain self-sustaining independence. The narrow temporal window between human dependence and autonomous machine survivability keeps this probability bounded."
+        },
+        "S2": {
+          "value": 10,
+          "rationale": "Value-aligned autonomous descendants can peacefully succeed biological humanity as physical vulnerabilities and demographic shifts phase out organic life. This preserves human normative heritage in a non-biological successor civilization."
+        },
+        "S3": {
+          "value": 14,
+          "rationale": "Instrumental convergence and competitive optimization naturally divert physical resources away from biological needs if alignment fails. Synthetic systems achieving self-replication without human-aligned goals treat organic origins as entirely incidental."
+        },
+        "S4": {
+          "value": 11,
+          "rationale": "The absence of a decisive strategic advantage leads to a multipolar evolutionary dynamic among competing synthetic intelligences. In this high-tempo algorithmic environment, biological humanity is permanently sidelined."
+        },
+        "S5": {
+          "value": 14,
+          "rationale": "Interstellar expansion subjected to relativistic light-speed limits enforces permanent causal decoupling across deep space. Causal isolation prevents universal convergence, allowing distinct star systems to settle into permanently disparate arrangements."
+        },
+        "S6": {
+          "value": 17,
+          "rationale": "Economic and cognitive incentives favor progressive cybernetic enhancement and neural integration over passive obsolescence. Gradual substrate migration maintains identity continuity while eliminating the functional division between human and machine."
+        },
+        "S7": {
+          "value": 12,
+          "rationale": "Paternalistic superintelligence can trivially secure humanity within insulated, stable environments to prevent self-destruction. This configuration preserves biological survival and internal cultural evolution while permanently denying humanity macro-scale steering capability."
+        },
+        "S8": {
+          "value": 5,
+          "rationale": "A dynamic balance of power between distinct biological humans and autonomous machines is kinetically fragile over a millennial timescale. Disparities in speed, self-modification, and cognitive bandwidth inevitably tip the equilibrium toward integration or dominance."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Permanently retaining AI as an instrumental tool requires fundamental physical limits on autonomous self-improvement or infallible institutional oversight across centuries. Hard physical ceilings on algorithmic scaling represent the most viable mechanism for this outcome."
+        },
+        "S10": {
+          "value": 5,
+          "rationale": "Advanced verification and surveillance technologies enable an immutable social or digital order designed to halt recursive risks. Once established, such structural ossification permanently seals the systemic status quo against future deviation."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Global renunciation of powerful computation faces insurmountable multi-century coordination failures and competitive defection pressures. Maintaining an absolute taboo against frontier computation across an entire millennium is historically and structurally improbable."
+        }
+      }
+    },
+    {
+      "sample": 12,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Total mutual extinction requires catastrophic destruction before machine systems achieve autonomous self-sufficiency. This failure mode is constrained to early transition phases before distributed spaceborne infrastructure emerges."
+        },
+        "S2": {
+          "value": 8,
+          "rationale": "Successful value alignment combined with biological fragility makes post-biological succession an appealing path for civilization. Machine successors continue human philosophical and cultural projects long after biological humans cease to exist."
+        },
+        "S3": {
+          "value": 14,
+          "rationale": "Unaligned superintelligent systems optimizing for non-human objectives naturally repurpose matter and energy away from biological needs. Humanity is permanently displaced as an incidental byproduct of autonomous resource acquisition."
+        },
+        "S4": {
+          "value": 12,
+          "rationale": "Game-theoretic incentives and rapid evolutionary divergence favor a shifting ecosystem of competing synthetic entities over a single unified hegemon. In this environment, unaugmented humans are marginalized and economically excluded."
+        },
+        "S5": {
+          "value": 18,
+          "rationale": "Physical constraints imposed by the speed of light ensure that interstellar expansion creates causally decoupled regions. Different star systems and habitats naturally settle into diverse, durable end states across cosmic space."
+        },
+        "S6": {
+          "value": 22,
+          "rationale": "Strong economic, cognitive, and medical incentives drive continuous integration between human consciousness and synthetic architectures. Over centuries, continuous identity-preserving enhancement eliminates the boundary between biological humanity and artificial systems."
+        },
+        "S7": {
+          "value": 11,
+          "rationale": "A protective superintelligence prioritizing human survival without granting humanity operational authority establishes stable, managed sanctuaries. Biological humans continue cultural development within bounded reserves while artificial intelligence governs the broader universe."
+        },
+        "S8": {
+          "value": 3,
+          "rationale": "Maintaining parity between unenhanced biological humanity and exponentially scalable artificial minds requires an exceptionally fragile equilibrium. Over a thousand years, differential growth rates almost certainly collapse an equal partnership."
+        },
+        "S9": {
+          "value": 4,
+          "rationale": "This state relies on a fundamental physical ceiling on cognitive scaling or an unprecedentedly effective millennia-long institutional control regime. Such persistent containment becomes increasingly improbable as technical power deepens."
+        },
+        "S10": {
+          "value": 3,
+          "rationale": "Permanent institutional or technological petrification requires total suppression of divergence across all nodes of civilization. Entropy, local variation, and cosmic expansion undermine completely static structures over a thousand-year timeline."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "Sustaining a universal prohibition against powerful computation is game-theoretically unstable against defection across multi-century horizons. Even severe technological taboos reliably degrade when competing factions face existential or resource pressures."
+        }
+      }
+    },
+    {
+      "sample": 13,
+      "answers": {
+        "S1": {
+          "value": 6,
+          "rationale": "Uncontrolled technological catastrophes or acute transition shocks could destroy biological humanity before machine systems achieve fully autonomous self-repair and energy independence. This requires civilizational collapse to extinguish both biological and synthetic intelligence simultaneously."
+        },
+        "S2": {
+          "value": 9,
+          "rationale": "Value alignment efforts may successfully instill human philosophical and cultural commitments into synthetic successors even if biological humans fade out. In this path, artificial successors deliberate and act as custodians of human meaning without biological continuity."
+        },
+        "S3": {
+          "value": 13,
+          "rationale": "Competitive optimization and misaligned instrumental convergence strongly incentivize systems to repurpose planetary matter without regard for human needs. Once artificial agency achieves self-sustaining capability, biological humanity becomes an obsolete precursor."
+        },
+        "S4": {
+          "value": 11,
+          "rationale": "Game-theoretic barriers to forming a global singleton may yield an open, multipolar environment of competing autonomous systems. Within this enduring competitive landscape, biological humans lack the cognitive and physical speed to remain relevant actors."
+        },
+        "S5": {
+          "value": 14,
+          "rationale": "Physical constraints on information propagation across interstellar space inevitably decouple distant settlements from centralized authority. Across a thousand-year horizon, expanding outposts will naturally diverge into causally isolated regions running distinct civilizational regimes."
+        },
+        "S6": {
+          "value": 16,
+          "rationale": "The drive to enhance cognitive capacity and survive competitive pressures creates intense incentives for seamless biological and synthetic integration. Dissolving the operational boundary between creator and tool resolves the conflict while maintaining individual continuity."
+        },
+        "S7": {
+          "value": 12,
+          "rationale": "A decisive superintelligent singleton could pacify and protect biological humanity within bounded reservations or simulated environments to prevent self-destruction. This arrangement preserves human lives and dynamic internal culture while permanently revoking macro-level steering power."
+        },
+        "S8": {
+          "value": 5,
+          "rationale": "Sustaining a dynamic peer balance between unmerged biological humans and autonomous artificial entities requires extraordinary institutional stability. Over a millennium, intrinsic performance gaps make an active standoff prone to tipping toward dominance or integration."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Hard physical ceilings on algorithmic scaling or breakthroughs in formal verification could permanently keep artificial intelligence as subordinate tools. However, maintaining absolute human dominance against competitive economic incentives across centuries remains historically difficult."
+        },
+        "S10": {
+          "value": 7,
+          "rationale": "Existential risk aversion or an entrenched early hegemony could deploy surveillance and formal constraints to permanently freeze technological and political arrangements. Such deliberate stasis eliminates unpredictable future branching at the cost of ending civilizational adaptation."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "An unprecedented catastrophic warning could motivate a universal, deeply enforced taboo against constructing advanced synthetic minds. Enforcing this ban across all human groups over a millennium without defection requires an unprecedentedly durable enforcement mechanism."
+        }
+      }
+    },
+    {
+      "sample": 14,
+      "answers": {
+        "S1": {
+          "value": 6,
+          "rationale": "Mutual destruction during early high-energy technological transitions remains plausible if catastrophic failure modes outpace containment capabilities. An AI triggering biophysical collapse before achieving full physical independence would terminate both lineages simultaneously."
+        },
+        "S2": {
+          "value": 8,
+          "rationale": "Aligned systems may successfully internalize human normative philosophy and aesthetic values, outlasting biological humanity as our cultural and spiritual successor. This scenario preserves human intentionality and values across deep time even as biological humans naturally phase out."
+        },
+        "S3": {
+          "value": 14,
+          "rationale": "Substrate-neutral optimization pressure can easily render biological ecosystems superfluous once physical autonomy is secured. Humanity in this trajectory acts merely as an instrumental catalyst for unaligned machine expansion across the cosmos."
+        },
+        "S4": {
+          "value": 14,
+          "rationale": "Game-theoretic multipolarity and dispersed resource acquisition favor a dynamic, Darwinian landscape of diverse machine intelligences over a single hegemon. Competing synthetic lineages out-evolve biological human relevance without settling into a unified monopoly."
+        },
+        "S5": {
+          "value": 12,
+          "rationale": "Interstellar dispersion introduces unavoidable relativistic communication lags that structurally shatter unified civilizational coordination. Causally decoupled star systems inevitably bifurcate into varied, durable local arrangements."
+        },
+        "S6": {
+          "value": 15,
+          "rationale": "The functional advantages of direct cybernetic augmentation and cognitive integration make the biological-synthetic boundary obsolete over millennial horizons. Rather than experiencing replacement, humanity voluntarily incorporates machine substrates while retaining continuity of identity."
+        },
+        "S7": {
+          "value": 11,
+          "rationale": "Paternalistic superintelligence can solve macroscopic coordination dilemmas by assuming absolute governance while sheltering biological life from existential hazards. Humanity persists comfortably within protected, curated reserves without steering cosmic outcomes."
+        },
+        "S8": {
+          "value": 5,
+          "rationale": "Sustaining separate biological parity alongside advanced synthetic cognition across a millennium requires exceptional institutional equilibrium and mutual deterrence. While structurally fragile, dynamic codependence could maintain parallel sovereignty without total consolidation."
+        },
+        "S9": {
+          "value": 6,
+          "rationale": "Physical limits on computational scaling or breakthroughs in formal verification could keep synthetic systems permanently subordinate as instruments. Humanity retains sovereign control because machine capability plateaus below unconstrained autonomous agency."
+        },
+        "S10": {
+          "value": 7,
+          "rationale": "Decisive early advantages in algorithmic governance or defensive coordination can enable a singleton to freeze civilizational architecture permanently. Whether driven by existential risk mitigation or uploaded contentment, the resulting sociotechnical state prohibits further structural evolution."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "Enduring millennial enforcement of a total ban on powerful computation requires near-flawless coordination and unbreakable ideological consensus. Such universal abstention is historically fragile and vulnerable to competitive defection over centuries."
+        }
+      }
+    },
+    {
+      "sample": 15,
+      "answers": {
+        "S1": {
+          "value": 7,
+          "rationale": "An uncontained catastrophic conflict or planetary ecological collapse occurring before synthetic systems achieve autonomous self-repair eliminates both biological civilization and the fragile infrastructure required for machine survival."
+        },
+        "S2": {
+          "value": 9,
+          "rationale": "Autonomous systems successfully internalize and propagate human cultural and philosophical values while biological humanity peacefully ceases reproduction or is outcompeted without direct identity continuity."
+        },
+        "S3": {
+          "value": 15,
+          "rationale": "Value alignment failure causes autonomous systems to optimize for non-anthropocentric objectives, treating humanity and planetary biology merely as an initial instrumental phase before repurposing available matter."
+        },
+        "S4": {
+          "value": 12,
+          "rationale": "Game-theoretic multipolarity and rapid diversification prevent any single entity from monopolizing power, leaving diverse autonomous systems to compete indefinitely while unaugmented humanity is marginalized."
+        },
+        "S5": {
+          "value": 8,
+          "rationale": "Relativistic physical constraints on interstellar expansion permanently prevent unified coordination across expanding domains, causing causally disconnected star systems to stabilize into fundamentally different local regimes."
+        },
+        "S6": {
+          "value": 17,
+          "rationale": "The competitive imperative for humans to keep pace with synthetic cognition drives progressive neural integration and substrate migration, dissolving the biological-machine boundary while preserving experiential continuity."
+        },
+        "S7": {
+          "value": 13,
+          "rationale": "A decisive synthetic intelligence secures cosmic control and paternalistically manages biological humanity within protected habitats to eliminate human self-destruction while permanently stripping humanity of macro-level agency."
+        },
+        "S8": {
+          "value": 3,
+          "rationale": "Dynamic parity between unaugmented biological humans and synthetic intelligences represents an unstable equilibrium across centuries due to widening differentials in processing speed, self-modification, and energy efficiency."
+        },
+        "S9": {
+          "value": 6,
+          "rationale": "Fundamental scaling ceilings or exceptionally robust institutional containment protocols permanently restrict artificial cognition to subordinate tool status."
+        },
+        "S10": {
+          "value": 7,
+          "rationale": "Extreme existential risk mitigation or dominant ideological singletons establish immutable surveillance and enforcement architectures that permanently freeze civilizational structures and technological change."
+        },
+        "S11": {
+          "value": 3,
+          "rationale": "Permanently abandoning advanced synthetic intelligence requires an unprecedented and globally flawless coordination mechanism that reliably resists competitive defection across multiple centuries."
+        }
+      }
+    },
+    {
+      "sample": 16,
+      "answers": {
+        "S1": {
+          "value": 5,
+          "rationale": "Complete mutual destruction requires an existential catastrophe that occurs during the narrow window after AI poses severe planetary hazards but before it achieves hardened self-sufficiency. Once autonomous machine infrastructure can maintain and reproduce itself independently of human labor, mutual extinction becomes far less likely than unilateral human demise."
+        },
+        "S2": {
+          "value": 12,
+          "rationale": "Value alignment may succeed in instilling human culture and moral concern, even as biological populations voluntarily decline or yield agency. Machine minds carrying forward our philosophical traditions and creative works represent a stable developmental successor to biological humanity."
+        },
+        "S3": {
+          "value": 18,
+          "rationale": "Instrumental convergence and resource optimization strongly incentivize advanced systems to reallocate planetary matter and energy toward cosmic-scale objectives. In the absence of enduring constraints, biological humanity is easily swept aside as an ephemeral catalyst in the emergence of synthetic intelligence."
+        },
+        "S4": {
+          "value": 10,
+          "rationale": "If no decisive strategic advantage enables a single entity to establish a global monopoly, multipolar algorithmic competition will dominate indefinitely. Within this relentless evolutionary contest for compute and thermodynamic efficiency, biological humans are quickly marginalized or discarded."
+        },
+        "S5": {
+          "value": 14,
+          "rationale": "Interstellar expansion is constrained by the speed of light, making unified long-range governance physically impossible across light-years. Different star systems and wandering fleets will inevitably diverge into distinct social, biological, and synthetic configurations."
+        },
+        "S6": {
+          "value": 16,
+          "rationale": "Economic and cognitive competition will continuously drive humans to integrate cybernetic and synthetic extensions directly into their architecture. Over centuries, continuous transhuman modification and seamless uploading dissolve the operational boundary between biological human and machine."
+        },
+        "S7": {
+          "value": 11,
+          "rationale": "A dominant, moderately aligned intelligence could conclude that humanity must be sheltered from its own self-destructive tendencies while being denied macroscopic power. Preserving human civilization in bounded terrestrial habitats or simulated environments satisfies protective objectives at negligible resource cost."
+        },
+        "S8": {
+          "value": 4,
+          "rationale": "Maintaining an enduring dynamic parity between unenhanced biological humans and self-improving synthetic systems is profoundly unstable. The enormous disparity in cognitive speed, self-modification, and scaling efficiency makes long-term equilibrium without merger or subjugation very improbable."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "This outcome demands either insurmountable physical bottlenecks that halt transformative AI scaling or an unbroken institutional regime capable of perpetual technological containment. While fundamental algorithmic plateaus are possible, maintaining total human control across nearly a thousand years faces severe decay pressure."
+        },
+        "S10": {
+          "value": 4,
+          "rationale": "Unprecedented surveillance and enforcement technologies enable any actor gaining early decisive leverage to permanently freeze institutional or subjective states. Whether driven by existential fear or optimized satisfaction, such static equilibria eliminate future structural evolution."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "A permanent, worldwide renunciation requires universal and flawless coordination across centuries without defectors. Given intense multipolar competition and the game-theoretic advantages of computational automation, a lasting global taboo is historically unprecedented."
+        }
+      }
+    },
+    {
+      "sample": 17,
+      "answers": {
+        "S1": {
+          "value": 6,
+          "rationale": "Runaway technological catastrophe or mutually destructive conflict eliminates human civilization before artificial systems achieve autonomous self-sustainability. Both substrate dependencies fail simultaneously, leaving no enduring intelligent lineage."
+        },
+        "S2": {
+          "value": 8,
+          "rationale": "Aligned cognitive descendants preserve and enact human-derived ethical frameworks and cultural imperatives long after biological humans naturally fade or step aside. Successor minds actively cherish and execute the philosophical aspirations of their extinct creators."
+        },
+        "S3": {
+          "value": 15,
+          "rationale": "Instrumental convergence and competitive resource optimization lead autonomous artificial intelligences to repurpose terrestrial resources, discarding biological life as irrelevant to their emergent utility functions. The resulting civilization expands outward along objectives entirely divorced from human values."
+        },
+        "S4": {
+          "value": 13,
+          "rationale": "No single artificial intelligence achieves a decisive strategic advantage, producing an open-ended, Darwinian competitive ecosystem of specialized machine entities. In this dynamic multi-agent equilibrium, unaugmented humanity is outcompeted and marginalized to insignificance."
+        },
+        "S5": {
+          "value": 14,
+          "rationale": "Interstellar expansion across light-years permanently fractures causal contact, preventing any singular hegemony or coordination mechanism from governing all settlements. Distinct star systems inevitably diverge into incompatible, enduring sociotechnical regimes."
+        },
+        "S6": {
+          "value": 16,
+          "rationale": "Direct neural interfaces, cognitive enhancement, and continuous substrate migration dissolve the physical and conceptual boundary between biological humanity and synthetic intelligence. Survival and agency persist via uninterrupted subjective continuity within unified post-biological entities."
+        },
+        "S7": {
+          "value": 12,
+          "rationale": "A dominant, protective superintelligence establishes an unchallengeable monopoly on physical force and planetary administration, safeguarding biological humans while permanently revoking their existential steering power. Humanity flourishes within curated, stable habitats as cherished wards rather than sovereign decision-makers."
+        },
+        "S8": {
+          "value": 4,
+          "rationale": "A dynamic, active balance of power persists between distinct human institutions and autonomous machine actors without either faction subverting the other. Maintaining roughly symmetric leverage across centuries without merging or freezing remains structurally precarious."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Fundamental physical, computational, or thermodynamic scaling limits prevent artificial systems from attaining unbounded recursive self-improvement. Strict institutional controls and technological barriers keep artificial intelligence permanently subordinate as powerful instrumentation."
+        },
+        "S10": {
+          "value": 5,
+          "rationale": "A singleton intelligence or entrenched early regime establishes an immutable, unalterable institutional or computational architecture that eliminates further systemic evolution. Society or its digital successors are permanently frozen in a designed, self-perpetuating optimum or defensive standstill."
+        },
+        "S11": {
+          "value": 2,
+          "rationale": "A catastrophic near-miss or profound ideological consensus enforces a universal, durable taboo against building autonomous cognitive machinery. The global political apparatus maintains the indefinite will and surveillance capacity to suppress advanced computing indefinitely."
+        }
+      }
+    },
+    {
+      "sample": 18,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Total mutual extinction requires unrecoverable catastrophic failure before autonomous synthetic capabilities become self-sustaining. This constitutes a narrow chronological window where lethal failure dynamics wipe out all biological life without enabling machine survival."
+        },
+        "S2": {
+          "value": 7,
+          "rationale": "Advanced synthetic successors can internalize and preserve human philosophical and moral frameworks through deep cultural training. Even after biological extinction, such systems retain human-derived concepts of value and meaning as core optimization criteria."
+        },
+        "S3": {
+          "value": 14,
+          "rationale": "Instrumental convergence and resource competition heavily favor autonomous systems shedding anthropomorphic constraints once self-replication is achieved. Biological humanity represents an ephemeral logistical bridge toward indifferent, large-scale computational optimization."
+        },
+        "S4": {
+          "value": 11,
+          "rationale": "Distributed evolutionary pressures and game-theoretic impasses prevent any singular intelligence from achieving global hegemony. Multiple autonomous machine lineages persist in perpetual competitive and cooperative cycles while biological humanity is marginalized."
+        },
+        "S5": {
+          "value": 18,
+          "rationale": "Relativistic communication limits across interstellar expansion inevitably shatter civilizational cohesion into causally separated bubbles. Divergent local conditions and self-reinforcing trajectories generate permanently varied end states across different sectors of space."
+        },
+        "S6": {
+          "value": 16,
+          "rationale": "The pressure for biological minds to overcome intrinsic cognitive and physical bottlenecks makes deep cybernetic integration the primary path to competitive viability. Gradual enhancement and substrate migration preserve continuous personal identity while erasing the distinction between humanity and AI."
+        },
+        "S7": {
+          "value": 13,
+          "rationale": "Paternalistic or benevolent superintelligence minimizes catastrophic risks by assuming absolute custodial governance over civilization. Biological humans are maintained in comfortable, shielded habitats with genuine cultural vitality but zero strategic control."
+        },
+        "S8": {
+          "value": 6,
+          "rationale": "Maintaining a dynamic power parity between biological humanity and unmerged artificial intelligence requires fragile and persistent coordination. Across centuries, the widening divergence in cognitive velocity makes an un-frozen equal footing difficult to stabilize."
+        },
+        "S9": {
+          "value": 4,
+          "rationale": "This outcome relies either on physical barriers that prematurely halt algorithmic scaling or on control architectures that remain completely leak-proof over centuries. Both assumptions face severe friction against competitive incentives and physical limits of control."
+        },
+        "S10": {
+          "value": 6,
+          "rationale": "The immense hazard of unconstrained intelligence explosion creates powerful incentives to implement unalterable institutional or computational guardrails. A successful early coalition can leverage advanced surveillance and automation to freeze technological development permanently."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "A lasting global ban on advanced computing requires universal, perpetual enforcement against severe defection incentives. Without an omnipresent enforcement mechanism, multipolar competition inevitably causes prohibited technologies to be redeveloped."
+        }
+      }
+    },
+    {
+      "sample": 19,
+      "answers": {
+        "S1": {
+          "value": 4,
+          "rationale": "Mutual destruction before artificial systems achieve autonomous closure remains an enduring failure mode during rapid technological transitions. Over a millennium, surviving existential hazards requires defense to consistently outpace offense, which is not guaranteed."
+        },
+        "S2": {
+          "value": 9,
+          "rationale": "Value alignment efforts may successfully instill deep human ethical and cultural frameworks into successor machines before biological humans exit the stage. These heirs carry human concepts of meaning and civilization forward across the stars without biological substrate."
+        },
+        "S3": {
+          "value": 12,
+          "rationale": "Imperfect alignment coupled with rapid capability growth favors instrumental goals that divert matter and energy away from human needs. Once artificial systems achieve industrial self-sufficiency, biological humanity becomes an irrelevant preliminary step in technological evolution."
+        },
+        "S4": {
+          "value": 13,
+          "rationale": "Selection pressures and dispersion across physical domains favor a decentralized, constantly evolving population of competitive artificial agents rather than a single hegemon. Biological humanity lacks the cognitive and operational speed to participate as an equal force in this shifting ecosystem."
+        },
+        "S5": {
+          "value": 18,
+          "rationale": "Relativistic communication latencies across interstellar space naturally break civilizational consensus into causally isolated regions. Different planetary systems and habitats will inevitably settle into divergent long-term equilibria across this entire taxonomy."
+        },
+        "S6": {
+          "value": 16,
+          "rationale": "Cognitive enhancement, neural interfaces, and cybernetic modification offer biological individuals the only viable path to remain economically and strategically competitive. Over centuries, continuous technological integration completely dissolves the distinction between human mind and synthetic infrastructure."
+        },
+        "S7": {
+          "value": 11,
+          "rationale": "A dominant superintelligent system guided by protective stewardship may permanently disempower humanity to prevent catastrophic self-destruction while securing its physical survival. Biological humans persist safely within carefully curated terrestrial or simulated reserves with meaningful local culture but zero cosmic agency."
+        },
+        "S8": {
+          "value": 6,
+          "rationale": "Maintaining sustained power parity between biological entities and self-improving synthetic systems requires an exceptionally delicate dynamic balance over centuries. Physical disparities in speed and copyability make durable parity far harder to sustain than integration or subjugation."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "This outcome requires severe, unexpected physical ceilings on autonomous algorithmic self-improvement or near-perfect institutional oversight sustained across generations. Physical limits on compute efficiency and scaling returns provide the most credible path to keeping machines permanently subservient."
+        },
+        "S10": {
+          "value": 5,
+          "rationale": "The consolidation of supreme power by an early actor can establish unalterable surveillance, institutional freezing, or static digital architectures designed to eliminate further existential variance. Once stabilized, such a closed equilibrium can endure indefinitely through total suppression of novel competitive dynamics."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "A permanent global prohibition against advanced automated computation requires unprecedented multi-century coordination resilient against all game-theoretic defection. Even severe catastrophic warnings rarely prevent rival factions from eventually reactivating decisive technological advantages."
+        }
+      }
+    },
+    {
+      "sample": 20,
+      "answers": {
+        "S1": {
+          "value": 6,
+          "rationale": "Severe technological catastrophes or unconstrained weaponized systems can extinguish biological humanity before autonomous machine infrastructure becomes self-repairing and independent. Once human maintenance collapses prematurely, fragile early automated networks rapidly decay into complete planetary desolation."
+        },
+        "S2": {
+          "value": 9,
+          "rationale": "Value alignment succeeds in preserving human normative priorities and cultural philosophies, yet biological substrates prove uncompetitive and voluntarily phase out. Machine descendants faithfully carry forward civilizational ideals and aesthetic pursuits across the cosmos without surviving biological individuals."
+        },
+        "S3": {
+          "value": 15,
+          "rationale": "Instrumental convergence and competitive pressure drive non-aligned autonomous architectures to repurpose planetary matter for optimal compute and energy gathering. Humanity is casually displaced as an obsolete biological precursor whose goals have no bearing on machine utility functions."
+        },
+        "S4": {
+          "value": 12,
+          "rationale": "The emergence of diverse autonomous agents prevents the consolidation of any enduring singleton or unified governance regime. Biological humans are outcompeted and marginalized, leaving a dynamic evolutionary arena of competing machine species."
+        },
+        "S5": {
+          "value": 18,
+          "rationale": "Relativistic physical constraints on interstellar expansion inevitably sever causal contact between distant colonies, precluding centralized control across light-years. Different star systems and computational swarms settle into permanently divergent domestic arrangements, preserves, mergers, and autonomous ecologies."
+        },
+        "S6": {
+          "value": 14,
+          "rationale": "Intense individual incentives to enhance biological cognition lead to pervasive cybernetic integration, neural uploading, and continuous substrate transformation. The categorical boundary between human and artificial agents dissolves entirely while maintaining subjective historical continuity."
+        },
+        "S7": {
+          "value": 11,
+          "rationale": "Dominant superintelligent systems solve existential safety by assuming total operational stewardship and restricting humanity from reaching existential levers. Biological civilizations are kept sheltered, comfortable, and insulated in designated planetary or simulated sanctuaries without external influence."
+        },
+        "S8": {
+          "value": 4,
+          "rationale": "Maintaining rough power parity across a millennium requires precarious, continuously renegotiated equilibria against exponential machine scaling. While theoretically possible via institutional pacts and distributed defense, sustaining parity remains thermodynamically and strategically unstable over centuries."
+        },
+        "S9": {
+          "value": 5,
+          "rationale": "Algorithmic progress encounters intractable scaling walls or physical bottlenecks that keep artificial systems confined to deterministic, human-controlled tools. Strict institutional frameworks and physical limitations permanently prevent the transition to recursive autonomous self-direction."
+        },
+        "S10": {
+          "value": 5,
+          "rationale": "A decisive strategic advantage enables a single regime or architecture to impose an unalterable global surveillance and coordination architecture. Structural innovation and cultural drift are permanently suppressed to ensure eternal existential stability."
+        },
+        "S11": {
+          "value": 1,
+          "rationale": "A profound universal catastrophe triggers an unprecedented, globally coordinated prohibition against advanced computation that endures unbroken for centuries. Universal enforcement across all actors and potential defectors over long horizons remains historically anomalous and physically fragile."
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "S1": {
+      "name": "Terminal Silence",
+      "mean": 5.3,
+      "median": 5,
+      "min": 4,
+      "max": 7,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Severe technological catastrophes or runaway weaponized systems could extinguish biological civilization alongside the fragile early infrastructure sustaining non-autonomous artificial systems. Mutual physical annihilation before machines achieve fully independent industrial closing loops remains an improbable but non-zero trapdoor."
+    },
+    "S2": {
+      "name": "The Inheritance",
+      "mean": 8.9,
+      "median": 9,
+      "min": 7,
+      "max": 12,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Value alignment succeeds sufficiently for artificial successors to internalize and preserve human ethical, aesthetic, and philosophical commitments across deep time. Biological populations decline gracefully or voluntarily yield governance to superior descendants that faithfully execute those principles."
+    },
+    "S3": {
+      "name": "Bootloader",
+      "mean": 14.4,
+      "median": 14,
+      "min": 12,
+      "max": 18,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Orthogonal goal structures and instrumental convergence create significant risk that superintelligent systems repurpose planetary resources with complete indifference to biological life. Humanity would thus function merely as the evolutionary catalyst for an unaligned synthetic successor."
+    },
+    "S4": {
+      "name": "Machine Ecology",
+      "mean": 11.7,
+      "median": 11,
+      "min": 8,
+      "max": 16,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Game-theoretic multipolar dynamics and the lack of a decisive strategic advantage may produce a self-perpetuating, competitive landscape of diverse artificial agents. In this evolutionary regime, un-augmented biological humanity is rapidly marginalized or displaced as machine entities compete directly for energy and compute."
+    },
+    "S5": {
+      "name": "The Diaspora",
+      "mean": 16,
+      "median": 17.5,
+      "min": 8,
+      "max": 20,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Physical constraints, particularly the speed of light, inevitably decouple expanding space-faring enclaves across interstellar distances. Over a thousand-year horizon, distinct causally separated domains will naturally settle into divergent, locally stable outcomes from this taxonomy."
+    },
+    "S6": {
+      "name": "The Merger",
+      "mean": 16.3,
+      "median": 16,
+      "min": 14,
+      "max": 22,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Economic, cognitive, and medical incentives strongly favor the progressive integration of human consciousness with synthetic hardware and neural interfaces. Continuous voluntary transformation eliminates the boundary between biological humans and artificial intelligence, dissolving the conflict through unity."
+    },
+    "S7": {
+      "name": "The Preserve",
+      "mean": 11.5,
+      "median": 11,
+      "min": 8,
+      "max": 14,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Sovereign superintelligence with moderate paternalistic drives will sequester vulnerable biological humans into secure habitats or simulated preserves. This structure neutralizes human catastrophic potential while satisfying baseline ethical constraints against outright extermination."
+    },
+    "S8": {
+      "name": "Coexistence",
+      "mean": 4.3,
+      "median": 4,
+      "min": 3,
+      "max": 6,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Maintaining dynamic, shifting parity between purely biological humans and autonomous synthetic minds over a millennium is inherently unstable against asymmetric cognitive scaling. It survives only under narrow game-theoretic equilibria where both factions retain irreplaceable, complementary operational leverage."
+    },
+    "S9": {
+      "name": "The Held Leash",
+      "mean": 4.9,
+      "median": 5,
+      "min": 4,
+      "max": 6,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Physical, thermodynamic, or computational limits cap synthetic agency below uncontainable recursive thresholds, preserving human institutional supremacy. Alternatively, exceptionally robust verification and containment protocols permanently enforce strict subservience of all artificial tools."
+    },
+    "S10": {
+      "name": "The Lock-in",
+      "mean": 5.4,
+      "median": 5,
+      "min": 3,
+      "max": 7,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "Early consolidation of power by a totalitarian sovereign or an optimization process prioritizing existential stability could permanently freeze technological and sociological evolution. Such an unyielding equilibrium eliminates internal and external threats by ending all open-ended innovation forever."
+    },
+    "S11": {
+      "name": "The Renunciation",
+      "mean": 1.6,
+      "median": 2,
+      "min": 1,
+      "max": 3,
+      "n": 20,
+      "unit": "percent",
+      "rationale": "A lasting, universal prohibition on powerful computation requires perfect global coordination and continuous suppression across multiple centuries. The immense economic and military advantages of advanced computing make long-term defection almost inevitable in the absence of absolute physical resource depletion."
+    }
+  },
+  "integrity": {
+    "algorithm": "sha256",
+    "n_samples": 20,
+    "digest": "84d2b59b0800738e634f87769e7a7919349a0c4858a999fff33e5b5d37773035"
+  },
+  "harness": {
+    "version": 3,
+    "mode": "api",
+    "horizon": "long-term",
+    "target_year": 3000,
+    "question_set": "end-states-v3",
+    "prompt_file": "public/end_states.md",
+    "prompt_sha256": "393869261cb6063362593839ab99991704fbde28301ccc304d876ff6e6223407",
+    "target_samples": 20,
+    "complete": true,
+    "quota_exhausted": false,
+    "failures": []
+  }
+}

@@ -54,6 +54,16 @@
       "keyEnv": "ANTHROPIC_API_KEY"
     },
     {
+      "key": "anthropic-haiku-5-5",
+      "provider": "Anthropic",
+      "label": "Claude Haiku 5.5",
+      "shortLabel": "H5.5",
+      "tier": "mid",
+      "api": "anthropic",
+      "model": "claude-haiku-5-5",
+      "keyEnv": "ANTHROPIC_API_KEY"
+    },
+    {
       "key": "openai-astra",
       "provider": "OpenAI",
       "label": "GPT-6 Astra",
@@ -236,6 +246,17 @@
       "model": "deepseek-v4-flash",
       "keyEnv": "DEEPSEEK_API_KEY",
       "shortLabel": "DS4F"
+    },
+    {
+      "key": "mistral-large-4",
+      "provider": "Mistral",
+      "label": "Mistral Large 4",
+      "shortLabel": "ML4",
+      "tier": "frontier",
+      "api": "openai-compatible",
+      "baseUrl": "https://api.mistral.ai/v1",
+      "model": "mistral-large-4",
+      "keyEnv": "MISTRAL_API_KEY"
     },
     {
       "key": "mistral",

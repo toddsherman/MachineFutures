@@ -97,7 +97,10 @@ const TARGET_YEAR = HORIZONS.find(candidate => candidate.id === HORIZON).targetY
 const QUESTION_SET = HORIZON_CONFIG.questionSet;
 // A reasoning model can legitimately take minutes; a stalled connection can
 // take forever. Timed out requests are retried like any other failure.
-const REQUEST_TIMEOUT_MS = 5 * 60 * 1000;
+// Ten minutes, not five: Mistral Large 4 answers in about four, so on a slow
+// evening most of its calls crossed a five-minute limit and were thrown away
+// after the provider had already done the work.
+const REQUEST_TIMEOUT_MS = 10 * 60 * 1000;
 const HTTP_TRIES = 4;
 // One provider having a bad hour must not consume the job's whole budget. The
 // workflow runs one model per job and several horizons in sequence, so this is
@@ -232,6 +235,19 @@ async function post(url, headers, body) {
   return JSON.parse(text);
 }
 
+// An OpenAI-style message is usually one string, but some providers return a
+// list of typed parts instead: Mistral's reasoning models put their thinking
+// in one part and the answer in another. Keep only the answer text, the way
+// the Anthropic and Google adapters already drop thinking blocks.
+function completionText(content) {
+  if (typeof content === 'string') return content;
+  if (!Array.isArray(content)) return '';
+  return content
+    .filter(part => part && (part.type === 'text' || part.type === 'output_text') && typeof part.text === 'string')
+    .map(part => part.text)
+    .join('');
+}
+
 const adapters = {
   async anthropic(model, prompt, key) {
     // Fable-5-generation models: thinking is always on (omit the param) and
@@ -248,9 +264,10 @@ const adapters = {
       authorization: `Bearer ${key}`
     }, { model: model.model, messages: [{ role: 'user', content: prompt }] });
     const choice = res.choices?.[0];
-    if (!choice?.message?.content) throw new Error('empty completion');
+    const text = completionText(choice?.message?.content);
+    if (!text) throw new Error('empty completion');
     if (choice.finish_reason === 'length') throw new Error('response truncated');
-    return choice.message.content;
+    return text;
   },
   async google(model, prompt, key) {
     const res = await post(`https://generativelanguage.googleapis.com/v1beta/models/${model.model}:generateContent`, {
@@ -277,6 +294,7 @@ function mockResponse(model, sampleIndex) {
 
 /* ---------- validation (same rules the ingester enforces) ---------- */
 function parseAndValidate(text) {
+  if (typeof text !== 'string') throw new Error('answer was not text: the adapter returned ' + (Array.isArray(text) ? 'a list' : typeof text));
   const clean = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
   let obj;
   try { obj = JSON.parse(clean); } catch (error) { throw new Error('invalid JSON: ' + error.message); }
@@ -547,8 +565,8 @@ async function elicit(model, prompt) {
 }
 
 /* ---------- preflight: does the key work and does the model id resolve? ---------- */
-// One minimal call per model. Any HTTP 200 is a pass — we only care that the
-// credential is accepted and the model id exists, not what the model says.
+// One minimal call per model. We only care that the credential is accepted,
+// the model id exists, and the reply can be read as text, not what it says.
 async function check(model) {
   const status = model.status || 'active';
   if (status !== 'active') return { model, status: 'skip', detail: `${status} — not asked` };
@@ -562,8 +580,13 @@ async function check(model) {
       await post(`https://generativelanguage.googleapis.com/v1beta/models/${model.model}:generateContent`,
         { 'x-goog-api-key': key }, { contents: [{ role: 'user', parts: [{ text: 'Reply with OK.' }] }] });
     } else {
-      await post(`${model.baseUrl}/chat/completions`, { authorization: `Bearer ${key}` },
+      const res = await post(`${model.baseUrl}/chat/completions`, { authorization: `Bearer ${key}` },
         { model: model.model, messages: [{ role: 'user', content: 'Reply with OK.' }] });
+      // The call succeeding is not enough: Mistral Large 4 answered with a list
+      // of parts, passed this check, and then failed every paid attempt.
+      if (!completionText(res.choices?.[0]?.message?.content)) {
+        return { model, status: 'fail', detail: `reply had no readable text — unsupported response shape: ${JSON.stringify(res.choices?.[0]?.message?.content ?? null).slice(0, 140)}` };
+      }
     }
     return { model, status: 'ok', detail: model.model };
   } catch (error) {

@@ -21,7 +21,22 @@ const cases = [
   ['refusal',                        err('refusal (violence)', undefined, undefined), 'permanent'],
   ['unparseable answer',             err('missing end_states array'), 'permanent'],
 ];
+const completionText = eval(`${grab(/function completionText\(content\) \{[\s\S]*?\n\}/)}\ncompletionText`);
+const textCases = [
+  ['plain string',                 '{"a":1}', '{"a":1}'],
+  ['Mistral thinking + text parts', [{ type: 'thinking', thinking: [{ type: 'text', text: 'hmm' }] }, { type: 'text', text: '{"a":1}' }], '{"a":1}'],
+  ['several text parts',           [{ type: 'text', text: '{"a":' }, { type: 'text', text: '1}' }], '{"a":1}'],
+  ['only thinking',                [{ type: 'thinking', thinking: [{ type: 'text', text: 'hmm' }] }], ''],
+  ['null',                         null, ''],
+  ['object',                       { text: 'x' }, ''],
+];
 let bad = 0;
+for (const [label, content, expected] of textCases) {
+  const got = completionText(content);
+  const ok = got === expected;
+  if (!ok) bad++;
+  console.log(`${ok ? '✓' : '✗'} text: ${label.padEnd(30)} → ${JSON.stringify(got)}${ok ? '' : `  (expected ${JSON.stringify(expected)})`}`);
+}
 for (const [label, error, expected] of cases) {
   const got = classify(error);
   const ok = got === expected;

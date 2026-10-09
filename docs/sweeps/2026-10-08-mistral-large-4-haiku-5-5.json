@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "run_date": "2026-10-08",
+  "target_samples": 20,
+  "cohort": [
+    {
+      "key": "anthropic-haiku-5-5",
+      "model": "claude-haiku-5-5"
+    },
+    {
+      "key": "mistral-large-4",
+      "model": "mistral-large-4"
+    }
+  ],
+  "horizons": [
+    {
+      "id": "long-term",
+      "target_year": 3000,
+      "prompt_file": "public/end_states.md",
+      "question_set": "end-states-v3",
+      "prompt_sha256": "9571c6e9c095cfc9290a1c2cdf6f6c73bc17ed66139dbebb66809455d47d1ca1"
+    },
+    {
+      "id": "2030",
+      "target_year": 2030,
+      "prompt_file": "public/end_states_2030.md",
+      "question_set": "end-states-2030-v2",
+      "prompt_sha256": "3b6f662938afd752f510b7ea3c19c25a028ef873b6eea7f0e41c98bde82258d1"
+    },
+    {
+      "id": "2040",
+      "target_year": 2040,
+      "prompt_file": "public/end_states_2040.md",
+      "question_set": "end-states-2040-v2",
+      "prompt_sha256": "72d8e0a92b7cd837e33bc6da58d9feaa3ede26c68fca62500f062cd4ff7c5a9a"
+    },
+    {
+      "id": "2050",
+      "target_year": 2050,
+      "prompt_file": "public/end_states_2050.md",
+      "question_set": "end-states-2050-v2",
+      "prompt_sha256": "eb9eccfa504fcb67b9f6e0e6bc7f92c624be199a273dcd7dae69d7127400bb96"
+    },
+    {
+      "id": "2060",
+      "target_year": 2060,
+      "prompt_file": "public/end_states_2060.md",
+      "question_set": "end-states-2060-v2",
+      "prompt_sha256": "757e6f04d03532cf1149483c4f608f73e58df08bd368dbfda89a0d5030df10ef"
+    },
+    {
+      "id": "2035",
+      "target_year": 2035,
+      "prompt_file": "public/end_states_2035.md",
+      "question_set": "end-states-2035-v2",
+      "prompt_sha256": "dd3e00518229cd0ceca98951438cf855b89da87c23a20a65d28d8fd56ba1b87f"
+    },
+    {
+      "id": "2070",
+      "target_year": 2070,
+      "prompt_file": "public/end_states_2070.md",
+      "question_set": "end-states-2070-v2",
+      "prompt_sha256": "d5a61dc3a9b025fe317c80c4d6f38ed3dde6d5c01f8c7c3ab7538c491638b33d"
+    },
+    {
+      "id": "2080",
+      "target_year": 2080,
+      "prompt_file": "public/end_states_2080.md",
+      "question_set": "end-states-2080-v2",
+      "prompt_sha256": "f04411846c4ebd595a44ea6cff2de1e74f64b8f5e040da3b3357878f772c47c7"
+    },
+    {
+      "id": "2090",
+      "target_year": 2090,
+      "prompt_file": "public/end_states_2090.md",
+      "question_set": "end-states-2090-v2",
+      "prompt_sha256": "407bc94024676a84f2b4c454c8e7f2423ab3494200162b5a3e2126c9eb9f8984"
+    },
+    {
+      "id": "2100",
+      "target_year": 2100,
+      "prompt_file": "public/end_states_2100.md",
+      "question_set": "end-states-2100-v2",
+      "prompt_sha256": "337e3cb13e9a9d3edd2d4ddc20c1b65cd454d63b7f63c3f60ed7fc1d0ff31672"
+    },
+    {
+      "id": "2200",
+      "target_year": 2200,
+      "prompt_file": "public/end_states_2200.md",
+      "question_set": "end-states-2200-v2",
+      "prompt_sha256": "edb8560663638073b8664bc73ac35d3d270ca56cc10005116fb6a3f43e7db4f0"
+    }
+  ]
+}

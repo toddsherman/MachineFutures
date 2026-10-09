@@ -97,7 +97,10 @@ const TARGET_YEAR = HORIZONS.find(candidate => candidate.id === HORIZON).targetY
 const QUESTION_SET = HORIZON_CONFIG.questionSet;
 // A reasoning model can legitimately take minutes; a stalled connection can
 // take forever. Timed out requests are retried like any other failure.
-const REQUEST_TIMEOUT_MS = 5 * 60 * 1000;
+// Ten minutes, not five: Mistral Large 4 answers in about four, so on a slow
+// evening most of its calls crossed a five-minute limit and were thrown away
+// after the provider had already done the work.
+const REQUEST_TIMEOUT_MS = 10 * 60 * 1000;
 const HTTP_TRIES = 4;
 // One provider having a bad hour must not consume the job's whole budget. The
 // workflow runs one model per job and several horizons in sequence, so this is

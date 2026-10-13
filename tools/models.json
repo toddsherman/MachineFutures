@@ -181,6 +181,17 @@
       "keyEnv": "GEMINI_API_KEY"
     },
     {
+      "key": "xai-4-7",
+      "provider": "xAI",
+      "label": "Grok 4.7",
+      "shortLabel": "GR4.7",
+      "tier": "frontier",
+      "api": "openai-compatible",
+      "baseUrl": "https://api.x.ai/v1",
+      "model": "grok-4.7",
+      "keyEnv": "XAI_API_KEY"
+    },
+    {
       "key": "xai",
       "provider": "xAI",
       "label": "Grok 4.6",
@@ -201,6 +212,17 @@
       "model": "grok-4.5",
       "keyEnv": "XAI_API_KEY",
       "baseUrl": "https://api.x.ai/v1"
+    },
+    {
+      "key": "meta-wonder-1-0",
+      "provider": "Meta",
+      "label": "Muse Wonder 1.0",
+      "shortLabel": "MW1.0",
+      "tier": "frontier",
+      "api": "openai-compatible",
+      "baseUrl": "https://api.meta.ai/v1",
+      "model": "muse-wonder-1.0",
+      "keyEnv": "META_API_KEY"
     },
     {
       "key": "meta",

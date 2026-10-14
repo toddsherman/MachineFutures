@@ -1,13 +1,11 @@
 name: Preflight — keys and model ids
 
-# A canary ahead of the paid sweep. One cheap call per model confirms the key
-# is accepted, the account has credit, and the model id still resolves — so a
-# lapsed card or a retired model id is found days before the monthly run
-# rather than halfway through it.
+# A canary for keys and model ids. One cheap call per model confirms the key
+# is accepted, the account has credit, and the model id still resolves. Models
+# are collected once, when they are added, so nothing paid runs on a timer and
+# this check runs only on demand: before a paid collection, or after a key or
+# billing change.
 on:
-  schedule:
-    # The 25th, a week before the elicitation cron on the 1st.
-    - cron: '0 13 25 * *'
   workflow_dispatch:
 
 permissions:
@@ -16,7 +14,6 @@ permissions:
 
 jobs:
   preflight:
-    if: github.event_name == 'workflow_dispatch' || vars.ELICITATION_ENABLED == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -60,11 +57,11 @@ jobs:
             exit 0
           fi
           gh issue create \
-            --title "Preflight failed before the monthly elicitation" \
+            --title "Preflight failed: a model on the roster is not callable" \
             --label preflight \
             --body "$(printf '%s\n' \
               "At least one model on the roster could not be called." \
               "" \
               "Per-model detail is in the job summary: $RUN_URL" \
               "" \
-              "Usual causes: an expired key, an account with no credit, or a model id the provider has retired. Fix it before the 1st, or the monthly sweep will come back short.")"
+              "Usual causes: an expired key, an account with no credit, or a model id the provider has retired. Fix it before dispatching a collection, or that collection will come back short.")"

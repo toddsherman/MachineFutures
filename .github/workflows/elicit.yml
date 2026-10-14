@@ -1,12 +1,13 @@
 name: Elicit end-state forecasts
 
+# One and done: each model is collected once, at every horizon, when it is
+# added to the roster, and is not asked again. There is no schedule; a run is
+# dispatched for the newly added models, and the plan step refuses any model
+# that has already answered a requested horizon unless allow_reask is set.
+# Six ordered matrix waves own one model at a time and ask at most two
+# horizons in sequence, preserving the per-horizon budget without ever
+# calling the same model concurrently.
 on:
-  schedule:
-    # 14:00 UTC on the 1st of every month. Scheduled sweeps ask all eleven
-    # horizons. Six ordered matrix waves own one active model at a time and ask
-    # at most two horizons in sequence, preserving the per-horizon budget
-    # without ever calling the same model concurrently.
-    - cron: '0 14 1 * *'
   workflow_dispatch:
     inputs:
       horizons:
@@ -30,7 +31,7 @@ on:
           - 2030+2040
           - all
       models:
-        description: 'Comma-separated active model keys from tools/models.json (default: all active)'
+        description: 'Comma-separated active model keys from tools/models.json to collect (required unless resuming; each model is asked once)'
         required: false
       samples:
         description: 'Samples per model and horizon'
@@ -53,6 +54,11 @@ on:
       resume_from_run_id:
         description: 'Restore the combined runs artifact from a previous workflow run id and buy only what is missing'
         required: false
+      allow_reask:
+        description: 'Ask models again at horizons they have already answered (normally off: each model is asked once)'
+        type: boolean
+        required: false
+        default: false
 
 # A second sweep should wait, not race the first one to publish competing
 # branches or spend twice on the same model/date/horizon.
@@ -68,7 +74,6 @@ permissions:
 
 jobs:
   plan:
-    if: github.event_name == 'workflow_dispatch' || vars.ELICITATION_ENABLED == 'true'
     runs-on: ubuntu-latest
     outputs:
       should_elicit: ${{ steps.plan.outputs.should_elicit }}
@@ -108,12 +113,12 @@ jobs:
       - name: Build the model and horizon matrices
         id: plan
         env:
-          EVENT_NAME: ${{ github.event_name }}
           HORIZON_SELECTION: ${{ inputs.horizons }}
           REQUESTED_MODELS: ${{ inputs.models }}
           CHECK_ONLY: ${{ inputs.check_only }}
           LIST_MODELS: ${{ inputs.list_models }}
           RESUME_RUN_ID: ${{ inputs.resume_from_run_id }}
+          ALLOW_REASK: ${{ inputs.allow_reask }}
           REQUESTED_SAMPLES: ${{ inputs.samples || '20' }}
           BUDGET_MINUTES: ${{ inputs.budget_minutes || '100' }}
         run: |
@@ -158,7 +163,6 @@ jobs:
           RUN_DATE="$run_date" node -e 'const value=process.env.RUN_DATE; const date=new Date(`${value}T00:00:00Z`); if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(date.valueOf()) || date.toISOString().slice(0,10)!==value) throw new Error(`invalid elicitation date ${JSON.stringify(value)}`)'
 
           selection="${HORIZON_SELECTION:-all}"
-          if [ "$EVENT_NAME" = "schedule" ]; then selection=all; fi
           case "$selection" in
             long-term) horizons='["long-term"]' ;;
             2030) horizons='["2030"]' ;;
@@ -245,6 +249,36 @@ jobs:
             if (!Number.isFinite(budget) || budget < 1 || budget > 240) throw new Error(`budget_minutes must be from 1 to 240; received ${JSON.stringify(process.env.BUDGET_MINUTES)}`);
             if ((budget + 5) * count > 315) throw new Error(`${count} horizons in one wave at ${budget} minutes each could outrun the resumable-artifact window; reduce the budget`);
           '
+
+          # One and done. Every dispatch must name its models, so an empty field
+          # can never mean "the whole roster"; that includes a resume, whose
+          # frozen cohort is the whole active roster. A model that has already
+          # answered a requested horizon is refused unless allow_reask is set.
+          # Batches still waiting on elicitation/* branches count, so a capture
+          # that has not been merged cannot be bought twice. A resume ignores
+          # batches from its own date, which it reuses or finishes rather than
+          # buying again.
+          if [ -z "$(printf '%s' "${REQUESTED_MODELS:-}" | tr -d '[:space:],')" ]; then
+            echo "::error::name the model(s) to collect in the models input; each model is asked once, when it is added, so an empty list no longer means the whole roster"
+            exit 1
+          fi
+          if [ "${ALLOW_REASK:-false}" != "true" ]; then
+            git fetch --no-tags --depth=1 origin '+refs/heads/elicitation/*:refs/remotes/origin/elicitation/*'
+            mkdir -p pending-runs
+            for ref in $(git for-each-ref --format='%(refname)' refs/remotes/origin/elicitation/); do
+              branch_id="${ref##*/}"
+              while IFS= read -r path; do
+                if [ -e "$path" ]; then continue; fi
+                git show "$ref:$path" > "pending-runs/${branch_id}__${path#runs/}"
+              done < <(git ls-tree -r --name-only "$ref" -- runs/ | grep -E '^runs/[^/]+\.json$' || true)
+            done
+            captured_args=(--models "$REQUESTED_MODELS" --horizons-json "$horizons" --runs runs --runs pending-runs)
+            if [ -n "${RESUME_RUN_ID:-}" ]; then captured_args+=(--except-date "$run_date"); fi
+            if ! node tools/check-captured.mjs "${captured_args[@]}"; then
+              echo "::error::the one-and-done check refused this dispatch before any paid call; see the step log for the models and horizons"
+              exit 1
+            fi
+          fi
 
           # The matrix is selected from the frozen cohort, never rebuilt from
           # today's active roster. This also verifies requested prompt files

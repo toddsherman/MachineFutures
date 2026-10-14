@@ -4,7 +4,7 @@
 // be rebuilt from these files; these files cannot be regenerated from it.
 //
 // Runs on every push, not only after elicitation, so corruption or a bad
-// hand-edit is caught when it lands rather than at the next monthly sweep.
+// hand-edit is caught when it lands rather than at the next collection.
 //
 // Usage: node tools/verify-runs.mjs
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';

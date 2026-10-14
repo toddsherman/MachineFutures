@@ -63,7 +63,7 @@ Raw batches in [`runs/`](../runs/) are the canonical forecast evidence. Their ge
 
 ## Interpretation
 
-These results record what models express under a fixed elicitation procedure. They are not calibrated probabilities, expert consensus, or a leaderboard. Small gaps between models should not be treated as meaningful unless they clear the sampling uncertainty. Changes over time can reflect a model release, a model's revised answers, or a change in the roster; the leader timeline carries lab and model counts to make compositional changes visible.
+These results record what models express under a fixed elicitation procedure. They are not calibrated probabilities, expert consensus, or a leaderboard. Small gaps between models should not be treated as meaningful unless they clear the sampling uncertainty. Since October 14, 2026, each model is asked once, at every horizon, when it is added to the roster, and is not asked again. Changes over time therefore reflect new model releases and a changing roster rather than a model revising its own answers. Batches from the earlier full-roster sweeps remain in the raw record. The leader timeline carries lab and model counts to make compositional changes visible.
 
 ## Global forecast selection
 

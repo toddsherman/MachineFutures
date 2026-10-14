@@ -1,12 +1,14 @@
 name: Watch for new models
 
-# Weekly check for models a provider has started serving that are not yet on
-# the roster. Opens (or updates) a single issue so new flagships get noticed
-# without anyone having to remember to look.
+# Daily check for models a provider has started serving that are not yet on
+# the roster. Each model is collected once, at every horizon, when it is added,
+# so the forecast on the site is only as current as this scan. Opens (or
+# updates) a single issue so new flagships get noticed within a day without
+# anyone having to remember to look.
 
 on:
   schedule:
-    - cron: '0 13 * * 1'
+    - cron: '0 13 * * *'
   workflow_dispatch:
 
 permissions:
@@ -41,7 +43,7 @@ jobs:
           cat new-models.txt >> "$GITHUB_STEP_SUMMARY"
 
       # Commit the refreshed baseline so the same models are not reported again
-      # next week. Runs even when nothing new turned up, since the catalogue may
+      # tomorrow. Runs even when nothing new turned up, since the catalogue may
       # still have shifted.
       - name: Update baseline
         run: |
@@ -56,7 +58,7 @@ jobs:
           git push
 
       # Exit code 3 means the scan found something. Reuse one open issue rather
-      # than filing a fresh one every week.
+      # than filing a fresh one every day.
       - name: Report new models
         if: steps.scan.outputs.exit == '3'
         env:
@@ -64,7 +66,7 @@ jobs:
         run: |
           set -euo pipefail
           TITLE="New models available to add to the roster"
-          BODY=$(printf 'The weekly scan found models these providers now serve that are not on `tools/models.json`:\n\n```\n%s\n```\n\nTo add one: put it in `tools/models.json`, run the elicit workflow with **check_only** to confirm it is callable, then run it with `models: <its key>`.\n\nTo stop asking a model without losing its published forecast, set `"status": "paused"` (or `"retired"`) on its roster entry.\n\n_Scan run: %s_\n' "$(cat new-models.txt)" "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}")
+          BODY=$(printf 'The daily scan found models these providers now serve that are not on `tools/models.json`:\n\n```\n%s\n```\n\nNot every id is a new model: aliases, dated snapshots and non-chat models also appear here.\n\nOne and done: a new model is asked once, at every horizon, when it is added, and is not asked again. To add one: put it in `tools/models.json`, run the elicit workflow with **check_only** to confirm it is callable, then run it with `models: <its key>` and `horizons: all`. See `docs/OPERATIONS.md` for the full addition steps.\n\n_Scan run: %s_\n' "$(cat new-models.txt)" "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}")
           gh label create model-roster --color 1D76DB --description "Model roster needs review" 2>/dev/null || true
           EXISTING=$(gh issue list --state open --search "$TITLE in:title" --json number -q '.[0].number // empty')
           if [ -n "$EXISTING" ]; then

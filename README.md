@@ -44,7 +44,7 @@ public/end_states*.md + tools/models.json
 | [`data/`](data/) | Combined CSV and JSON downloads, each keyed by horizon | Generated from `public/data.js` and `runs/` | No |
 | [`tools/`](tools/) | Elicitation, import, export, validation, and analysis | Hand-authored code | No |
 | [`docs/`](docs/) | Methodology, prompt management, operations, and roadmap | Maintainer documentation | No |
-| [`.github/workflows/`](.github/workflows/) | CI, monthly elicitation, preflight, and model discovery | Automation | No |
+| [`.github/workflows/`](.github/workflows/) | CI, on-demand elicitation and preflight, and daily model discovery | Automation | No |
 | [`archive/`](archive/) | Retired instruments and their historical data | Frozen provenance | No |
 
 Large machine-produced files are marked as generated in [`.gitattributes`](.gitattributes), so GitHub collapses routine data refreshes by default without removing the underlying evidence from review.
@@ -88,9 +88,9 @@ npm run test:browser
 
 ## Publishing
 
-The monthly workflow writes new raw batches, validates a complete same-date sweep, rebuilds the generated outputs, and pushes an `elicitation/<run-id>` branch. Open and review a pull request from that branch, then merge it to publish through Vercel. Failed or incomplete elicitation branches are retained because they can contain paid samples not yet present on `main`.
+Collection is one and done: each model is asked once, at every horizon, when it is added to the roster, and is not asked again. A daily scan reports models the providers have started serving. Adding one means a roster entry, a preflight, a frozen addition plan, and a dispatch of the elicitation workflow for that model, which writes its raw batches to an `elicitation/<run-id>` branch. The batches are validated against the addition plan, the generated outputs are rebuilt, and a reviewed pull request publishes through Vercel. Failed or incomplete elicitation branches are retained because they can contain paid samples not yet present on `main`.
 
-See [Operations](docs/OPERATIONS.md) for schedules, recovery, model and horizon changes, and the publication checklist.
+See [Operations](docs/OPERATIONS.md) for the addition steps, schedules, recovery, model and horizon changes, and the publication checklist.
 
 ## Documentation
 

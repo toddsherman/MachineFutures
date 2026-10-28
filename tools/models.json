@@ -97,6 +97,17 @@
       "keyEnv": "OPENAI_API_KEY"
     },
     {
+      "key": "openai-6-1-terra",
+      "provider": "OpenAI",
+      "label": "GPT-6.1 Terra",
+      "shortLabel": "T6.1",
+      "tier": "frontier",
+      "api": "openai-compatible",
+      "baseUrl": "https://api.openai.com/v1",
+      "model": "gpt-6.1-terra",
+      "keyEnv": "OPENAI_API_KEY"
+    },
+    {
       "key": "openai-6-luna",
       "provider": "OpenAI",
       "label": "GPT-6 Luna",
@@ -311,6 +322,17 @@
       "model": "mistral-medium-3",
       "keyEnv": "MISTRAL_API_KEY",
       "shortLabel": "M3"
+    },
+    {
+      "key": "moonshot-k3-1-pro",
+      "provider": "Moonshot",
+      "label": "Kimi K3.1 Pro",
+      "shortLabel": "K3.1P",
+      "tier": "frontier",
+      "api": "openai-compatible",
+      "baseUrl": "https://api.moonshot.ai/v1",
+      "model": "kimi-k3.1-pro",
+      "keyEnv": "MOONSHOT_API_KEY"
     },
     {
       "key": "moonshot",

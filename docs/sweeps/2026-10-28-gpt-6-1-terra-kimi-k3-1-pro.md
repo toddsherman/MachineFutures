@@ -1,0 +1,14 @@
+# October 28, 2026 GPT-6.1 Terra and Kimi K3.1 Pro additions
+
+The owner requested forecast runs and new site entries for two models the daily catalogue scan reported: GPT-6.1 Terra, which reached OpenAI's API on October 26, and Kimi K3.1 Pro, which reached Moonshot's API on October 23. The [addition plan](2026-10-28-gpt-6-1-terra-kimi-k3-1-pro.json), committed before collection, freezes the two exact API ids (`gpt-6.1-terra`, `kimi-k3.1-pro`), all eleven horizons, prompt identities and hashes, the October 28 UTC run date, and 20 accepted samples per model and horizon. The prompt hashes differ from the October 13 plan only because the rendered prompt carries the collection date; rendered for October 13, the same prompts reproduce that plan exactly.
+
+This one-and-done addition preserves all previously published model results and dates. GPT-6.1 Terra belongs to OpenAI and Kimi K3.1 Pro to Moonshot; each shares its lab's existing weight in the lab-balanced aggregate. Moonshot also serves `kimi-k3.1-pro-highspeed`, which it describes as K3.1 Pro at two to three times the speed. It is a faster serving of the same model and was not added.
+
+- Authenticated inference preflight: [40621247970](https://github.com/toddsherman/MachineFutures/actions/runs/40621247970), passed for both.
+- Collection: [40621339260](https://github.com/toddsherman/MachineFutures/actions/runs/40621339260). Twenty-one of the 22 model and horizon cells completed. Kimi K3.1 Pro at 2070 stopped at 10 of 20 samples when Moonshot answered its remaining attempts with HTTP 429 "engine overloaded"; it was a capacity limit, not missing credit.
+- Resume: [42139707076](https://github.com/toddsherman/MachineFutures/actions/runs/42139707076) restored the original artifact and plan, kept the 10 paid samples, and finished the cell under the October 28 date. The one-and-done check treated it as finishing that run rather than a re-ask.
+- Final evidence: 22 complete raw batches and 440 accepted samples. The precommitted two-model plan passed the sweep validator.
+- All previously published model records remain unchanged: the regenerated per-model exports only gain rows for the two new models. Each dated horizon now has 32 models across 8 labs; long term has 33. The lab-balanced aggregate moves by at most 0.9 points (The Held Leash at 2030, 61.5 to 62.4).
+- Generated files reproduce byte for byte and the data-integrity checks passed. The Chromium and WebKit browser suite runs in CI on the pull request.
+
+As with the earlier additions, the workflow's full-roster gate rejected both targeted dispatches after preserving their raw samples. Publication requires the precommitted two-model addition plan to pass the existing sweep validator, plus integrity, reproducibility, and browser checks. Revalidate with `tools/check-sweep.mjs --plan-json` using this manifest and `--runs runs`.

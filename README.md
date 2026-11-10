@@ -30,6 +30,8 @@ public/end_states*.md + tools/models.json
                                  data/*.csv + JSON
 ```
 
+The front page is built last: `tools/build-front.mjs` reads `data/forecasts.json` and the taxonomy colours in `public/data.js`, then writes `public/front-data.js` and the default headline inside `public/index.html`.
+
 `runs/` is the irreplaceable source for the forecasts. The forecast block in `public/data.js` is rebuilt from those batches while preserving the hand-authored taxonomy and horizon copy already in that file. The downloadable datasets are then rebuilt from both inputs. Do not edit generated portions or exports by hand.
 
 ## Repository map
@@ -41,6 +43,9 @@ public/end_states*.md + tools/models.json
 | [`tools/models.json`](tools/models.json) | Model roster, API ids, providers, and lifecycle status | Canonical configuration | No |
 | [`runs/`](runs/) | Raw samples, rationales, recorded failures, within-run sampling summaries, and integrity digests | Canonical forecast evidence; completed batches are preserved | No |
 | [`public/data.js`](public/data.js) | Taxonomy copy plus the generated forecast payload used by the browser | Mixed hand-authored/generated runtime file | Yes |
+| [`public/index.html`](public/index.html), `front.css`, `front.js` | The front page: the answer in five plain groups, one year control, and a way into the explorer | Hand-authored; the headline between the `BUILD` markers is generated | Yes |
+| [`public/front-data.js`](public/front-data.js) | Compact summary of the published figures for the front page | Generated from `data/forecasts.json` and `public/data.js` | Yes |
+| [`public/explore.html`](public/explore.html), `styles.css`, `app.js` | The explorer: every model, every future, every reason | Hand-authored | Yes |
 | [`data/`](data/) | Combined CSV and JSON downloads, each keyed by horizon | Generated from `public/data.js` and `runs/` | No |
 | [`tools/`](tools/) | Elicitation, import, export, validation, and analysis | Hand-authored code | No |
 | [`docs/`](docs/) | Methodology, prompt management, operations, and roadmap | Maintainer documentation | No |
@@ -65,7 +70,7 @@ npm run check
 npm run serve
 ```
 
-Open `http://localhost:4173`. For browser layout and interaction coverage, install Playwright's browsers once and run:
+Open `http://localhost:4173` for the front page and `http://localhost:4173/explore.html` for the explorer. For browser layout and interaction coverage, install Playwright's browsers once and run:
 
 ```bash
 npx playwright install chromium webkit
@@ -80,7 +85,8 @@ npm run test:browser
 | `npm run verify:runs` | Verify every raw batch and its SHA-256 sample digest |
 | `npm run data:import` | Rebuild the site's generated forecast block from raw runs |
 | `npm run data:export` | Rebuild downloadable CSV and JSON files |
-| `npm run data:rebuild` | Run import and export in the required order |
+| `npm run data:front` | Rebuild the front page's data and pre-rendered headline |
+| `npm run data:rebuild` | Run import, export and the front-page build in the required order |
 | `npm run test:browser` | Test layout and behavior in Chromium and WebKit |
 | `node tools/run-elicitation.mjs --mock --horizon 2030` | Exercise the harness without making paid calls or touching real runs |
 

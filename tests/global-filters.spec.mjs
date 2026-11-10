@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 const lab = page => page.locator('.lab-button[data-lab="Anthropic"]');
 const start = async page => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/?horizon=long-term');
+  await page.goto('/explore.html?horizon=long-term');
   await expect(lab(page)).toBeVisible();
 };
 
@@ -169,7 +169,7 @@ test('lab and model selections preserve the reading position throughout the page
 
 test('the landing page defaults to 2030 and keeps explicit horizon links', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/');
+  await page.goto('/explore.html');
   await expect(page.locator('.horizon-button')).toHaveText(['2030', '2035', '2040', '2050', '2060', '2070', '2080', '2090', '2100', '2200', 'Long term']);
   await expect(page.locator('.horizon-button[aria-pressed="true"]')).toHaveAttribute('data-horizon', '2030');
   await expect(page.locator('#pdoom-unit')).toContainText('2030');
@@ -193,7 +193,7 @@ test('eleven horizons remain reachable without overflowing and update the chart'
       }
     ` });
   });
-  await page.goto('/');
+  await page.goto('/explore.html');
   const years = ['2030','2035','2040','2050','2060','2070','2080','2090','2100','2200','long-term'];
   await expect(page.locator('.horizon-button')).toHaveCount(years.length);
   for (const year of years) {
@@ -212,7 +212,7 @@ test('eleven horizons remain reachable without overflowing and update the chart'
 
 
 test('filter changes animate the mean without replaying summary entrances', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/explore.html');
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   const result = await page.evaluate(() => {
     const bar = document.querySelector('#consensus-bar');
@@ -231,7 +231,7 @@ test('filter changes animate the mean without replaying summary entrances', asyn
 });
 
 test('mobile horizon labels are vertical and fit in the attached row', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/explore.html');
   if (page.viewportSize().width > 600) return;
   const layout = await page.locator('#horizon-toggle').evaluate(row => ({
     fits: row.scrollWidth <= row.clientWidth + 1,

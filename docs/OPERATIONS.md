@@ -57,6 +57,7 @@ Before merging an addition, confirm:
 - Every published model has the intended provider/lab grouping, and the aggregate's lab and model counts match the cohort.
 - `npm run check` passes.
 - `npm run data:rebuild` leaves no unexpected diff beyond the intended generated outputs.
+- The front page (`public/index.html`, `public/front-data.js`) is rebuilt by the same command; its five-group labels and plain names for the futures live in `tools/build-front.mjs` and are display copy only.
 - The pull request contains raw batches as well as the site and download exports.
 - Prompt and question-set provenance match the immutable sweep plan.
 

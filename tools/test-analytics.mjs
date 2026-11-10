@@ -41,10 +41,14 @@ test('analytics stays off during local development', () => {
 });
 
 test('both content security policies allow the first-party collector', () => {
-  const html = readFileSync(join(root, 'public', 'index.html'), 'utf8');
   const config = JSON.parse(readFileSync(join(root, 'vercel.json'), 'utf8'));
   const header = config.headers[0].headers.find(item => item.key === 'Content-Security-Policy')?.value;
-  assert.match(html, /<script src="analytics\.js"><\/script>/);
-  assert.match(html, /connect-src 'self'/);
+  // The front page and the explorer are separate documents; each has to load
+  // the collector itself.
+  for (const page of ['index.html', 'explore.html']) {
+    const html = readFileSync(join(root, 'public', page), 'utf8');
+    assert.match(html, /<script src="analytics\.js"><\/script>/, page);
+    assert.match(html, /connect-src 'self'/, page);
+  }
   assert.match(header, /connect-src 'self'/);
 });

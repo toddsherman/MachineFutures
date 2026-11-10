@@ -1592,6 +1592,7 @@ jobs:
           set -euo pipefail
           node tools/import-runs.mjs
           node tools/export-data.mjs
+          node tools/build-front.mjs
 
       - name: Check the complete site
         if: needs.elicit_wave_one.result == 'success' && (needs.plan.outputs.has_wave_two != 'true' || needs.elicit_wave_two.result == 'success') && (needs.plan.outputs.has_wave_three != 'true' || needs.elicit_wave_three.result == 'success') && (needs.plan.outputs.has_wave_four != 'true' || needs.elicit_wave_four.result == 'success') && (needs.plan.outputs.has_wave_five != 'true' || needs.elicit_wave_five.result == 'success') && (needs.plan.outputs.has_wave_six != 'true' || needs.elicit_wave_six.result == 'success') && steps.merge.outputs.failed == 'false' && steps.sweep.outcome == 'success'
@@ -1602,7 +1603,7 @@ jobs:
         run: |
           set -euo pipefail
           branch="elicitation/${{ github.run_id }}"
-          git add public/data.js data
+          git add public/data.js data public/front-data.js public/index.html
           if git diff --cached --quiet; then
             echo "No site changes to commit."
             exit 0

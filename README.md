@@ -30,7 +30,7 @@ public/end_states*.md + tools/models.json
                                  data/*.csv + JSON
 ```
 
-The front page is built last: `tools/build-front.mjs` reads `data/forecasts.json` and the taxonomy colours in `public/data.js`, then writes `public/front-data.js` and the default headline inside `public/index.html`.
+The front page is built last. `tools/build-front.mjs` reads `data/forecasts.json`, the raw samples in `data/samples.csv`, the taxonomy colours in `public/data.js` and the approved quote pairs in `tools/front-quotes.json`. It writes `public/front-data.js`, `public/front-why.js`, and the default headline and link-preview tags inside `public/index.html`. Every sentence with a number comes from `public/front-copy.js`, which the page, the build and the checks all share. The link-preview picture, `public/share.png`, is the one output that needs a browser; `npm run share:render` redraws it, and `npm run check` fails while it shows old figures.
 
 `runs/` is the irreplaceable source for the forecasts. The forecast block in `public/data.js` is rebuilt from those batches while preserving the hand-authored taxonomy and horizon copy already in that file. The downloadable datasets are then rebuilt from both inputs. Do not edit generated portions or exports by hand.
 
@@ -43,8 +43,11 @@ The front page is built last: `tools/build-front.mjs` reads `data/forecasts.json
 | [`tools/models.json`](tools/models.json) | Model roster, API ids, providers, and lifecycle status | Canonical configuration | No |
 | [`runs/`](runs/) | Raw samples, rationales, recorded failures, within-run sampling summaries, and integrity digests | Canonical forecast evidence; completed batches are preserved | No |
 | [`public/data.js`](public/data.js) | Taxonomy copy plus the generated forecast payload used by the browser | Mixed hand-authored/generated runtime file | Yes |
-| [`public/index.html`](public/index.html), `front.css`, `front.js` | The front page: the answer in five plain groups, one year control, and a way into the explorer | Hand-authored; the headline between the `BUILD` markers is generated | Yes |
-| [`public/front-data.js`](public/front-data.js) | Compact summary of the published figures for the front page | Generated from `data/forecasts.json` and `public/data.js` | Yes |
+| [`public/index.html`](public/index.html), `front.css`, `front.js` | The front page: the answer in five plain groups, one year control, the labs side by side, the models' reasoning, and a way into the explorer | Hand-authored; the text between the `BUILD` markers is generated | Yes |
+| [`public/front-copy.js`](public/front-copy.js) | Every front-page sentence that carries a number, written from the data | Hand-authored; shared by the page, the build, and the checks | Yes |
+| [`public/front-data.js`](public/front-data.js), `front-why.js` | Compact figures for the front page, and each model's reason for its top future, loaded on demand | Generated from `data/` and `public/data.js` | Yes |
+| [`public/share.png`](public/share.png) | The picture a link to the site unfurls with | Drawn by `npm run share:render` from `tools/share-card.mjs`; stamped with the figures it shows | Yes |
+| [`tools/front-quotes.json`](tools/front-quotes.json) | Pairs of model quotes for "Why they disagree" | Hand-picked and owner-approved; the build rejects any quote that is not word for word | No |
 | [`public/explore.html`](public/explore.html), `styles.css`, `app.js` | The explorer: every model, every future, every reason | Hand-authored | Yes |
 | [`data/`](data/) | Combined CSV and JSON downloads, each keyed by horizon | Generated from `public/data.js` and `runs/` | No |
 | [`tools/`](tools/) | Elicitation, import, export, validation, and analysis | Hand-authored code | No |
@@ -56,7 +59,7 @@ Large machine-produced files are marked as generated in [`.gitattributes`](.gita
 
 ## Forecast horizons and prompts
 
-The dated views — 2030, 2035, 2040, 2050, 2060, 2070, 2080, 2090, 2100, and 2200 — ask for the arrangement visible at year end without requiring permanence. The long-term view asks for a durable arrangement by the year 3000 ; 2030 is the site's default.
+The dated views (2030, 2035, 2040, 2050, 2060, 2070, 2080, 2090, 2100, and 2200) ask for the arrangement visible at year end without requiring permanence. The long-term view asks for a durable arrangement by the year 3000 ; 2030 is the site's default.
 
 See [Prompt management](docs/PROMPTS.md) for the canonical ids, question-set versions, repository files, and stable public copies. Prompt files intentionally stay in `public/` because their exact paths and hashes are part of run provenance and immutable sweep plans.
 
@@ -85,7 +88,8 @@ npm run test:browser
 | `npm run verify:runs` | Verify every raw batch and its SHA-256 sample digest |
 | `npm run data:import` | Rebuild the site's generated forecast block from raw runs |
 | `npm run data:export` | Rebuild downloadable CSV and JSON files |
-| `npm run data:front` | Rebuild the front page's data and pre-rendered headline |
+| `npm run data:front` | Rebuild the front page's data, pre-rendered headline, and link-preview tags |
+| `npm run share:render` | Redraw the link-preview picture after the front-page figures change (needs Playwright's Chromium or Google Chrome) |
 | `npm run data:rebuild` | Run import, export and the front-page build in the required order |
 | `npm run test:browser` | Test layout and behavior in Chromium and WebKit |
 | `node tools/run-elicitation.mjs --mock --horizon 2030` | Exercise the harness without making paid calls or touching real runs |
@@ -100,10 +104,10 @@ See [Operations](docs/OPERATIONS.md) for the addition steps, schedules, recovery
 
 ## Documentation
 
-- [Methodology](docs/METHODOLOGY.md) — sampling, per-model summaries, lab-balanced aggregation, exposure, and interpretation
-- [Prompt management](docs/PROMPTS.md) — prompt catalog, path stability, and versioning rules
-- [Operations](docs/OPERATIONS.md) — automation, recovery, roster changes, testing, and publishing
-- [Data dictionary](data/README.md) — generated CSV and JSON schemas
-- [Raw-run format](runs/README.md) — batch naming, integrity, and provenance
-- [Roadmap](docs/ROADMAP.md) — active work only
-- [Archive](archive/README.md) — retired instruments and data
+- [Methodology](docs/METHODOLOGY.md): sampling, per-model summaries, lab-balanced aggregation, exposure, and interpretation
+- [Prompt management](docs/PROMPTS.md): prompt catalog, path stability, and versioning rules
+- [Operations](docs/OPERATIONS.md): automation, recovery, roster changes, testing, and publishing
+- [Data dictionary](data/README.md): generated CSV and JSON schemas
+- [Raw-run format](runs/README.md): batch naming, integrity, and provenance
+- [Roadmap](docs/ROADMAP.md): active work only
+- [Archive](archive/README.md): retired instruments and data

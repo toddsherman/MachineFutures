@@ -53,7 +53,7 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .end-toggle-button { min-height: 38px; padding: 9px 13px; display: inline-flex; align-items: center; gap: 8px; color: var(--muted); border: 1px solid var(--line); border-radius: 99px; background: transparent; font: 700 11px var(--mono); text-transform: uppercase; cursor: pointer; }
 .end-toggle-button:hover { color: var(--ink); border-color: var(--ink); background: rgba(17, 18, 15, .07); }
 .end-toggle-button.active { color: var(--paper); border-color: var(--ink); background: var(--ink); }
-/* The lab-balanced mean is an aggregate, not a model, so it carries no swatch and no hue —
+/* The lab-balanced mean is an aggregate, not a model, so it carries no swatch and no hue:
    any tint would read as a twelfth model and sit close to the real ones. */
 .end-toggle-button.is-aggregate { color: var(--ink); border-color: var(--ink); background: transparent; }
 .end-toggle-button.is-aggregate:hover { background: rgba(17, 18, 15, .08); }
@@ -161,7 +161,7 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .state-card > p { max-width: 430px; margin-top: 54px; color: var(--muted); font-size: 15px; line-height: 1.55; }
 /* Card summary: where the eleven models sit on this ending. Full range as a
    light band, middle half solid, published figure as a tick. No per-model marks
-   — they collide whenever an ending occupies a narrow slice of the axis. */
+   because they collide whenever an ending occupies a narrow slice of the axis. */
 .state-strip { margin-top: auto; padding-top: 34px; padding-bottom: 14px; }
 .strip-axis { position: relative; height: 42px; border-bottom: 1px solid var(--ink); }
 .strip-axis u { position: absolute; top: 8px; bottom: 0; width: 1px; background: var(--line); }
@@ -174,7 +174,7 @@ h1 em, h2 em { color: transparent; -webkit-text-stroke: 1.5px var(--ink); paint-
 .strip-iqr { position: absolute; bottom: 0; height: 26px; background: color-mix(in srgb, var(--state) 88%, var(--ink)); }
 /* The tick carries its own figure above the axis, so the value is readable
    without hovering or looking back up at the card header. */
-/* A halo so the tick stays legible wherever it lands — the aggregate often equals
+/* A halo so the tick stays legible wherever it lands: the aggregate often equals
    the upper quartile, which puts it exactly on the dark block's edge. */
 .strip-mid { position: absolute; z-index: 2; bottom: -3px; width: 2px; height: 36px; margin-left: -1px; background: var(--ink);
   box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--paper) 78%, transparent); }
@@ -514,7 +514,7 @@ body.dialog-open { overflow: hidden; }
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
 }
 
-/* Matrix: endings down, models across, grouped by lab. Scales with the roster —
+/* Matrix: endings down, models across, grouped by lab. Scales with the roster:
    a new model is one more column, not another full-width block. */
 .matrix-section, .states-section { border-top: 1px solid var(--line); }
 .matrix-scroll { margin-top: 34px; overflow-x: auto; overscroll-behavior-x: contain; }
@@ -542,7 +542,7 @@ body.dialog-open { overflow: hidden; }
 /* The two tiers stack from the bottom: `gone` sits on the floor and `risk`
    starts where it ends, so the bar's full height is the combined exposure. */
 
-/* Narrow screens cannot afford a label column — it left room for four of eleven
+/* Narrow screens cannot afford a label column: it left room for four of eleven
    models. The ending's name moves onto its own line and the cells span the full
    width, so the whole row is visible at once. Cells keep a 26px floor, so a
    roster large enough to need it still falls back to horizontal scrolling. */
@@ -578,7 +578,7 @@ body.dialog-open { overflow: hidden; }
 
 @media (max-width: 820px) {
   /* The matrix already carries every model's number for every ending, so the
-     per-card chip row is redundant on a narrow screen — and it is what makes
+     per-card chip row is redundant on a narrow screen, and it is what makes
      eleven cards unscrollably tall. */
   .state-card { min-height: 0; }
   .state-card > p { margin-top: 22px; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }

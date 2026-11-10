@@ -57,7 +57,10 @@ Before merging an addition, confirm:
 - Every published model has the intended provider/lab grouping, and the aggregate's lab and model counts match the cohort.
 - `npm run check` passes.
 - `npm run data:rebuild` leaves no unexpected diff beyond the intended generated outputs.
-- The front page (`public/index.html`, `public/front-data.js`) is rebuilt by the same command; its five-group labels and plain names for the futures live in `tools/build-front.mjs` and are display copy only.
+- The front page (`public/index.html`, `public/front-data.js`, `public/front-why.js`) is rebuilt by the same command; its five-group labels and plain names for the futures live in `tools/build-front.mjs` and are display copy only.
+- If the build or `npm run check` says the link-preview picture is out of date, run `npm run share:render` and commit `public/share.png`. The picture shows the headline, the five figures, and the model count, so most additions change it. It needs a browser, so it is not part of `npm run data:rebuild`.
+- Read the headline and link-preview text in the pull request's diff of `public/index.html`. They are written from the data, so a new model can change them.
+- The quote pairs in `tools/front-quotes.json` are checked word for word against the published reasoning. They only need attention if the build rejects one.
 - The pull request contains raw batches as well as the site and download exports.
 - Prompt and question-set provenance match the immutable sweep plan.
 

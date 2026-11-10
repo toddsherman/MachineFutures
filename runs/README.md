@@ -1,6 +1,6 @@
 # Runs
 
-Raw forecast batches written by [`tools/run-elicitation.mjs`](../tools/run-elicitation.mjs), or long-term batches exported by [`tools/manual-ingest.html`](../tools/manual-ingest.html) for models without an API — one JSON file per model, date, prompt family, and horizon. Dated snapshots always use the automated harness so their horizon provenance is explicit. Each file holds every raw sample plus a within-run sampling summary (mean/median/min/max per question, with the rationale closest to the median).
+Raw forecast batches written by [`tools/run-elicitation.mjs`](../tools/run-elicitation.mjs), or long-term batches exported by [`tools/manual-ingest.html`](../tools/manual-ingest.html) for models without an API: one JSON file per model, date, prompt family, and horizon. Dated snapshots always use the automated harness so their horizon provenance is explicit. Each file holds every raw sample plus a within-run sampling summary (mean/median/min/max per question, with the rationale closest to the median).
 
 The raw batch field named `aggregate` describes one model's repeated samples; it is not the site's cross-model aggregate. During publication, the coordinate medians from a batch are converted to that model's 100-point published allocation. The site-wide result is then derived separately by averaging published models within each provider/lab and averaging those lab means equally. See [Methodology](../docs/METHODOLOGY.md) for the full rule.
 

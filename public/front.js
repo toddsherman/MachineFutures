@@ -1,33 +1,16 @@
 (function () {
   const D = window.FRONT;
+  // Sentences with numbers, and the arithmetic behind them, live in
+  // front-copy.js so the build and the checks can read the same words.
+  const C = window.FRONT_COPY(D);
+  const { esc, sum, yearOf, forYear, toHundred, distance, groupVals, allLabs, modelsFor } = C;
   const H = D.horizons;
   const G = D.groups;
   const $ = selector => document.querySelector(selector);
-  const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
-  // Rationales are model-authored, so everything that reaches innerHTML is escaped.
-  const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ESC[c]);
-  const sum = values => values.reduce((total, value) => total + value, 0);
-  const yearOf = h => (h === 'long-term' ? '3000' : h);
-  const forYear = h => (h === 'long-term' ? 'the year 3000' : h);
   const PRODUCT = { Anthropic: 'Claude', OpenAI: 'ChatGPT', Google: 'Gemini', xAI: 'Grok', Meta: 'Meta AI', DeepSeek: 'DeepSeek', Mistral: 'Le Chat', Moonshot: 'Kimi' };
   const SVG = 'http://www.w3.org/2000/svg';
 
-  const groupVals = p => G.map(g => sum(g.ids.map(id => p[id - 1])));
-  // Whole numbers that still add to exactly 100 (largest remainder).
-  function toHundred(values, target = 100) {
-    const total = sum(values);
-    if (!total) return values.map(() => 0);
-    const scaled = values.map(v => v / total * target);
-    const out = scaled.map(Math.floor);
-    const order = scaled.map((v, i) => [v - out[i], i]).sort((a, b) => b[0] - a[0] || a[1] - b[1]);
-    for (let k = 0, short = target - sum(out); k < short; k += 1) out[order[k % order.length][1]] += 1;
-    return out;
-  }
-  const distance = (a, b) => sum(a.map((v, i) => Math.abs(v - b[i]))) / 2;
-  const allLabs = h => toHundred(groupVals(D.aggregates[h].p));
-  const modelsFor = h => D.models.filter(m => m.h[h]);
-
-  const state = { year: D.defaultHorizon, lab: '', model: '', mine: [20, 20, 20, 20, 20], sort: 0, showAll: false };
+  const state = { year: D.defaultHorizon, lab: '', model: '', mine: [20, 20, 20, 20, 20], sort: 0, labsBy: 0, showAll: false };
   const RANKS_SHOWN = 10;
   const explorerUrl = (h, modelId) => {
     const params = new URLSearchParams();
@@ -74,6 +57,32 @@
     risk: '<span class="state-mark" role="img" aria-label="Humanity might perish" title="Humanity might perish"><svg viewBox="0 0 22 22" aria-hidden="true"><path d="M11 3.2 20.1 18.5H1.9Z"/><path d="M11 9.1v3.9M11 15.8h.01"/></svg></span>'
   };
 
+  // What readers use, counted by the same cookieless collector that counts
+  // page views. analytics.js defines window.va on the public site only, so
+  // this is silent on localhost. Nothing about the reader is sent, and each
+  // kind of event is capped per visit so a busy day cannot multiply the count.
+  const noted = {};
+  function note(name, data, limit = 1) {
+    if (typeof window.va !== 'function') return;
+    noted[name] = (noted[name] || 0) + 1;
+    if (noted[name] <= limit) window.va('event', { name, data });
+  }
+
+  // Each model's reason for its top future is a file of its own, so the page
+  // does not carry every reason for every year before anyone asks for one. It
+  // is fetched when the reader gets near "What does your AI say?" or opens a
+  // model's answer, whichever comes first.
+  let why = window.FRONT_WHY ? 'ready' : 'idle';
+  function loadWhy() {
+    if (why !== 'idle') return;
+    why = 'loading';
+    const script = document.createElement('script');
+    script.src = 'front-why.js';
+    script.onload = () => { why = window.FRONT_WHY ? 'ready' : 'failed'; renderYou(); };
+    script.onerror = () => { why = 'failed'; renderYou(); };
+    document.head.appendChild(script);
+  }
+
   // ---------- Hero and answer ----------
   function buildHero() {
     $('#year-select').innerHTML = H.map(h => `<option value="${h}">${yearOf(h)}</option>`).join('');
@@ -93,10 +102,7 @@
           <div class="inside-item" style="--c:${f.color}"><i></i><span>${id}. ${esc(f.plain)} <small>· ${esc(f.name)}</small></span><b data-future="${id}"></b></div>`; }).join('')}
         </div>
       </details>`).join('');
-    const pretty = D.datasetDate.match(/^(\d\d)\.(\d\d)\.(\d\d)$/);
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const date = pretty ? `${Number(pretty[2])} ${months[Number(pretty[1]) - 1]} 20${pretty[3]}` : D.datasetDate;
-    $('#footer-note').textContent = `${date} dataset · ${D.models.length} models across ${D.labs.length} labs`;
+    $('#footer-note').textContent = C.footerNote();
   }
 
   function renderHero() {
@@ -104,17 +110,11 @@
     const agg = D.aggregates[h];
     const values = allLabs(h);
     const base = allLabs(D.defaultHorizon);
-    const ranked = values.map((v, i) => i).sort((a, b) => values[b] - values[a]);
-    const top = ranked[0], second = ranked[1];
 
-    $('#kicker').textContent = `We asked ${agg.models} AI models from ${agg.labs} labs how things turn out between humans and AI`;
-    $('#headline').innerHTML = values[top] >= 50
-      ? `For ${esc(forYear(h))}, AI models put most of their points on <em>${esc(G[top].lead)}.</em>`
-      : `For ${esc(forYear(h))}, AI models put more points on <em>${esc(G[top].lead)}</em> than on any other outcome.`;
-    $('#dek').innerHTML = `Counting each lab once, that is <b>${values[top]} of 100 points</b>. The runner-up is ${esc(G[second].lead)}, with <b>${values[second]}</b>.`;
-    $('#year-note').textContent = h === 'long-term'
-      ? 'The lasting arrangement by the year 3000.'
-      : `A snapshot of how things stand at the end of ${h}. It does not have to last.`;
+    $('#kicker').textContent = C.kicker(h);
+    $('#headline').innerHTML = C.headline(h);
+    $('#dek').innerHTML = C.dek(h);
+    $('#year-note').textContent = C.yearNote(h);
 
     $('#year-select').value = h;
     document.querySelectorAll('#year-toggle .horizon-button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.year === h)));
@@ -198,20 +198,14 @@
     });
     host.replaceChildren(svg);
 
-    const control = series[0].points, gone = series[4].points;
-    const cross = control.findIndex((v, i) => gone[i] > v);
-    const whole = H.map(h => allLabs(h));
-    const last = H.length - 1;
-    $('#time-takeaway').innerHTML = cross > 0
-      ? `Humans staying in control gets more points than humanity being gone or at risk in every year through <b>${yearOf(H[cross - 1])}</b>. From <b>${yearOf(H[cross])}</b> on it is the other way round: ${whole[cross][4]} against ${whole[cross][0]}. For the year 3000 it is ${whole[last][4]} against ${whole[last][0]}.`
-      : `Humans staying in control goes from ${whole[0][0]} points for 2030 to ${whole[last][0]} for the year 3000.`;
+    $('#time-takeaway').innerHTML = C.timeTakeaway();
   }
 
   // ---------- Quotes ----------
   function renderQuotes() {
     const h = state.year;
     const { hi, lo } = D.quotes[h];
-    $('#words-takeaway').innerHTML = `Every model has to explain each number. On humans staying in control for ${esc(forYear(h))}, the answers run from <b>${lo.value}</b> to <b>${hi.value}</b> of 100. These are the two ends.`;
+    $('#words-takeaway').innerHTML = C.wordsTakeaway(h);
     const figure = (voice, tag) => `
       <figure class="quote">
         <div class="quote-kicker"><span>${voice.value}%</span>${tag} · ${esc(yearOf(h))}</div>
@@ -242,10 +236,19 @@
         <p class="card-say">${esc(model.name)} was not asked about ${esc(forYear(h))}. It was asked about ${Object.keys(model.h).map(forYear).map(esc).join(', ')}.</p>`;
       return;
     }
-    const mine = toHundred(groupVals(answer.p));
+    const mine = C.modelVals(model, h);
     const everyone = allLabs(h);
     const top = mine.indexOf(Math.max(...mine));
     const future = D.futures[answer.top - 1];
+    // The reason is in a file of its own; show the numbers now and the words
+    // as soon as they arrive.
+    loadWhy();
+    const reason = why === 'ready' ? { text: window.FRONT_WHY[model.id]?.[h] ?? '' } : null;
+    const reasonMarkup = reason
+      ? `<p class="why">&ldquo;${esc(reason.text)}&rdquo;</p>`
+      : why === 'failed'
+        ? '<p class="why">Its reason did not load. It is in the full explorer, linked below.</p>'
+        : '<p class="why" data-loading>Loading its reason\u2026</p>';
     const link = `?year=${yearOf(h)}&model=${encodeURIComponent(model.id)}#you`;
     card.innerHTML = `
       <div>
@@ -254,7 +257,7 @@
         <span class="leader-unit">On ${esc(G[top].label)} · ${esc(yearOf(h))} · ${esc(model.lab)} · asked ${esc(model.asked)}</span>
       </div>
       <div>
-        <p class="card-say">For ${esc(forYear(h))}, ${esc(model.name)} puts <b>${mine[top]} of 100 points</b> on ${esc(G[top].lead)}. All labs together put <b>${everyone[top]}</b> there.</p>
+        <p class="card-say">${C.cardSay(model, h)}</p>
         <div class="compare">
           <div class="compare-row"><b>${esc(model.name)}</b>${slimBar(mine)}</div>
           <div class="compare-row"><b>All labs</b>${slimBar(everyone)}</div>
@@ -262,7 +265,7 @@
         <div class="card-top">
           <p class="label">Its single most likely future · ${answer.p[answer.top - 1]}%</p>
           <h3>${esc(future.plain)}</h3>
-          <p class="why">&ldquo;${esc(answer.why)}&rdquo;</p>
+          ${reasonMarkup}
         </div>
         <p class="card-links">
           <a class="text-link" href="${link}">Link to this answer <span aria-hidden="true">↗</span></a>
@@ -281,12 +284,9 @@
     const h = state.year;
     const by = state.sort;
     const everyone = allLabs(h);
-    const rows = modelsFor(h)
-      .map(model => ({ model, values: toHundred(groupVals(model.h[h].p)) }))
-      .sort((a, b) => b.values[by] - a.values[by] || a.model.name.localeCompare(b.model.name));
+    const rows = C.ranking(h, by);
     document.querySelectorAll('#sort-toggle button').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.sort) === by)));
-    const high = rows[0], low = rows.at(-1);
-    $('#all-takeaway').innerHTML = `For ${esc(forYear(h))}, points on ${esc(G[by].lead)} run from <b>${low.values[by]}</b> (${esc(low.model.name)}) to <b>${high.values[by]}</b> (${esc(high.model.name)}). All labs together: <b>${everyone[by]}</b>. Select a model to open its answer.`;
+    $('#all-takeaway').innerHTML = C.allTakeaway(h, by);
 
     // The picked model always stays visible, even when the list is cut short.
     const visible = state.showAll ? rows : rows.filter((row, i) => i < RANKS_SHOWN || row.model.id === state.model);
@@ -308,6 +308,122 @@
     $('#explorer-link').href = explorerUrl(h);
   }
 
+  // ---------- Why they disagree ----------
+  function buildCruxes() {
+    $('#cruxes').innerHTML = D.cruxes.map(crux => {
+      const future = D.futures[crux.future - 1];
+      const span = Math.max(1, crux.high - crux.low);
+      const at = value => ((value - crux.low) / span * 100).toFixed(1);
+      const [first, second] = crux.quotes;
+      return `
+        <article class="crux">
+          <div class="quote-kicker"><span>${esc(yearOf(crux.horizon))}</span>${esc(future.name)}</div>
+          <h3>${esc(crux.question)}</h3>
+          <p class="crux-about">${esc(future.plain)}</p>
+          ${crux.quotes.map(quote => `
+          <blockquote>&ldquo;${esc(quote.text)}&rdquo;<cite><b>${quote.value}%</b>${esc(quote.model)}</cite></blockquote>`).join('')}
+          <div class="crux-range" role="img" aria-label="${esc(first.model)} gave it ${first.value} of 100 points and ${esc(second.model)} gave it ${second.value}. Across all ${crux.count} models the answers run from ${crux.low} to ${crux.high}.">
+            <div class="crux-line">${crux.quotes.map(quote => `<i style="left:${at(quote.value)}%"></i>`).join('')}</div>
+            <p><span>${crux.low}%</span><span>All ${crux.count} models</span><span>${crux.high}%</span></p>
+          </div>
+        </article>`;
+    }).join('');
+  }
+
+  // ---------- Lab by lab ----------
+  function buildLabs() {
+    $('#labs-toggle').innerHTML = G.map((g, i) =>
+      `<button type="button" data-labs-by="${i}" aria-pressed="false">${esc(g.short)}</button>`).join('');
+  }
+
+  function renderLabs() {
+    const h = state.year;
+    const by = state.labsBy;
+    const rows = C.labRows(h);
+    const everyone = allLabs(h)[by];
+    // The axis stretches to the highest answer, so groups that get few points
+    // are not squeezed into the left edge.
+    const highest = Math.max(everyone, ...rows.flatMap(row => row.models.map(entry => entry.values[by])));
+    const scale = Math.max(20, Math.ceil(highest / 20) * 20);
+    const at = value => `${(value / scale * 100).toFixed(1)}%`;
+    document.querySelectorAll('#labs-toggle button').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.labsBy) === by)));
+    $('#labs-takeaway').innerHTML = C.labsTakeaway(h, by);
+    $('#labs').style.setProperty('--c', G[by].color);
+    $('#lab-rows').innerHTML = rows.map(row => {
+      const values = row.models.map(entry => entry.values[by]);
+      const count = `${row.models.length} model${row.models.length === 1 ? '' : 's'}`;
+      return `
+        <div class="lab-row" role="img" aria-label="${esc(row.lab)}: an average of ${row.values[by]} of 100 points on ${esc(G[by].label)} for ${esc(forYear(h))}. ${count}, from ${Math.min(...values)} to ${Math.max(...values)}.">
+          <span class="rank-label"><b>${esc(row.lab)}</b><small>${esc(PRODUCT[row.lab] || row.lab)} \u00b7 ${count}</small></span>
+          <span class="lab-track">
+            <i class="lab-all" style="left:${at(everyone)}"></i>
+            ${row.models.map(entry => `<i class="lab-dot${entry.model.id === state.model ? ' is-picked' : ''}" style="left:${at(entry.values[by])}" title="${esc(entry.model.name)}: ${entry.values[by]}"></i>`).join('')}
+            <i class="lab-avg" style="left:${at(row.values[by])}" title="${esc(row.lab)} average: ${row.values[by]}"></i>
+          </span>
+          <span class="rank-total">${row.values[by]}%</span>
+        </div>`;
+    }).join('') + `
+        <div class="lab-row lab-axis" aria-hidden="true">
+          <span></span>
+          <span class="lab-track">${[0, scale / 2, scale].map(tick => `<small style="left:${at(tick)}">${tick}</small>`).join('')}</span>
+          <span></span>
+        </div>`;
+    $('#labs-key').innerHTML = `<span><i class="lab-dot"></i>One model</span><span><i class="lab-avg"></i>The lab\u2019s average</span><span><i class="lab-all"></i>All labs together: ${everyone}</span>`;
+    $('#labs-note').textContent = C.labsNote(h);
+  }
+
+  // ---------- Asked twice ----------
+  function buildSteady() {
+    const R = D.reask;
+    const scale = Math.max(R.moved, R.between) * 1.08;
+    $('#steady-takeaway').innerHTML = C.steadyTakeaway();
+    $('#steady-caption').textContent = C.steadyCaption();
+    $('#steady-say').textContent = C.steadySay();
+    $('#steady-gaps').innerHTML = [
+      ['The same model, asked again', R.moved, 'points moved, the median'],
+      ['Two different models', R.between, 'points apart, on average'],
+    ].map(([label, value, unit]) => `
+      <div class="gap-row">
+        <div class="gap-head"><b>${label}</b><strong>${value.toFixed(1)}</strong></div>
+        <div class="gap-bar"><i style="width:${(value / scale * 100).toFixed(1)}%"></i></div>
+        <small>${unit}</small>
+      </div>`).join('');
+  }
+
+  function renderSteady() {
+    const R = D.reask;
+    const host = $('#steady-chart');
+    const width = Math.max(280, Math.floor(host.clientWidth));
+    const height = Math.min(width, 520);
+    const margin = { top: 14, right: 14, bottom: 48, left: 54 };
+    const plotW = width - margin.left - margin.right;
+    const plotH = height - margin.top - margin.bottom;
+    const max = Math.ceil(Math.max(...R.pairs.flatMap(pair => [pair[2], pair[3]])) / 10) * 10;
+    const x = v => margin.left + v / max * plotW;
+    const y = v => margin.top + (1 - v / max) * plotH;
+    const gone = G[C.groupIndex('gone')];
+
+    const svg = node('svg', { viewBox: `0 0 ${width} ${height}`, role: 'img', 'aria-label': `${R.pairs.length} answers asked for twice. Points on ${gone.label} the first time, across, against the published answer, up. The dots sit close to the line where the two are equal.` });
+    svg.appendChild(node('rect', { class: 'frame', x: margin.left, y: margin.top, width: plotW, height: plotH }));
+    for (let v = 0; v <= max; v += 10) {
+      if (v > 0 && v < max) {
+        svg.appendChild(node('line', { class: 'grid', x1: margin.left, x2: margin.left + plotW, y1: y(v), y2: y(v) }));
+        svg.appendChild(node('line', { class: 'grid', x1: x(v), x2: x(v), y1: margin.top, y2: margin.top + plotH }));
+      }
+      svg.appendChild(node('text', { class: 'axis-text', x: margin.left - 9, y: y(v) + 4, 'text-anchor': 'end' }, v));
+      svg.appendChild(node('text', { class: 'axis-text', x: x(v), y: margin.top + plotH + 18, 'text-anchor': 'middle' }, v));
+    }
+    svg.appendChild(node('line', { class: 'guide', x1: x(0), y1: y(0), x2: x(max), y2: y(max) }));
+    svg.appendChild(node('text', { class: 'axis-text on', x: margin.left + plotW / 2, y: height - 6, 'text-anchor': 'middle' }, 'First answer'));
+    svg.appendChild(node('text', { class: 'axis-text on', transform: `translate(13 ${margin.top + plotH / 2}) rotate(-90)`, 'text-anchor': 'middle' }, 'Published answer'));
+    R.pairs.forEach(([modelIndex, yearIndex, first, now]) => {
+      const dot = node('circle', { class: 'pair', cx: x(first).toFixed(1), cy: y(now).toFixed(1), r: 4, fill: gone.color });
+      dot.appendChild(node('title', {}, `${D.models[modelIndex].name}, ${yearOf(H[yearIndex])}: ${first} then ${now}`));
+      svg.appendChild(dot);
+    });
+    host.replaceChildren(svg);
+  }
+
   // ---------- Try it ----------
   function buildTry() {
     $('#sliders').innerHTML = G.map((g, i) => `
@@ -327,6 +443,7 @@
       const rebalanced = toHundred(shares, 100 - value);
       state.mine = rebalanced.map((v, i) => (i === index ? value : v));
       renderTry();
+      note('Sliders used', { year: yearOf(state.year) });
     });
   }
 
@@ -336,9 +453,9 @@
       $(`#mine-${i}`).value = String(value);
       $(`#mine-out-${i}`).textContent = value;
     });
-    $('#try-takeaway').textContent = `This is the same job the models were given, in five groups instead of eleven. Move any slider for ${forYear(h)}; the others adjust so you always total 100.`;
+    $('#try-takeaway').textContent = C.tryTakeaway(h);
     const ranked = modelsFor(h)
-      .map(model => { const values = toHundred(groupVals(model.h[h].p)); return { model, values, gap: distance(values, state.mine) }; })
+      .map(model => { const values = C.modelVals(model, h); return { model, values, gap: distance(values, state.mine) }; })
       .sort((a, b) => a.gap - b.gap);
     const closest = ranked[0], furthest = ranked.at(-1);
     const everyone = distance(allLabs(h), state.mine);
@@ -386,7 +503,7 @@
     const models = modelsFor(h);
     const everything = models.flatMap(m => m.h[h].p);
     const axis = Math.max(...everything);
-    $('#futures-takeaway').textContent = `The five groups are made of these eleven. Figures are the share of 100 points for ${forYear(h)}, counting each lab once.`;
+    $('#futures-takeaway').textContent = C.futuresTakeaway(h);
     const who = list => (list.length > 2 ? `${list[0]} +${list.length - 1}` : list.join(', '));
     document.querySelectorAll('.state-card').forEach(card => {
       const id = Number(card.dataset.future);
@@ -411,6 +528,7 @@
     renderQuotes();
     renderYou();
     renderRanks();
+    renderLabs();
     renderTry();
     renderFutures();
   }
@@ -420,14 +538,22 @@
     state.year = h;
     renderAll();
     writeUrl();
+    note('Year changed', { year: yearOf(h) }, 3);
   }
 
   $('#year-select').addEventListener('change', event => setYear(event.target.value));
   document.addEventListener('click', event => {
+    const out = event.target.closest('a[href^="explore.html"]');
+    if (out) {
+      const place = out.closest('section[id], footer, header');
+      note('Explorer opened', { from: place ? place.id || place.tagName.toLowerCase() : 'page' });
+    }
     const year = event.target.closest('[data-year]');
     if (year) { setYear(year.dataset.year); return; }
     const sort = event.target.closest('[data-sort]');
     if (sort) { state.sort = Number(sort.dataset.sort); renderRanks(); return; }
+    const labsBy = event.target.closest('[data-labs-by]');
+    if (labsBy) { state.labsBy = Number(labsBy.dataset.labsBy); renderLabs(); return; }
     if (event.target.closest('#ranks-more')) { state.showAll = !state.showAll; renderRanks(); return; }
     const lab = event.target.closest('[data-lab]');
     if (lab) {
@@ -438,7 +564,9 @@
       state.model = newest ? newest.id : '';
       renderYou();
       renderRanks();
+      renderLabs();
       writeUrl();
+      if (newest) note('AI picked', { lab: newest.lab, model: newest.id }, 3);
       return;
     }
     const model = event.target.closest('[data-model]');
@@ -446,7 +574,9 @@
       state.model = model.dataset.model;
       renderYou();
       renderRanks();
+      renderLabs();
       writeUrl();
+      note('AI picked', { lab: state.lab, model: state.model }, 3);
       return;
     }
     const open = event.target.closest('[data-open-model]');
@@ -456,7 +586,9 @@
       state.lab = target.lab;
       renderYou();
       renderRanks();
+      renderLabs();
       writeUrl();
+      note('AI picked', { lab: target.lab, model: target.id }, 3);
       $('#you').scrollIntoView();
     }
   });
@@ -464,17 +596,43 @@
   readUrl();
   buildHero();
   buildRanks();
+  buildCruxes();
+  buildLabs();
+  buildSteady();
   buildTry();
   buildFutures();
   renderAll();
+  renderSteady();
   writeUrl();
   if ('ResizeObserver' in window) {
-    let last = $('#chart').clientWidth;
-    new ResizeObserver(() => {
-      const width = $('#chart').clientWidth;
-      if (Math.abs(width - last) < 2) return;
-      last = width;
-      renderChart();
-    }).observe($('#chart'));
+    // Both charts are drawn to the width they are given.
+    [['#chart', renderChart], ['#steady-chart', renderSteady]].forEach(([selector, draw]) => {
+      let last = $(selector).clientWidth;
+      new ResizeObserver(() => {
+        const width = $(selector).clientWidth;
+        if (Math.abs(width - last) < 2) return;
+        last = width;
+        draw();
+      }).observe($(selector));
+    });
+  }
+  if ('IntersectionObserver' in window) {
+    // Which sections a reader gets to. The first two are on screen at load,
+    // so they would say nothing.
+    const seen = new IntersectionObserver(entries => {
+      entries.filter(entry => entry.isIntersecting).forEach(entry => {
+        seen.unobserve(entry.target);
+        note('Section seen', { section: entry.target.id }, 12);
+      });
+    }, { rootMargin: '0px 0px -35% 0px' });
+    document.querySelectorAll('main section[id]').forEach(section => {
+      if (section.id !== 'top' && section.id !== 'answer') seen.observe(section);
+    });
+    const near = new IntersectionObserver(entries => {
+      if (!entries.some(entry => entry.isIntersecting)) return;
+      near.disconnect();
+      loadWhy();
+    }, { rootMargin: '900px 0px' });
+    near.observe($('#you'));
   }
 })();

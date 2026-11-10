@@ -5,13 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="theme-color" content="#11120f">
-  <meta name="description" content="We asked the leading AI models how things turn out between humans and AI. Here is what they said, in plain words.">
   <title>Machine Futures: what AI models say about the future of AI</title>
+  <link rel="canonical" href="https://www.machinefutures.ai/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Machine Futures">
+  <meta property="og:url" content="https://www.machinefutures.ai/">
   <meta property="og:title" content="What AI models say about the future of AI">
-  <meta property="og:description" content="We asked the leading AI models how things turn out between humans and AI. Here is what they said, in plain words.">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- BUILD:meta -->
+  <meta name="description" content="For 2030, 32 AI models from 8 labs put 62 of 100 points on humans staying in control. See all 11 years we asked about, and what your AI said.">
+  <meta property="og:description" content="For 2030, 32 AI models from 8 labs put 62 of 100 points on humans staying in control. See all 11 years we asked about, and what your AI said.">
+  <meta property="og:image" content="https://www.machinefutures.ai/share.png?v=01d963b8">
+  <meta property="og:image:alt" content="For 2030, AI models put most of their points on humans staying in control. Humans stay in control: 62 of 100 points. Humans and AI share power or merge: 16 of 100 points. AI is in charge and humans survive: 8 of 100 points. Change is frozen or AI is given up: 5 of 100 points. Humanity is gone or might perish: 9 of 100 points.">
+  <meta name="twitter:image" content="https://www.machinefutures.ai/share.png?v=01d963b8">
+  <!-- /BUILD:meta -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' fill='%23f2efe6'/%3E%3Cg fill='none' stroke='%2311120f' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M4 9.5 18 2l14 7.5v17L18 34 4 26.5z'/%3E%3Cpath d='M11 23h14'/%3E%3C/g%3E%3Ccircle cx='12' cy='16' r='2.1' fill='%2311120f'/%3E%3Ccircle cx='24' cy='16' r='2.1' fill='%2311120f'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="front.css">
 </head>
@@ -91,6 +100,15 @@
       <div class="quotes" id="quotes"></div>
     </section>
 
+    <section class="block shell" id="why" aria-labelledby="why-title">
+      <div class="section-heading">
+        <h2 id="why-title">Why they <em>disagree</em></h2>
+        <p class="section-note">The same future, the same year, two models and two different numbers. Each pair shows where the reasoning parts ways.</p>
+      </div>
+      <div class="cruxes" id="cruxes"></div>
+      <p class="caption">Quotes are word for word. The pairs were picked by hand to show a disagreement, so they are not typical of every model.</p>
+    </section>
+
     <section class="block shell" id="you" aria-labelledby="you-title">
       <div class="section-heading">
         <h2 id="you-title">What does <em>your AI say?</em></h2>
@@ -119,6 +137,20 @@
       </div>
     </section>
 
+    <section class="block shell" id="labs" aria-labelledby="labs-title">
+      <div class="section-heading">
+        <h2 id="labs-title">Lab <em>by lab</em></h2>
+        <p class="section-note" id="labs-takeaway"></p>
+      </div>
+      <div class="pick">
+        <div class="picker-copy plain"><span id="labs-by-label">Compare the labs on</span></div>
+        <div class="lab-toggle" id="labs-toggle" role="group" aria-labelledby="labs-by-label"></div>
+      </div>
+      <div class="lab-rows" id="lab-rows"></div>
+      <div class="lab-key" id="labs-key" aria-hidden="true"></div>
+      <p class="caption" id="labs-note"></p>
+    </section>
+
     <section class="block shell" id="try" aria-labelledby="try-title">
       <div class="section-heading">
         <h2 id="try-title">Now <em>you try</em></h2>
@@ -136,6 +168,23 @@
         <p class="section-note" id="futures-takeaway"></p>
       </div>
       <div class="state-grid" id="future-list"></div>
+    </section>
+
+    <section class="block shell" id="steady" aria-labelledby="steady-title">
+      <div class="section-heading">
+        <h2 id="steady-title">Asked <em>twice</em></h2>
+        <p class="section-note" id="steady-takeaway"></p>
+      </div>
+      <div class="steady">
+        <figure class="steady-plot">
+          <div class="chart" id="steady-chart"></div>
+          <figcaption class="chart-caption" id="steady-caption"></figcaption>
+        </figure>
+        <div>
+          <div class="gaps" id="steady-gaps"></div>
+          <p class="steady-say" id="steady-say"></p>
+        </div>
+      </div>
     </section>
 
     <section class="block shell" id="trust" aria-labelledby="trust-title">
@@ -178,6 +227,7 @@
 
   <script src="analytics.js"></script>
   <script src="front-data.js"></script>
+  <script src="front-copy.js"></script>
   <script src="front.js"></script>
 </body>
 </html>

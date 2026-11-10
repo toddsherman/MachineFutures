@@ -9,6 +9,7 @@
     "data:export": "node tools/export-data.mjs",
     "data:front": "node tools/build-front.mjs",
     "data:rebuild": "npm run data:import && npm run data:export && npm run data:front",
+    "share:render": "node tools/render-share.mjs",
     "test:browser": "playwright test",
     "serve": "python3 -m http.server 4173 --directory public"
   },

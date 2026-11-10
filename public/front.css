@@ -276,3 +276,72 @@ button.rank-row:hover .rank-label b { text-decoration: underline; text-underline
   .desc-wrap[open] summary::after { content: "\2212"; }
   .state-card .desc { margin: 14px 0 0; }
 }
+
+/* Why they disagree: the reasoning panel again, two voices to a card */
+.cruxes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; }
+.crux { padding: 34px 32px 30px; display: flex; flex-direction: column; color: var(--paper); background: var(--ink-2); }
+.crux h3 { margin-top: 26px; font: 900 clamp(28px, 2.7vw, 40px)/.95 var(--display); letter-spacing: -.045em; text-transform: uppercase; }
+.crux-about { margin-top: 10px; color: #9b9b93; font: 11px/1.5 var(--mono); text-transform: uppercase; }
+.crux blockquote { margin: 24px 0 0; font-size: 16px; line-height: 1.5; }
+.crux cite { display: flex; align-items: baseline; gap: 10px; margin-top: 10px; color: #b6b5ac; font: normal 11px var(--mono); text-transform: uppercase; }
+.crux cite b { color: var(--acid); font-size: 13px; }
+.crux-range { margin-top: auto; padding-top: 30px; }
+.crux-line { position: relative; height: 12px; margin-inline: 6px; }
+.crux-line::before { content: ""; position: absolute; left: -6px; right: -6px; top: 5px; border-top: 1px solid rgba(255, 255, 255, .35); }
+.crux-line i { position: absolute; top: 0; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--acid); }
+.crux-range p { display: flex; justify-content: space-between; margin-top: 8px; color: #9b9b93; font: 11px var(--mono); text-transform: uppercase; }
+
+/* Lab by lab: one row per lab, a dot per model */
+.lab-rows { margin-top: 28px; border-top: 1px solid var(--ink); }
+.lab-row { display: grid; grid-template-columns: 210px minmax(0, 1fr) 78px; align-items: center; gap: 18px; min-height: 56px; border-bottom: 1px solid var(--line); }
+.lab-track { position: relative; align-self: stretch; margin-inline: 7px; }
+.lab-track::before { content: ""; position: absolute; left: -7px; right: -7px; top: 50%; border-top: 1px solid var(--line); }
+.lab-dot { position: absolute; top: 50%; width: 13px; height: 13px; margin: -6.5px 0 0 -6.5px; border: 1px solid var(--ink); border-radius: 50%; background: var(--c); }
+.lab-dot.is-picked { z-index: 2; box-shadow: 0 0 0 3px var(--acid), 0 0 0 4px var(--ink); }
+.lab-avg { position: absolute; top: 9px; bottom: 9px; z-index: 1; width: 3px; margin-left: -1.5px; background: var(--ink); }
+.lab-all { position: absolute; top: 0; bottom: 0; border-left: 1px dashed var(--muted); }
+.lab-axis { min-height: 26px; border-bottom: 0; }
+.lab-axis .lab-track::before { display: none; }
+.lab-axis small { position: absolute; top: 6px; transform: translateX(-50%); color: var(--muted); font: 11px var(--mono); }
+.lab-key { display: flex; flex-wrap: wrap; gap: 6px 26px; margin-top: 10px; font: 700 11px var(--mono); text-transform: uppercase; }
+.lab-key span { display: inline-flex; align-items: center; gap: 9px; min-height: 24px; }
+.lab-key i { position: static; margin: 0; }
+.lab-key .lab-avg { height: 16px; }
+.lab-key .lab-all { height: 16px; }
+
+/* Asked twice */
+.steady { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 60px; align-items: start; }
+.steady-plot { margin: 0; max-width: 620px; }
+.chart .pair { fill-opacity: .6; stroke: var(--ink); stroke-opacity: .35; stroke-width: .75; }
+.gaps { border-top: 1px solid var(--ink); }
+.gap-row { padding: 18px 0 16px; border-bottom: 1px solid var(--line); }
+.gap-row:last-child { border-bottom-color: var(--ink); }
+.gap-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; }
+.gap-head b { font: 800 17px var(--display); letter-spacing: -.01em; text-transform: uppercase; }
+.gap-head strong { font: 900 clamp(34px, 3.6vw, 52px)/.8 var(--display); letter-spacing: -.06em; font-variant-numeric: tabular-nums; }
+.gap-bar { height: 24px; margin-top: 12px; border: 1px solid var(--ink); }
+.gap-bar i { display: block; height: 100%; background: var(--ink); }
+.gap-row small { display: block; margin-top: 8px; color: var(--muted); font: 11px var(--mono); text-transform: uppercase; }
+.steady-say { max-width: 52ch; margin-top: 22px; color: var(--muted); font-size: 15px; line-height: 1.6; }
+
+@media (max-width: 1100px) {
+  .cruxes { grid-template-columns: 1fr; }
+  .crux-range { margin-top: 30px; padding-top: 0; }
+}
+@media (max-width: 820px) {
+  .steady { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+}
+@media (max-width: 600px) {
+  /* The top bar has to hold the name and the year on a 320px screen, in the
+     wider fallback face too. The select keeps its accessible name. */
+  .topbar-inner { gap: 12px; }
+  .wordmark { min-width: 0; overflow: hidden; font-size: 18px; }
+  .year-pick > span { display: none; }
+  .crux { padding: 24px 20px 26px; }
+  .lab-row { grid-template-columns: minmax(0, 1fr) auto; gap: 0 12px; padding: 8px 0 2px; }
+  .lab-row .rank-label { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+  .lab-row .rank-label small { white-space: nowrap; }
+  .lab-row .lab-track { grid-column: 1 / -1; grid-row: 2; height: 34px; }
+  .lab-axis { padding: 0; }
+  .lab-axis .lab-track { grid-row: 1; height: 24px; }
+}

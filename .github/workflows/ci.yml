@@ -35,9 +35,9 @@ jobs:
           node tools/import-runs.mjs
           node tools/export-data.mjs
           node tools/build-front.mjs
-          if ! git diff --quiet public/data.js data public/front-data.js public/index.html; then
+          if ! git diff --quiet public/data.js data public/front-data.js public/front-why.js public/index.html; then
             echo "::error::Generated site files do not match what runs/ produces. Run npm run data:rebuild and commit the result."
-            git --no-pager diff --stat public/data.js data public/front-data.js public/index.html
+            git --no-pager diff --stat public/data.js data public/front-data.js public/front-why.js public/index.html
             exit 1
           fi
           echo "public/data.js, data/ and the front page are reproducible from runs/"

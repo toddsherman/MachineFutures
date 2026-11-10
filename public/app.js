@@ -19,7 +19,7 @@
     : (datasets['long-term'] ? 'long-term' : Object.keys(datasets)[0]);
   // A horizon becomes selectable only when it has something to show. This
   // keeps staged prompts and pipeline changes from exposing a control that
-  // would collapse every data section—and the reader's viewport—on selection.
+  // would collapse every data section, and the reader's viewport, on selection.
   const hasForecasts = horizon => Object.keys(datasets[horizon]?.endStateRuns || {}).length > 0;
   const horizonOptions = configuredHorizons
     .filter(option => option.id === fallbackHorizon || hasForecasts(option.id))
@@ -449,7 +449,7 @@
 
   function renderHorizonChartTable(data) {
     const table = $('#horizon-chart-table');
-    table.innerHTML = `<table><caption>${esc(selectionLabel())} scenario probabilities by forecast horizon.</caption><thead><tr><th>Scenario</th>${data.horizons.map(horizon => `<th>${horizon.year}</th>`).join('')}</tr></thead><tbody>${data.series.map(series => `<tr><th>${series.id}. ${esc(series.name)}${series.extinction ? ` — ${extinctionLabels[series.extinction]}` : ''}</th>${series.points.map(point => `<td>${aggregatePercent(point.value)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+    table.innerHTML = `<table><caption>${esc(selectionLabel())} scenario probabilities by forecast horizon.</caption><thead><tr><th>Scenario</th>${data.horizons.map(horizon => `<th>${horizon.year}</th>`).join('')}</tr></thead><tbody>${data.series.map(series => `<tr><th>${series.id}. ${esc(series.name)}${series.extinction ? ` (${extinctionLabels[series.extinction]})` : ''}</th>${series.points.map(point => `<td>${aggregatePercent(point.value)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
   }
 
   function drawHorizonChart() {
@@ -607,7 +607,7 @@
   // that won, while the figure counts up to meet it.
   //
   // The DOM holds the final text before any of this starts, and a timer forces
-  // it again at the end. Nothing here is load-bearing — a paused tab, a missed
+  // it again at the end. Nothing here is load-bearing: a paused tab, a missed
   // frame or reduced motion all leave the answer on screen, which is the whole
   // requirement for an effect wrapped around a fact.
   let leaderSettled = false;
@@ -773,7 +773,7 @@
     });
     const values = rows.map(r => r.value);
     // Two models often land on the same figure. The tie goes to whichever said
-    // it most consistently — the narrower sample range — rather than to
+    // it most consistently (the narrower sample range) rather than to
     // whichever the roster happens to list first.
     const pick = value => rows.filter(r => r.value === value).sort((a, b) => a.spread - b.spread)[0];
     return {
@@ -816,7 +816,7 @@
   }
 
   // Lab marks, monochrome, so model identity is carried by shape rather than
-  // colour — colour belongs to the endings. Geometry is the official mark from
+  // colour: colour belongs to the endings. Geometry is the official mark from
   // each lab's icon (simple-icons; xAI from lobehub), normalised to a 24x24 box
   // and inheriting currentColor. Only path data is embedded, never third-party
   // markup. Trademarks belong to their owners; used here to identify each lab's
@@ -973,7 +973,7 @@
     const rows = orderedStates.map((state, row) => `
       <div class="matrix-row" role="row" data-state="${state.id}">
         <div class="matrix-rowheader" role="rowheader">
-          <button class="matrix-state" type="button" data-state="${state.id}" style="--state:${state.color}" aria-label="${esc(state.name)} — see each model's reasoning">
+          <button class="matrix-state" type="button" data-state="${state.id}" style="--state:${state.color}" aria-label="${esc(state.name)}: see each model's reasoning">
             <i></i><span class="matrix-state-name">${state.id}. ${esc(state.name)}</span>${extinctionMark(state)}
           </button>
         </div>
@@ -998,13 +998,13 @@
         : `${esc(horizonMeta().label)} forecasts are being collected. They will use the same 11-state taxonomy and 100-point allocation as every other horizon.`;
     }
     const methodSamples = $('#method-samples');
-    if (methodSamples) methodSamples.textContent = !samples.length ? '—' : samples.length === 1 ? samples[0] : `${Math.min(...samples)}–${Math.max(...samples)}`;
+    if (methodSamples) methodSamples.textContent = !samples.length ? 'n/a' : samples.length === 1 ? samples[0] : `${Math.min(...samples)}–${Math.max(...samples)}`;
     const errors = entries.map(entry => entry.exposurePublished?.se).filter(Number.isFinite);
     const threshold = $('#method-threshold');
     if (threshold && errors.length) {
       const pooled = Math.sqrt(errors.reduce((sum, se) => sum + se * se, 0) / errors.length);
       threshold.textContent = (2.78 * pooled).toFixed(1);
-    } else if (threshold) threshold.textContent = '—';
+    } else if (threshold) threshold.textContent = 'n/a';
 
     const roster = $('#footer-roster');
     if (roster) roster.textContent = `${entries.length} models across ${labs.size} labs`;
@@ -1042,7 +1042,7 @@
     tweenTimers.set(el, setTimeout(() => { if (tweenTokens.get(el) === token) land(); }, MOTION_MS + 80));
   }
 
-  // Structure is built once. Selecting a model then rewrites values in place —
+  // Structure is built once. Selecting a model then rewrites values in place:
   // rebuilding the markup would restart every element at its final state and
   // there would be nothing for a transition to animate between.
   // px per percentage point in the card chips. Chosen so the largest value or
@@ -1253,7 +1253,7 @@
       const spread = activeRun?.range?.[state.id];
       const displayed = showingAggregate ? aggregatePercent(state.probability) : `${state.probability}%`;
       segment.title = `${state.name}: ${displayed}${spread ? ` (${spread[0]}–${spread[1]}% across samples)` : ''}${state.extinction ? ` · ${extinctionLabels[state.extinction]}` : ''}`;
-      segment.setAttribute('aria-label', `${state.name}: ${displayed} — jump to this ${outcomeTerm(false)}`);
+      segment.setAttribute('aria-label', `${state.name}: ${displayed}. Jump to this ${outcomeTerm(false)}`);
 
       legend.children[index].querySelector('span').innerHTML = `${state.id}. ${esc(state.name)}${extinctionMark(state)}`;
       const value = legend.children[index].querySelector('b');
@@ -1322,7 +1322,7 @@
 
       const figure = card.querySelector('.state-card-meta strong');
       animate ? tweenNumber(figure, state.probability, '%', 1) : (figure.textContent = aggregatePercent(state.probability));
-      card.setAttribute('aria-label', `${state.name}: ${aggregatePercent(state.probability)} — see each model's reasoning`);
+      card.setAttribute('aria-label', `${state.name}: ${aggregatePercent(state.probability)}. See each model's reasoning`);
     });
 
     const leader = [...selectedStates].sort((a, b) => b.probability - a.probability)[0];
@@ -1375,7 +1375,7 @@
             ${ticks.map(t => `<span style="left:${pos(t)}%">${t}</span>`).join('')}
             <span class="strip-end">${axisMax}%</span>
           </div>
-          <span class="answer-range">${entry.range?.[state.id] ? `${entry.range[state.id][0]}–${entry.range[state.id][1]}%` : '—'}</span>
+          <span class="answer-range">${entry.range?.[state.id] ? `${entry.range[state.id][0]}–${entry.range[state.id][1]}%` : 'n/a'}</span>
         </div>
         ${entry.rationales?.[state.id] ? `<p>${esc(entry.rationales[state.id])}</p>` : ''}
       </article>`).join('');
@@ -1416,7 +1416,7 @@
     markTipFor = mark;
     markTip.innerHTML = `<b>${extinctionLabels[tier]}</b><span>${extinctionTip(tier)}</span>`;
     // A modal dialog paints in the top layer, above anything parented to the
-    // body — so inside one, the tooltip has to live in the dialog.
+    // body, so inside one, the tooltip has to live in the dialog.
     const host = mark.closest('dialog[open]') || document.body;
     if (markTip.parentNode !== host) host.appendChild(markTip);
     // Measure from a corner: a left already near the viewport edge would
@@ -1771,7 +1771,7 @@
     targets.forEach(el => el.classList.add('will-reveal'));
 
     // After the reveal has had its time the classes come off, so the end state
-    // never depends on a transition having run — browsers pause them in
+    // never depends on a transition having run: browsers pause them in
     // background tabs.
     const settle = el => setTimeout(() => el.classList.remove('will-reveal', 'is-in'), delay + 1600);
     const io = new IntersectionObserver((records, observer) => {
@@ -1788,7 +1788,7 @@
 
     // The animation waits for the whole axis to be on screen. A short viewport,
     // a zoomed page, or a scroll that never quite frames a card can miss that
-    // threshold — and because the hidden state is opt-in, missing it leaves the
+    // threshold, and because the hidden state is opt-in, missing it leaves the
     // chart blank rather than unanimated. This second observer gives up on the
     // animation and shows the element once it has simply been on screen.
     const rescue = new IntersectionObserver(records => {

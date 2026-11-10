@@ -65,6 +65,14 @@ Raw batches in [`runs/`](../runs/) are the canonical forecast evidence. Their ge
 
 These results record what models express under a fixed elicitation procedure. They are not calibrated probabilities, expert consensus, or a leaderboard. Small gaps between models should not be treated as meaningful unless they clear the sampling uncertainty. Since October 14, 2026, each model is asked once, at every horizon, when it is added to the roster, and is not asked again. Changes over time therefore reflect new model releases and a changing roster rather than a model revising its own answers. Batches from the earlier full-roster sweeps remain in the raw record. The leader timeline carries lab and model counts to make compositional changes visible.
 
+## The front page
+
+The front page restates the same published figures for a first-time reader. It sums the eleven states into five plain groups; states 1 through 5 form one group that follows the extinction tiers, and the grouping and the plain names are display copy that never reaches a prompt. A lab's figure is the arithmetic mean of its models, the first step of the lab-balanced aggregate.
+
+"Asked twice" compares each published answer with the earliest earlier batch of at least 20 samples for the same model, horizon, and question set, from the sweeps that ran before October 14, 2026. Both batches are summarised the way every published figure is: coordinate-wise medians renormalized to whole numbers that sum to 100. The distance between two allocations is half the sum of their absolute differences, which is the number of points that would have to move to turn one into the other. The section reports the median distance between a model's two answers and the mean distance between two different models at the same horizon. It measures stability, not accuracy.
+
+"Why they disagree" quotes pairs chosen by hand. Each quote is checked word for word against the model's published rationale when the page is built.
+
 ## Global forecast selection
 
 The attached lab icon row selects the forecast across the page. Select a lab for its mean; select its icon again to open the model dropdown. The headline, pDoom, outcome cards and details, exposure list, and horizon chart follow that selection. The full model matrix and its details retain every model. Horizon, lab, and model choices are shareable URL parameters. The horizon chart uses only measurements available for the selected lab or model.

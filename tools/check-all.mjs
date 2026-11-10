@@ -2,7 +2,7 @@
 // Run every non-browser check and report all of them.
 //
 // These used to be an && chain, so the first failure hid the state of
-// everything after it — when check-site broke, nobody knew whether the links
+// everything after it. When check-site broke, nobody knew whether the links
 // or the harness tests were fine, and one terse line was easy to misread as a
 // pass. This runs them all and ends on an unambiguous verdict.
 //
@@ -18,7 +18,11 @@ const checks = [
   ['published links', ['tools/check-links.mjs']],
   ['application parses', ['--check', 'public/app.js']],
   ['data parses', ['--check', 'public/data.js']],
-  ['unit and harness tests', ['--test', 'tools/test-allocations.mjs', 'tools/test-analytics.mjs', 'tools/test-capture.mjs', 'tools/test-classify.mjs', 'tools/test-harness.mjs', 'tools/test-horizons.mjs', 'tools/test-sweep.mjs']]
+  ['front page parses', ['--check', 'public/front.js']],
+  ['front page wording parses', ['--check', 'public/front-copy.js']],
+  ['front page data parses', ['--check', 'public/front-data.js']],
+  ['front page reasons parse', ['--check', 'public/front-why.js']],
+  ['unit and harness tests', ['--test', 'tools/test-allocations.mjs', 'tools/test-analytics.mjs', 'tools/test-capture.mjs', 'tools/test-classify.mjs', 'tools/test-copy.mjs', 'tools/test-front.mjs', 'tools/test-harness.mjs', 'tools/test-horizons.mjs', 'tools/test-sweep.mjs']]
 ];
 
 const results = [];

@@ -34,12 +34,13 @@ jobs:
           set -euo pipefail
           node tools/import-runs.mjs
           node tools/export-data.mjs
-          if ! git diff --quiet public/data.js data; then
-            echo "::error::public/data.js or data/ does not match what runs/ produces. Run tools/import-runs.mjs and tools/export-data.mjs and commit the result."
-            git --no-pager diff --stat public/data.js data
+          node tools/build-front.mjs
+          if ! git diff --quiet public/data.js data public/front-data.js public/front-why.js public/index.html; then
+            echo "::error::Generated site files do not match what runs/ produces. Run npm run data:rebuild and commit the result."
+            git --no-pager diff --stat public/data.js data public/front-data.js public/front-why.js public/index.html
             exit 1
           fi
-          echo "public/data.js and data/ are reproducible from runs/"
+          echo "public/data.js, data/ and the front page are reproducible from runs/"
 
   browser:
     runs-on: ubuntu-latest

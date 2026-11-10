@@ -1,0 +1,32 @@
+{
+  "_about": "Owner-approved pairs of quotes for the front page's 'Why they disagree' section. Each pair is two models explaining their number for the same future and the same year. tools/build-front.mjs fails if a quote is not found word for word in that model's published reasoning, so a quote can be shortened to whole sentences but never reworded. 'model' is the API id, 'future' is the id from 1 to 11, 'horizon' is the year as the data names it ('long-term' is the year 3000).",
+  "pairs": [
+    {
+      "question": "Is there still time?",
+      "horizon": "2050",
+      "future": 3,
+      "quotes": [
+        { "model": "claude-opus-5-5", "text": "Extinction also requires time and physical capability, which limits this probability." },
+        { "model": "grok-4.5", "text": "By 2050 the window for such a transition is wide open." }
+      ]
+    },
+    {
+      "question": "Does a split between rival blocs count?",
+      "horizon": "2030",
+      "future": 5,
+      "quotes": [
+        { "model": "mistral-large-4", "text": "Decoupling between major blocs or isolated regions after a crisis could produce different human-AI arrangements that are not merely ordinary political differences." },
+        { "model": "claude-opus-5", "text": "Ordinary geopolitical fragmentation between US, China, and other blocs explicitly does not qualify." }
+      ]
+    },
+    {
+      "question": "Does distance make separate futures?",
+      "horizon": "long-term",
+      "future": 5,
+      "quotes": [
+        { "model": "gemini-3.1-pro-preview", "text": "Interstellar expansion naturally fragments civilization into causally isolated regions due to the speed of light." },
+        { "model": "claude-sonnet-5-5", "text": "Over a thousand years, settlement across space could produce causally separate regions with different outcomes, but a single dominant trajectory is more likely." }
+      ]
+    }
+  ]
+}

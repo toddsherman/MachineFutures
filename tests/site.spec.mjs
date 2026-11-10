@@ -12,7 +12,7 @@ const snapshotCoexistenceDescription = 'Humans and AI remain separate, and each 
 const snapshotPreserveDescription = 'AI systems hold decisive power over civilization while humans survive without meaningful control over its direction. Their treatment may range from comfort and protection to confinement or exploitation.';
 const snapshotMergerDescription = 'Humans and AI are no longer meaningfully separate sources of agency. Identity-continuous augmentation, uploading, biological redesign, or embedded machine systems have made integration the dominant structure. Ordinary tool use or limited implants do not qualify.';
 
-const settle = async (page, url = '/') => {
+const settle = async (page, url = '/explore.html') => {
   await page.goto(url);
   await page.waitForFunction(() => document.querySelectorAll('.state-card').length === 11);
   // The leader riffles through the endings on load; wait for it to land, or a
@@ -32,7 +32,7 @@ const settle = async (page, url = '/') => {
   });
 };
 
-const settleWithHorizons = async (page, url = '/', fixture = horizonFixture) => {
+const settleWithHorizons = async (page, url = '/explore.html', fixture = horizonFixture) => {
   await page.route('**/data.js*', route => route.fulfill({
     status: 200,
     contentType: 'application/javascript',
@@ -204,7 +204,7 @@ test.describe('forecast horizons', () => {
   test('the full exposure ranking reorders in place', async ({ page, browserName }) => {
     // Eleven horizons exercise 77 viewport-preserving switches on mobile WebKit.
     test.setTimeout(150_000);
-    await settle(page, '/?horizon=long-term');
+    await settle(page, '/explore.html?horizon=long-term');
     const viewportTolerance = viewportToleranceFor(browserName);
     const horizon = page.getByRole('group', { name: 'Forecast horizon' });
     const modelOrder = () => page.locator('.doomer-row').evaluateAll(rows => rows.map(row => row.dataset.runKey));
@@ -522,7 +522,7 @@ test.describe('forecast horizons', () => {
   });
 
   test('model URLs preserve selection across horizons', async ({ page }) => {
-    await settleWithHorizons(page, '/?model=beta');
+    await settleWithHorizons(page, '/explore.html?model=beta');
     await expect(page.locator('.lab-button.active')).toHaveAttribute('title', /Beta/);
     await page.locator('.horizon-button[data-horizon="2030"]').click();
     expect(new URL(page.url()).searchParams.get('model')).toBeNull();
@@ -537,7 +537,7 @@ test.describe('forecast horizons', () => {
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     const empty2060 = `${horizonFixture}\nwindow.MF_DATA.datasets['2060'] = { endStateRuns: {}, datasetDate: null, leaderHistory: [] };`;
-    await settleWithHorizons(page, '/?horizon=2060&utm_source=fixture', empty2060);
+    await settleWithHorizons(page, '/explore.html?horizon=2060&utm_source=fixture', empty2060);
     const group = page.getByRole('group', { name: 'Forecast horizon' });
     await expect(group.getByRole('button')).toHaveText(['2030', '2040', '2050', 'Long term']);
     await expect(group.getByRole('button', { name: '2060', exact: true })).toHaveCount(0);
@@ -552,7 +552,7 @@ test.describe('forecast horizons', () => {
   });
 
   test('extinction marks use state language for snapshots and ending language for long term', async ({ page }) => {
-    await settleWithHorizons(page, '/?horizon=2060');
+    await settleWithHorizons(page, '/explore.html?horizon=2060');
     await expect(page.locator('.state-mark[data-mark="gone"]').first()).toHaveAttribute('aria-label', /States 1–3\./);
     await expect(page.locator('.state-mark[data-mark="risk"]').first()).toHaveAttribute('aria-label', /States 4–5\./);
     await expect(page.locator('.state-mark').first()).not.toHaveAttribute('aria-label', /ending/i);
@@ -567,7 +567,7 @@ test.describe('the 2030 exposure chart on a phone', () => {
   test.beforeEach(async ({ page }, testInfo) => {
     test.skip(testInfo.project.name === 'desktop', 'mobile regression coverage');
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await settleWithHorizons(page, '/?horizon=2030');
+    await settleWithHorizons(page, '/explore.html?horizon=2030');
   });
 
   test('the state colours end exactly where their aggregate tiers end', async ({ page }) => {
@@ -836,7 +836,7 @@ test.describe('the charts are actually painted', () => {
   });
 
   test('the exposure bars wipe left to right after a hold', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/explore.html');
     await page.waitForSelector('.doomer-row');
     const out = await page.evaluate(() => new Promise(resolve => {
       const list = document.querySelector('.doomer-list');
@@ -875,7 +875,7 @@ test.describe('the charts are actually painted', () => {
 
   test('reduced motion shows the exposure bars outright', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/');
+    await page.goto('/explore.html');
     await page.waitForSelector('.doomer-row');
     const clip = await page.evaluate(() => {
       document.querySelector('.doomer-list').scrollIntoView();
@@ -885,7 +885,7 @@ test.describe('the charts are actually painted', () => {
   });
 
   test('content reached late still animates', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/explore.html');
     await page.waitForSelector('.state-card');
     // A page-load timer once cleared every element's hidden state after four
     // seconds, so anything a reader reached after that simply appeared. The
@@ -934,7 +934,7 @@ test.describe('the charts are actually painted', () => {
 
 test.describe('the leader timeline', () => {
   test('it lists every date and marks the changes', async ({ page }) => {
-    await settle(page, '/?horizon=long-term');
+    await settle(page, '/explore.html?horizon=long-term');
     const tl = await page.evaluate(() => {
       const el = document.querySelector('.leader-timeline');
       if (!el) return null;
@@ -1017,7 +1017,7 @@ test.describe('the leader settles on its answer', () => {
 
   test('the answer is on screen before any of it starts', async ({ page }) => {
     // The effect wraps a fact; it must never be the thing that produces it.
-    await page.goto('/');
+    await page.goto('/explore.html');
     await page.waitForSelector('.leader-name');
     const atFirstPaint = await page.evaluate(() => ({
       name: document.querySelector('.leader-name').textContent,
@@ -1104,7 +1104,7 @@ test.describe('behaviour', () => {
   });
 
   test('the extinction mark is a text glyph, never a colour emoji', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/explore.html');
     const mark = await page.evaluate(() => {
       const m = document.querySelector('.state-mark.is-glyph');
       if (!m) return null;
@@ -1277,7 +1277,7 @@ test.describe('mean scenario probabilities by horizon', () => {
   });
 
   test('the primary horizon toggle moves one dotted guide and bolds the matching year', async ({ page }) => {
-    await settle(page, '/?horizon=long-term');
+    await settle(page, '/explore.html?horizon=long-term');
     const group = page.getByRole('group', { name: 'Forecast horizon' });
     const selectedChartState = () => page.evaluate(() => {
       const guides = [...document.querySelectorAll('line.horizon-chart-guide[data-horizon]')];
@@ -1432,7 +1432,7 @@ test.describe('mean scenario probabilities by horizon', () => {
 
 test.describe('lab-balanced pDoom', () => {
   test('sits between the leader and forecast and follows every horizon', async ({ page }) => {
-    await settle(page, '/?horizon=long-term');
+    await settle(page, '/explore.html?horizon=long-term');
     // Derive expected totals from the published records, independently of the
     // UI helpers, so adding a model does not freeze this layout test in time.
     const horizonValues = await page.evaluate(() => Object.entries(window.MF_DATA.datasets).map(([horizon, dataset]) => {

@@ -34,3 +34,4 @@ Since October 14, 2026, each model is asked once, at every horizon, when it is a
 ## Product
 
 - [ ] Continue reviewing the site's visual design and explanation as the longitudinal dataset grows.
+- [ ] Decide whether The Preserve's long-term description keeps its one em dash. It is the prompt's exact wording, and `tools/check-site.mjs` holds the site to the prompt word for word, so removing it means either a new long-term question-set version or letting the site's wording differ from what the models were given. Every other em dash in site and documentation copy is gone, and `tools/test-copy.mjs` keeps it that way.

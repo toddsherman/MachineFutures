@@ -107,7 +107,7 @@ test('every sentence renders for every year and every choice, with no holes', ()
   check('steadySay', copy.steadySay());
   check('footerNote', copy.footerNote());
   for (const h of front.horizons) {
-    for (const name of ['kicker', 'headline', 'headlineText', 'dek', 'yearNote', 'metaDescription', 'wordsTakeaway', 'tryTakeaway', 'futuresTakeaway', 'labsNote']) {
+    for (const name of ['kicker', 'headline', 'headlineText', 'dek', 'yearNote', 'metaDescription', 'wordsTakeaway', 'futuresTakeaway', 'labsNote']) {
       check(`${name} ${h}`, copy[name](h));
     }
     front.groups.forEach((group, by) => {

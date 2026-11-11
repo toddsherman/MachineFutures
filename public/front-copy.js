@@ -143,8 +143,7 @@
       return `Each dot is one model and the bar is its lab’s average. ${span}, so a small gap between two lab averages means little.${twins.join('')}`;
     }
 
-    // ---------- Eleven futures, try it ----------
-    const tryTakeaway = h => `This is the same job the models were given, in five groups instead of eleven. Move any slider for ${forYear(h)}; the others adjust so you always total 100.`;
+    // ---------- Eleven futures ----------
     const futuresTakeaway = h => `The five groups are made of these eleven. Figures are the share of 100 points for ${forYear(h)}, counting each lab once.`;
 
     // ---------- Asked twice ----------
@@ -178,7 +177,7 @@
       groupIndex, groupVals, allLabs, modelsFor, modelVals, leaders, ranking, labRows,
       kicker, headline, headlineText, dek, yearNote, metaDescription,
       timeTakeaway, wordsTakeaway, cardSay, allTakeaway, labsTakeaway, labsNote,
-      tryTakeaway, futuresTakeaway, steadyTakeaway, steadyCaption, steadySay, footerNote
+      futuresTakeaway, steadyTakeaway, steadyCaption, steadySay, footerNote
     };
   };
 })();

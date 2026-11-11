@@ -3,14 +3,14 @@
   // Sentences with numbers, and the arithmetic behind them, live in
   // front-copy.js so the build and the checks can read the same words.
   const C = window.FRONT_COPY(D);
-  const { esc, sum, yearOf, forYear, toHundred, distance, groupVals, allLabs, modelsFor } = C;
+  const { esc, sum, yearOf, forYear, groupVals, allLabs, modelsFor } = C;
   const H = D.horizons;
   const G = D.groups;
   const $ = selector => document.querySelector(selector);
   const PRODUCT = { Anthropic: 'Claude', OpenAI: 'ChatGPT', Google: 'Gemini', xAI: 'Grok', Meta: 'Meta AI', DeepSeek: 'DeepSeek', Mistral: 'Le Chat', Moonshot: 'Kimi' };
   const SVG = 'http://www.w3.org/2000/svg';
 
-  const state = { year: D.defaultHorizon, lab: '', model: '', mine: [20, 20, 20, 20, 20], sort: 0, labsBy: 0, showAll: false };
+  const state = { year: D.defaultHorizon, lab: '', model: '', sort: 0, labsBy: 0, showAll: false };
   const RANKS_SHOWN = 10;
   const explorerUrl = (h, modelId) => {
     const params = new URLSearchParams();
@@ -144,6 +144,31 @@
     return n;
   }
 
+  // A smooth line through the points that never bends past them (monotone
+  // cubic, as in d3's curveMonotoneX), so it cannot dip below 0 or invent a peak.
+  function smoothPath(pts) {
+    const n = pts.length;
+    const f = v => v.toFixed(1);
+    if (n < 3) return pts.map(([px, py], i) => `${i ? 'L' : 'M'}${f(px)},${f(py)}`).join(' ');
+    const slope = [];
+    for (let i = 0; i < n - 1; i += 1) slope.push((pts[i + 1][1] - pts[i][1]) / (pts[i + 1][0] - pts[i][0]));
+    const tangent = pts.map((_, i) => {
+      if (i === 0) return slope[0];
+      if (i === n - 1) return slope[n - 2];
+      const a = slope[i - 1], b = slope[i];
+      if (a * b <= 0) return 0;
+      const ha = pts[i][0] - pts[i - 1][0], hb = pts[i + 1][0] - pts[i][0];
+      return (3 * (ha + hb)) / ((2 * hb + ha) / a + (hb + 2 * ha) / b);
+    });
+    let d = `M${f(pts[0][0])},${f(pts[0][1])}`;
+    for (let i = 0; i < n - 1; i += 1) {
+      const [x0, y0] = pts[i], [x1, y1] = pts[i + 1];
+      const h = (x1 - x0) / 3;
+      d += ` C${f(x0 + h)},${f(y0 + h * tangent[i])} ${f(x1 - h)},${f(y1 - h * tangent[i + 1])} ${f(x1)},${f(y1)}`;
+    }
+    return d;
+  }
+
   function renderChart() {
     const host = $('#chart');
     const width = Math.max(300, Math.floor(host.clientWidth));
@@ -172,7 +197,7 @@
     svg.appendChild(node('line', { class: 'guide', x1: x(selected), x2: x(selected), y1: margin.top, y2: margin.top + plotH }));
 
     series.forEach(s => {
-      const d = s.points.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+      const d = smoothPath(s.points.map((v, i) => [x(i), y(v)]));
       svg.appendChild(node('path', { class: 'series', d, stroke: s.color }));
       s.points.forEach((v, i) => svg.appendChild(node('circle', { cx: x(i), cy: y(v), r: i === selected ? 4.5 : 2, fill: s.color })));
     });
@@ -424,52 +449,6 @@
     host.replaceChildren(svg);
   }
 
-  // ---------- Try it ----------
-  function buildTry() {
-    $('#sliders').innerHTML = G.map((g, i) => `
-      <div class="slider-row" style="--c:${g.color}">
-        <span class="sw"></span>
-        <label for="mine-${i}">${esc(g.label)}</label>
-        <output id="mine-out-${i}" for="mine-${i}"></output>
-        <input type="range" id="mine-${i}" min="0" max="100" step="1" data-mine="${i}">
-      </div>`).join('');
-    $('#sliders').addEventListener('input', event => {
-      const index = Number(event.target.dataset.mine);
-      if (!Number.isInteger(index)) return;
-      const value = Number(event.target.value);
-      const others = state.mine.map((v, i) => (i === index ? 0 : v));
-      // The rest keep their proportions so the total is always 100.
-      const shares = sum(others) ? others : others.map((v, i) => (i === index ? 0 : 1));
-      const rebalanced = toHundred(shares, 100 - value);
-      state.mine = rebalanced.map((v, i) => (i === index ? value : v));
-      renderTry();
-      note('Sliders used', { year: yearOf(state.year) });
-    });
-  }
-
-  function renderTry() {
-    const h = state.year;
-    state.mine.forEach((value, i) => {
-      $(`#mine-${i}`).value = String(value);
-      $(`#mine-out-${i}`).textContent = value;
-    });
-    $('#try-takeaway').textContent = C.tryTakeaway(h);
-    const ranked = modelsFor(h)
-      .map(model => { const values = C.modelVals(model, h); return { model, values, gap: distance(values, state.mine) }; })
-      .sort((a, b) => a.gap - b.gap);
-    const closest = ranked[0], furthest = ranked.at(-1);
-    const everyone = distance(allLabs(h), state.mine);
-    $('#match').innerHTML = `
-      <div class="quote-kicker"><span>${Math.round(closest.gap)} apart</span>Closest to you · ${esc(yearOf(h))}</div>
-      <h3>${esc(closest.model.name)}</h3>
-      <p>${esc(closest.model.lab)}. You would have to move ${Math.round(closest.gap)} of your 100 points to match it. All labs together are ${Math.round(everyone)} points from you. Furthest from you is ${esc(furthest.model.name)}, ${Math.round(furthest.gap)} points away.</p>
-      <div class="compare">
-        <div class="compare-row"><b>You</b>${slimBar(state.mine)}</div>
-        <div class="compare-row"><b>${esc(closest.model.name)}</b>${slimBar(closest.values)}</div>
-      </div>
-      <button type="button" data-open-model="${esc(closest.model.id)}">See its answer</button>`;
-  }
-
   // ---------- Eleven futures ----------
   function buildFutures() {
     $('#future-list').innerHTML = G.flatMap(g => g.ids.map(id => {
@@ -484,7 +463,7 @@
           <p class="state-coined">${esc(f.name)} · ${esc(g.label)}</p>
           <details class="desc-wrap"><summary>What this means</summary><p class="desc"></p></details>
           <div class="state-foot">
-            <div class="meter"><i></i></div>
+            <div class="meter"><i></i><b></b></div>
             <p class="state-range"></p>
           </div>
         </article>`;
@@ -511,6 +490,9 @@
       const value = agg.p[id - 1];
       card.querySelector('.state-card-meta strong').textContent = `${value.toFixed(1)}%`;
       card.querySelector('.meter i').style.width = `${(value / axis * 100).toFixed(1)}%`;
+      const mean = card.querySelector('.meter b');
+      mean.style.left = `${(value / axis * 100).toFixed(1)}%`;
+      mean.title = `Mean, counting each lab once: ${value.toFixed(1)}%`;
       card.querySelector('.desc').textContent = h === 'long-term' ? f.longTerm : f.dated;
       const values = models.map(m => m.h[h].p[id - 1]);
       const low = Math.min(...values), high = Math.max(...values);
@@ -529,7 +511,6 @@
     renderYou();
     renderRanks();
     renderLabs();
-    renderTry();
     renderFutures();
   }
 
@@ -599,7 +580,6 @@
   buildCruxes();
   buildLabs();
   buildSteady();
-  buildTry();
   buildFutures();
   renderAll();
   renderSteady();

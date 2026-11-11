@@ -143,7 +143,7 @@ test('what readers use is counted without anything about the reader, and capped'
   expect(named('Year changed').map(data => data.year)).toEqual(['2050', '2100', '2200']);
   expect(named('Section seen').map(data => data.section)).toContain('trust');
   // Only short labels from the page itself: nothing typed, nothing about the reader.
-  const allowed = { 'AI picked': ['lab', 'model'], 'Year changed': ['year'], 'Section seen': ['section'], 'Explorer opened': ['from'], 'Sliders used': ['year'] };
+  const allowed = { 'AI picked': ['lab', 'model'], 'Year changed': ['year'], 'Section seen': ['section'], 'Explorer opened': ['from'] };
   for (const [, event] of sent) expect(Object.keys(event.data).sort()).toEqual(allowed[event.name]);
   expect(errors).toEqual([]);
 });

@@ -1,0 +1,13 @@
+# November 11, 2026 Claude Fable 5.2, Gemini 4 Carbon and Muse Ember 1.0 additions
+
+The owner requested forecast runs and new site entries for three models the daily catalogue scan reported: Claude Fable 5.2, which reached Anthropic's API on November 9; Muse Ember 1.0, which reached Meta's API on November 9; and Gemini 4 Carbon, which Google made generally available on November 10. The [addition plan](2026-11-11-fable-5-2-gemini-4-carbon-muse-ember.json), committed before collection, freezes the three exact API ids (`claude-fable-5-2`, `gemini-4-carbon`, `muse-ember-1.0`), all eleven horizons, prompt identities and hashes, the November 11 UTC run date, and 20 accepted samples per model and horizon. The prompt hashes differ from the October 28 plan only because the rendered prompt carries the collection date; rendered for October 28, the same prompts reproduce that plan exactly.
+
+This one-and-done addition preserves all previously published model results and dates. Claude Fable 5.2 belongs to Anthropic, Gemini 4 Carbon to Google and Muse Ember 1.0 to Meta; each shares its lab's existing weight in the lab-balanced aggregate. Muse Ember 1.0 is Meta's smallest model and is listed in the mid tier, like Claude Haiku 5.5. The scan also reported `gemini-omni-1.2-flash`, a video generation model, which was not added. Claude Mythos 5.2, released with Fable 5.2, is limited to verified organizations and does not appear in the scanned catalogue.
+
+- Authenticated inference preflight: [43119287509](https://github.com/toddsherman/MachineFutures/actions/runs/43119287509), passed for all three.
+- Collection: [43119405487](https://github.com/toddsherman/MachineFutures/actions/runs/43119405487). All 33 model and horizon cells completed.
+- Final evidence: 33 complete raw batches and 660 accepted samples. The precommitted three-model plan passed the sweep validator.
+- All previously published model records remain unchanged: the regenerated per-model exports only gain rows for the three new models. Each dated horizon now has 35 models across 8 labs; long term has 36. The lab-balanced aggregate moves by at most 0.7 points (The Diaspora at long term, 12.8 to 12.1).
+- The data-integrity checks passed, and the share picture was redrawn for the new headline figures. The Chromium and WebKit browser suite runs in CI on the pull request.
+
+As with the earlier additions, the workflow's full-roster gate rejected the targeted dispatch after preserving its raw samples. Publication requires the precommitted three-model addition plan to pass the existing sweep validator, plus integrity, reproducibility, and browser checks. Revalidate with `tools/check-sweep.mjs --plan-json` using this manifest and `--runs runs`.

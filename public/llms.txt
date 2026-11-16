@@ -1,0 +1,37 @@
+# Machine Futures
+
+> A public record of what frontier AI models say when asked how things turn out between humans and AI. Each model splits 100 points across 11 possible futures, once for each year asked about.
+
+For 2030, AI models put most of their points on humans staying in control. Counting each lab once, that is 63 of 100 points. The runner-up is humans and AI sharing power or merging, with 15. That is 35 models from 8 labs, in the dataset of 2026-11-11.
+
+Before quoting a number:
+
+- The points show where each model puts its weight. They are not calibrated odds, and they are not a prediction by this site.
+- Every model got the same written question, with no web search and no tools, and was asked 20 times for each year. The published figure is its middle answer, adjusted to whole numbers that add up to 100.
+- The combined figure counts every lab once. Models are averaged inside their lab first, then the labs are averaged, so a lab with many models does not set the result.
+- Each model was asked once, when it was added, and is not asked again. Answers for different years are never pooled.
+- The years are 2030, 2035, 2040, 2050, 2060, 2070, 2080, 2090, 2100, 2200 and "long-term". A dated year is a snapshot of how things stand at the end of that year. "long-term" is the lasting arrangement by the year 3000.
+
+## Data
+
+- [Summary](https://www.machinefutures.ai/data/summary.json): Start here. The combined answer for every year, the 11 futures and what they mean, the five plain groups the front page uses, and the list of models.
+- [Every model, every year](https://www.machinefutures.ai/data/forecasts.json): How each model split its 100 points for each year. Numbers only.
+- [One model in full](https://www.machinefutures.ai/data/models/claude-fable-5-2.json): This one is Claude Fable 5.2. There is a file like it for every model at `/data/models/{id}.json`, with the ids listed in the summary. It adds the spread across the model's answers and the reason it gave for every number.
+
+## Pages
+
+- [Front page](https://www.machinefutures.ai/): The answer in plain words, with charts. The charts need JavaScript. The files above do not.
+- [Explorer](https://www.machinefutures.ai/explore.html): Every model, every future and every reason, side by side.
+
+In browsers that support WebMCP, both pages also offer the same data as read-only tools.
+
+## The questions
+
+- [Question for 2030](https://www.machinefutures.ai/end_states_2030.md): The exact wording every model was given. The other dated years are at `/end_states_{year}.md`.
+- [Question for the long term](https://www.machinefutures.ai/end_states.md): The wording for the year 3000.
+
+## Optional
+
+- [Methodology](https://github.com/toddsherman/MachineFutures/blob/main/docs/METHODOLOGY.md): How the answers are collected, summarised and combined.
+- [Spreadsheet downloads](https://github.com/toddsherman/MachineFutures/tree/main/data): CSV files, including every raw answer.
+- [Raw batches](https://github.com/toddsherman/MachineFutures/tree/main/runs): The untouched record of each time a model was asked.

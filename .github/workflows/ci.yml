@@ -35,9 +35,16 @@ jobs:
           node tools/import-runs.mjs
           node tools/export-data.mjs
           node tools/build-front.mjs
-          if ! git diff --quiet public/data.js data public/front-data.js public/front-why.js public/index.html; then
+          node tools/build-agent-files.mjs
+          if ! git diff --quiet public/data.js data public/front-data.js public/front-why.js public/index.html public/data public/llms.txt; then
             echo "::error::Generated site files do not match what runs/ produces. Run npm run data:rebuild and commit the result."
-            git --no-pager diff --stat public/data.js data public/front-data.js public/front-why.js public/index.html
+            git --no-pager diff --stat public/data.js data public/front-data.js public/front-why.js public/index.html public/data public/llms.txt
+            exit 1
+          fi
+          # git diff cannot see a generated file that was never committed.
+          if [ -n "$(git status --porcelain --untracked-files=all public/data public/llms.txt)" ]; then
+            echo "::error::Generated agent files are missing from the commit. Run npm run data:rebuild and commit the result."
+            git status --porcelain --untracked-files=all public/data public/llms.txt
             exit 1
           fi
           echo "public/data.js, data/ and the front page are reproducible from runs/"

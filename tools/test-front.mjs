@@ -83,7 +83,7 @@ test('model ids match the explorer, so links between the two pages resolve', () 
 
 test('the page opens on a small file and leaves the reasons until they are wanted', () => {
   const scripts = [...html.matchAll(/<script src="([^"]+)"/g)].map(match => match[1]);
-  assert.deepEqual(scripts, ['analytics.js', 'front-data.js', 'front-copy.js', 'front.js']);
+  assert.deepEqual(scripts, ['analytics.js', 'front-data.js', 'front-copy.js', 'front.js', 'webmcp.js']);
   assert.ok(!scripts.includes('data.js'), 'the explorer payload is not loaded by the front page');
   assert.match(read('public/front.js'), /script\.src = 'front-why\.js'/, 'the reasons are fetched by the script, on demand');
   assert.ok(front.models.every(model => Object.values(model.h).every(answer => !('why' in answer))), 'no reason rides in the main data file');

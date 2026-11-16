@@ -58,6 +58,7 @@ Before merging an addition, confirm:
 - `npm run check` passes.
 - `npm run data:rebuild` leaves no unexpected diff beyond the intended generated outputs.
 - The front page (`public/index.html`, `public/front-data.js`, `public/front-why.js`) is rebuilt by the same command; its five-group labels and plain names for the futures live in `tools/build-front.mjs` and are display copy only.
+- The files for AI agents (`public/llms.txt` and `public/data/`) are rebuilt by the same command. A new model adds one file under `public/data/models/`; commit it with the rest. See [Files for AI agents](#files-for-ai-agents).
 - If the build or `npm run check` says the link-preview picture is out of date, run `npm run share:render` and commit `public/share.png`. The picture shows the headline, the five figures, and the model count, so most additions change it. It needs a browser, so it is not part of `npm run data:rebuild`.
 - Read the headline and link-preview text in the pull request's diff of `public/index.html`. They are written from the data, so a new model can change them.
 - The quote pairs in `tools/front-quotes.json` are checked word for word against the published reasoning. They only need attention if the build rejects one.
@@ -149,6 +150,27 @@ node tools/run-elicitation.mjs --mock --horizon 2030
 Mock output lands in the gitignored `runs/.mock/` directory and cannot overwrite paid batches.
 
 [`tools/manual-ingest.html`](../tools/manual-ingest.html) handles one-off long-term responses for models without an API and retains archival support for the retired 50-question 2030 format. Current dated horizon snapshots intentionally use only the automated harness because it records horizon provenance.
+
+## Files for AI agents
+
+The site publishes its figures a second time for programs. All of it is read-only and all of it comes from the same export the pages use.
+
+| File | For | What it holds |
+| --- | --- | --- |
+| `public/llms.txt` | Assistants and crawlers that fetch a URL | A plain-text guide: the headline, how to read the numbers, and links to the files below |
+| `public/data/summary.json` | The same | The combined answer for every year, the 11 futures and their definitions, the five plain groups, and the list of models |
+| `public/data/forecasts.json` | The same | Every model's 100 points for every year, numbers only |
+| `public/data/models/<id>.json` | The same | One model in full: its points, the spread across its answers, and its reason for every number |
+| `public/webmcp.js` | Agents running inside the browser | Five read-only WebMCP tools that answer from the JSON above |
+
+`tools/build-agent-files.mjs` writes the first four as the last step of `npm run data:rebuild`. Do not edit them by hand. CI rebuilds them and fails if the committed copies differ or if a new model's file was left out of the commit. The JSON says "points", as the front page does, so that nobody quotes a model's weight as a calibrated probability. A model id becomes a file name, so the build refuses an id with anything other than lowercase letters, digits, dots and hyphens. `vercel.json` lets other origins read `/llms.txt` and `/data/`, which is safe because they are public and carry no credentials.
+
+`public/webmcp.js` is hand-written and loaded by both pages. It registers its tools on `document.modelContext` when the browser has it and stops at its first line when the browser does not, so it costs other visitors nothing. Each tool fetches one of the static files, so a tool and a file cannot disagree.
+
+WebMCP is not a finished standard. As of November 2026 it is a W3C Community Group draft, in an origin trial in Chrome from version 149, and its API has already moved once. Two things follow.
+
+- **Switching it on for visitors needs a trial token.** Without one, the tools exist only for people who have turned on `chrome://flags/#enable-webmcp-testing`. To enable them for everyone in the trial, register `https://www.machinefutures.ai` on the [WebMCP origin trial page](https://developer.chrome.com/origintrials/#/register_trial/4163014905550602241) and add the token to the first `headers` block in `vercel.json` as `{ "key": "Origin-Trial", "value": "<token>" }`. A response header covers both pages and leaves the HTML alone. Tokens expire, so the trial has to be renewed until the API ships. The token is public by design and is not a secret.
+- **If the API changes, only `public/webmcp.js` changes.** `tools/test-agent-files.mjs` and `tests/agents.spec.mjs` run it against a stand-in for `document.modelContext`. They prove our side of the contract (the tools register, are marked read-only, and return the published figures), not Chrome's. After a Chrome change, check by hand: enable the flag, run `npm run serve`, open `http://localhost:4173`, and look under DevTools, Application, WebMCP, where the five tools are listed and can be run.
 
 ## Verification
 

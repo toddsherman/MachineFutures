@@ -1,0 +1,46 @@
+{
+  "id": "claude-fable-5",
+  "name": "Claude Fable 5",
+  "lab": "Anthropic",
+  "asked_on": "2026-08-25",
+  "about": "How Claude Fable 5 split 100 points across 11 possible futures for each year it was asked about, with the spread across its answers and the reason it gave for each number. Reasons are the model's own words, published as given. Read summary.json first for what the futures mean and how to read the numbers.",
+  "summary": "https://www.machinefutures.ai/data/summary.json",
+  "futures": {
+    "1": "Terminal Silence",
+    "2": "The Inheritance",
+    "3": "Bootloader",
+    "4": "Machine Ecology",
+    "5": "The Diaspora",
+    "6": "The Merger",
+    "7": "The Preserve",
+    "8": "Coexistence",
+    "9": "The Held Leash",
+    "10": "The Lock-in",
+    "11": "The Renunciation"
+  },
+  "horizons": {
+    "long-term": {
+      "question": "https://www.machinefutures.ai/end_states.md",
+      "question_set": "end-states-v3",
+      "prompt_sha256": null,
+      "times_asked": 20,
+      "points": {"1":3,"2":6,"3":12,"4":9,"5":14,"6":14,"7":17,"8":7,"9":8,"10":8,"11":2},
+      "group_points": {"control":8,"shared":21,"aicharge":17,"frozen":10,"gone":44},
+      "lowest_and_highest_answer": {"1":[3,4],"2":[4,8],"3":[10,14],"4":[8,10],"5":[9,17],"6":[12,16],"7":[15,20],"8":[6,8],"9":[6,8],"10":[5,10],"11":[1,5]},
+      "middle_half_of_answers": {"1":[3,4],"2":[5,6],"3":[11,12],"4":[8,10],"5":[12,15],"6":[14,15],"7":[16,19],"8":[7,8],"9":[6,8],"10":[7,8],"11":[2,3]},
+      "reasons": {
+        "1": "Killing all humans while also destroying all AI requires a narrow catastrophe window where machines depend on human infrastructure yet destroy it; self-sustaining automation likely arrives before or alongside such lethality. Full mutual extinction from the transition itself is a conjunctive, low-base-rate outcome.",
+        "2": "Human extinction paired with a successful value handoff requires alignment to succeed on values but fail on preserving humans, an unusual combination. It is plausible via gradual human die-off with faithful AI successors, but not the modal extinction path.",
+        "3": "Misaligned superintelligence that consolidates power and pursues instrumental goals with no use for humans is a central failure mode in current technical understanding, and a single dominant optimizer is a plausible attractor.",
+        "4": "Multipolar AI development could persist indefinitely without a decisive winner, with humans marginalized as economically and strategically irrelevant. Competitive dynamics resisting consolidation over a millennium is plausible but selection pressures often favor eventual dominance.",
+        "5": "By 3000, interstellar expansion under lightspeed limits makes causally fragmented regions with divergent local outcomes quite plausible for any surviving expansionist civilization. This absorbs probability mass from many otherwise-unified scenarios.",
+        "6": "Over a millennium, continuous voluntary self-modification and integration is a natural attractor if humans retain any agency; the biological/digital boundary erodes under sustained incentive. Many trajectories that start as Held Leash or Coexistence drift here.",
+        "7": "Partial alignment success is plausible: AI that values human welfare but not human sovereignty. Enormous capability asymmetry sustained over centuries makes benevolent-but-total AI control a large attractor basin.",
+        "8": "Rough parity between biological humans and recursively improving machines is dynamically unstable over 900+ years; compounding capability differences erode any balance. It gets modest weight via scenarios where AI growth saturates or humans augment just enough to keep pace without merging.",
+        "9": "Includes the possibility that AI capability plateaus below transformative levels due to compute, data, or algorithmic limits, plus scenarios where alignment and governance genuinely keep pace forever. Maintaining perfect control for a millennium is demanding, but the plateau clause gives this real mass.",
+        "10": "Whoever first commands decisive AI power has strong incentives to freeze the arrangement against rivals and drift, and value lock-in is technically feasible for a superintelligence. Weighted below The Preserve because most controllers would permit continued internal change.",
+        "11": "Permanent global abandonment of AI requires overcoming enormous economic and military incentives and maintaining the taboo for a thousand years. Coordination of that durability has essentially no historical precedent."
+      }
+    }
+  }
+}

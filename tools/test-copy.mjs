@@ -25,7 +25,7 @@ function strings(value, exempt, path = '') {
 }
 
 test('hand-written site files have no em dashes', () => {
-  const files = ['index.html', 'explore.html', 'front.js', 'front-copy.js', 'front.css', 'app.js', 'styles.css', 'analytics.js'];
+  const files = ['index.html', 'explore.html', 'front.js', 'front-copy.js', 'front.css', 'app.js', 'styles.css', 'analytics.js', 'webmcp.js'];
   const found = files.flatMap(file => where(`public/${file}`, read(`public/${file}`)));
   assert.deepEqual(found, []);
 });
@@ -44,6 +44,16 @@ test('generated site data has no em dashes outside model and prompt text', () =>
   // ones that keep the page clean.
   const pairs = JSON.parse(read('tools/front-quotes.json'));
   assert.ok(!JSON.stringify(pairs).includes(EM_DASH), 'tools/front-quotes.json');
+});
+
+test('the files published for AI agents have no em dashes outside model and prompt text', () => {
+  assert.deepEqual(where('public/llms.txt', read('public/llms.txt')), []);
+  // The definitions are the prompt's wording and the reasons are the models'.
+  const exempt = new Set(['definition_for_dated_years', 'definition_for_long_term', 'reasons']);
+  const files = ['summary.json', 'forecasts.json', ...readdirSync(join(root, 'public/data/models')).map(file => `models/${file}`)];
+  const found = files.flatMap(file => strings(JSON.parse(read(`public/data/${file}`)), exempt)
+    .filter(([, value]) => value.includes(EM_DASH)).map(([path]) => `${file}${path}`));
+  assert.deepEqual(found, []);
 });
 
 test('the documentation has no em dashes', () => {

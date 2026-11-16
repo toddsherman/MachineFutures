@@ -22,7 +22,8 @@ const checks = [
   ['front page wording parses', ['--check', 'public/front-copy.js']],
   ['front page data parses', ['--check', 'public/front-data.js']],
   ['front page reasons parse', ['--check', 'public/front-why.js']],
-  ['unit and harness tests', ['--test', 'tools/test-allocations.mjs', 'tools/test-analytics.mjs', 'tools/test-capture.mjs', 'tools/test-classify.mjs', 'tools/test-copy.mjs', 'tools/test-front.mjs', 'tools/test-harness.mjs', 'tools/test-horizons.mjs', 'tools/test-sweep.mjs']]
+  ['agent tools parse', ['--check', 'public/webmcp.js']],
+  ['unit and harness tests', ['--test', 'tools/test-agent-files.mjs', 'tools/test-allocations.mjs', 'tools/test-analytics.mjs', 'tools/test-capture.mjs', 'tools/test-classify.mjs', 'tools/test-copy.mjs', 'tools/test-front.mjs', 'tools/test-harness.mjs', 'tools/test-horizons.mjs', 'tools/test-sweep.mjs']]
 ];
 
 const results = [];
